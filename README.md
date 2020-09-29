@@ -1,4 +1,6 @@
-This Bootcamp took place at Skylab Coders Academy (Barcelona) from the 6th of July until the 25th of September of 2020.
+# Poemunity
+
+This Bootcamp took place at Skylab Coders Academy (Barcelona) from the 6th of July to the 25th of September of 2020.
 
 My final Project was a social poetry website made in 2,5 weeks with the following technologies and methodologies:
 
@@ -6,6 +8,7 @@ JavaScript, React, Flux, SCSS, Node.js, Express, MongoDB, Mongoose, Git, Github,
 
 Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
 
+## Scrum's User Stories
 
 DESCRIPTION 1
 As a poetry enthusiast
