@@ -1,8 +1,8 @@
 # Poemunity - React Application with Flux
 
-This Bootcamp took place at Skylab Coders Academy (Barcelona) from the 6th of July to the 25th of September of 2020.
+This Bootcamp took place at _Skylab Coders Academy_ (Barcelona) from the 6th of July to the 25th of September of 2020.
 
-My final Project was a social poetry website made in 2,5 weeks with the following technologies and methodologies:
+My final Project was **Poemunity**, a social poetry website made in 2,5 weeks with the following technologies and methodologies:
 
 - JavaScript
 - React
