@@ -4,7 +4,17 @@ This Bootcamp took place at Skylab Coders Academy (Barcelona) from the 6th of Ju
 
 My final Project was a social poetry website made in 2,5 weeks with the following technologies and methodologies:
 
-JavaScript, React, Flux, SCSS, Node.js, Express, MongoDB, Mongoose, Git, Github, TDD & BDD Testing (Jasmine, Jest, Mocha, Chai), Agile (Scrum), SOLID.
+- JavaScript
+- React
+- Flux
+- SCSS
+- Node.js
+- Express
+- MongoDB & Mongoose
+- Git & Github
+- TDD & BDD Testing (Jasmine, Jest, Mocha, Chai)
+- Agile (Scrum)
+- SOLID principles
 
 Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
 
