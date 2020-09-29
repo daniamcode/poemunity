@@ -1,4 +1,4 @@
-# Poemunity - React Application with Flux
+# Poemunity - Fullstack React Application with Flux & Node.js
 
 This Bootcamp took place at _Skylab Coders Academy_ (Barcelona) from the 6th of July to the 25th of September of 2020.
 
