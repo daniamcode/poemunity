@@ -1,0 +1,6 @@
+projectKey=poemunity
+serverUrl=http://localhost:9000
+serverVersion=8.4.2.36762
+dashboardUrl=http://localhost:9000/dashboard?id=poemunity
+ceTaskId=AXSV8FYj7KXOKJRi95-J
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AXSV8FYj7KXOKJRi95-J
