@@ -7,10 +7,11 @@ My final Project was a social poetry website made in 2,5 weeks with the followin
 - JavaScript
 - React
 - Flux
-- SCSS
 - Node.js
 - Express
 - MongoDB & Mongoose
+- SCSS
+- Material UI
 - Git & Github
 - TDD & BDD Testing (Jasmine, Jest, Mocha, Chai)
 - Agile (Scrum)
