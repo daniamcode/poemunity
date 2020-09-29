@@ -27,11 +27,15 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.<br />
+Important! You will need a local implementation of MongoDB. My database is called "poemsAPI" and my collection is called "poems".
+
+From the frontend folder, runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+
+From the backend folder, runs the app in the development mode.<br />
+Open [http://localhost:4200](http://localhost:4200) to view it in the browser.
+
 
 ### `npm test`
 
