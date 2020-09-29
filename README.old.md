@@ -1,0 +1,37 @@
+# Poemunity
+
+This Bootcamp took place at Skylab Coders Academy (Barcelona) from the 6th of July to the 25th of September of 2020.
+
+My final Project was a social poetry website made in 2,5 weeks with the following technologies and methodologies:
+
+JavaScript, React, Flux, SCSS, Node.js, Express, MongoDB, Mongoose, Git, Github, TDD & BDD Testing (Jasmine, Jest, Mocha, Chai), Agile (Scrum), SOLID.
+
+Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
+
+## Scrum's User Stories
+
+DESCRIPTION 1
+
+As a poetry enthusiast
+I want a social network
+So that I can write my poems, share them and interact whit other poets
+
+DESCRIPTION 2
+
+As a poetry enthusiast
+I want a list
+so that I can see poems by category
+
+SCENARIOS
+
+1. Create poem list
+   Given a component poemList
+   When I select it 
+   Then the component returns the list
+
+2. Switch betwwen lists
+   Given a component poemList
+   When I select a specific category 
+   Then the component returns the list of that category
+
+and so on.
