@@ -7,6 +7,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 const Poem = require('./src/models/poemModel');
 
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
