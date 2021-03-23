@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 
-const db = mongoose.connect('mongodb://localhost/poemsAPI');
+const db = mongoose.connect('mongodb+srv://daniamcode:daniamcode@cluster0.m6ejn.mongodb.net/poemsAPI?retryWrites=true&w=majority');
 
 app.get('/', (req, res) => {
 	res.send('My server is running');
