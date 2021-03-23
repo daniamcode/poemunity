@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const Poem = require('./src/models/poemModel');
 
 app.use(bodyParser.urlencoded({ extended: true}));
