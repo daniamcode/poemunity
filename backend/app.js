@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 const db = mongoose.connect('mongodb://localhost/poemsAPI');
 
-app.get('/frontend', (req, res) => {
+app.get('/', (req, res) => {
 	res.send('My server is running');
 });
 
