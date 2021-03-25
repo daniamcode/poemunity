@@ -6,6 +6,12 @@ import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Auth0Provider } from "@auth0/auth0-react";
 
+let redirectUri = "http://localhost:3000/perfil"
+if (process.env.NODE_ENV === 'production') {
+  redirectUri = 'https://poemunity.com/perfil'
+}
+
+//test
 
 ReactDOM.render(
   <React.StrictMode>
@@ -13,7 +19,7 @@ ReactDOM.render(
        <Auth0Provider
     domain="dev-kpid04y3.eu.auth0.com"
     clientId="A9LJVea7ss5WV8pjbW1505492DGyqosI"
-    redirectUri={'https://poemunity.com/perfil'}
+    redirectUri={redirectUri}
     >
 			<App />
     </Auth0Provider>
