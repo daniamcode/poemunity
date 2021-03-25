@@ -42,15 +42,21 @@ Open [http://localhost:4200](http://localhost:4200) to view it in the browser.
 Launches the test runner in the interactive watch mode, both from the frontend and backend folders.<br />
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Upgrade
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+I've decided to launch this app into the real world. Just to remember:
+- I bought my domain on Godaddy
+- first I redirected my DNS from Godaddy to Heroku, but then I did it from Cloudfare, in order to get a free SSL certificate so my public direction is https://poemunity.com 
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+### `npm run build` and deploy to Heroku
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The Git repository on the root folder is the one that synchs with github. We go to the "frontend" folder, and type "npm run build". This buids the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file).
+
+In the "backend" folder we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type git add --all, git commit -m "modify static files from frontend" and git push heroku master. Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
+
+The MongoDB database is in the cloud, so he just have to link it.
+
+It's important to note that the auth0 uri is now conditional: in development is http://localhost:3000/perfil and in production is https://poemunity.com/perfil. We do this with the process.env.NODE_ENV variable.
 
 ### `npm run eject`
 

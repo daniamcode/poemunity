@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "57320db88c4f635b3c92aab8ef5d6be4",
+    "revision": "7ce4d9b5272e939276d4ba0c552e02bc",
     "url": "https://poemunity.com/index.html"
   },
   {
-    "revision": "29313fb248601f665b11",
+    "revision": "853fe487c7840ce37efd",
     "url": "https://poemunity.com/static/css/main.18af3b7c.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "https://poemunity.com/static/js/2.52b149af.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "29313fb248601f665b11",
-    "url": "https://poemunity.com/static/js/main.9bd3dbdb.chunk.js"
+    "revision": "853fe487c7840ce37efd",
+    "url": "https://poemunity.com/static/js/main.fee0cb38.chunk.js"
   },
   {
     "revision": "7f7f69a14acde8060b3c",
