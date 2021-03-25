@@ -27,7 +27,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
-**Important!** You will need a local implementation of MongoDB. My database is called "poemsAPI" and my collection is called "poems".
+**Important!** You will need an implementation of MongoDB. My database is called "poemsAPI" and my collection is called "poems".
 
 In the project directory, you can run:
 
