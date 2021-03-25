@@ -1,3 +1,7 @@
+## Important note
+
+There are two folders: flux and redux. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. The, I crate the redux folder and continue from there. The project will grow in the redux folder and I will probably will refactor the code in order to incorporate redux and remove flux.
+
 # Poemunity - Fullstack React Application with Flux & Node.js
 
 This Bootcamp took place at _Skylab Coders Academy_ (Barcelona) from the 6th of July to the 25th of September of 2020.
@@ -50,9 +54,11 @@ I've decided to launch this app into the real world. Just to remember:
 
 ### `npm run build` and deploy to Heroku
 
-The Git repository on the root folder is the one that synchs with github. We go to the "frontend" folder, and type "npm run build". This buids the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file).
+The Git repository on the root folder is the one that synchs with github. We go to the "frontend" folder, and type "npm run build". This builds the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file). So we just have to serve the backend (that serves a static index; the whole frontend resumes into that static file)
 
-In the "backend" folder we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type git add --all, git commit -m "modify static files from frontend" and git push heroku master. Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
+In the "backend" folder we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type from inside of the backend folder: git add --all, git commit -m "modify static files from frontend" and git push heroku master. Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
+
+That's it, Heroku builds the backend and deploys.
 
 The MongoDB database is in the cloud, so he just have to link it.
 
