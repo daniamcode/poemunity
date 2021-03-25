@@ -13,7 +13,7 @@ ReactDOM.render(
        <Auth0Provider
     domain="dev-kpid04y3.eu.auth0.com"
     clientId="A9LJVea7ss5WV8pjbW1505492DGyqosI"
-    redirectUri={'https://poemunity.herokuapp.com/perfil'}
+    redirectUri={'https://poemunity.com/perfil'}
     >
 			<App />
     </Auth0Provider>
