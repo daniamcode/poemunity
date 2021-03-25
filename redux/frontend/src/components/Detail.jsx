@@ -10,6 +10,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Disqus from "disqus-react";
 import CircularProgress from "./CircularIndeterminate";
 import "./PageNotFound.scss";
+import {Helmet} from "react-helmet";
 
 
 function Detail(props) {
@@ -74,6 +75,9 @@ function Detail(props) {
       )}
       {poem && poem.likes && (
         <main className="poem__detail">
+          <Helmet>
+            <title>{`Poema: ${poem.title}`}</title>
+          </Helmet>
           <section className="poem__block">
             <section>
               <h2 className="poem__title">{poem.title}</h2>

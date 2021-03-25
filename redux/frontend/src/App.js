@@ -1,5 +1,5 @@
-import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import React, {useEffect} from 'react';
+import { Route, Switch, useLocation } from 'react-router-dom';
 import './App.scss';
 import Dashboard from './components/Dashboard';
 import Detail from './components/Detail';
@@ -8,7 +8,9 @@ import Profile from "./components/Profile";
 import PageNotFound from "./components/PageNotFound";
 import { BrowserRouter as Router } from 'react-router-dom';
 
+
 function App(props) {
+	
   return (
 	<Router>
 	<div className="container">

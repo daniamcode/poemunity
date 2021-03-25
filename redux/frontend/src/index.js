@@ -11,7 +11,6 @@ if (process.env.NODE_ENV === 'production') {
   redirectUri = 'https://poemunity.com/perfil'
 }
 
-//test
 
 ReactDOM.render(
   <React.StrictMode>

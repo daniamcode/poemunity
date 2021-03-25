@@ -16,6 +16,7 @@ import HighlightOffSharpIcon from "@material-ui/icons/HighlightOffSharp";
 import SubjectSharpIcon from "@material-ui/icons/SubjectSharp";
 import { useAuth0 } from "@auth0/auth0-react";
 import CircularProgress from "./CircularIndeterminate";
+import {Helmet} from "react-helmet";
 
 
 function List(props) {
@@ -67,6 +68,9 @@ function List(props) {
 
   return (
     <>
+       <Helmet>
+        <title>{`Poemas de ${genre}`}</title>
+      </Helmet>
       <div className="list__container">
         <div className="list__intro">
           {!genre && (
