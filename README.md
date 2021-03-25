@@ -1,6 +1,6 @@
 ## Important note
 
-There are two folders: flux and redux. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. The, I crate the redux folder and continue from there. The project will grow in the redux folder and I will probably will refactor the code in order to incorporate redux and remove flux.
+There are two folders: flux and redux. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the redux folder and continued from there. The project will grow in the redux folder and I will probably refactor the code in order to incorporate redux and remove flux.
 
 # Poemunity - Fullstack React Application with Flux & Node.js
 
