@@ -69,7 +69,7 @@ function List(props) {
   return (
     <>
        <Helmet>
-        <title>{`Poemas de ${genre}`}</title>
+        <title>{genre ? `Poemas de ${genre}` : 'Poemunity'}</title>
       </Helmet>
       <div className="list__container">
         <div className="list__intro">
