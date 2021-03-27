@@ -16,6 +16,7 @@ import HighlightOffSharpIcon from "@material-ui/icons/HighlightOffSharp";
 import SubjectSharpIcon from "@material-ui/icons/SubjectSharp";
 import { useAuth0 } from "@auth0/auth0-react";
 import CircularProgress from "./CircularIndeterminate";
+import capitalizeFirstLetter from '../scripts/capitalizeFirstLetter';
 import {Helmet} from "react-helmet";
 import {
   WEB_SUBTITLE,
@@ -30,7 +31,7 @@ import {
   ORDER_BY_TITLE,
   CATEGORIES_TITLE_LABEL
 } from "../data/constants";
-const {REACT_APP_ADMIN} = process.env
+const {REACT_APP_ADMIN} = process.env;
 
 
 function List(props) {
@@ -81,7 +82,7 @@ function List(props) {
   return (
     <>
        <Helmet>
-        <title>{genre ? `${genre} poems` : 'Poemunity'}</title>
+        <title>{genre ? `${capitalizeFirstLetter(genre)} poems` : 'Poemunity'}</title>
       </Helmet>
       <div className="list__container">
         <div className="list__intro">
