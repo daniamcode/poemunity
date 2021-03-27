@@ -5,7 +5,7 @@
 	"main": "app.js",
 	"scripts": {
 		"test-coverage": "nyc --reporter=html mocha src/**/*.test.js",
-		"start": "DEBUG=app,app:* nodemon app.js",
+		"start": "DEBUG=app,app:* nodemon index.js",
 		"lint": "eslint . --fix"
 	},
 	"keywords": [],

@@ -58,7 +58,7 @@ The Git repository on the root folder is the one that synchs with github. We go 
 
 In the "backend" folder we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type from inside of the backend folder: git add --all, git commit -m "modify static files from frontend" and git push heroku master. Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
 
-That's it, Heroku builds the backend and deploys. Don't forget to add the env variables to Heroku (on production, from the backend folder. The .env file on the backed folder works fine on development, but for production I have to tell Heroku about them)
+That's it, Heroku builds the backend and deploys. Don't forget to add the env variables to Heroku (on production, from the backend folder. The .env file on the backed folder works fine on development, but for production I have to tell Heroku about them). The .env files (on backend and frontend folders) are included in .gitignore for security reasons.
 
 The MongoDB database is in the cloud, so he just have to link it.
 

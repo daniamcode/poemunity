@@ -1,11 +1,12 @@
 const express = require('express');
 const debug = require('debug')('app');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 8080;
 const Poem = require('./src/models/poemModel');
+const { MONGODB } = process.env
 
 if (process.env.NODE_ENV === 'production') {
 app.use(express.static('public'));
@@ -13,8 +14,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
-
-const db = mongoose.connect('mongodb+srv://daniamcode:daniamcode@cluster0.m6ejn.mongodb.net/poemsAPI?retryWrites=true&w=majority');
+const db = mongoose.connect(MONGODB);
 
 const poemRouter = require('./src/routes/poemRouter')(Poem)
 
