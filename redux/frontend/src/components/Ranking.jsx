@@ -10,6 +10,12 @@ import Paper from '@material-ui/core/Paper';
 import "./Ranking.scss";
 import poemStore from "../stores/poemStore";
 import { loadPoems } from "../actions/poemActions";
+import {
+  RANKING_TITLE,
+  RANKING_SUBTITLE,
+  RANKING_POETS_TITLE,
+  RANKING_POINTS_TITLE
+} from "../data/constants";
 
 const useStyles = makeStyles({
   table: {
@@ -43,14 +49,14 @@ export default function Ranking() {
     <>
     
     <main className="ranking">
-    <h3 className="ranking__title">Ranking de poetas</h3>
-    <h5 className="ranking__subtitle">3 puntos por poema, 1 por like</h5>
+    <h3 className="ranking__title">{RANKING_TITLE}</h3>
+    <h5 className="ranking__subtitle">{RANKING_SUBTITLE}</h5>
     <TableContainer className="ranking__body" component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell align="center">Poetas</TableCell>
-            <TableCell align="center">Puntos</TableCell>
+            <TableCell align="center">{RANKING_POETS_TITLE}</TableCell>
+            <TableCell align="center">{RANKING_POINTS_TITLE}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

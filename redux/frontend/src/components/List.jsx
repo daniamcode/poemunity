@@ -17,6 +17,20 @@ import SubjectSharpIcon from "@material-ui/icons/SubjectSharp";
 import { useAuth0 } from "@auth0/auth0-react";
 import CircularProgress from "./CircularIndeterminate";
 import {Helmet} from "react-helmet";
+import {
+  WEB_SUBTITLE,
+  LIKE,
+  LIKES,
+  READ_MORE,
+  SEARCH_PLACEHOLDER,
+  ORDER_BY,
+  ORDER_BY_DATE,
+  ORDER_BY_LIKES,
+  ORDER_BY_RANDOM,
+  ORDER_BY_TITLE,
+  CATEGORIES_TITLE_LABEL
+} from "../data/constants";
+const {REACT_APP_ADMIN} = process.env
 
 
 function List(props) {
@@ -49,11 +63,6 @@ function List(props) {
     likePoem(poemId, userId);
   }
 
-  const LIKE = "Like";
-  const LIKES = "Likes";
-  const READ_MORE = "Leer más";
-  const ADMIN = "google-oauth2|102774395820207939159";
-
   const handleSearchChange = (event) => {
     setFilter(event.target.value);
   };
@@ -74,17 +83,17 @@ function List(props) {
       <div className="list__container">
         <div className="list__intro">
           {!genre && (
-            <p className="list__presentation">¡Tu red social de poesía!</p>
+            <p className="list__presentation">{WEB_SUBTITLE}</p>
           )}
           {genre && (
             <p className="list__presentation">
-              Categoría: {genre.toUpperCase()}
+              {CATEGORIES_TITLE_LABEL}{genre.toUpperCase()}
             </p>
           )}
           <div className="separator"></div>
           <form className="list__sort">
             <label>
-              {`Ordenar poemas por: `}
+              {ORDER_BY}
               <select
                 type="submit"
                 id="sort"
@@ -94,17 +103,17 @@ function List(props) {
                   sortByCriteria(event.target.value);
                 }}
               >
-                <option value="likes">Likes</option>
-                <option value="fecha">Fecha</option>
-                <option value="aleatorio">Aleatorio</option>
-                <option value="titulo">Título</option>
+                <option value={ORDER_BY_LIKES}>{ORDER_BY_LIKES}</option>
+                <option value={ORDER_BY_DATE}>{ORDER_BY_DATE}</option>
+                <option value={ORDER_BY_RANDOM}>{ORDER_BY_RANDOM}</option>
+                <option value={ORDER_BY_TITLE}>{ORDER_BY_TITLE}</option>
               </select>
             </label>
           </form>
           <div className="list__search">
             <SearchIcon style={{ fontSize: 40, fill: "#4F5D73" }} />
             <TextField
-              label="Buscar autor"
+              label={SEARCH_PLACEHOLDER}
               InputLabelProps={{
                 style: { color: "#4F5D73" },
               }}
@@ -172,7 +181,7 @@ function List(props) {
                       ></Link>
                     )}
                   {isAuthenticated &&
-                    (poem.author === user.name || user.sub === ADMIN) && (
+                    (poem.author === user.name || user.sub === REACT_APP_ADMIN) && (
                       <HighlightOffSharpIcon
                         className="poem__delete-icon"
                         style={{ fill: "red" }}

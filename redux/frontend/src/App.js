@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
 import './App.scss';
 import Dashboard from './components/Dashboard';
 import Detail from './components/Detail';

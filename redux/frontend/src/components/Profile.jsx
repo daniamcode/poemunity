@@ -14,7 +14,19 @@ import MyPoems from "./MyPoems";
 import MyFavouritePoems from "./MyFavouritePoems";
 import { useAuth0 } from "@auth0/auth0-react";
 import CircularProgress from "./CircularIndeterminate";
-
+import {
+  PROFILE_TITLE,
+  PROFILE_SUBTITLE,
+  PROFILE_POEMS,
+  PROFILE_FAVOURITE_POEMS,
+  CATEGORIES,
+  PROFILE_SELECT_CATEGORY_TITLE,
+  PROFILE_SELECT_CATEGORY,
+  PROFILE_SELECT_TITLE_TITLE,
+  PROFILE_SELECT_TITLE,
+  PROFILE_POEM_PLACEHOLDER,
+  PROFILE_SEND_POEM
+} from "../data/constants";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -119,7 +131,10 @@ export default function Profile(props) {
     isAuthenticated && (
       <main className="profile__main">
         <section className="profile__title">
-          <div>Perfil de {user.name}</div>
+          <div>
+            {user.name}
+            {PROFILE_TITLE}
+          </div>
         </section>
         <section className="profile__intro">
           <img
@@ -129,7 +144,7 @@ export default function Profile(props) {
           ></img>
           <div className="profile__personal-data">
             <div className="profile__insert-poem">
-              <p className="profile__insert-poem-title">Insertar un poema:</p>
+              <p className="profile__insert-poem-title">{PROFILE_SUBTITLE}</p>
               <br></br>
               <form
                 className="profile__insert-poem-form"
@@ -137,10 +152,10 @@ export default function Profile(props) {
               >
                 <div className="profile__insert-poem-inputs">
                   <label className="profile__insert-poem-input">
-                    {`Título: `}
+                    {PROFILE_SELECT_TITLE_TITLE}
                     <input
                       className="profile__insert-poem-input"
-                      placeholder="Título"
+                      placeholder={PROFILE_SELECT_TITLE}
                       name="title"
                       required
                       value={poemTitle}
@@ -150,7 +165,7 @@ export default function Profile(props) {
                     />
                   </label>
                   <label className="profile__insert-poem-input">
-                    {`Categoría: `}
+                    {PROFILE_SELECT_CATEGORY_TITLE}
                     <select
                       className="profile__insert-poem-input"
                       id="category"
@@ -158,18 +173,12 @@ export default function Profile(props) {
                       required
                       onChange={(event) => {
                         onFieldChange(event.target.value, setPoemCategory);
-                      }
-                      }
+                      }}
                     >
-                      <option value="">Seleccionar</option>
-                      <option value="alegria">Alegría</option>
-                      <option value="amistad">Amistad</option>
-                      <option value="amor">Amor</option>
-                      <option value="aniversario">Aniversario</option>
-                      <option value="desamor">Desamor</option>
-                      <option value="haikus">Haikus</option>
-                      <option value="infantiles">Infantiles</option>
-                      <option value="tristes">Tristes</option>
+                      <option value="">{PROFILE_SELECT_CATEGORY}</option>
+                      {CATEGORIES?.map((category) => (
+                        <option value={category}>{category}</option>
+                      ))}
                     </select>
                   </label>
                 </div>
@@ -179,7 +188,7 @@ export default function Profile(props) {
                     id="poem"
                     name="poem"
                     required
-                    placeholder="Inserta aquí tu poema"
+                    placeholder={PROFILE_POEM_PLACEHOLDER}
                     value={poemContent}
                     onChange={(event) =>
                       onFieldChange(event.target.value, setPoemContent)
@@ -188,7 +197,7 @@ export default function Profile(props) {
                 </div>
 
                 <button className="profile__send-poem" type="submit">
-                  Enviar
+                  {PROFILE_SEND_POEM}
                 </button>
               </form>
             </div>
@@ -205,8 +214,8 @@ export default function Profile(props) {
                 variant="fullWidth"
                 aria-label="full width tabs example"
               >
-                <Tab label="Mis poemas" {...a11yProps(0)} />
-                <Tab label="Mis poemas favoritos" {...a11yProps(1)} />
+                <Tab label={PROFILE_POEMS} {...a11yProps(0)} />
+                <Tab label={PROFILE_FAVOURITE_POEMS} {...a11yProps(1)} />
               </Tabs>
             </AppBar>
             <SwipeableViews

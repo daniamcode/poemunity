@@ -5,10 +5,10 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import "./Header.scss";
 import { Link } from "react-router-dom";
+import { CATEGORIES_TITLE, CATEGORIES, ALL } from '../data/constants'
 
 
 export default function SimpleAccordion() {  
-
   return (
     <div>
       <Accordion className="accordion">
@@ -17,51 +17,22 @@ export default function SimpleAccordion() {
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <p className="header__dropdown-categories">Categorías</p>
+          <p className="header__dropdown-categories">{CATEGORIES_TITLE}</p>
         </AccordionSummary>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/alegria">
-            Alegría
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/amistad">
-            Amistad
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/amor">
-            Amor
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/aniversario">
-            Aniversario
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/desamor">
-            Desamor
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/haikus">
-            Haikus
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/infantiles">
-            Infantiles
-          </Link>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Link className="header__dropdown-subcategories" to="/tristes">
-            Tristes
-          </Link>
-        </AccordionDetails>
+        <div>
+          {
+            CATEGORIES?.sort().map((category)=> (
+              <AccordionDetails>
+              <Link className="header__dropdown-subcategories" to={`/${category.toLowerCase()}`}>
+                {category}
+              </Link>
+              </AccordionDetails>
+            ))
+          }
+          </div>
         <AccordionDetails>
           <Link className="header__dropdown-subcategories" to="/">
-            Todos
+            {ALL}
           </Link>
         </AccordionDetails>
       </Accordion>

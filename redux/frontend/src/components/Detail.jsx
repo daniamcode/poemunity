@@ -11,6 +11,12 @@ import Disqus from "disqus-react";
 import CircularProgress from "./CircularIndeterminate";
 import "./PageNotFound.scss";
 import { Helmet } from "react-helmet";
+import {
+  LIKE,
+  LIKES
+} from "../data/constants";
+const {REACT_APP_ADMIN} = process.env
+
 
 function Detail(props) {
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -43,10 +49,6 @@ function Detail(props) {
     event.preventDefault();
     likePoem(poemId, userId);
   }
-
-  const LIKE = "Like";
-  const LIKES = "Likes";
-  const ADMIN = "google-oauth2|102774395820207939159";
 
   if (isLoading) {
     return <CircularProgress />;
@@ -119,7 +121,7 @@ function Detail(props) {
                   ></Link>
                 )}
               {isAuthenticated &&
-                (poem.author === user.name || user.sub === ADMIN) && (
+                (poem.author === user.name || user.sub === REACT_APP_ADMIN) && (
                   <HighlightOffSharpIcon
                     className="poem__delete-icon"
                     style={{ fill: "red" }}
