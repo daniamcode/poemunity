@@ -77,7 +77,7 @@ function Detail(props) {
       {poem && poem.likes && (
         <main className="poem__detail">
           <Helmet>
-            <title>{`Poema: ${poem.title}`}</title>
+            <title>{`Poem: ${poem.title}`}</title>
           </Helmet>
           <section className="poem__block">
             <section>

@@ -177,7 +177,7 @@ export default function Profile(props) {
                     >
                       <option value="">{PROFILE_SELECT_CATEGORY}</option>
                       {CATEGORIES?.map((category) => (
-                        <option value={category}>{category}</option>
+                        <option value={category.toLowerCase()}>{category}</option>
                       ))}
                     </select>
                   </label>

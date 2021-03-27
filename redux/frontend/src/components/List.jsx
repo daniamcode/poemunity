@@ -37,8 +37,11 @@ function List(props) {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const genre = props.match.params.genre;
   const [poems, setPoems] = useState(poemStore.getPoems(genre));
-  const [sort, setSort] = useState("Likes");
+  const [sort, setSort] = useState(ORDER_BY_LIKES);
   const [filter, setFilter] = useState("");
+
+  console.log(poems)
+  console.log(genre)
 
   useEffect(() => {
     poemStore.addChangeListener(onChange);
@@ -78,7 +81,7 @@ function List(props) {
   return (
     <>
        <Helmet>
-        <title>{genre ? `Poemas de ${genre}` : 'Poemunity'}</title>
+        <title>{genre ? `${genre} poems` : 'Poemunity'}</title>
       </Helmet>
       <div className="list__container">
         <div className="list__intro">
