@@ -11,14 +11,16 @@ if (process.env.NODE_ENV === 'production') {
   redirectUri = 'https://poemunity.com/perfil'
 }
 
-//test
+const {REACT_APP_AUTH0_DOMAIN, REACT_APP_AUTH0_CLIENTID} = process.env
+//same as process.env.AUTH0_DOMAIN, but cleaner
+
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
        <Auth0Provider
-    domain="dev-kpid04y3.eu.auth0.com"
-    clientId="A9LJVea7ss5WV8pjbW1505492DGyqosI"
+    domain={REACT_APP_AUTH0_DOMAIN}
+    clientId={REACT_APP_AUTH0_CLIENTID}
     redirectUri={redirectUri}
     >
 			<App />

@@ -10,8 +10,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Disqus from "disqus-react";
 import CircularProgress from "./CircularIndeterminate";
 import "./PageNotFound.scss";
-import {Helmet} from "react-helmet";
-
+import { Helmet } from "react-helmet";
 
 function Detail(props) {
   const { user, isAuthenticated, isLoading } = useAuth0();
