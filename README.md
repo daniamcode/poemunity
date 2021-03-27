@@ -60,7 +60,7 @@ In the "backend" folder we create another git repository (git init) that is nece
 
 That's it, Heroku builds the backend and deploys. Don't forget to add the env variables to Heroku (on production, from the backend folder. The .env file on the backed folder works fine on development, but for production I have to tell Heroku about them). The .env files (on backend and frontend folders) are included in .gitignore for security reasons.
 
-The MongoDB database is in the cloud, so he just have to link it.
+The MongoDB database is in the cloud, so we just have to link it.
 
 It's important to note that the auth0 uri is now conditional: in development is http://localhost:3000/perfil and in production is https://poemunity.com/perfil. We do this with the process.env.NODE_ENV variable.
 
