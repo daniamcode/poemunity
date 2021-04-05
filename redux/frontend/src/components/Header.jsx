@@ -30,9 +30,12 @@ function Header () {
           </Link>
         </div>
         <div className='separator' />
-        {isAuthenticated ? <Link to='/perfil' className='header__profile' /> : <></>}
+        {isAuthenticated ? (
+          <Link to='/perfil' className='header__profile' />
+        ) : (
+          <></>
+        )}
         {isAuthenticated ? <LogoutButton /> : <LoginButton />}
-
       </section>
     </>
   )

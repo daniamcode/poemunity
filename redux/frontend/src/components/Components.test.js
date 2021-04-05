@@ -2,13 +2,11 @@ import React from 'react'
 import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import Ranking from './Ranking'
-import List from './List'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
 import Login from './Login'
 import Logout from './Logout'
 import Profile from './Profile'
-import Detail from './Detail'
 import Header from './Header'
 Enzyme.configure({ adapter: new Adapter() })
 

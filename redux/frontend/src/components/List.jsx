@@ -81,16 +81,17 @@ function List (props) {
   return (
     <>
       <Helmet>
-        <title>{genre ? `${capitalizeFirstLetter(genre)} poems` : 'Poemunity'}</title>
+        <title>
+          {genre ? `${capitalizeFirstLetter(genre)} poems` : 'Poemunity'}
+        </title>
       </Helmet>
       <div className='list__container'>
         <div className='list__intro'>
-          {!genre && (
-            <p className='list__presentation'>{WEB_SUBTITLE}</p>
-          )}
+          {!genre && <p className='list__presentation'>{WEB_SUBTITLE}</p>}
           {genre && (
             <p className='list__presentation'>
-              {CATEGORIES_TITLE_LABEL}{genre.toUpperCase()}
+              {CATEGORIES_TITLE_LABEL}
+              {genre.toUpperCase()}
             </p>
           )}
           <div className='separator' />
@@ -184,12 +185,13 @@ function List (props) {
                       />
                   )}
                   {isAuthenticated &&
-                    (poem.author === user.name || user.sub === REACT_APP_ADMIN) && (
-                      <HighlightOffSharpIcon
-                        className='poem__delete-icon'
-                        style={{ fill: 'red' }}
-                        onClick={(event) => onDelete(event, poem._id)}
-                      />
+                    (poem.author === user.name ||
+                      user.sub === REACT_APP_ADMIN) && (
+                        <HighlightOffSharpIcon
+                          className='poem__delete-icon'
+                          style={{ fill: 'red' }}
+                          onClick={(event) => onDelete(event, poem._id)}
+                        />
                   )}
                   <Link
                     to={`/detalle/${poem._id}`}
