@@ -98,19 +98,19 @@ export default function Profile (props) {
     event.preventDefault()
     event.target.reset()
 
-    const current_datetime = new Date()
+    const currentDatetime = new Date()
     const formattedDate =
-      current_datetime.getFullYear() +
+      currentDatetime.getFullYear() +
       '-' +
-      (current_datetime.getMonth() + 1) +
+      (currentDatetime.getMonth() + 1) +
       '-' +
-      current_datetime.getDate() +
+      currentDatetime.getDate() +
       ' ' +
-      current_datetime.getHours() +
+      currentDatetime.getHours() +
       ':' +
-      current_datetime.getMinutes() +
+      currentDatetime.getMinutes() +
       ':' +
-      current_datetime.getSeconds()
+      currentDatetime.getSeconds()
 
     savePoem({
       userId: user.sub,

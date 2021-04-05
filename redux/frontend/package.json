@@ -55,7 +55,10 @@
     "extends": "./node_modules/standard/eslintrc.json "
   },
   "standard": {
-    "env": [ "jest" ]
+    "env": [ "jest" ],
+    "ignore": [
+			"/src/serviceWorker.js"
+		]
   },
   "browserslist": {
     "production": [

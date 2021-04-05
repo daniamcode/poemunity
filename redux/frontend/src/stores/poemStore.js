@@ -13,7 +13,7 @@ import {
 const CHANGE_EVENT = 'change'
 let _poem = null
 let _poems = []
-let _sort = ''
+const _sort = ''
 
 class PoemStore extends EventEmitter {
   addChangeListener (callback) {
@@ -95,7 +95,7 @@ class PoemStore extends EventEmitter {
       delete object.tempSortName
       for (const prop in object) {
         if (object.hasOwnProperty(prop)) {
-          var id = prop
+          const id = prop
         }
       }
       const item = object[id]
@@ -155,7 +155,7 @@ dispatcher.register((action) => {
       poemStore.emitChange()
       break
     case actionTypes.SORT_POEMS:
-      _sort = action.data
+      // _sort = action.data
       _poems = poemStore.sortPoems(action.data, _poems)
       poemStore.emitChange()
       break

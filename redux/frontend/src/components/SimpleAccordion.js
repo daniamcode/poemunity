@@ -11,23 +11,17 @@ export default function SimpleAccordion () {
   return (
     <div>
       <Accordion className='accordion'>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls='panel1a-content'
-          id='panel1a-header'
-        >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='panel1a-content' id='panel1a-header'>
           <p className='header__dropdown-categories'>{CATEGORIES_TITLE}</p>
         </AccordionSummary>
         <div>
-          {
-            CATEGORIES?.sort().map((category) => (
-              <AccordionDetails>
-                <Link className='header__dropdown-subcategories' to={`/${category.toLowerCase()}`}>
-                  {category}
-                </Link>
-              </AccordionDetails>
-            ))
-          }
+          {CATEGORIES?.sort().map((category) => (
+            <AccordionDetails>
+              <Link className='header__dropdown-subcategories' to={`/${category.toLowerCase()}`}>
+                {category}
+              </Link>
+            </AccordionDetails>
+          ))}
         </div>
         <AccordionDetails>
           <Link className='header__dropdown-subcategories' to='/'>

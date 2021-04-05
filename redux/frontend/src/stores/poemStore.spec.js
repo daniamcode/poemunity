@@ -10,15 +10,15 @@ function reduceAction (action, data) {
 }
 
 describe('poemStore', () => {
-  let action
-  const secondAction = ''
-  let thirdAction
+  const action
+  let secondAction = ''
+  const thirdAction
   let fourthAction
   let fifthAction
   let sixthAction
-  let seventhAction
+  const seventhAction
   let seventhActionRandom
-  let eigthAction
+  const eigthAction
   let myCallbackMockFunction
 
   beforeEach(() => {
