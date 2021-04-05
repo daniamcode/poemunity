@@ -18,14 +18,6 @@ function App (props) {
             <Route path='/' exact component={Dashboard} />
             <Route path='/perfil' component={Profile} />
             <Route path='/:genre' exact component={Dashboard} />
-            <Route path='/alegria' exact component={Dashboard} />
-            <Route path='/amistad' exact component={Dashboard} />
-            <Route path='/amor' exact component={Dashboard} />
-            <Route path='/aniversario' exact component={Dashboard} />
-            <Route path='/desamor' exact component={Dashboard} />
-            <Route path='/haikus' exact component={Dashboard} />
-            <Route path='/infantiles' exact component={Dashboard} />
-            <Route path='/tristes' exact component={Dashboard} />
             <Route path='/detalle/:poemId' exact component={Detail} />
             <Route component={PageNotFound} />
           </Switch>
