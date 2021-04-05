@@ -95,7 +95,7 @@ class PoemStore extends EventEmitter {
       delete object.tempSortName
       for (const prop in object) {
         if (object.hasOwnProperty(prop)) {
-          const id = prop
+          var id = prop
         }
       }
       const item = object[id]
