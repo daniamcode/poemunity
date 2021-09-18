@@ -42,11 +42,13 @@
 		"extends": "./node_modules/standard/eslintrc.json "
 	},
 	"standard": {
-		"env": [ "mocha" ],
+		"env": [
+			"mocha"
+		],
 		"ignore": [
 			"/public"
 		]
-	  },
+	},
 	"nodemonConfig": {
 		"restartable": "rs",
 		"ignore": [
