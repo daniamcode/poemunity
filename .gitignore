@@ -2,3 +2,7 @@
 
 # repo needed for heroku deploy
 /redux/backend/.git
+
+#build
+
+/redux/backend/public
