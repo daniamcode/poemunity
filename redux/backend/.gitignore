@@ -1,8 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# repo needed for heroku deploy
-.git
-
 # dependencies
 /node_modules
 /.pnp
