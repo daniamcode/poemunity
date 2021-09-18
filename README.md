@@ -54,7 +54,7 @@ I've decided to launch this app into the real world. Just to remember:
 
 ### `npm run build` and deploy to Heroku
 
-Git clone the project. The Git repository on the root folder is the one that synchs with github. We go to the "frontend" folder, and type "npm run build" (npm i first, to install node_modules). This builds the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file). So we just have to serve the backend (that serves a static index; the whole frontend resumes into that static file)
+Git clone the project. The Git repository on the root folder is the one that synchs with github. We go to "redux", then the "frontend" folder, and type "npm run build" (npm i first, to install node_modules). This builds the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file). So we just have to serve the backend (that serves a static index; the whole frontend resumes into that static file)
 
 In the "backend" folder (npm i first, to install node_modules, and also install heroku) we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type from inside of the backend folder: git add --all, git commit -m "modify static files from frontend" and "git push heroku master --force". Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
 
