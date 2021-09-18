@@ -7,6 +7,7 @@ export const PROFILE_SUBTITLE = 'Insert a poem:'
 export const PROFILE_SELECT_TITLE_AUTHOR = "Author's Id: "
 export const PROFILE_SELECT_TITLE_TITLE = 'Title: '
 export const PROFILE_SELECT_TITLE = 'Title'
+export const PROFILE_SELECT_LIKES = 'Likes'
 export const PROFILE_SELECT_CATEGORY_TITLE = 'Category: '
 export const PROFILE_SELECT_CATEGORY = 'Select'
 export const PROFILE_POEM_PLACEHOLDER = 'Insert your poem here'

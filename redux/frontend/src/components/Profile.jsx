@@ -25,6 +25,7 @@ import {
   PROFILE_SELECT_TITLE_AUTHOR,
   PROFILE_SELECT_TITLE_TITLE,
   PROFILE_SELECT_TITLE,
+  PROFILE_SELECT_LIKES,
   PROFILE_POEM_PLACEHOLDER,
   PROFILE_SEND_POEM,
   ADMIN
@@ -78,6 +79,7 @@ export default function Profile (props) {
   const [poemAuthorId, setPoemAuthorId] = useState('')
   const [poemTitle, setPoemTitle] = useState('')
   const [poemCategory, setPoemCategory] = useState('')
+  const [poemLikes, setPoemLikes] = useState([])
 
   const { user, isAuthenticated, isLoading } = useAuth0()
 
@@ -122,20 +124,17 @@ export default function Profile (props) {
       {id: 4, name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
     ]
 
-
-    const match = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
-    console.log(poemAuthorId)
-    console.log(fakeUsers)
+    const fakeUser = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
 
     if(user?.sub === ADMIN) {
       savePoem({
         userId: poemAuthorId,
-        author: match?.name || '',
-        picture: match?.picture || '',
+        author: fakeUser?.name || '',
+        picture: fakeUser?.picture || '',
         poem: poemContent,
         title: poemTitle,
         genre: poemCategory,
-        likes: [],
+        likes: [...poemLikes.split(',')],
         date: formattedDate,
       });  
     } else {
@@ -181,17 +180,30 @@ export default function Profile (props) {
                 <div className='profile__insert-poem-inputs'>
                   {
                   user.sub === ADMIN && (
-                  <label className='profile__insert-poem-input'>
-                    {PROFILE_SELECT_TITLE_AUTHOR}
+                  <>
+                    <label className='profile__insert-poem-input'>
+                      {PROFILE_SELECT_TITLE_AUTHOR}
+                      <input
+                        className='profile__insert-poem-input'
+                        name='author'
+                        required
+                        value={poemAuthorId}
+                        onChange={(event) =>
+                          onFieldChange(event.target.value, setPoemAuthorId)}
+                      />
+                    </label>
+                    <label className='profile__insert-poem-input'>
+                    {PROFILE_SELECT_LIKES}
                     <input
                       className='profile__insert-poem-input'
-                      name='author'
+                      name='likes'
                       required
-                      value={poemAuthorId}
+                      value={poemLikes}
                       onChange={(event) =>
-                        onFieldChange(event.target.value, setPoemAuthorId)}
+                        onFieldChange(event.target.value, setPoemLikes)}
                     />
                   </label>
+                </>
                   )
                   }
                   <label className='profile__insert-poem-input'>
