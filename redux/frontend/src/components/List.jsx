@@ -19,7 +19,6 @@ import CircularProgress from './CircularIndeterminate'
 import capitalizeFirstLetter from '../scripts/capitalizeFirstLetter'
 import { Helmet } from 'react-helmet'
 import {
-  WEB_SUBTITLE,
   LIKE,
   LIKES,
   READ_MORE,
@@ -87,14 +86,26 @@ function List (props) {
       </Helmet>
       <div className='list__container'>
         <div className='list__intro'>
-          {!genre && <p className='list__presentation'>{WEB_SUBTITLE}</p>}
           {genre && (
             <p className='list__presentation'>
               {CATEGORIES_TITLE_LABEL}
               {genre.toUpperCase()}
             </p>
           )}
+          <div className='list__search'>
           <div className='separator' />
+            <SearchIcon style={{ fontSize: 40, fill: '#4F5D73' }} />
+            <TextField
+              label={SEARCH_PLACEHOLDER}
+              InputLabelProps={{
+                style: { color: '#4F5D73' }
+              }}
+              InputProps={{
+                style: { color: '#4F5D73' }
+              }}
+              onChange={handleSearchChange}
+            />
+          </div>
           <form className='list__sort'>
             <label>
               {ORDER_BY}
@@ -114,19 +125,6 @@ function List (props) {
               </select>
             </label>
           </form>
-          <div className='list__search'>
-            <SearchIcon style={{ fontSize: 40, fill: '#4F5D73' }} />
-            <TextField
-              label={SEARCH_PLACEHOLDER}
-              InputLabelProps={{
-                style: { color: '#4F5D73' }
-              }}
-              InputProps={{
-                style: { color: '#4F5D73' }
-              }}
-              onChange={handleSearchChange}
-            />
-          </div>
         </div>
 
         {poems.map((poem) => (

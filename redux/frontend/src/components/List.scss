@@ -6,7 +6,7 @@
 
 .list__presentation {
     display: none;
-    margin-bottom: 35px;
+    margin-top: 15px;
 }
 
 .poems__content {
@@ -31,7 +31,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 35px;
 }
 
 .list__sort {
@@ -58,7 +58,7 @@
     }
 
     .list__presentation {
-        display: block;
+        display: flex;
         font-size: 20px;
         margin-left: 5%;
     }
