@@ -31,7 +31,7 @@ function Header () {
         </div>
         <div className='separator' />
         {isAuthenticated ? (
-          <Link to='/perfil' className='header__profile' />
+          <Link to='/profile' className='header__profile' />
         ) : (
           <></>
         )}

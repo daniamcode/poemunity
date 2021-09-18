@@ -52,8 +52,8 @@ function Detail (props) {
 
   const disqusShortname = 'poemunity'
   const disqusConfig = {
-    url: `http://localhost:3000/detalle/${props.match.params.poemId}`,
-    identifier: `http://localhost:3000/detalle/${props.match.params.poemId}`,
+    url: `http://localhost:3000/detail/${props.match.params.poemId}`,
+    identifier: `http://localhost:3000/detail/${props.match.params.poemId}`,
     title: 'Title of Your Article'
   }
 
@@ -124,7 +124,7 @@ function Detail (props) {
                     onClick={(event) => onDelete(event, poem._id)}
                   />
               )}
-              <Link to={`/detalle/${poem._id}`} className='poem__comments-icon'>
+              <Link to={`/detail/${poem._id}`} className='poem__comments-icon'>
                 <SubjectSharpIcon style={{ fill: '#000' }} />
               </Link>
             </section>

@@ -6,9 +6,9 @@ import * as serviceWorker from './serviceWorker'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Auth0Provider } from '@auth0/auth0-react'
 
-let redirectUri = 'http://localhost:3000/perfil'
+let redirectUri = 'http://localhost:3000/profile'
 if (process.env.NODE_ENV === 'production') {
-  redirectUri = 'https://poemunity.com/perfil'
+  redirectUri = 'https://poemunity.com/profile'
 }
 
 const { REACT_APP_AUTH0_DOMAIN, REACT_APP_AUTH0_CLIENTID } = process.env

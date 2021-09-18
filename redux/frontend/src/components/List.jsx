@@ -134,7 +134,7 @@ function List (props) {
             {poem.author.includes(filter) && (
               <section className='poem__block'>
                 <section>
-                  <Link to={`/detalle/${poem._id}`} className='poem__title'>
+                  <Link to={`/detail/${poem._id}`} className='poem__title'>
                     {poem.title}
                   </Link>
                   <div className='poem__author-container'>
@@ -149,7 +149,7 @@ function List (props) {
                   </div>
                   <div className='poems__read-more'>
                     <Link
-                      to={`/detalle/${poem._id}`}
+                      to={`/detail/${poem._id}`}
                       className='poems__read-more'
                     >
                       {READ_MORE}
@@ -194,7 +194,7 @@ function List (props) {
                         />
                   )}
                   <Link
-                    to={`/detalle/${poem._id}`}
+                    to={`/detail/${poem._id}`}
                     className='poem__comments-icon'
                   >
                     <SubjectSharpIcon style={{ fill: '#000' }} />

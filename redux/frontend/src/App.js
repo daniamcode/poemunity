@@ -16,9 +16,9 @@ function App (props) {
         <div className='margin-body'>
           <Switch>
             <Route path='/' exact component={Dashboard} />
-            <Route path='/perfil' component={Profile} />
+            <Route path='/profile' component={Profile} />
             <Route path='/:genre' exact component={Dashboard} />
-            <Route path='/detalle/:poemId' exact component={Detail} />
+            <Route path='/detail/:poemId' exact component={Detail} />
             <Route component={PageNotFound} />
           </Switch>
         </div>
