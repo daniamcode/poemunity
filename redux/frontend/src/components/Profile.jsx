@@ -22,10 +22,12 @@ import {
   CATEGORIES,
   PROFILE_SELECT_CATEGORY_TITLE,
   PROFILE_SELECT_CATEGORY,
+  PROFILE_SELECT_TITLE_AUTHOR,
   PROFILE_SELECT_TITLE_TITLE,
   PROFILE_SELECT_TITLE,
   PROFILE_POEM_PLACEHOLDER,
-  PROFILE_SEND_POEM
+  PROFILE_SEND_POEM,
+  ADMIN
 } from '../data/constants'
 
 function TabPanel (props) {
@@ -73,6 +75,7 @@ export default function Profile (props) {
   const [value, setValue] = React.useState(0)
 
   const [poemContent, setPoemContent] = useState('')
+  const [poemAuthorId, setPoemAuthorId] = useState('')
   const [poemTitle, setPoemTitle] = useState('')
   const [poemCategory, setPoemCategory] = useState('')
 
@@ -112,16 +115,41 @@ export default function Profile (props) {
       ':' +
       currentDatetime.getSeconds()
 
-    savePoem({
-      userId: user.sub,
-      author: user.name,
-      picture: user.picture,
-      poem: poemContent,
-      title: poemTitle,
-      genre: poemCategory,
-      likes: [],
-      date: formattedDate
-    })
+    const fakeUsers = [
+      {id: 1, name: 'Catherine Cawley', picture: 'https://cdn.getyourguide.com/img/location/5c88db055a755.jpeg/88.jpg'},
+      {id: 2, name: 'Stacey Cosgrove', picture: 'https://media-cdn.tripadvisor.com/media/photo-s/05/62/06/0e/restaurant-els-valencians.jpg'},
+      {id: 3, name: 'Sarah Griffin', picture: 'https://cdn.pixabay.com/photo/2017/11/09/17/11/sea-2934076_960_720.jpg'},
+      {id: 4, name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
+    ]
+
+
+    const match = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
+    console.log(poemAuthorId)
+    console.log(fakeUsers)
+
+    if(user?.sub === ADMIN) {
+      savePoem({
+        userId: poemAuthorId,
+        author: match?.name || '',
+        picture: match?.picture || '',
+        poem: poemContent,
+        title: poemTitle,
+        genre: poemCategory,
+        likes: [],
+        date: formattedDate,
+      });  
+    } else {
+      savePoem({
+        userId: user.sub,
+        author: user.name,
+        picture: user.picture,
+        poem: poemContent,
+        title: poemTitle,
+        genre: poemCategory,
+        likes: [],
+        date: formattedDate,
+      });
+    }
     setPoemContent('')
     setPoemTitle('')
     setPoemCategory('')
@@ -151,6 +179,21 @@ export default function Profile (props) {
                 onSubmit={handleSubmit}
               >
                 <div className='profile__insert-poem-inputs'>
+                  {
+                  user.sub === ADMIN && (
+                  <label className='profile__insert-poem-input'>
+                    {PROFILE_SELECT_TITLE_AUTHOR}
+                    <input
+                      className='profile__insert-poem-input'
+                      name='author'
+                      required
+                      value={poemAuthorId}
+                      onChange={(event) =>
+                        onFieldChange(event.target.value, setPoemAuthorId)}
+                    />
+                  </label>
+                  )
+                  }
                   <label className='profile__insert-poem-input'>
                     {PROFILE_SELECT_TITLE_TITLE}
                     <input
