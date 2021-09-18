@@ -59,6 +59,7 @@ Git clone the project. The Git repository on the root folder is the one that syn
 In the "backend" folder (npm i first, to install node_modules, and also install heroku) we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type from inside of the backend folder: git add --all, git commit -m "modify static files from frontend" and "git push heroku master --force". Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
 
 (I need another terminal with the root open so I can add, commit and push all the changes to my repo)
+(I also need to create a .env file in redux/backend with the info contained in my google drive (poemunity -> .env))
 
 That's it, Heroku builds the backend and deploys. Don't forget to add the env variables to Heroku (on production, from the backend folder. The .env file on the backed folder works fine on development, but for production I have to tell Heroku about them). The .env files (on backend and frontend folders) are included in .gitignore for security reasons.
 
