@@ -2,13 +2,21 @@ import axios from 'axios'
 import dispatcher from '../appDispatcher'
 import actionTypes from './actionTypes'
 
-export function loadPoems () {
-  return axios.get('/api/poems').then((poems) => {
-    dispatcher.dispatch({
-      type: actionTypes.LOAD_POEMS,
-      data: poems.data
-    })
-  })
+// export function loadPoems () {
+//   return axios.get('/api/poems').then((poems) => {
+//     dispatcher.dispatch({
+//       type: actionTypes.LOAD_POEMS,
+//       data: poems.data
+//     })
+//   })
+// }
+
+export const loadPoems = async () => {
+  const response = await fetch('/api/poems')
+  if(!response.ok) {
+    throw new Error('Something went wrong')    
+  }
+  return response.json()
 }
 
 export function loadPoem (_id) {

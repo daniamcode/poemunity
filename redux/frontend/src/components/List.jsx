@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useQuery } from 'react-query'
 import {
   loadPoems,
   deletePoem,
@@ -16,7 +17,8 @@ import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
-import capitalizeFirstLetter from '../scripts/capitalizeFirstLetter'
+import capitalizeFirstLetter from '../utils/capitalizeFirstLetter'
+import sortPoems from '../utils/sortPoems'
 import { Helmet } from 'react-helmet'
 import {
   LIKE,
@@ -33,27 +35,42 @@ import {
 const { REACT_APP_ADMIN } = process.env
 
 function List (props) {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
-  const [poems, setPoems] = useState(poemStore.getPoems(genre))
+  // const [poems, setPoems] = useState(poemStore.getPoems(genre))
+  const [poems, setPoems] = useState()
   const [sort, setSort] = useState(ORDER_BY_LIKES)
   const [filter, setFilter] = useState('')
+  
+  const { data, error, isError, isLoading: backendIsLoading } = useQuery('poems', loadPoems)
 
-  console.log(poems)
-  console.log(genre)
-
-  useEffect(() => {
-    poemStore.addChangeListener(onChange)
-    if (poems.length === 0) loadPoems()
-    else {
-      onChange()
+  useEffect(()=> {
+    if(data) {
+      const newData = [...data]
+      if(genre) {
+        const poemsFiltered = newData.filter((poems) => poems.genre === genre)
+        const poemsSorted = sortPoems(sort, poemsFiltered)
+        setPoems(poemsSorted)
+      }
+      else {
+        const poemsSorted = sortPoems(sort, newData)
+        setPoems(poemsSorted)
+      }
     }
-    return () => poemStore.removeChangeListener(onChange)
-  }, [poems.length, genre, sort])
+  }, [JSON.stringify([data, genre, sort])])
 
-  function onChange () {
-    setPoems(poemStore.getPoems(genre))
-  }
+  // useEffect(() => {
+  //   poemStore.addChangeListener(onChange)
+  //   if (poems.length === 0) loadPoems()
+  //   else {
+  //     onChange()
+  //   }
+  //   return () => poemStore.removeChangeListener(onChange)
+  // }, [poems.length, genre, sort])
+
+  // function onChange () {
+  //   setPoems(poemStore.getPoems(genre))
+  // }
 
   function onDelete (event, poemId) {
     event.preventDefault()
@@ -73,7 +90,7 @@ function List (props) {
     setValue(value)
   }
 
-  if (isLoading) {
+  if (auth0IsLoading) {
     return <CircularProgress />
   }
 
@@ -127,7 +144,7 @@ function List (props) {
           </form>
         </div>
 
-        {poems.map((poem) => (
+        {poems?.map((poem) => (
           <main key={poem._id} className='poem__detail'>
             {poem.author.includes(filter) && (
               <section className='poem__block'>

@@ -5,6 +5,11 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Auth0Provider } from '@auth0/auth0-react'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 let redirectUri = 'http://localhost:3000/profile'
 if (process.env.NODE_ENV === 'production') {
@@ -14,17 +19,22 @@ if (process.env.NODE_ENV === 'production') {
 const { REACT_APP_AUTH0_DOMAIN, REACT_APP_AUTH0_CLIENTID } = process.env
 // same as process.env.AUTH0_DOMAIN, but cleaner
 
+const queryClient = new QueryClient();
+
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <Auth0Provider
-        domain={REACT_APP_AUTH0_DOMAIN}
-        clientId={REACT_APP_AUTH0_CLIENTID}
-        redirectUri={redirectUri}
-      >
-        <App />
-      </Auth0Provider>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Auth0Provider
+          domain={REACT_APP_AUTH0_DOMAIN}
+          clientId={REACT_APP_AUTH0_CLIENTID}
+          redirectUri={redirectUri}
+        >
+          <App />
+        </Auth0Provider>
+      </Router>
+    <ReactQueryDevtools />
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )

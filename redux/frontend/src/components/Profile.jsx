@@ -134,7 +134,7 @@ export default function Profile (props) {
         poem: poemContent,
         title: poemTitle,
         genre: poemCategory,
-        likes: [...poemLikes.split(',')],
+        likes: poemLikes.length !== 0 ? [...poemLikes.split(',')] : [],
         date: formattedDate,
       });  
     } else {
@@ -197,7 +197,6 @@ export default function Profile (props) {
                     <input
                       className='profile__insert-poem-input'
                       name='likes'
-                      required
                       value={poemLikes}
                       onChange={(event) =>
                         onFieldChange(event.target.value, setPoemLikes)}
