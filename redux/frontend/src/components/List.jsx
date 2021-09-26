@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import { useQuery } from 'react-query'
+import useDeletePoem from '../react-query/useDeletePoem'
 import {
   loadPoems,
-  deletePoem,
   likePoem,
-  sortByCriteria
+  sortByCriteria,
+  deletePoem
 } from '../actions/poemActions'
 import poemStore from '../stores/poemStore'
 import './List.scss'
@@ -72,10 +74,11 @@ function List (props) {
   //   setPoems(poemStore.getPoems(genre))
   // }
 
-  function onDelete (event, poemId) {
-    event.preventDefault()
-    deletePoem(poemId)
-  }
+  // function onDelete (event, poemId) {
+  //   event.preventDefault()
+  //   deletePoem(poemId)
+  // }
+  const deletePoemMutation = useDeletePoem()
 
   function onLike (event, poemId, userId) {
     event.preventDefault()
@@ -205,7 +208,7 @@ function List (props) {
                         <HighlightOffSharpIcon
                           className='poem__delete-icon'
                           style={{ fill: 'red' }}
-                          onClick={(event) => onDelete(event, poem._id)}
+                          onClick={(event) => deletePoemMutation.mutate(poem._id)}
                         />
                   )}
                   <Link
