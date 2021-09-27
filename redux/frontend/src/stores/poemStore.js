@@ -105,7 +105,7 @@ class PoemStore extends EventEmitter {
   }
 
   getRanking (poems, poemPoints, likePoints) {
-    let rank = poems.reduce(function (accumulator, item) {
+    let rank = poems?.reduce(function (accumulator, item) {
       const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
 
       accumulator[item.userId] = {

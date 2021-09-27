@@ -6,8 +6,7 @@ export default function useDeletePoem() {
   return useMutation(
     (_id) => axios.delete(`/api/poems/${_id}`).then((res) => res.data),
     {
-      onSuccess: (poemDeleted) => {
-
+      onSuccess: (data, poemDeleted) => {
         // const oldPoems = queryClient.getQueryData('poems')
   
 
@@ -24,7 +23,6 @@ export default function useDeletePoem() {
         queryClient.invalidateQueries('poems')
       },
         // onSuccess: () => queryCache.refetchQueries('poems'),
-        // onSuccess: () => queryCache?.invalidateQueries('poems'),
         onError: (error) => {
             console.error(error);
       }

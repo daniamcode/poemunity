@@ -8,8 +8,8 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import './Ranking.scss'
-import poemStore from '../stores/poemStore'
-import { loadPoems } from '../actions/poemActions'
+import usePoems from '../react-query/usePoems'
+import { getRanking } from '../utils/getRanking.js'
 import {
   RANKING_TITLE,
   RANKING_SUBTITLE,
@@ -28,28 +28,24 @@ export default function Ranking () {
   const poemPoints = 3
   const likePoints = 1
 
-  const [poems, setPoems] = useState(poemStore.getPoems())
+  const [poems, setPoems] = useState([])
+  const poemsQuery = usePoems()
+
   const [rank, setRank] = useState(
-    poemStore.getRanking(poems, poemPoints, likePoints)
+    getRanking(null)
   )
 
-  useEffect(
-    () => {
-      poemStore.addChangeListener(onChange)
-      if (poems.length === 0) loadPoems()
-      else {
-        onChange()
-      }
-      return () => poemStore.removeChangeListener(onChange)
-    },
-    [poems.length],
-    rank
-  )
+  useEffect(()=> {
+    if(poemsQuery.data) {
+      setPoems(poemsQuery.data)
+    }
+  }, [JSON.stringify(poemsQuery.data)])
 
-  function onChange () {
-    setPoems(poemStore.getPoems())
-    setRank(poemStore.getRanking(poems, poemPoints, likePoints))
-  }
+  useEffect(()=> {
+    if(poems) {
+      setRank(getRanking(poems, poemPoints, likePoints))
+    }
+  }, [JSON.stringify([poems, poemPoints, likePoints])])
 
   return (
     <>

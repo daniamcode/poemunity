@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
-import { useQuery } from 'react-query'
+import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import {
-  loadPoems,
   likePoem,
   sortByCriteria,
-  deletePoem
 } from '../actions/poemActions'
-import poemStore from '../stores/poemStore'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
@@ -40,15 +36,17 @@ function List (props) {
   const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
   // const [poems, setPoems] = useState(poemStore.getPoems(genre))
-  const [poems, setPoems] = useState()
+  const [poems, setPoems] = useState([])
   const [sort, setSort] = useState(ORDER_BY_LIKES)
   const [filter, setFilter] = useState('')
   
-  const { data, error, isError, isLoading: backendIsLoading } = useQuery('poems', loadPoems)
+  // const { data, error, isError, isLoading: backendIsLoading } = useQuery('poems', loadPoems)
+  const poemsQuery = usePoems()
 
   useEffect(()=> {
-    if(data) {
-      const newData = [...data]
+    if(poemsQuery.data) {
+      const newData = [...poemsQuery.data]
+
       if(genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
         const poemsSorted = sortPoems(sort, poemsFiltered)
@@ -59,25 +57,8 @@ function List (props) {
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([data, genre, sort])])
+  }, [JSON.stringify([poemsQuery.data, genre, sort])])
 
-  // useEffect(() => {
-  //   poemStore.addChangeListener(onChange)
-  //   if (poems.length === 0) loadPoems()
-  //   else {
-  //     onChange()
-  //   }
-  //   return () => poemStore.removeChangeListener(onChange)
-  // }, [poems.length, genre, sort])
-
-  // function onChange () {
-  //   setPoems(poemStore.getPoems(genre))
-  // }
-
-  // function onDelete (event, poemId) {
-  //   event.preventDefault()
-  //   deletePoem(poemId)
-  // }
   const deletePoemMutation = useDeletePoem()
 
   function onLike (event, poemId, userId) {
