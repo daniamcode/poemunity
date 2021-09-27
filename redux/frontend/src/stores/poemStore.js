@@ -48,79 +48,79 @@ class PoemStore extends EventEmitter {
     return _poems.filter((poems) => poems.likes.some((element) => element === user.sub))
   }
 
-  sortPoems (sort, poems) {
-    if (sort === ORDER_BY_TITLE) {
-      poems.sort(function (a, b) {
-        if (a.title.toLowerCase() < b.title.toLowerCase()) return -1
-        if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
-        return 0
-      })
-    }
-    if (sort === ORDER_BY_LIKES) {
-      poems.sort(function (a, b) {
-        return b.likes.length - a.likes.length
-      })
-    }
-    if (sort === ORDER_BY_RANDOM) {
-      poems.sort(() => Math.random() - 0.5)
-    }
-    if (sort === ORDER_BY_DATE) {
-      poems.sort(function (a, b) {
-        return new Date(b.date) - new Date(a.date)
-      })
-    }
-    return poems
-  }
+  // sortPoems (sort, poems) {
+  //   if (sort === ORDER_BY_TITLE) {
+  //     poems.sort(function (a, b) {
+  //       if (a.title.toLowerCase() < b.title.toLowerCase()) return -1
+  //       if (a.title.toLowerCase() > b.title.toLowerCase()) return 1
+  //       return 0
+  //     })
+  //   }
+  //   if (sort === ORDER_BY_LIKES) {
+  //     poems.sort(function (a, b) {
+  //       return b.likes.length - a.likes.length
+  //     })
+  //   }
+  //   if (sort === ORDER_BY_RANDOM) {
+  //     poems.sort(() => Math.random() - 0.5)
+  //   }
+  //   if (sort === ORDER_BY_DATE) {
+  //     poems.sort(function (a, b) {
+  //       return new Date(b.date) - new Date(a.date)
+  //     })
+  //   }
+  //   return poems
+  // }
 
-  SortObjectOfObjects (data, attribute) {
-    const array = []
-    for (const prop in data) {
-      if (data.hasOwnProperty(prop)) {
-        const object = {}
-        object[prop] = data[prop]
-        object.tempSortName = data[prop][attribute]
-        array.push(object)
-      }
-    }
+  // SortObjectOfObjects (data, attribute) {
+  //   const array = []
+  //   for (const prop in data) {
+  //     if (data.hasOwnProperty(prop)) {
+  //       const object = {}
+  //       object[prop] = data[prop]
+  //       object.tempSortName = data[prop][attribute]
+  //       array.push(object)
+  //     }
+  //   }
 
-    array.sort(function (a, b) {
-      const at = a.tempSortName
-      const bt = b.tempSortName
-      return at > bt ? -1 : (at < bt ? 1 : 0)
-    })
+  //   array.sort(function (a, b) {
+  //     const at = a.tempSortName
+  //     const bt = b.tempSortName
+  //     return at > bt ? -1 : (at < bt ? 1 : 0)
+  //   })
 
-    const result = []
-    for (let i = 0, l = array.length; i < l; i++) {
-      const object = array[i]
-      delete object.tempSortName
-      for (const prop in object) {
-        if (object.hasOwnProperty(prop)) {
-          var id = prop
-        }
-      }
-      const item = object[id]
-      result.push(item)
-    }
-    return result
-  }
+  //   const result = []
+  //   for (let i = 0, l = array.length; i < l; i++) {
+  //     const object = array[i]
+  //     delete object.tempSortName
+  //     for (const prop in object) {
+  //       if (object.hasOwnProperty(prop)) {
+  //         var id = prop
+  //       }
+  //     }
+  //     const item = object[id]
+  //     result.push(item)
+  //   }
+  //   return result
+  // }
 
-  getRanking (poems, poemPoints, likePoints) {
-    let rank = poems?.reduce(function (accumulator, item) {
-      const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
+  // getRanking (poems, poemPoints, likePoints) {
+  //   let rank = poems?.reduce(function (accumulator, item) {
+  //     const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
 
-      accumulator[item.userId] = {
-        author: item.author,
-        picture: item.picture,
-        points
-      }
+  //     accumulator[item.userId] = {
+  //       author: item.author,
+  //       picture: item.picture,
+  //       points
+  //     }
 
-      return accumulator
-    }, {})
+  //     return accumulator
+  //   }, {})
 
-    rank = this.SortObjectOfObjects(rank, 'points')
+  //   rank = this.SortObjectOfObjects(rank, 'points')
 
-    return rank
-  }
+  //   return rank
+  // }
 }
 
 const poemStore = new PoemStore()
