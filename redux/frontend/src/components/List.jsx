@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
+import useLikePoem from '../react-query/useLikePoem'
+
 import {
-  likePoem,
   sortByCriteria,
 } from '../actions/poemActions'
 import './List.scss'
@@ -35,12 +36,10 @@ const { REACT_APP_ADMIN } = process.env
 function List (props) {
   const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
-  // const [poems, setPoems] = useState(poemStore.getPoems(genre))
   const [poems, setPoems] = useState([])
   const [sort, setSort] = useState(ORDER_BY_LIKES)
   const [filter, setFilter] = useState('')
   
-  // const { data, error, isError, isLoading: backendIsLoading } = useQuery('poems', loadPoems)
   const poemsQuery = usePoems()
 
   useEffect(()=> {
@@ -60,10 +59,11 @@ function List (props) {
   }, [JSON.stringify([poemsQuery.data, genre, sort])])
 
   const deletePoemMutation = useDeletePoem()
+  const likePoemMutation = useLikePoem()
 
   function onLike (event, poemId, userId) {
     event.preventDefault()
-    likePoem(poemId, userId)
+    likePoemMutation.mutate({poemId, userId})
   }
 
   const handleSearchChange = (event) => {
