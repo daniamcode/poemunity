@@ -12,6 +12,7 @@ import CircularProgress from './CircularIndeterminate'
 import './PageNotFound.scss'
 import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
+import usePoem from '../react-query/usePoem'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 
@@ -19,21 +20,27 @@ const { REACT_APP_ADMIN } = process.env
 
 function Detail (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
-  const [poem, setPoem] = useState(
-    poemStore.getPoem(props.match.params.poemId)
-  )
+  const [poem, setPoem] = useState([])
 
-  useEffect(() => {
-    poemStore.addChangeListener(onChange)
+  // useEffect(() => {
+  //   poemStore.addChangeListener(onChange)
 
-    if (!poem) {
-      loadPoem(props.match.params.poemId)
+  //   if (!poem) {
+  //     loadPoem(props.match.params.poemId)
+  //   }
+
+  //   return () => {
+  //     poemStore.removeChangeListener(onChange)
+  //   }
+  // }, [poem])
+
+  const poemsQuery = usePoem(props.match.params.poemId)
+
+  useEffect(()=> {
+    if(poemsQuery.data) {
+      setPoem(poemsQuery.data)
     }
-
-    return () => {
-      poemStore.removeChangeListener(onChange)
-    }
-  }, [poem])
+  }, [JSON.stringify(poemsQuery.data)])
 
   function onChange () {
     setPoem(poemStore.getPoem())
