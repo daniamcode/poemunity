@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import poemStore from '../stores/poemStore'
-import { loadPoem } from '../actions/poemActions'
 import './Detail.scss'
 import '../App.scss'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
@@ -22,18 +20,6 @@ function Detail (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
   const [poem, setPoem] = useState([])
 
-  // useEffect(() => {
-  //   poemStore.addChangeListener(onChange)
-
-  //   if (!poem) {
-  //     loadPoem(props.match.params.poemId)
-  //   }
-
-  //   return () => {
-  //     poemStore.removeChangeListener(onChange)
-  //   }
-  // }, [poem])
-
   const poemsQuery = usePoem(props.match.params.poemId)
 
   useEffect(()=> {
@@ -41,10 +27,6 @@ function Detail (props) {
       setPoem(poemsQuery.data)
     }
   }, [JSON.stringify(poemsQuery.data)])
-
-  function onChange () {
-    setPoem(poemStore.getPoem())
-  }
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
