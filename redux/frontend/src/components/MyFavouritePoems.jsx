@@ -11,35 +11,32 @@ import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
+import usePoems from '../react-query/usePoems'
+import useDeletePoem from '../react-query/useDeletePoem'
+import useLikePoem from '../react-query/useLikePoem'
+import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 
 function MyFavouritePoems (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
 
   const [poems, setPoems] = useState(poemStore.getPoemsByUser(user))
-
   const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    poemStore.addChangeListener(onChange)
-    if (poems.length === 0) loadPoems()
-    else {
-      onChange()
+  const poemsQuery = usePoems()
+
+  useEffect(()=> {
+    if(poemsQuery.data) {
+      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, user)
+      setPoems(poemsFiltered)
     }
-    return () => poemStore.removeChangeListener(onChange)
-  }, [poems.length])
+  }, [JSON.stringify([poemsQuery.data, user])])
 
-  function onChange () {
-    setPoems(poemStore.getFavouritePoemsByUser(user))
-  }
-
-  function onDelete (event, poemId) {
-    event.preventDefault()
-    deletePoem(poemId)
-  }
+  const deletePoemMutation = useDeletePoem()
+  const likePoemMutation = useLikePoem()
 
   function onLike (event, poemId, userId) {
     event.preventDefault()
-    likePoem(poemId, userId)
+    likePoemMutation.mutate({poemId, userId})
   }
 
   const LIKE = 'Like'
@@ -129,7 +126,7 @@ function MyFavouritePoems (props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => onDelete(event, poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
                   />
                 )}
                 <Link

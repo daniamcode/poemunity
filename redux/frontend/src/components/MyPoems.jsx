@@ -13,22 +13,13 @@ import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import usePoems from '../react-query/usePoems'
 import getPoemsByUser from '../utils/getPoemsByUser'
+import useDeletePoem from '../react-query/useDeletePoem'
 
 function MyPoems (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
 
   const [poems, setPoems] = useState([])
-
   const [filter, setFilter] = useState('')
-
-  // useEffect(() => {
-  //   poemStore.addChangeListener(onChange)
-  //   if (poems.length === 0) loadPoems()
-  //   else {
-  //     onChange()
-  //   }
-  //   return () => poemStore.removeChangeListener(onChange)
-  // }, [poems.length])
 
   const poemsQuery = usePoems()
 
@@ -39,21 +30,7 @@ function MyPoems (props) {
     }
   }, [JSON.stringify([poemsQuery.data, user])])
 
-  // useEffect(()=> {
-  //   if(user) {
-  //     const poemsFiltered = getPoemsByUser(poems, user)
-  //     setPoems(poemsFiltered)
-  //   }
-  // }, [JSON.stringify(user)])
-
-  function onChange () {
-    setPoems(poemStore.getPoemsByUser(user))
-  }
-
-  function onDelete (event, poemId) {
-    event.preventDefault()
-    deletePoem(poemId)
-  }
+  const deletePoemMutation = useDeletePoem()
 
   const LIKE = 'Like'
   const LIKES = 'Likes'
@@ -123,7 +100,7 @@ function MyPoems (props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => onDelete(event, poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
                   />
                 )}
                 <Link
