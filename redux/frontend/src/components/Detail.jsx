@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import poemStore from '../stores/poemStore'
-import { loadPoem, deletePoem, likePoem } from '../actions/poemActions'
+import { loadPoem } from '../actions/poemActions'
 import './Detail.scss'
 import '../App.scss'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
@@ -12,6 +12,9 @@ import CircularProgress from './CircularIndeterminate'
 import './PageNotFound.scss'
 import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
+import useDeletePoem from '../react-query/useDeletePoem'
+import useLikePoem from '../react-query/useLikePoem'
+
 const { REACT_APP_ADMIN } = process.env
 
 function Detail (props) {
@@ -36,14 +39,12 @@ function Detail (props) {
     setPoem(poemStore.getPoem())
   }
 
-  function onDelete (event, poemId) {
-    event.preventDefault()
-    deletePoem(poemId)
-  }
+  const deletePoemMutation = useDeletePoem()
+  const likePoemMutation = useLikePoem()
 
   function onLike (event, poemId, userId) {
     event.preventDefault()
-    likePoem(poemId, userId)
+    likePoemMutation.mutate({poemId, userId})
   }
 
   if (isLoading) {
@@ -121,7 +122,7 @@ function Detail (props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => onDelete(event, poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
                   />
               )}
               <Link to={`/detail/${poem._id}`} className='poem__comments-icon'>

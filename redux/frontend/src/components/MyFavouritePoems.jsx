@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { loadPoems, deletePoem, likePoem } from '../actions/poemActions'
-import poemStore from '../stores/poemStore'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
@@ -19,7 +17,7 @@ import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 function MyFavouritePoems (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
 
-  const [poems, setPoems] = useState(poemStore.getPoemsByUser(user))
+  const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
   const poemsQuery = usePoems()

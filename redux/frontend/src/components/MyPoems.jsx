@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { deletePoem } from '../actions/poemActions'
-import poemStore from '../stores/poemStore'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
