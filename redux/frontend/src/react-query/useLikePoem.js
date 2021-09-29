@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from 'react-query';
 export default function useLikePoem() {
  const queryClient = useQueryClient()
   return useMutation(
+    // arguments have to be a single variable or object in this case
     ({poemId, userId}) => axios.put(`/api/poems/${poemId}`, {
       userId}).then((res) => res.data),
     {

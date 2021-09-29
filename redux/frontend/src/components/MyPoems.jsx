@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { loadPoems, deletePoem } from '../actions/poemActions'
+import { deletePoem } from '../actions/poemActions'
 import poemStore from '../stores/poemStore'
 import './List.scss'
 import './Detail.scss'
@@ -11,22 +11,40 @@ import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
+import usePoems from '../react-query/usePoems'
+import getPoemsByUser from '../utils/getPoemsByUser'
 
 function MyPoems (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
 
-  const [poems, setPoems] = useState(poemStore.getPoemsByUser(user))
+  const [poems, setPoems] = useState([])
 
   const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    poemStore.addChangeListener(onChange)
-    if (poems.length === 0) loadPoems()
-    else {
-      onChange()
+  // useEffect(() => {
+  //   poemStore.addChangeListener(onChange)
+  //   if (poems.length === 0) loadPoems()
+  //   else {
+  //     onChange()
+  //   }
+  //   return () => poemStore.removeChangeListener(onChange)
+  // }, [poems.length])
+
+  const poemsQuery = usePoems()
+
+  useEffect(()=> {
+    if(poemsQuery.data) {
+      const poemsFiltered = getPoemsByUser(poemsQuery.data, user)
+      setPoems(poemsFiltered)
     }
-    return () => poemStore.removeChangeListener(onChange)
-  }, [poems.length])
+  }, [JSON.stringify([poemsQuery.data, user])])
+
+  // useEffect(()=> {
+  //   if(user) {
+  //     const poemsFiltered = getPoemsByUser(poems, user)
+  //     setPoems(poemsFiltered)
+  //   }
+  // }, [JSON.stringify(user)])
 
   function onChange () {
     setPoems(poemStore.getPoemsByUser(user))

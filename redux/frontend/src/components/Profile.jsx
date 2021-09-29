@@ -9,11 +9,11 @@ import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
 import './Profile.scss'
 import '../App.scss'
-import { savePoem } from '../actions/poemActions'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
+import useCreatePoem from '../react-query/useCreatePoem'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE,
@@ -82,6 +82,7 @@ export default function Profile (props) {
   const [poemLikes, setPoemLikes] = useState([])
 
   const { user, isAuthenticated, isLoading } = useAuth0()
+  const createPoemMutation = useCreatePoem()
 
   if (isLoading) {
     return <CircularProgress />
@@ -127,7 +128,7 @@ export default function Profile (props) {
     const fakeUser = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
 
     if(user?.sub === ADMIN) {
-      savePoem({
+      createPoemMutation.mutate({
         userId: poemAuthorId,
         author: fakeUser?.name || '',
         picture: fakeUser?.picture || '',
@@ -138,7 +139,7 @@ export default function Profile (props) {
         date: formattedDate,
       });  
     } else {
-      savePoem({
+      createPoemMutation.mutate({
         userId: user.sub,
         author: user.name,
         picture: user.picture,
