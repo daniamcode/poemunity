@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { BrowserRouter as Router } from 'react-router-dom'
 import { Auth0Provider } from '@auth0/auth0-react'
 import {
   QueryClient,
@@ -24,15 +23,13 @@ const queryClient = new QueryClient();
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Auth0Provider
-          domain={REACT_APP_AUTH0_DOMAIN}
-          clientId={REACT_APP_AUTH0_CLIENTID}
-          redirectUri={redirectUri}
-        >
-          <App />
-        </Auth0Provider>
-      </Router>
+      <Auth0Provider
+        domain={REACT_APP_AUTH0_DOMAIN}
+        clientId={REACT_APP_AUTH0_CLIENTID}
+        redirectUri={redirectUri}
+      >
+        <App />
+      </Auth0Provider>
     <ReactQueryDevtools />
     </QueryClientProvider>
   </React.StrictMode>,

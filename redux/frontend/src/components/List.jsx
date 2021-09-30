@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
+import { AppContext } from '../App';
 
-import {
-  sortByCriteria,
-} from '../actions/poemActions'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
@@ -40,6 +38,7 @@ function List (props) {
   const [sort, setSort] = useState(ORDER_BY_LIKES)
   const [filter, setFilter] = useState('')
   
+  const context = useContext(AppContext);
   const poemsQuery = usePoems()
 
   useEffect(()=> {
@@ -116,7 +115,7 @@ function List (props) {
                 name='sort'
                 onChange={(event) => {
                   onFieldChange(event.target.value, setSort)
-                  sortByCriteria(event.target.value)
+                  context.setState({sortPoemsBy: event.target.value})
                 }}
               >
                 <option value={ORDER_BY_LIKES}>{ORDER_BY_LIKES}</option>
