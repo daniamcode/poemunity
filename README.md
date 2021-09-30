@@ -1,6 +1,6 @@
 ## Important note
 
-There are two folders: flux and react-query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the react-query folder and continued from there. The project will grow in the react-query folder, as I now manage Server State (cache) with React-Query and Client State with useContext. We don't need anymore a Global State Manager like Flux or Redux since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
+There are two folders: flux and react-query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the react-query folder and continued from there. Now I manage Server State (cache) with React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
 
 # Poemunity - Fullstack React Application with Flux & Node.js
 
