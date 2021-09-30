@@ -74,7 +74,7 @@ function List (props) {
     setValue(value)
   }
 
-  if (auth0IsLoading) {
+  if (auth0IsLoading || poemsQuery.isLoading) {
     return <CircularProgress />
   }
 

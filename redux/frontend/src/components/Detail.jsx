@@ -17,16 +17,16 @@ import useLikePoem from '../react-query/useLikePoem'
 const { REACT_APP_ADMIN } = process.env
 
 function Detail (props) {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const [poem, setPoem] = useState([])
 
-  const poemsQuery = usePoem(props.match.params.poemId)
+  const poemQuery = usePoem(props.match.params.poemId)
 
   useEffect(()=> {
-    if(poemsQuery.data) {
-      setPoem(poemsQuery.data)
+    if(poemQuery.data) {
+      setPoem(poemQuery.data)
     }
-  }, [JSON.stringify(poemsQuery.data)])
+  }, [JSON.stringify(poemQuery.data)])
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
@@ -36,7 +36,7 @@ function Detail (props) {
     likePoemMutation.mutate({poemId, userId})
   }
 
-  if (isLoading) {
+  if (auth0IsLoading || poemQuery.isLoading) {
     return <CircularProgress />
   }
 

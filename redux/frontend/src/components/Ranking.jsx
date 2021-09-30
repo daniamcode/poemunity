@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper'
 import './Ranking.scss'
 import usePoems from '../react-query/usePoems'
 import { getRanking } from '../utils/getRanking.js'
+import CircularProgress from './CircularIndeterminate'
 import {
   RANKING_TITLE,
   RANKING_SUBTITLE,
@@ -46,6 +47,10 @@ export default function Ranking () {
       setRank(getRanking(poems, poemPoints, likePoints))
     }
   }, [JSON.stringify([poems, poemPoints, likePoints])])
+
+  if (poemsQuery.isLoading) {
+    return <CircularProgress />
+  }
 
   return (
     <>
