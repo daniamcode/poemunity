@@ -35,7 +35,6 @@ function List (props) {
   const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
   const [poems, setPoems] = useState([])
-  const [sort, setSort] = useState(ORDER_BY_LIKES)
   const [filter, setFilter] = useState('')
   
   const context = useContext(AppContext);
@@ -47,15 +46,15 @@ function List (props) {
 
       if(genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
-        const poemsSorted = sortPoems(sort, poemsFiltered)
+        const poemsSorted = sortPoems(context.sortPoemsBy, poemsFiltered)
         setPoems(poemsSorted)
       }
       else {
-        const poemsSorted = sortPoems(sort, newData)
+        const poemsSorted = sortPoems(context.sortPoemsBy, newData)
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([poemsQuery.data, genre, sort])])
+  }, [JSON.stringify([poemsQuery.data, genre, context.sortPoemsBy])])
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
@@ -67,10 +66,6 @@ function List (props) {
 
   const handleSearchChange = (event) => {
     setFilter(event.target.value)
-  }
-
-  function onFieldChange (value, setValue) {
-    setValue(value)
   }
 
   if (auth0IsLoading || poemsQuery.isLoading) {
@@ -114,7 +109,6 @@ function List (props) {
                 id='sort'
                 name='sort'
                 onChange={(event) => {
-                  onFieldChange(event.target.value, setSort)
                   context.setState({sortPoemsBy: event.target.value})
                 }}
               >

@@ -6,12 +6,13 @@ import Detail from './components/Detail'
 import Header from './components/Header'
 import Profile from './components/Profile'
 import PageNotFound from './components/PageNotFound'
+import {ORDER_BY_LIKES} from './data/constants'
 
 export const AppContext = React.createContext();
 
 function App (props) {
   const [contextState, setContextState] = useState({
-    sortPoemsBy: '',
+    sortPoemsBy: ORDER_BY_LIKES,
     setState(data) {
         const { setState, ...res } = data;
         const newState = { ...contextState, ...res };
