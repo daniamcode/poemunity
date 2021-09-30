@@ -1,6 +1,6 @@
 ## Important note
 
-There are two folders: flux and react-query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the react-query folder and continued from there. Now I manage Server State (cache) with React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
+There are two folders: flux and Poemunity-React-Query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the Poemunity-React-Query folder and continued from there. Now I manage Server State (cache) with Poemunity-React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
 
 # Poemunity - Fullstack React Application with Flux & Node.js
 
@@ -54,12 +54,12 @@ I've decided to launch this app into the real world. Just to remember:
 
 ### `npm run build` and deploy to Heroku
 
-Git clone the project. The Git repository on the root folder is the one that synchs with github. We go to "react-query", then the "frontend" folder, and type "npm run build" (npm i first, to install node_modules). This builds the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file). So we just have to serve the backend (that serves a static index; the whole frontend resumes into that static file)
+Git clone the project. The Git repository on the root folder is the one that synchs with github. We go to "Poemunity-React-Query", then the "frontend" folder, and type "npm run build" (npm i first, to install node_modules). This builds the frontend into static files, and redirects automatically (see prebuild and postbuild scripts on package.json) to the "public" folder of the "backend" folder. We also send there the favicon (poemunity.svg file). So we just have to serve the backend (that serves a static index; the whole frontend resumes into that static file)
 
 In the "backend" folder (npm i first, to install node_modules, and also install heroku) we create another git repository (git init) that is necessary in order to connect with Heroku. Each time that we make a new build, we type from inside of the backend folder: git add --all, git commit -m "modify static files from frontend" and "git push heroku master --force". Previously we have had to type heroku git:remote -a poemunity, in order to link the git repository to Heroku.
 
 (I need another terminal with the root open so I can add, commit and push all the changes to my repo)
-(I also need to create a .env file in react-query/backend with the info contained in my google drive (poemunity -> .env))
+(I also need to create a .env file in Poemunity-React-Query/backend with the info contained in my google drive (poemunity -> .env))
 
 That's it, Heroku builds the backend and deploys. Don't forget to add the env variables to Heroku (on production, from the backend folder. The .env file on the backed folder works fine on development, but for production I have to tell Heroku about them). The .env files (on backend and frontend folders) are included in .gitignore for security reasons.
 
