@@ -114,10 +114,10 @@ function List (props) {
                   context.setState({sortPoemsBy: event.target.value})
                 }}
               >
-                <option value={ORDER_BY_LIKES}>{ORDER_BY_LIKES}</option>
-                <option value={ORDER_BY_DATE}>{ORDER_BY_DATE}</option>
-                <option value={ORDER_BY_RANDOM}>{ORDER_BY_RANDOM}</option>
-                <option value={ORDER_BY_TITLE}>{ORDER_BY_TITLE}</option>
+                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === context.sortPoemsBy}>{ORDER_BY_LIKES}</option>
+                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === context.sortPoemsBy}>{ORDER_BY_DATE}</option>
+                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === context.sortPoemsBy}>{ORDER_BY_RANDOM}</option>
+                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === context.sortPoemsBy}>{ORDER_BY_TITLE}</option>
               </select>
             </label>
           </form>
