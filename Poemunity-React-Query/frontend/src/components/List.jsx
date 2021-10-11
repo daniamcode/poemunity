@@ -29,6 +29,8 @@ import {
   ORDER_BY_TITLE,
   CATEGORIES_TITLE_LABEL
 } from '../data/constants'
+import normalizeString from '../utils/normalizeString'
+
 const { REACT_APP_ADMIN } = process.env
 
 function List (props) {
@@ -65,7 +67,7 @@ function List (props) {
   }
 
   const handleSearchChange = (event) => {
-    setFilter(event.target.value)
+    setFilter(normalizeString(event.target.value))
   }
 
   if (auth0IsLoading || poemsQuery.isLoading) {
@@ -123,7 +125,7 @@ function List (props) {
 
         {poems?.map((poem) => (
           <main key={poem._id} className='poem__detail'>
-            {poem.author.includes(filter) && (
+            {normalizeString(poem.author).includes(filter) && (
               <section className='poem__block'>
                 <section>
                   <Link to={`/detail/${poem._id}`} className='poem__title'>

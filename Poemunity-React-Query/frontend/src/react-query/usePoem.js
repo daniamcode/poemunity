@@ -8,7 +8,7 @@ export default function usePoem(_id) {
     () => axios.get(`/api/poems/${_id}`).then((res) => res.data),
     {
       initialData: () => { 
-        return queryClient.getQueryData('poems')?.find(d => d.id == _id)
+        return queryClient.getQueryData('poems')?.find(d => d.id === _id)
       },
       initialStale: true,
       onError: (error) => {
