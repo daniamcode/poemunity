@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { AppContext } from '../App';
 import { Link } from 'react-router-dom'
 import './Detail.scss'
 import '../App.scss'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
+import EditIcon from '@material-ui/icons/Edit';
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
 import Disqus from 'disqus-react'
@@ -13,12 +15,15 @@ import { LIKE, LIKES } from '../data/constants'
 import usePoem from '../react-query/usePoem'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
+import { useHistory } from "react-router-dom";
 
 const { REACT_APP_ADMIN } = process.env
 
 function Detail (props) {
   const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const [poem, setPoem] = useState([])
+
+  const context = useContext(AppContext);
 
   const poemQuery = usePoem(props.match.params.poemId)
 
@@ -34,6 +39,14 @@ function Detail (props) {
   function onLike (event, poemId, userId) {
     event.preventDefault()
     likePoemMutation.mutate({poemId, userId})
+  }
+  
+  const history = useHistory();
+
+  const editPoem = (poemId) => {
+    const newPath = '/profile'
+    history.push(newPath);
+    context.setState({elementToEdit: poemId})
   }
 
   if (auth0IsLoading || poemQuery.isLoading) {
@@ -105,6 +118,14 @@ function Detail (props) {
                     className='poem__unlikes-icon'
                     onClick={(event) => onLike(event, poem._id, user.sub)}
                   />
+              )}
+              {isAuthenticated &&
+                (poem.author === user.name ||
+                  user.sub === REACT_APP_ADMIN) && (
+                    <EditIcon
+                    className='poem__edit-icon'
+                    onClick={(event) => editPoem(poem._id)}
+                    />
               )}
               {isAuthenticated &&
                 (poem.author === user.name || user.sub === REACT_APP_ADMIN) && (

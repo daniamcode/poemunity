@@ -20,6 +20,23 @@ const put = (req, res) => {
   })
 }
 
+const patch = (req, res) => {
+	const { poem } = req;
+
+	Object.entries(req.body).forEach((item) => {
+		const key = item[0];
+		const value = item[1];
+		poem[key] = value;
+	});
+  console.log(poem)
+	poem.save((error) => {
+		if (error) {
+			res.send(error);
+		}
+		res.json(poem);
+	});
+};
+
 const deleter = (req, res) => {
   const { poem } = req
 
@@ -31,4 +48,4 @@ const deleter = (req, res) => {
   })
 }
 
-module.exports = { get, put, deleter }
+module.exports = { get, put, patch, deleter }

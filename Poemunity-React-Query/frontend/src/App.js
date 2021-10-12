@@ -13,6 +13,7 @@ export const AppContext = React.createContext();
 function App (props) {
   const [contextState, setContextState] = useState({
     sortPoemsBy: ORDER_BY_LIKES,
+    elementToEdit: '',
     setState(data) {
         const { setState, ...res } = data;
         const newState = { ...contextState, ...res };

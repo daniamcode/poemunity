@@ -4,13 +4,13 @@ import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import { AppContext } from '../App';
-
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
+import EditIcon from '@material-ui/icons/Edit';
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
@@ -30,6 +30,7 @@ import {
   CATEGORIES_TITLE_LABEL
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
+import { useHistory } from "react-router-dom";
 
 const { REACT_APP_ADMIN } = process.env
 
@@ -61,9 +62,17 @@ function List (props) {
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
 
-  function onLike (event, poemId, userId) {
+  const onLike = (event, poemId, userId) => {
     event.preventDefault()
     likePoemMutation.mutate({poemId, userId})
+  }
+
+  const history = useHistory();
+
+  const editPoem = (poemId) => {
+    const newPath = '/profile'
+    history.push(newPath);
+    context.setState({elementToEdit: poemId})
   }
 
   const handleSearchChange = (event) => {
@@ -177,6 +186,14 @@ function List (props) {
                         className='poem__unlikes-icon'
                         onClick={(event) => onLike(event, poem._id, user.sub)}
                       />
+                  )}
+                  {isAuthenticated &&
+                    (poem.author === user.name ||
+                      user.sub === REACT_APP_ADMIN) && (
+                    <EditIcon
+                    className='poem__edit-icon'
+                    onClick={(event) => editPoem(poem._id)}
+                  />
                   )}
                   {isAuthenticated &&
                     (poem.author === user.name ||

@@ -28,6 +28,7 @@ function routes (Poem) {
     .route('/:poemId')
     .get(poemRouteController.get)
     .put(poemRouteController.put)
+    .patch(poemRouteController.patch)
     .delete(poemRouteController.deleter)
 
   return poemRouter

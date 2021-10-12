@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { AppContext } from '../App';
 import PropTypes from 'prop-types'
 import SwipeableViews from 'react-swipeable-views'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
@@ -14,6 +15,8 @@ import MyFavouritePoems from './MyFavouritePoems'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import useCreatePoem from '../react-query/useCreatePoem'
+import useSavePoem from '../react-query/useSavePoem'
+import usePoem from '../react-query/usePoem'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE,
@@ -28,6 +31,7 @@ import {
   PROFILE_SELECT_LIKES,
   PROFILE_POEM_PLACEHOLDER,
   PROFILE_SEND_POEM,
+  PROFILE_RESET_POEM,
   ADMIN
 } from '../data/constants'
 
@@ -83,9 +87,21 @@ export default function Profile (props) {
 
   const { user, isAuthenticated, isLoading } = useAuth0()
   const createPoemMutation = useCreatePoem()
+  const savePoemMutation = useSavePoem()
 
-  if (isLoading) {
-    return <CircularProgress />
+  const context = useContext(AppContext);
+  const poemQuery = usePoem(context.elementToEdit)
+
+  useEffect(()=> {
+    setPoemTitle(context.elementToEdit ? poemQuery?.data?.title : '')
+    setPoemContent(context.elementToEdit ? poemQuery?.data?.poem : '')
+    setPoemAuthorId(context.elementToEdit ? poemQuery?.data?.userId : '')
+    setPoemLikes(context.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
+    setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
+  }, [JSON.stringify([context.elementToEdit, poemQuery.data?.title])])
+
+  const editPoem = (poemId) => {
+    context.setState({elementToEdit: poemId})
   }
 
   const handleChange = (event, newValue) => {
@@ -100,9 +116,18 @@ export default function Profile (props) {
     setValue(value)
   }
 
-  function handleSubmit (event) {
+  const fakeUsers = [
+    {id: 1, name: 'Catherine Cawley', picture: 'https://cdn.getyourguide.com/img/location/5c88db055a755.jpeg/88.jpg'},
+    {id: 2, name: 'Stacey Cosgrove', picture: 'https://media-cdn.tripadvisor.com/media/photo-s/05/62/06/0e/restaurant-els-valencians.jpg'},
+    {id: 3, name: 'Sarah Griffin', picture: 'https://cdn.pixabay.com/photo/2017/11/09/17/11/sea-2934076_960_720.jpg'},
+    {id: 4, name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
+  ]
+
+  const fakeUser = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
+
+  const handleSend = (event) => {
     event.preventDefault()
-    event.target.reset()
+    // event.target.reset()
 
     const currentDatetime = new Date()
     const formattedDate =
@@ -118,41 +143,63 @@ export default function Profile (props) {
       ':' +
       currentDatetime.getSeconds()
 
-    const fakeUsers = [
-      {id: 1, name: 'Catherine Cawley', picture: 'https://cdn.getyourguide.com/img/location/5c88db055a755.jpeg/88.jpg'},
-      {id: 2, name: 'Stacey Cosgrove', picture: 'https://media-cdn.tripadvisor.com/media/photo-s/05/62/06/0e/restaurant-els-valencians.jpg'},
-      {id: 3, name: 'Sarah Griffin', picture: 'https://cdn.pixabay.com/photo/2017/11/09/17/11/sea-2934076_960_720.jpg'},
-      {id: 4, name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
-    ]
+      if(!context.elementToEdit) {
+        if(user?.sub === ADMIN) {
+          createPoemMutation.mutate({
+            userId: poemAuthorId,
+            author: fakeUser?.name || '',
+            picture: fakeUser?.picture || '',
+            poem: poemContent,
+            title: poemTitle,
+            genre: poemCategory,
+            likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+            date: formattedDate,
+          });  
+        } else {
+          createPoemMutation.mutate({
+            userId: user.sub,
+            author: user.name,
+            picture: user.picture,
+            poem: poemContent,
+            title: poemTitle,
+            genre: poemCategory,
+            likes: [],
+            date: formattedDate,
+          });
+        }
+        setPoemContent('')
+        setPoemTitle('')
+        setPoemCategory('')
+      } else {
+        if(user?.sub === ADMIN) {
+          savePoemMutation.mutate({poem: {
+            userId: poemAuthorId,
+            author: fakeUser?.name || '',
+            picture: fakeUser?.picture || '',
+            poem: poemContent,
+            title: poemTitle,
+            genre: poemCategory,
+            likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+            date: formattedDate,
+          }, poemId: poemQuery.data._id});  
+        } else {
+          savePoemMutation.mutate({poem: {
+            userId: user.sub,
+            author: user.name,
+            picture: user.picture,
+            poem: poemContent,
+            title: poemTitle,
+            genre: poemCategory,
+            likes: [],
+            date: formattedDate,
+          }, poemId: poemQuery.data._id});
+        }
+        context.setState({elementToEdit: ''})
+      }
+  }
 
-    const fakeUser = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
-
-    if(user?.sub === ADMIN) {
-      createPoemMutation.mutate({
-        userId: poemAuthorId,
-        author: fakeUser?.name || '',
-        picture: fakeUser?.picture || '',
-        poem: poemContent,
-        title: poemTitle,
-        genre: poemCategory,
-        likes: poemLikes.length !== 0 ? [...poemLikes.split(',')] : [],
-        date: formattedDate,
-      });  
-    } else {
-      createPoemMutation.mutate({
-        userId: user.sub,
-        author: user.name,
-        picture: user.picture,
-        poem: poemContent,
-        title: poemTitle,
-        genre: poemCategory,
-        likes: [],
-        date: formattedDate,
-      });
-    }
-    setPoemContent('')
-    setPoemTitle('')
-    setPoemCategory('')
+  const handleReset = (event) => {
+    context.setState({elementToEdit: ''})
   }
 
   return (
@@ -176,7 +223,6 @@ export default function Profile (props) {
               <br />
               <form
                 className='profile__insert-poem-form'
-                onSubmit={handleSubmit}
               >
                 <div className='profile__insert-poem-inputs'>
                   {
@@ -231,7 +277,7 @@ export default function Profile (props) {
                     >
                       <option value=''>{PROFILE_SELECT_CATEGORY}</option>
                       {CATEGORIES?.map((category) => (
-                        <option value={category.toLowerCase()}>
+                        <option value={category.toLowerCase()} selected={poemQuery?.data?.genre === category.toLowerCase()}>
                           {category}
                         </option>
                       ))}
@@ -251,7 +297,10 @@ export default function Profile (props) {
                   />
                 </div>
 
-                <button className='profile__send-poem' type='submit'>
+                <button className='profile__send-poem' type='submit' onClick={handleReset}>
+                  {PROFILE_RESET_POEM}
+                </button>
+                <button className='profile__send-poem' type='submit' onClick={handleSend}>
                   {PROFILE_SEND_POEM}
                 </button>
               </form>

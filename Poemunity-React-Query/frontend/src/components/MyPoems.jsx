@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { AppContext } from '../App';
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
+import EditIcon from '@material-ui/icons/Edit';
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -13,12 +15,15 @@ import usePoems from '../react-query/usePoems'
 import getPoemsByUser from '../utils/getPoemsByUser'
 import useDeletePoem from '../react-query/useDeletePoem'
 
+const { REACT_APP_ADMIN } = process.env
+
 function MyPoems (props) {
   const { user, isAuthenticated, isLoading } = useAuth0()
 
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
+  const context = useContext(AppContext);
   const poemsQuery = usePoems()
 
   useEffect(()=> {
@@ -27,6 +32,10 @@ function MyPoems (props) {
       setPoems(poemsFiltered)
     }
   }, [JSON.stringify([poemsQuery.data, user])])
+
+  const editPoem = (poemId) => {
+    context.setState({elementToEdit: poemId})
+  }
 
   const deletePoemMutation = useDeletePoem()
 
@@ -94,6 +103,14 @@ function MyPoems (props) {
                   </div>
                 )}
                 <div className='separator' />
+                {isAuthenticated &&
+                  (poem.author === user.name ||
+                    user.sub === REACT_APP_ADMIN) && (
+                      <EditIcon
+                      className='poem__edit-icon'
+                      onClick={(event) => editPoem(poem._id)}
+                      />
+                )}
                 {isAuthenticated && poem.author === user.name && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
