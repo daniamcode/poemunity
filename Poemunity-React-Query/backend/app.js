@@ -1,32 +1,29 @@
-const express = require('express')
-const debug = require('debug')('app')
-const mongoose = require('mongoose')
-const bodyParser = require('body-parser')
+require('./mongo')
 
+const express = require('express')
 const app = express()
+const debug = require('debug')('app')
+const path = require('path')
 const port = process.env.PORT || 8080
-const Poem = require('./src/models/poemModel')
-const { MONGODB } = process.env
+
+const loginRouter = require('./src/controllers/login')
+const usersRouter = require('./src/controllers/users')
+const poemsRouter = require('./src/controllers/poems')
+const poemRouter = require('./src/controllers/poem')
+
+app.use(express.json())
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('public'))
 }
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-)
-app.use(bodyParser.json())
 
-mongoose.connect(MONGODB)
-
-const poemRouter = require('./src/routes/poemRouter')(Poem)
-
+app.use('/api/login', loginRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/poems', poemsRouter)
 app.use('/api/poems', poemRouter)
 
-app.listen(port, () => debug(`running on port ${port}`))
+const server = app.listen(port, () => debug(`running on port ${port}`))
 
-const path = require('path')
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
@@ -36,3 +33,5 @@ if (process.env.NODE_ENV === 'production') {
     res.send('Server is ok')
   })
 }
+
+module.exports = { app, server }
