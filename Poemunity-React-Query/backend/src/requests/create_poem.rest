@@ -1,0 +1,10 @@
+POST http://localhost:4200/api/poems
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNmFhOWYyZTExZTNlZTdjZjg2Y2JkZiIsInVzZXJuYW1lIjoiZGFuaWFtMiIsImlhdCI6MTYzNDM4MzczNiwiZXhwIjoxNjM0OTg4NTM2fQ.7FXmNBfME4gNZDk4u0kdsHYAbJuNvHWIJR_hDd-OOb4
+
+{
+    "likes": [],
+    "poem": "test10",
+    "title": "test2",
+    "genre": "haikus"
+}
