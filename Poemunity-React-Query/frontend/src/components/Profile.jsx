@@ -12,11 +12,13 @@ import './Profile.scss'
 import '../App.scss'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
+import Notification from './Notification'
 import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import useCreatePoem from '../react-query/useCreatePoem'
 import useSavePoem from '../react-query/useSavePoem'
 import usePoem from '../react-query/usePoem'
+import useLogin from '../react-query/useLogin'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE,
@@ -85,7 +87,11 @@ export default function Profile (props) {
   const [poemCategory, setPoemCategory] = useState('')
   const [poemLikes, setPoemLikes] = useState([])
 
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  // const { user, isAuthenticated, isLoading } = useAuth0()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
+  // const [errorMessage, setErrorMessage] = useState(null)
   const createPoemMutation = useCreatePoem()
   const savePoemMutation = useSavePoem()
 
@@ -95,10 +101,10 @@ export default function Profile (props) {
   useEffect(()=> {
     setPoemTitle(context.elementToEdit ? poemQuery?.data?.title : '')
     setPoemContent(context.elementToEdit ? poemQuery?.data?.poem : '')
-    setPoemAuthorId(context.elementToEdit ? poemQuery?.data?.userId : '')
+    // setPoemAuthorId(context.elementToEdit ? poemQuery?.data?.userId : '')
     setPoemLikes(context.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
     setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
-  }, [JSON.stringify([context.elementToEdit, poemQuery.data?.title])])
+  }, [JSON.stringify([context.elementToEdit, poemQuery.data])])
 
   const editPoem = (poemId) => {
     context.setState({elementToEdit: poemId})
@@ -145,27 +151,21 @@ export default function Profile (props) {
 
       if(!context.elementToEdit) {
         if(user?.sub === ADMIN) {
-          createPoemMutation.mutate({
-            userId: poemAuthorId,
-            author: fakeUser?.name || '',
-            picture: fakeUser?.picture || '',
+          createPoemMutation.mutate({poem: {
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
-          });  
+          }, token: user.token});  
         } else {
-          createPoemMutation.mutate({
-            userId: user.sub,
-            author: user.name,
-            picture: user.picture,
+          createPoemMutation.mutate({poem: {
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: [],
             date: formattedDate,
-          });
+          }, token: user.token});
         }
         setPoemContent('')
         setPoemTitle('')
@@ -173,9 +173,6 @@ export default function Profile (props) {
       } else {
         if(user?.sub === ADMIN) {
           savePoemMutation.mutate({poem: {
-            userId: poemAuthorId,
-            author: fakeUser?.name || '',
-            picture: fakeUser?.picture || '',
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
@@ -184,9 +181,6 @@ export default function Profile (props) {
           }, poemId: poemQuery.data._id});  
         } else {
           savePoemMutation.mutate({poem: {
-            userId: user.sub,
-            author: user.name,
-            picture: user.picture,
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
@@ -202,20 +196,83 @@ export default function Profile (props) {
     context.setState({elementToEdit: ''})
   }
 
+  const loginQuery = useLogin()
+
+  const handleLogin = (event) => {
+    event.preventDefault()
+    loginQuery.mutate({username, password})
+    
+    setUsername('')
+    setPassword('')
+    
+    window.localStorage.setItem(
+      'loggedUser', JSON.stringify(loginQuery?.data)
+    )
+      setUser(loginQuery?.data)
+  }
+  
+  useEffect(()=> {    
+    const loggedUserJSON = window.localStorage.getItem('loggedUser')
+    const loggedUser = JSON.parse(loggedUserJSON)
+    
+    setUser(loggedUser)
+  }, [])
+
+  const handleLogout = (event) => {
+    event.preventDefault()
+    setUser(null)
+    
+    window.localStorage.removeItem('loggedUser')
+  }
+
   return (
-    isAuthenticated && (
+    
       <main className='profile__main'>
-        <section className='profile__title'>
+        {
+          !user ?
+          (<form onSubmit={handleLogin}>
           <div>
-            {user.name}
+            <input
+              type='text'
+              value={username}
+              name='Username'
+              placeholder='Username'
+              onChange={
+                ({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            <input
+              type='password'
+              value={password}
+              name='Password'
+              placeholder='Password'
+              onChange={
+                ({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <button>
+            Login
+          </button>
+          {/* <Notification message={errorMessage}/> */}
+          
+        </form>)
+        : (
+          <div>
+            <button onClick={handleLogout}>
+            Logout
+          </button>
+          <section className='profile__title'>
+          <div>
+            {user?.name}
             {PROFILE_TITLE}
           </div>
         </section>
         <section className='profile__intro'>
           <img
             className='profile__image'
-            src={user.picture}
-            alt={user.name}
+            src={user?.picture}
+            alt={user?.name}
           />
           <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
@@ -226,7 +283,7 @@ export default function Profile (props) {
               >
                 <div className='profile__insert-poem-inputs'>
                   {
-                  user.sub === ADMIN && (
+                  user?.sub === ADMIN && (
                   <>
                     <label className='profile__insert-poem-input'>
                       {PROFILE_SELECT_TITLE_AUTHOR}
@@ -346,7 +403,13 @@ export default function Profile (props) {
             </SwipeableViews>
           </div>
         </section>
+        </div>
+
+        )
+        }
+        
+        
       </main>
-    )
+    
   )
 }

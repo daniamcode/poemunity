@@ -71,13 +71,13 @@ function MyPoems (props) {
       </div>
       {poems.map((poem) => (
         <main key={poem._id} className='poem__detail'>
-          {poem.author.includes(filter) && (
+          {poem.author?.includes(filter) && (
             <section className='poem__block'>
               <section>
                 <Link to={`/detail/${poem._id}`} className='poem__title'>
                   {poem.title}
                 </Link>
-                <p className='poem__author'>{poem.author}</p>
+                <p className='poem__author'>{poem?.author}</p>
                 <div className='poem__date'>{poem.date}</div>
               </section>
               <section>

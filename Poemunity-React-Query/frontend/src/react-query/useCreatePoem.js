@@ -3,8 +3,14 @@ import { useMutation, useQueryClient } from 'react-query';
 
 export default function useCreatePoem() {
  const queryClient = useQueryClient()
-  return useMutation(
-    (poem) => axios.post('/api/poems', poem).then((res) => res.data),
+ return useMutation(
+   ({poem, token}) => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      axios.post('/api/poems', poem, config).then((res) => res.data)},
     {
       onSuccess: () => {        
         queryClient.invalidateQueries('poems')
