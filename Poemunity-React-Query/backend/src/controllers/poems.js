@@ -23,7 +23,8 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
 
   const newPoem = new Poem({
     ...poem,
-    userId: user._id
+    userId: user._id,
+    author: user.username
   })
   try {
     const savedPoem = await newPoem.save()
