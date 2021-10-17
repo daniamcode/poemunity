@@ -16,22 +16,22 @@ poemRouter.get('/:poemId', async (req, res) => {
   })
 })
 
-// poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
-//   const { poem } = req
-//   if (poem.likes.some((id) => id === req.body.userId)) {
-//     poem.likes.splice(poem.likes.indexOf(req.body.userId), 1)
-//   } else {
-//     poem.likes.push(req.body.userId)
-//   }
+poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
+  const { poem } = req
+  if (poem.likes.some((id) => id == req.userId)) {
+    poem.likes.splice(poem.likes.indexOf(req.userId), 1)
+  } else {
+    poem.likes.push(req.userId)
+  }
 
-//   poem.save((error) => {
-//     if (error) {
-//       res.send(error)
-//     } else {
-//       res.json(poem)
-//     }
-//   })
-// })
+  poem.save((error) => {
+    if (error) {
+      res.send(error)
+    } else {
+      res.json(poem)
+    }
+  })
+})
     
 poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req;
@@ -53,9 +53,12 @@ poemRouter.delete('/:poemId', userExtractor, async (req, res) => {
   const { poemId } = req.params
   
   const response = await Poem.findByIdAndDelete(poemId)
-  if (response === null) return res.sendStatus(404)
+  if (response === null) {
+    return res.status(404).json({
+    error: 'poem not found or not deleted'
+  })}
 
   res.status(204).end()
 })
 
-module.exports = poemRouter
+module.exports = poemRouter 

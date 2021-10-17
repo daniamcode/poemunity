@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
-  const authorization = req.get('authorization')//express method to get this header
+  const authorization = req.get('authorization') //express method to get this header
   let token = ''
     
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {

@@ -6,7 +6,10 @@ const poemSchema = new Schema({
   author: String,
   picture: String,
   genre: String,
-  likes: [{ String }],
+  likes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   date: Date,
   userId: {
     type: Schema.Types.ObjectId,
