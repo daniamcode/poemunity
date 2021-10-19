@@ -1,12 +1,18 @@
 import React from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useHistory } from 'react-router'
 import './Header.scss'
 
 const Logout = () => {
-  const { logout } = useAuth0()
+  const history = useHistory()
+ 
+  const handleLogout = (event) => {
+    event.preventDefault()
+    window.localStorage.removeItem('loggedUser')
+    history.push('/')
+  }
 
   return (
-    <button className='header__logout' onClick={() => logout({ returnTo: window.location.origin })} />
+    <button className='header__logout' onClick={handleLogout} />
   )
 }
 
