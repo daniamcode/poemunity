@@ -1,11 +1,55 @@
-import React from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import React, {useState} from 'react'
 import './Header.scss'
+import { useHistory } from 'react-router'
+import { NavLink } from 'react-router-dom'
+import useLogin from '../react-query/useLogin'
 
 const Login = () => {
-  const { loginWithRedirect } = useAuth0()
+  const history = useHistory()
+  
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-  return <button className='header__login' onClick={() => loginWithRedirect()} />
+  const loginQuery = useLogin()
+
+  const handleLogin = (event) => {
+    event.preventDefault()
+    loginQuery.mutate({username, password})
+    
+    setUsername('')
+    setPassword('')
+  }
+
+  return (
+    <form onSubmit={handleLogin}>
+          <div>
+            <input
+              type='text'
+              value={username}
+              name='Username'
+              placeholder='Username'
+              onChange={
+                ({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            <input
+              type='password'
+              value={password}
+              name='Password'
+              placeholder='Password'
+              onChange={
+                ({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <button>
+            Login
+          </button>
+          <NavLink to='/register'>Register</NavLink>
+          {/* <Notification message={errorMessage}/> */}
+          
+        </form>
+  )
 }
 
 export default Login
