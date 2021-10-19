@@ -7,6 +7,7 @@ const path = require('path')
 const port = process.env.PORT || 8080
 
 const loginRouter = require('./src/controllers/login')
+const registerRouter = require('./src/controllers/register')
 const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
@@ -18,6 +19,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use('/api/login', loginRouter)
+app.use('/api/register', registerRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/poems', poemsRouter)
 app.use('/api/poems', poemRouter)

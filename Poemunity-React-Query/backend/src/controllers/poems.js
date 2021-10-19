@@ -5,7 +5,6 @@ const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 
 poemsRouter.get('/', async (req, res) => {
-  console.log(req)
   Poem.find((error, poems) => {
     if (error) {
       res.send(error)
