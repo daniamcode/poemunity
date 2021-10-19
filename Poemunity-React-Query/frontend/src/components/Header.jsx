@@ -1,19 +1,28 @@
-import React from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import './Header.scss'
 import '../App.scss'
 import Accordion from './SimpleAccordion'
 import CircularProgress from './CircularIndeterminate'
-import LoginButton from './Login'
+import LoginButton from './LoginButton'
 import LogoutButton from './Logout'
 import { useAuth0 } from '@auth0/auth0-react'
 import {
   WEB_SUBTITLE,
 } from '../data/constants'
+import { AppContext } from '../App';
+import {useLocation} from 'react-router-dom'
 
 function Header () {
   const { isAuthenticated, isLoading } = useAuth0()
+  const context = useContext(AppContext);
+  const location = useLocation()
 
+  useEffect(()=>{
+    const loggedUserJSON = window.localStorage.getItem('loggedUser')
+    context.setState({ user: JSON.parse(loggedUserJSON) })
+  }, [JSON.stringify(location)])
+  
   if (isLoading) {
     return <CircularProgress />
   }
@@ -34,12 +43,12 @@ function Header () {
         </div>
         <p className='list__presentation'>{WEB_SUBTITLE}</p>
         <div className='separator' />
-        {isAuthenticated ? (
+        {context.user ? (
           <Link to='/profile' className='header__profile' />
         ) : (
           <></>
         )}
-        {isAuthenticated ? <LogoutButton /> : <LoginButton />}
+        {context.user ? <LogoutButton /> : <LoginButton />}
       </section>
     </>
   )

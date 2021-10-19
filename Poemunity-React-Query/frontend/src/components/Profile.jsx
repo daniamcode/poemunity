@@ -18,7 +18,6 @@ import CircularProgress from './CircularIndeterminate'
 import useCreatePoem from '../react-query/useCreatePoem'
 import useSavePoem from '../react-query/useSavePoem'
 import usePoem from '../react-query/usePoem'
-import useLogin from '../react-query/useLogin'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE,
@@ -88,9 +87,6 @@ export default function Profile (props) {
   const [poemLikes, setPoemLikes] = useState([])
 
   // const { user, isAuthenticated, isLoading } = useAuth0()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   // const [errorMessage, setErrorMessage] = useState(null)
   const createPoemMutation = useCreatePoem()
   const savePoemMutation = useSavePoem()
@@ -150,14 +146,14 @@ export default function Profile (props) {
       currentDatetime.getSeconds()
 
       if(!context.elementToEdit) {
-        if(user?.sub === ADMIN) {
+        if(context.user === ADMIN) {
           createPoemMutation.mutate({poem: {
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
-          }, token: user.token});  
+          }, token: context.user.token});  
         } else {
           createPoemMutation.mutate({poem: {
             poem: poemContent,
@@ -165,13 +161,13 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: [],
             date: formattedDate,
-          }, token: user.token});
+          }, token: context.user.token});
         }
         setPoemContent('')
         setPoemTitle('')
         setPoemCategory('')
       } else {
-        if(user?.sub === ADMIN) {
+        if(context.user === ADMIN) {
           savePoemMutation.mutate({poem: {
             poem: poemContent,
             title: poemTitle,
@@ -196,31 +192,9 @@ export default function Profile (props) {
     context.setState({elementToEdit: ''})
   }
 
-  const loginQuery = useLogin()
-
-  const handleLogin = (event) => {
-    event.preventDefault()
-    loginQuery.mutate({username, password})
-    
-    setUsername('')
-    setPassword('')
-    
-    window.localStorage.setItem(
-      'loggedUser', JSON.stringify(loginQuery?.data)
-    )
-      setUser(loginQuery?.data)
-  }
-  
-  useEffect(()=> {    
-    const loggedUserJSON = window.localStorage.getItem('loggedUser')
-    const loggedUser = JSON.parse(loggedUserJSON)
-    
-    setUser(loggedUser)
-  }, [])
-
   const handleLogout = (event) => {
     event.preventDefault()
-    setUser(null)
+    context.setState({ user: null })
     
     window.localStorage.removeItem('loggedUser')
   }
@@ -229,50 +203,20 @@ export default function Profile (props) {
     
       <main className='profile__main'>
         {
-          !user ?
-          (<form onSubmit={handleLogin}>
+          context.user ?
+          (
           <div>
-            <input
-              type='text'
-              value={username}
-              name='Username'
-              placeholder='Username'
-              onChange={
-                ({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type='password'
-              value={password}
-              name='Password'
-              placeholder='Password'
-              onChange={
-                ({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button>
-            Login
-          </button>
-          {/* <Notification message={errorMessage}/> */}
-          
-        </form>)
-        : (
-          <div>
-            <button onClick={handleLogout}>
-            Logout
-          </button>
           <section className='profile__title'>
           <div>
-            {user?.name}
+            {context.user?.username}
             {PROFILE_TITLE}
           </div>
         </section>
         <section className='profile__intro'>
           <img
             className='profile__image'
-            src={user?.picture}
-            alt={user?.name}
+            src={context.user?.picture}
+            alt={context.user?.username}
           />
           <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
@@ -283,7 +227,7 @@ export default function Profile (props) {
               >
                 <div className='profile__insert-poem-inputs'>
                   {
-                  user?.sub === ADMIN && (
+                  context.user === ADMIN && (
                   <>
                     <label className='profile__insert-poem-input'>
                       {PROFILE_SELECT_TITLE_AUTHOR}
@@ -405,7 +349,7 @@ export default function Profile (props) {
         </section>
         </div>
 
-        )
+        ) : null
         }
         
         
