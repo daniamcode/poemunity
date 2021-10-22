@@ -6,7 +6,6 @@ import '../App.scss'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import EditIcon from '@material-ui/icons/Edit';
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
-import { useAuth0 } from '@auth0/auth0-react'
 import Disqus from 'disqus-react'
 import CircularProgress from './CircularIndeterminate'
 import './PageNotFound.scss'
@@ -17,10 +16,7 @@ import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import { useHistory } from "react-router-dom";
 
-const { REACT_APP_ADMIN } = process.env
-
 function Detail (props) {
-  const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const [poem, setPoem] = useState([])
 
   const context = useContext(AppContext);
@@ -36,9 +32,9 @@ function Detail (props) {
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
 
-  function onLike (event, poemId, userId) {
+  function onLike (event, poemId) {
     event.preventDefault()
-    likePoemMutation.mutate({poemId, userId})
+    likePoemMutation.mutate(poemId)
   }
   
   const history = useHistory();
@@ -49,7 +45,7 @@ function Detail (props) {
     context.setState({elementToEdit: poemId})
   }
 
-  if (auth0IsLoading || poemQuery.isLoading) {
+  if (poemQuery.isLoading) {
     return <CircularProgress />
   }
 
@@ -103,39 +99,39 @@ function Detail (props) {
                 </div>
               )}
               <div className='separator' />
-              {isAuthenticated &&
-                poem.author !== user.name &&
-                poem.likes.some((id) => id === user.sub) && (
+              {context.user &&
+                poem.author !== context.username &&
+                poem.likes.some((id) => id === context.username) && (
                   <Link
                     className='poem__likes-icon'
-                    onClick={(event) => onLike(event, poem._id, user.sub)}
+                    onClick={(event) => onLike(event, poem.id)}
                   />
               )}
-              {isAuthenticated &&
-                poem.author !== user.name &&
-                !poem.likes.some((id) => id === user.sub) && (
+              {context.user &&
+                poem.author !== context.username &&
+                !poem.likes.some((id) => id === context.username) && (
                   <Link
                     className='poem__unlikes-icon'
-                    onClick={(event) => onLike(event, poem._id, user.sub)}
+                    onClick={(event) => onLike(event, poem.id)}
                   />
               )}
-              {isAuthenticated &&
-                (poem.author === user.name ||
-                  user.sub === REACT_APP_ADMIN) && (
+              {context.user &&
+                (poem.author === context.username ||
+                  context.userId === context.adminId) && (
                     <EditIcon
                     className='poem__edit-icon'
-                    onClick={(event) => editPoem(poem._id)}
+                    onClick={(event) => editPoem(poem.id)}
                     />
               )}
-              {isAuthenticated &&
-                (poem.author === user.name || user.sub === REACT_APP_ADMIN) && (
+              {context.user &&
+                (poem.author === context.username || context.userId === context.adminId) && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
                   />
               )}
-              <Link to={`/detail/${poem._id}`} className='poem__comments-icon'>
+              <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
                 <SubjectSharpIcon style={{ fill: '#000' }} />
               </Link>
             </section>

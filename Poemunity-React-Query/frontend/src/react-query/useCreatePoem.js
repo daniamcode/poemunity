@@ -1,16 +1,15 @@
 import axios from 'axios'
 import { useMutation, useQueryClient } from 'react-query';
+import { useContext } from 'react';
+import { AppContext } from '../App';
 
 export default function useCreatePoem() {
  const queryClient = useQueryClient()
+ const context = useContext(AppContext);
  return useMutation(
-   ({poem, token}) => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-      axios.post('/api/poems', poem, config).then((res) => res.data)},
+   (poem) => {
+     console.log(poem)
+      axios.post('/api/poems', poem, context.config).then((res) => res.data)},
     {
       onSuccess: () => {        
         queryClient.invalidateQueries('poems')

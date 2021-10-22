@@ -12,7 +12,6 @@ import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import EditIcon from '@material-ui/icons/Edit';
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
-import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import capitalizeFirstLetter from '../utils/capitalizeFirstLetter'
 import sortPoems from '../utils/sortPoems'
@@ -32,10 +31,7 @@ import {
 import normalizeString from '../utils/normalizeString'
 import { useHistory } from "react-router-dom";
 
-const { REACT_APP_ADMIN } = process.env
-
 function List (props) {
-  const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
@@ -62,9 +58,9 @@ function List (props) {
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
 
-  const onLike = (event, poemId, userId) => {
+  const onLike = (event, poemId) => {
     event.preventDefault()
-    likePoemMutation.mutate({poemId, userId})
+    likePoemMutation.mutate(poemId)
   }
 
   const history = useHistory();
@@ -79,7 +75,7 @@ function List (props) {
     setFilter(normalizeString(event.target.value))
   }
 
-  if (auth0IsLoading || poemsQuery.isLoading) {
+  if (poemsQuery.isLoading) {
     return <CircularProgress />
   }
 
@@ -133,11 +129,11 @@ function List (props) {
         </div>
 
         {poems?.map((poem) => (
-          <main key={poem._id} className='poem__detail'>
+          <main key={poem.id} className='poem__detail'>
             {normalizeString(poem.author).includes(filter) && (
               <section className='poem__block'>
                 <section>
-                  <Link to={`/detail/${poem._id}`} className='poem__title'>
+                  <Link to={`/detail/${poem.id}`} className='poem__title'>
                     {poem.title}
                   </Link>
                   <div className='poem__author-container'>
@@ -152,7 +148,7 @@ function List (props) {
                   </div>
                   <div className='poems__read-more'>
                     <Link
-                      to={`/detail/${poem._id}`}
+                      to={`/detail/${poem.id}`}
                       className='poems__read-more'
                     >
                       {READ_MORE}
@@ -171,41 +167,41 @@ function List (props) {
                     </div>
                   )}
                   <div className='separator' />
-                  {isAuthenticated &&
-                    poem.author !== user.name &&
-                    poem.likes.some((id) => id === user.sub) && (
+                  {context.user &&
+                    poem.author !== context.username &&
+                    poem.likes.some((id) => id === context.username) && (
                       <Link
                         className='poem__likes-icon'
-                        onClick={(event) => onLike(event, poem._id, user.sub)}
+                        onClick={(event) => onLike(event, poem.id)}
                       />
                   )}
-                  {isAuthenticated &&
-                    poem.author !== user.name &&
-                    !poem.likes.some((id) => id === user.sub) && (
+                  {context.user &&
+                    poem.author !== context.username &&
+                    !poem.likes.some((id) => id === context.username) && (
                       <Link
                         className='poem__unlikes-icon'
-                        onClick={(event) => onLike(event, poem._id, user.sub)}
+                        onClick={(event) => onLike(event, poem.id)}
                       />
                   )}
-                  {isAuthenticated &&
-                    (poem.author === user.name ||
-                      user.sub === REACT_APP_ADMIN) && (
+                  {context.user &&
+                    (poem.author === context.username ||
+                      context.userId === context.adminId) && (
                     <EditIcon
                     className='poem__edit-icon'
-                    onClick={(event) => editPoem(poem._id)}
+                    onClick={(event) => editPoem(poem.id)}
                   />
                   )}
-                  {isAuthenticated &&
-                    (poem.author === user.name ||
-                      user.sub === REACT_APP_ADMIN) && (
+                  {context.user &&
+                    (poem.author === context.username ||
+                      context.userId === context.adminId) && (
                         <HighlightOffSharpIcon
                           className='poem__delete-icon'
                           style={{ fill: 'red' }}
-                          onClick={(event) => deletePoemMutation.mutate(poem._id)}
+                          onClick={(event) => deletePoemMutation.mutate(poem.id)}
                         />
                   )}
                   <Link
-                    to={`/detail/${poem._id}`}
+                    to={`/detail/${poem.id}`}
                     className='poem__comments-icon'
                   >
                     <SubjectSharpIcon style={{ fill: '#000' }} />

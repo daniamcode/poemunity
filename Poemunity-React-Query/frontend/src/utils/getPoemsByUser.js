@@ -1,5 +1,5 @@
-const getPoemsByUser = (poems, user) => {
-    return poems.filter((poem) => poem?.author === user?.name)
+const getPoemsByUser = (poems, username) => {
+    return poems.filter((poem) => poem?.author === username)
 }
 
 export default getPoemsByUser

@@ -9,17 +9,12 @@ import SearchIcon from '@material-ui/icons/Search'
 import EditIcon from '@material-ui/icons/Edit';
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
-import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import usePoems from '../react-query/usePoems'
 import getPoemsByUser from '../utils/getPoemsByUser'
 import useDeletePoem from '../react-query/useDeletePoem'
 
-const { REACT_APP_ADMIN } = process.env
-
 function MyPoems (props) {
-  const { user, isAuthenticated, isLoading } = useAuth0()
-
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
@@ -28,10 +23,10 @@ function MyPoems (props) {
 
   useEffect(()=> {
     if(poemsQuery.data) {
-      const poemsFiltered = getPoemsByUser(poemsQuery.data, user)
+      const poemsFiltered = getPoemsByUser(poemsQuery.data, context.username)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery.data, user])])
+  }, [JSON.stringify([poemsQuery.data, context.username])])
 
   const editPoem = (poemId) => {
     context.setState({elementToEdit: poemId})
@@ -47,9 +42,9 @@ function MyPoems (props) {
     setFilter(event.target.value)
   }
 
-  if (isLoading) {
-    return <CircularProgress />
-  }
+  // if (isLoading) {
+  //   return <CircularProgress />
+  // }
 
   return (
     <>
@@ -70,11 +65,11 @@ function MyPoems (props) {
         </div>
       </div>
       {poems.map((poem) => (
-        <main key={poem._id} className='poem__detail'>
+        <main key={poem.id} className='poem__detail'>
           {poem.author?.includes(filter) && (
             <section className='poem__block'>
               <section>
-                <Link to={`/detail/${poem._id}`} className='poem__title'>
+                <Link to={`/detail/${poem.id}`} className='poem__title'>
                   {poem.title}
                 </Link>
                 <p className='poem__author'>{poem?.author}</p>
@@ -84,7 +79,7 @@ function MyPoems (props) {
                 <div className='poem__content poems__content'>{poem.poem}</div>
                 <div className='poems__read-more'>
                   <Link
-                    to={`/detail/${poem._id}`}
+                    to={`/detail/${poem.id}`}
                     className='poems__read-more'
                   >
                     {READ_MORE}
@@ -103,23 +98,23 @@ function MyPoems (props) {
                   </div>
                 )}
                 <div className='separator' />
-                {isAuthenticated &&
-                  (poem.author === user.name ||
-                    user.sub === REACT_APP_ADMIN) && (
+                {context.user &&
+                  (poem.author === context.username ||
+                    context.userId === context.adminId) && (
                       <EditIcon
                       className='poem__edit-icon'
-                      onClick={(event) => editPoem(poem._id)}
+                      onClick={(event) => editPoem(poem.id)}
                       />
                 )}
-                {isAuthenticated && poem.author === user.name && (
+                {context.user && poem.author === context.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
                   />
                 )}
                 <Link
-                  to={`/detail/${poem._id}`}
+                  to={`/detail/${poem.id}`}
                   className='poem__comments-icon'
                 >
                   <SubjectSharpIcon style={{ fill: '#000' }} />

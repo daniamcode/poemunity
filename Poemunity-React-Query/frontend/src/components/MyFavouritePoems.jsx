@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { AppContext } from '../App';
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
@@ -7,34 +8,34 @@ import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
-import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
+import parseJWT from '../utils/parseJWT'
 
 function MyFavouritePoems (props) {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const context = useContext(AppContext)
 
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
   const poemsQuery = usePoems()
-
+  
   useEffect(()=> {
     if(poemsQuery.data) {
-      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, user)
+      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, context.userId)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery.data, user])])
+  }, [JSON.stringify([poemsQuery.data, context.username])])
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
 
-  function onLike (event, poemId, userId) {
+  function onLike (event, poemId) {
     event.preventDefault()
-    likePoemMutation.mutate({poemId, userId})
+    likePoemMutation.mutate(poemId)
   }
 
   const LIKE = 'Like'
@@ -45,9 +46,9 @@ function MyFavouritePoems (props) {
     setFilter(event.target.value)
   }
 
-  if (isLoading) {
-    return <CircularProgress />
-  }
+  // if (isLoading) {
+  //   return <CircularProgress />
+  // }
 
   return (
     <>
@@ -68,11 +69,11 @@ function MyFavouritePoems (props) {
         </div>
       </div>
       {poems.map((poem) => (
-        <main key={poem._id} className='poem__detail'>
+        <main key={poem.id} className='poem__detail'>
           {poem.author.includes(filter) && (
             <section className='poem__block'>
               <section>
-                <Link to={`/detail/${poem._id}`} className='poem__title'>
+                <Link to={`/detail/${poem.id}`} className='poem__title'>
                   {poem.title}
                 </Link>
                 <div className='poem__author-container'>
@@ -85,7 +86,7 @@ function MyFavouritePoems (props) {
                 <div className='poem__content poems__content'>{poem.poem}</div>
                 <div className='poems__read-more'>
                   <Link
-                    to={`/detail/${poem._id}`}
+                    to={`/detail/${poem.id}`}
                     className='poems__read-more'
                   >
                     {READ_MORE}
@@ -104,31 +105,31 @@ function MyFavouritePoems (props) {
                   </div>
                 )}
                 <div className='separator' />
-                {isAuthenticated &&
-                  poem.author !== user.name &&
-                  poem.likes.some((id) => id === user.sub) && (
+                {context.user &&
+                  poem.author !== context.username &&
+                  poem.likes.some((id) => id === context.username) && (
                     <Link
                       className='poem__likes-icon'
-                      onClick={(event) => onLike(event, poem._id, user.sub)}
+                      onClick={(event) => onLike(event, poem.id)}
                     />
                 )}
-                {isAuthenticated &&
-                  poem.author !== user.name &&
-                  !poem.likes.some((id) => id === user.sub) && (
+                {context.user &&
+                  poem.author !== context.username &&
+                  !poem.likes.some((id) => id === context.username) && (
                     <Link
                       className='poem__unlikes-icon'
-                      onClick={(event) => onLike(event, poem._id, user.sub)}
+                      onClick={(event) => onLike(event, poem.id)}
                     />
                 )}
-                {isAuthenticated && poem.author === user.name && (
+                {context.user && poem.author === context.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem._id)}
+                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
                   />
                 )}
                 <Link
-                  to={`/detail/${poem._id}`}
+                  to={`/detail/${poem.id}`}
                   className='poem__comments-icon'
                 >
                   <SubjectSharpIcon style={{ fill: '#000' }} />

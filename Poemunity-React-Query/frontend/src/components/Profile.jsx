@@ -13,7 +13,6 @@ import '../App.scss'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
 import Notification from './Notification'
-import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import useCreatePoem from '../react-query/useCreatePoem'
 import useSavePoem from '../react-query/useSavePoem'
@@ -32,8 +31,7 @@ import {
   PROFILE_SELECT_LIKES,
   PROFILE_POEM_PLACEHOLDER,
   PROFILE_SEND_POEM,
-  PROFILE_RESET_POEM,
-  ADMIN
+  PROFILE_RESET_POEM
 } from '../data/constants'
 
 function TabPanel (props) {
@@ -81,12 +79,11 @@ export default function Profile (props) {
   const [value, setValue] = React.useState(0)
 
   const [poemContent, setPoemContent] = useState('')
-  const [poemAuthorId, setPoemAuthorId] = useState('')
+  const [poemFakeId, setPoemFakeId] = useState('')
   const [poemTitle, setPoemTitle] = useState('')
   const [poemCategory, setPoemCategory] = useState('')
   const [poemLikes, setPoemLikes] = useState([])
 
-  // const { user, isAuthenticated, isLoading } = useAuth0()
   // const [errorMessage, setErrorMessage] = useState(null)
   const createPoemMutation = useCreatePoem()
   const savePoemMutation = useSavePoem()
@@ -97,7 +94,7 @@ export default function Profile (props) {
   useEffect(()=> {
     setPoemTitle(context.elementToEdit ? poemQuery?.data?.title : '')
     setPoemContent(context.elementToEdit ? poemQuery?.data?.poem : '')
-    // setPoemAuthorId(context.elementToEdit ? poemQuery?.data?.userId : '')
+    setPoemFakeId(context.elementToEdit ? poemQuery?.data?.userId : '')
     setPoemLikes(context.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
     setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
   }, [JSON.stringify([context.elementToEdit, poemQuery.data])])
@@ -118,15 +115,6 @@ export default function Profile (props) {
     setValue(value)
   }
 
-  const fakeUsers = [
-    {id: 1, name: 'Catherine Cawley', picture: 'https://cdn.getyourguide.com/img/location/5c88db055a755.jpeg/88.jpg'},
-    {id: 2, name: 'Stacey Cosgrove', picture: 'https://media-cdn.tripadvisor.com/media/photo-s/05/62/06/0e/restaurant-els-valencians.jpg'},
-    {id: 3, name: 'Sarah Griffin', picture: 'https://cdn.pixabay.com/photo/2017/11/09/17/11/sea-2934076_960_720.jpg'},
-    {id: 4, name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
-  ]
-
-  const fakeUser = fakeUsers.find(user=>user.id === parseInt(poemAuthorId))
-
   const handleSend = (event) => {
     event.preventDefault()
     // event.target.reset()
@@ -146,35 +134,37 @@ export default function Profile (props) {
       currentDatetime.getSeconds()
 
       if(!context.elementToEdit) {
-        if(context.user === ADMIN) {
-          createPoemMutation.mutate({poem: {
+        if(context.userId === context.adminId) {
+          createPoemMutation.mutate({
+            userId: poemFakeId,
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
-          }, token: context.user.token});  
+          });  
         } else {
-          createPoemMutation.mutate({poem: {
+          createPoemMutation.mutate({
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: [],
             date: formattedDate,
-          }, token: context.user.token});
+          });
         }
         setPoemContent('')
         setPoemTitle('')
         setPoemCategory('')
       } else {
-        if(context.user === ADMIN) {
+        if(context.userId === context.adminId) {
           savePoemMutation.mutate({poem: {
+            userId: poemFakeId,
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
-          }, poemId: poemQuery.data._id});  
+          }, poemId: poemQuery.data.id});  
         } else {
           savePoemMutation.mutate({poem: {
             poem: poemContent,
@@ -182,7 +172,7 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: [],
             date: formattedDate,
-          }, poemId: poemQuery.data._id});
+          }, poemId: poemQuery.data.id});
         }
         context.setState({elementToEdit: ''})
       }
@@ -208,15 +198,15 @@ export default function Profile (props) {
           <div>
           <section className='profile__title'>
           <div>
-            {context.user?.username}
+            {context.username}
             {PROFILE_TITLE}
           </div>
         </section>
         <section className='profile__intro'>
           <img
             className='profile__image'
-            src={context.user?.picture}
-            alt={context.user?.username}
+            // src={context.user?.picture}
+            alt={context.username}
           />
           <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
@@ -227,7 +217,7 @@ export default function Profile (props) {
               >
                 <div className='profile__insert-poem-inputs'>
                   {
-                  context.user === ADMIN && (
+                  context.userId === context.adminId && (
                   <>
                     <label className='profile__insert-poem-input'>
                       {PROFILE_SELECT_TITLE_AUTHOR}
@@ -235,9 +225,9 @@ export default function Profile (props) {
                         className='profile__insert-poem-input'
                         name='author'
                         required
-                        value={poemAuthorId}
+                        value={poemFakeId}
                         onChange={(event) =>
-                          onFieldChange(event.target.value, setPoemAuthorId)}
+                          onFieldChange(event.target.value, setPoemFakeId)}
                       />
                     </label>
                     <label className='profile__insert-poem-input'>

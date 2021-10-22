@@ -1,5 +1,5 @@
-const getFavouritePoemsByUser = (poems, user) => {
-    return poems.filter((poem) => poem.likes.some((element) => element === user.sub))
+const getFavouritePoemsByUser = (poems, userId) => {
+    return poems.filter((poem) => poem.likes.some((element) => element === userId))
 }
 
 export default getFavouritePoemsByUser

@@ -17,6 +17,10 @@ function App (props) {
     sortPoemsBy: ORDER_BY_LIKES,
     elementToEdit: '',
     user: null,
+    userId: '',
+    username: '',
+    config: {},
+    adminId: process.env.REACT_APP_ADMIN,
     setState(data) {
         const { setState, ...res } = data;
         const newState = { ...contextState, ...res };
