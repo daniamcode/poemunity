@@ -8,6 +8,7 @@ const userSchema = new Schema({
   },
   email: String,
   name: String,
+  surname: String,
   passwordHash: String,
   poems: [{
     type: Schema.Types.ObjectId,

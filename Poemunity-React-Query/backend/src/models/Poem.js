@@ -6,15 +6,9 @@ const poemSchema = new Schema({
   author: String,
   picture: String,
   genre: String,
-  likes: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  }],
+  likes: [String],
   date: Date,
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  }
+  userId: String
 })
 
 poemSchema.set('toJSON', {
