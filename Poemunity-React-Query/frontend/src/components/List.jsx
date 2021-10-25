@@ -30,30 +30,42 @@ import {
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
 import { useHistory } from "react-router-dom";
+import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 
 function List (props) {
   const genre = props.match.params.genre
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
   
+  const history = useHistory();
   const context = useContext(AppContext);
   const poemsQuery = usePoems()
+
+  const [paramsData, setParamsData] = useFiltersFromQuery({
+    orderBy: null
+  })
 
   useEffect(()=> {
     if(poemsQuery.data) {
       const newData = [...poemsQuery.data]
-
+      
       if(genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
-        const poemsSorted = sortPoems(context.sortPoemsBy, poemsFiltered)
+        const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
         setPoems(poemsSorted)
       }
       else {
-        const poemsSorted = sortPoems(context.sortPoemsBy, newData)
+        const poemsSorted = sortPoems(paramsData.orderBy, newData)
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([poemsQuery.data, genre, context.sortPoemsBy])])
+  }, [JSON.stringify([poemsQuery.data, genre, paramsData])])
+  
+
+  const handleOrderChange = (event) => {
+    addQueryParam({id: 'orderBy', value: event.target.value})
+    setParamsData({orderBy: event.target.value})
+  }
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
@@ -63,7 +75,6 @@ function List (props) {
     likePoemMutation.mutate(poemId)
   }
 
-  const history = useHistory();
 
   const editPoem = (poemId) => {
     const newPath = '/profile'
@@ -115,14 +126,12 @@ function List (props) {
                 type='submit'
                 id='sort'
                 name='sort'
-                onChange={(event) => {
-                  context.setState({sortPoemsBy: event.target.value})
-                }}
+                onChange={handleOrderChange}
               >
-                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === context.sortPoemsBy}>{ORDER_BY_LIKES}</option>
-                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === context.sortPoemsBy}>{ORDER_BY_DATE}</option>
-                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === context.sortPoemsBy}>{ORDER_BY_RANDOM}</option>
-                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === context.sortPoemsBy}>{ORDER_BY_TITLE}</option>
+                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === paramsData.orderBy}>{ORDER_BY_LIKES}</option>
+                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === paramsData.orderBy}>{ORDER_BY_DATE}</option>
+                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === paramsData.orderBy}>{ORDER_BY_RANDOM}</option>
+                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === paramsData.orderBy}>{ORDER_BY_TITLE}</option>
               </select>
             </label>
           </form>

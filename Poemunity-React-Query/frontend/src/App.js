@@ -8,13 +8,11 @@ import Profile from './components/Profile'
 import Login from './components/Login'
 import Register from './components/Register'
 import PageNotFound from './components/PageNotFound'
-import {ORDER_BY_LIKES} from './data/constants'
 
 export const AppContext = React.createContext();
 
 function App (props) {
   const [contextState, setContextState] = useState({
-    sortPoemsBy: ORDER_BY_LIKES,
     elementToEdit: '',
     user: null,
     userId: '',
