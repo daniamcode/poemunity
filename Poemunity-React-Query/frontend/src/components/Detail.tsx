@@ -16,8 +16,25 @@ import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import { useHistory } from "react-router-dom";
 
-function Detail (props) {
-  const [poem, setPoem] = useState([])
+function Detail (props: any) {
+  interface Poem {
+    id: string,
+    title: string,
+    picture: string,
+    author: string,
+    date: string,
+    poem: string,
+    likes: string[],
+  }
+  const [poem, setPoem] = useState<Poem>({
+    id: '',
+    title: '',
+    picture: '',
+    author: '',
+    date: '',
+    poem: '',
+    likes: [],
+  })
 
   const context = useContext(AppContext);
 
@@ -29,17 +46,17 @@ function Detail (props) {
     }
   }, [JSON.stringify(poemQuery.data)])
 
-  const deletePoemMutation = useDeletePoem()
-  const likePoemMutation = useLikePoem()
+  const deletePoemMutation: {mutate: Function} = useDeletePoem()
+  const likePoemMutation: {mutate: Function} = useLikePoem()
 
-  function onLike (event, poemId) {
+  function onLike (event: {preventDefault: Function}, poemId: string) {
     event.preventDefault()
     likePoemMutation.mutate(poemId)
   }
   
   const history = useHistory();
 
-  const editPoem = (poemId) => {
+  const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath);
     context.setState({elementToEdit: poemId})
@@ -102,18 +119,18 @@ function Detail (props) {
               {context.user &&
                 poem.author !== context.username &&
                 poem.likes.some((id) => id === context.username) && (
-                  <Link
+                  <div
                     className='poem__likes-icon'
-                    onClick={(event) => onLike(event, poem.id)}
-                  />
+                    onClick={(event) => onLike(event, poem.id)}>
+                  </div>
               )}
               {context.user &&
                 poem.author !== context.username &&
                 !poem.likes.some((id) => id === context.username) && (
-                  <Link
+                  <div
                     className='poem__unlikes-icon'
-                    onClick={(event) => onLike(event, poem.id)}
-                  />
+                    onClick={(event) => onLike(event, poem.id)}>
+                  </div>
               )}
               {context.user &&
                 (poem.author === context.username ||
