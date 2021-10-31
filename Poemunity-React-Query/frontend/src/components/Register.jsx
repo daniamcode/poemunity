@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useRegister from '../react-query/useRegister'
 import { NavLink } from 'react-router-dom'
-import './Header.scss'
+import './Register.scss'
 
 const Register = () => {
   const [username, setUsername] = useState('')
@@ -22,8 +22,9 @@ const Register = () => {
 
 
   return (
-    <form onSubmit={handleRegister}>
-          <div>
+    <form className='register' onSubmit={handleRegister}>
+        <label>Introduce your new credentials or click "Login" if you already have them</label>
+          <div className='register__username'>
             <input
               type='text'
               value={username}
@@ -32,6 +33,8 @@ const Register = () => {
               onChange={
                 ({ target }) => setUsername(target.value)}
             />
+          </div>
+          <div className='register__email'>
             <input
               type='text'
               value={email}
@@ -41,7 +44,7 @@ const Register = () => {
                 ({ target }) => setEmail(target.value)}
             />
           </div>
-          <div>
+          <div className='register__password'>
             <input
               type='password'
               value={password}
