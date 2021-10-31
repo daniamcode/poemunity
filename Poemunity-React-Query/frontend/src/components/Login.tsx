@@ -1,18 +1,19 @@
 import React, {useState} from 'react'
-import './Header.scss'
+import './Login.scss'
 import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import useLogin from '../react-query/useLogin'
+import { FormElement } from '../typescript/types'
 
-const Login = () => {
+const Login = (): JSX.Element => {
   const history = useHistory()
   
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const loginQuery = useLogin()
+  const loginQuery: {mutate: Function} = useLogin()
 
-  const handleLogin = (event) => {
+  const handleLogin = (event: any) => {
     event.preventDefault()
     loginQuery.mutate({username, password})
     
@@ -21,25 +22,26 @@ const Login = () => {
   }
 
   return (
-    <form onSubmit={handleLogin}>
-          <div>
+    <form className='login' onSubmit={handleLogin}>
+        <label>Introduce your login credentials or click "Register" if you don't have them</label>
+          <div className='login__username'>
             <input
               type='text'
               value={username}
               name='Username'
               placeholder='Username'
               onChange={
-                ({ target }) => setUsername(target.value)}
+                (event) => setUsername(event.target.value)}
             />
           </div>
-          <div>
+          <div className='login__password'>
             <input
               type='password'
               value={password}
               name='Password'
               placeholder='Password'
               onChange={
-                ({ target }) => setPassword(target.value)}
+                ( event ) => setPassword(event.target.value)}
             />
           </div>
           <button>

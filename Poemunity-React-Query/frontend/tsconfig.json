@@ -6,11 +6,11 @@
     "isolatedModules": true,
     "jsx": "react",
     "lib": [
-      "es6"
+      "es6", "DOM"
     ],
     "moduleResolution": "node",
     "noEmit": true,
-    "target": "esnext",
+    "target": "ES6",
     "noImplicitAny": true,
     "strict": true,
     "skipLibCheck": true,
