@@ -2,7 +2,3 @@
 
 # repo needed for heroku deploy
 /Poemunity-React-Query/backend/.git
-
-#build
-
-/Poemunity-React-Query/backend/public
