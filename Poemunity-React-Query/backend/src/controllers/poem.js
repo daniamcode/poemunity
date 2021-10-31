@@ -16,6 +16,7 @@ poemRouter.get('/:poemId', async (req, res) => {
   })
 })
 
+//like poem
 poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req
   if (poem.likes.some((id) => id == req.userId)) {
@@ -32,7 +33,8 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
     }
   })
 })
-    
+
+// modify poem
 poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req;
 
