@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/static/css/main.bd558636.chunk.css",
+    "main.js": "/static/js/main.de9f918f.chunk.js",
+    "main.js.map": "/static/js/main.de9f918f.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.c8a21426.js",
+    "runtime-main.js.map": "/static/js/runtime-main.c8a21426.js.map",
+    "static/js/2.021bdd18.chunk.js": "/static/js/2.021bdd18.chunk.js",
+    "static/js/2.021bdd18.chunk.js.map": "/static/js/2.021bdd18.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.d756abf328997d06b99844ec5ff12936.js": "/precache-manifest.d756abf328997d06b99844ec5ff12936.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.bd558636.chunk.css.map": "/static/css/main.bd558636.chunk.css.map",
+    "static/js/2.021bdd18.chunk.js.LICENSE.txt": "/static/js/2.021bdd18.chunk.js.LICENSE.txt",
+    "static/media/Header.scss": "/static/media/poemunity.67646028.svg",
+    "static/media/Profile.scss": "/static/media/profile.d17c2f24.svg",
+    "static/media/Detail.scss": "/static/media/white-heart.70ebbcd1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.c8a21426.js",
+    "static/js/2.021bdd18.chunk.js",
+    "static/css/main.bd558636.chunk.css",
+    "static/js/main.de9f918f.chunk.js"
+  ]
+}
