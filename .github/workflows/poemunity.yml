@@ -31,6 +31,6 @@ jobs:
     # - run: cd Poemunity-React-Query/frontend
     - run: ls
     - run: ls
-    # - run: npm i
+    # - run: npm i --no-optional
     # - run: npm test
     - run: npm run build

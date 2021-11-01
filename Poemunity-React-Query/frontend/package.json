@@ -37,7 +37,6 @@
   "scripts": {
     "start": "react-scripts start",
     "clean": "rimraf ../backend/public",
-    "prebuild": "npm run clean",
     "build": "react-scripts build",
     "postbuild": "mv build ../backend/public && mkdir ../backend/public/img && cp src/img/poemunity.svg ../backend/public/img",
     "test": "react-scripts test --watchAll --coverage",
