@@ -30,7 +30,6 @@ jobs:
         cache: 'npm'
     # - run: cd Poemunity-React-Query/frontend
     - run: ls
-    - run: ls
-    # - run: npm i
+    - run: npm i
     # - run: npm test
     - run: npm run build
