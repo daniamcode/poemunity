@@ -24,6 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - cd: cd Poemunity-React-Query/frontend
     - run: npm i
     # - run: npm test
     - run: npm run build
