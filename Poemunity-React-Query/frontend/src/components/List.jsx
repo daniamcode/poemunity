@@ -45,6 +45,8 @@ function List (props) {
     orderBy: null
   })
 
+  console.log(paramsData)
+
   useEffect(()=> {
     if(poemsQuery.data) {
       const newData = [...poemsQuery.data]
