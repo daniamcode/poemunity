@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
-import { AppContext } from '../App'
+import { AppContext } from '../App';
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
-import EditIcon from '@material-ui/icons/Edit'
+import EditIcon from '@material-ui/icons/Edit';
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import capitalizeFirstLetter from '../utils/capitalizeFirstLetter'
@@ -29,41 +29,42 @@ import {
   CATEGORIES_TITLE_LABEL
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
+import { useHistory } from "react-router-dom";
 import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 
 function List (props) {
   const genre = props.match.params.genre
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
-
-  const history = useHistory()
-  const context = useContext(AppContext)
+  
+  const history = useHistory();
+  const context = useContext(AppContext);
   const poemsQuery = usePoems()
-
-  console.log(poemsQuery)
 
   const [paramsData, setParamsData] = useFiltersFromQuery({
     orderBy: null
   })
 
-  useEffect(() => {
-    if (poemsQuery.data) {
+  useEffect(()=> {
+    if(poemsQuery.data) {
       const newData = [...poemsQuery.data]
-
-      if (genre) {
+      
+      if(genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
         const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
         setPoems(poemsSorted)
-      } else {
+      }
+      else {
         const poemsSorted = sortPoems(paramsData.orderBy, newData)
         setPoems(poemsSorted)
       }
     }
   }, [JSON.stringify([poemsQuery.data, genre, paramsData])])
+  
 
   const handleOrderChange = (event) => {
-    addQueryParam({ id: 'orderBy', value: event.target.value })
-    setParamsData({ orderBy: event.target.value })
+    addQueryParam({id: 'orderBy', value: event.target.value})
+    setParamsData({orderBy: event.target.value})
   }
 
   const deletePoemMutation = useDeletePoem()
@@ -74,10 +75,11 @@ function List (props) {
     likePoemMutation.mutate(poemId)
   }
 
+
   const editPoem = (poemId) => {
     const newPath = '/profile'
-    history.push(newPath)
-    context.setState({ elementToEdit: poemId })
+    history.push(newPath);
+    context.setState({elementToEdit: poemId})
   }
 
   const handleSearchChange = (event) => {
@@ -104,7 +106,7 @@ function List (props) {
             </p>
           )}
           <div className='list__search'>
-            <div className='separator' />
+          <div className='separator' />
             <SearchIcon style={{ fontSize: 40, fill: '#4F5D73' }} />
             <TextField
               label={SEARCH_PLACEHOLDER}
@@ -193,10 +195,10 @@ function List (props) {
                   {context.user &&
                     (poem.author === context.username ||
                       context.userId === context.adminId) && (
-                        <EditIcon
-                          className='poem__edit-icon'
-                          onClick={(event) => editPoem(poem.id)}
-                        />
+                    <EditIcon
+                    className='poem__edit-icon'
+                    onClick={(event) => editPoem(poem.id)}
+                  />
                   )}
                   {context.user &&
                     (poem.author === context.username ||
