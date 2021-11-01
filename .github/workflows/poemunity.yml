@@ -19,7 +19,7 @@ jobs:
 
     defaults:
           run:
-            working-directory: ./Poemunity-React-Query/frontend
+            working-directory: ./projects/poemunity/Poemunity-React-Query/frontend
 
     steps:
     - uses: actions/checkout@v2
