@@ -41,8 +41,6 @@ function List (props) {
   const context = useContext(AppContext);
   const poemsQuery = usePoems()
 
-  console.log(poemsQuery)
-
   const [paramsData, setParamsData] = useFiltersFromQuery({
     orderBy: null
   })
