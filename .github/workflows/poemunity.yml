@@ -13,6 +13,7 @@ jobs:
     runs-on: self-hosted
     env:
       SKIP_PREFLIGHT_CHECK: true
+      GENERATE_SOURCEMAP: false
 
     strategy:
       matrix:
@@ -35,4 +36,4 @@ jobs:
     - run: npm cache clean --force
     - run: npm ci --verbose
     # - run: npm test
-    - run: sudo npm run build --verbose
+    - run: npm run build --verbose
