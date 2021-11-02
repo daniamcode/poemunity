@@ -16,6 +16,7 @@ jobs:
       GENERATE_SOURCEMAP: false
 
     strategy:
+      fail-fast: false 
       matrix:
         node-version: [10.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
