@@ -31,6 +31,6 @@ jobs:
     - run: ls
     # - run: npm clean-install
     - run: npm cache clean --force
-    - run: npm i
+    - run: npm ci
     # - run: npm test
     - run: npm run build
