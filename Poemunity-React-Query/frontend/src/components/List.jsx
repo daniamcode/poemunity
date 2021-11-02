@@ -88,6 +88,8 @@ function List (props) {
     return <CircularProgress />
   }
 
+  console.log(poemsQuery)
+
   return (
     <>
       <Helmet>
