@@ -32,7 +32,6 @@ jobs:
         cache: 'npm'
     - run: ls
     # - run: npm clean-install
-    # - run: npm clean-install
     - run: npm cache clean --force
     - run: npm ci --verbose
     # - run: npm test
