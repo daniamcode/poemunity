@@ -4,9 +4,10 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": [
-      "es6", "DOM"
+      "es6",
+      "DOM"
     ],
     "moduleResolution": "node",
     "noEmit": true,
@@ -16,7 +17,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noFallthroughCasesInSwitch": true
   },
   "exclude": [
     "node_modules",

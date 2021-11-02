@@ -38,7 +38,6 @@
     "start": "react-scripts start",
     "clean": "rimraf ../backend/public",
     "build": "react-scripts build",
-    "postbuild": "mv build ../backend/public && mkdir ../backend/public/img && cp src/img/poemunity.svg ../backend/public/img",
     "test": "react-scripts test --watchAll --coverage",
     "eject": "react-scripts eject",
     "lint": "npx standard --fix"
@@ -50,9 +49,6 @@
       "src/appDispatcher",
       "src/App"
     ]
-  },
-  "eslintConfig": {
-    "extends": "./node_modules/standard/eslintrc.json"
   },
   "standard": {
     "env": [
