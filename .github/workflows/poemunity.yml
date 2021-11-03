@@ -40,10 +40,9 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
+        username: daniamcode
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          cd projects/poemunity
-          ls        
-          git pull origin feature/token
+          cd projects/poemunity      
           git status
