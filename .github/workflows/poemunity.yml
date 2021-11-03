@@ -44,5 +44,5 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           cd projects/poemunity        
-          git pull
+          git pull origin feature/token
           git status
