@@ -16,7 +16,6 @@ jobs:
       GENERATE_SOURCEMAP: false
 
     strategy:
-      fail-fast: false 
       matrix:
         node-version: [10.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -35,6 +34,23 @@ jobs:
     - run: ls
     # - run: npm clean-install
     - run: npm cache clean --force
-    - run: npm ci --verbose
+    - run: npm ci
     # - run: npm test
     - run: npm run build --verbose
+  
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd projects/poemunity        
+          git pull
+          git status
+
+
