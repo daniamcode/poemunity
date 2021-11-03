@@ -43,6 +43,7 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
-          cd projects/poemunity        
+          cd projects/poemunity
+          ls        
           git pull origin feature/token
           git status
