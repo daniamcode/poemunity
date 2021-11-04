@@ -44,6 +44,11 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         script: |
           ls
-          cd projects/poemunity
+          cd projects/poemunity/Poemunity-React-Query
           git pull
           git status
+          rimraf backend/public
+          mv frontend/build backend/public
+          mkdir backend/public/img
+          cp frontend/src/img/poemunity.svg backend/public/img
+          ls
