@@ -165,14 +165,14 @@ function List (props) {
                   </div>
                 </section>
                 <section className='poem__footer'>
-                  {poem.likes.length === 1 && (
+                  {poem.likes?.length === 1 && (
                     <div className='poem__likes'>
-                      {poem.likes.length} {LIKE}
+                      {poem.likes?.length} {LIKE}
                     </div>
                   )}
-                  {poem.likes.length !== 1 && (
+                  {poem.likes?.length !== 1 && (
                     <div className='poem__likes'>
-                      {poem.likes.length} {LIKES}
+                      {poem.likes?.length} {LIKES}
                     </div>
                   )}
                   <div className='separator' />
