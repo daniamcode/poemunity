@@ -43,3 +43,4 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         script: |
           ls
+          ls
