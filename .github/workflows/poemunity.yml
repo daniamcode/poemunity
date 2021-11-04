@@ -47,8 +47,8 @@ jobs:
           cd projects/poemunity/Poemunity-React-Query
           git pull
           git status
-          rm -r backend/public
-          mv frontend/build backend/public
-          mkdir backend/public/img
-          cp frontend/src/img/poemunity.svg backend/public/img
+          rm -r ./backend/public
+          mv ./frontend/build ./backend/public
+          mkdir ./backend/public/img
+          cp ./frontend/src/img/poemunity.svg ./backend/public/img
           ls
