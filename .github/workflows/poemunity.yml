@@ -40,7 +40,6 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: proppos
-        password: ${{ secrets.PASSWORD }}
+        key: ${{ secrets.PASSWORD }}
         script: |
           ls
