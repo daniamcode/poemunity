@@ -44,6 +44,6 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         script: |
           ls
-          cd poemunity
+          cd projects/poemunity
           git pull
           git status
