@@ -48,6 +48,7 @@ jobs:
           git pull
           git status
           rm -r ./backend/public
+          mkdir ./backend/public
           mv ./frontend/build ./backend/public
           mkdir ./backend/public/img
           cp ./frontend/src/img/poemunity.svg ./backend/public/img
