@@ -37,11 +37,12 @@ jobs:
     # - run: npm test
     # - run: npm run build --verbose
     - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@v0.1.4
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ubuntu
         key: ${{ secrets.PASSWORD }}
         script: |
           ls
-          ls
+          cd poemunity
+          git pull
+          git status
