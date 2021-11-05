@@ -53,7 +53,6 @@ jobs:
           pwd
           mkdir ./backend/public
           pwd
-          cd ../../frontend/build
           mv ./frontend/build ./backend/public
           pwd
           mkdir ./backend/public/img
