@@ -33,11 +33,12 @@ jobs:
         run: ls
     # - run: npm clean-install
     # - run: npm cache clean --force
-    # run: npm ci
+    run: npm ci
     # - run: npm test
-        run: |
-          npm ci
-          npm run build --verbose
+        run: npm run build --verbose
+        # run: |
+        #   npm ci
+        #   npm run build --verbose
         - uses: actions/checkout@v2
         - uses: actions/upload-artifact@master
         with:
