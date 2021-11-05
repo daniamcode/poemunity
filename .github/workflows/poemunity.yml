@@ -41,9 +41,9 @@ jobs:
           npm run build --verbose
       - uses: actions/checkout@v2
       - uses: actions/upload-artifact@master
-          with:
-          name: postbuild
-          path: public/
+        with:
+        name: postbuild
+        path: public/
   
   deploy:
     name: executing remote ssh commands using password
@@ -54,9 +54,9 @@ jobs:
 
       - name: Download artifact
       - uses: actions/download-artifact@master
-          with:
-          name: postbuild
-          path: public/
+        with:
+        name: postbuild
+        path: public/
 
       - uses: appleboy/ssh-action@master
         with:
