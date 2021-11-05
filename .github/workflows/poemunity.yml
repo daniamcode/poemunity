@@ -49,7 +49,6 @@ jobs:
           git pull origin feature/token
           git status
           pwd
-          pwd
           rm -r ./backend/public
           echo test1
           pwd
