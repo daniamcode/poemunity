@@ -49,4 +49,14 @@ jobs:
           git pull origin feature/token
           git status
           pwd
-        
+          rm -r ./backend/public
+          pwd
+          mkdir ./backend/public
+          pwd
+          cd ../../frontend/build
+          mv ./frontend/build ./backend/public
+          pwd
+          mkdir ./backend/public/img
+          pwd
+          cp ./frontend/src/img/poemunity.svg ./backend/public/img
+          pwd
