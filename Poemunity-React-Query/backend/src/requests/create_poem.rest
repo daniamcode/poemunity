@@ -4,7 +4,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNmFhOWYyZ
 
 {
     "likes": [],
-    "poem": "test10",
+    "poem": "test24",
     "title": "test2",
     "genre": "haikus"
 }
