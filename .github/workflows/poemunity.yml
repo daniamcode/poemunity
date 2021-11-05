@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SKIP_PREFLIGHT_CHECK: true
+      MONGODB: ${{ secrets.MONGODB }}
 
     strategy:
       matrix:
@@ -45,16 +46,16 @@ jobs:
         script: |
           ls
           cd projects/poemunity/Poemunity-React-Query
-          git pull
+          git pull origin feature/token
           git status
           ls
-          rm -r ./backend/public
-          ls
-          mkdir ./backend/public
-          ls
-          mv ./frontend/build ./backend/public
-          ls
-          mkdir ./backend/public/img
-          ls
-          cp ./frontend/src/img/poemunity.svg ./backend/public/img
-          ls
+          # rm -r ./backend/public
+          # ls
+          # mkdir ./backend/public
+          # ls
+          # mv ./frontend/build ./backend/public
+          # ls
+          # mkdir ./backend/public/img
+          # ls
+          # cp ./frontend/src/img/poemunity.svg ./backend/public/img
+          # ls
