@@ -34,9 +34,9 @@ jobs:
     - run: ls
     # - run: npm clean-install
     # - run: npm cache clean --force
-    # - run: npm ci
+    - run: npm ci
     # - run: npm test
-    # - run: npm run build --verbose
+    - run: npm run build --verbose
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
