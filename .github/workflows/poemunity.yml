@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
     env:
       SKIP_PREFLIGHT_CHECK: true
@@ -24,56 +25,56 @@ jobs:
             working-directory: ./Poemunity-React-Query/frontend
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-        run: ls
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: ls
     # - run: npm clean-install
     # - run: npm cache clean --force
-    run: npm ci
+    - run: npm ci
     # - run: npm test
-        run: npm run build --verbose
-        # run: |
-        #   npm ci
-        #   npm run build --verbose
-        - uses: actions/checkout@v2
-        - uses: actions/upload-artifact@master
-        with:
+    - run: npm run build --verbose
+    - uses: actions/checkout@v2
+    - name: upload artifact
+      uses: actions/upload-artifact@master
+      with:
         name: postbuild
         path: public/
+
   deploy:
-    name: executing remote ssh commands using password
+    name: deploy
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Download artifact
-      - uses: actions/download-artifact@master
-        with:
+    - name: download artifact
+      uses: actions/download-artifact@master
+      with:
         name: postbuild
         path: public/
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ubuntu
-          key: ${{ secrets.PASSWORD }}
-          script: |
-            pwd
-            cd projects/poemunity/Poemunity-React-Query
-            git pull origin feature/token
-            git status
-            pwd
-            rm -r ./backend/public
-            echo test1
-            pwd
-            mkdir ./backend/public
-            pwd
-            mv ./frontend/build ./backend/public
-            pwd
-            mkdir ./backend/public/img
-            pwd
-            cp ./frontend/src/img/poemunity.svg ./backend/public/img
-            pwd
+
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ubuntu
+        key: ${{ secrets.PASSWORD }}
+        script: |
+          pwd
+          cd projects/poemunity/Poemunity-React-Query
+          git pull origin feature/token
+          git status
+          pwd
+          rm -r ./backend/public
+          echo test1
+          pwd
+          mkdir ./backend/public
+          pwd
+          mv ./frontend/build ./backend/public
+          pwd
+          mkdir ./backend/public/img
+          pwd
+          cp ./frontend/src/img/poemunity.svg ./backend/public/img
+          pwd
