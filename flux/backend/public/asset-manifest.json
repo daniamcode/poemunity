@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "https://poemunity.com/static/css/main.18af3b7c.chunk.css",
+    "main.js": "https://poemunity.com/static/js/main.fee0cb38.chunk.js",
+    "main.js.map": "https://poemunity.com/static/js/main.fee0cb38.chunk.js.map",
+    "runtime-main.js": "https://poemunity.com/static/js/runtime-main.0bf47b77.js",
+    "runtime-main.js.map": "https://poemunity.com/static/js/runtime-main.0bf47b77.js.map",
+    "static/js/2.52b149af.chunk.js": "https://poemunity.com/static/js/2.52b149af.chunk.js",
+    "static/js/2.52b149af.chunk.js.map": "https://poemunity.com/static/js/2.52b149af.chunk.js.map",
+    "index.html": "https://poemunity.com/index.html",
+    "precache-manifest.21f5429312bd865fc594dd89f958e2d2.js": "https://poemunity.com/precache-manifest.21f5429312bd865fc594dd89f958e2d2.js",
+    "service-worker.js": "https://poemunity.com/service-worker.js",
+    "static/css/main.18af3b7c.chunk.css.map": "https://poemunity.com/static/css/main.18af3b7c.chunk.css.map",
+    "static/js/2.52b149af.chunk.js.LICENSE.txt": "https://poemunity.com/static/js/2.52b149af.chunk.js.LICENSE.txt",
+    "static/media/Header.scss": "https://poemunity.com/static/media/poemunity.67646028.svg",
+    "static/media/Profile.scss": "https://poemunity.com/static/media/profile.d17c2f24.svg",
+    "static/media/Detail.scss": "https://poemunity.com/static/media/white-heart.70ebbcd1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.0bf47b77.js",
+    "static/js/2.52b149af.chunk.js",
+    "static/css/main.18af3b7c.chunk.css",
+    "static/js/main.fee0cb38.chunk.js"
+  ]
+}
