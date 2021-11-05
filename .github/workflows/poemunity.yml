@@ -44,7 +44,9 @@ jobs:
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
         script: |
-          ls
+          pwd
           cd projects/poemunity/Poemunity-React-Query
-          ls
+          git pull origin feature/token
+          git status
+          pwd
         
