@@ -28,9 +28,9 @@ jobs:
 
       - name: Use Node.js ${{ matrix.node-version }}
       - uses: actions/setup-node@v2
-          with:
-            node-version: ${{ matrix.node-version }}
-            cache: 'npm'
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
         run: ls
     # - run: npm clean-install
     # - run: npm cache clean --force
