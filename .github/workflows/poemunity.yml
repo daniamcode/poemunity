@@ -46,7 +46,5 @@ jobs:
         script: |
           ls
           cd projects/poemunity/Poemunity-React-Query
-          git pull origin feature/token
-          git status
           ls
         
