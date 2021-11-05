@@ -42,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: postbuild
-        path: public/
+        path: publicc/
 
   deploy:
     name: deploy
@@ -53,7 +53,7 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: postbuild
-        path: public/
+        path: publicc
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
