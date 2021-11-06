@@ -33,7 +33,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - run: ls
     # - run: npm clean-install
     # - run: npm cache clean --force
 
@@ -41,12 +40,13 @@ jobs:
     # - run: npm test
     
     - run: npm run build --verbose
-    
+    - run: echo where i am
+    - run: pwd
     - name: upload artifact with public folder
       uses: actions/upload-artifact@master
       with:
         name: build
-        path: /
+        path: build/
 
   deploy:
     name: deploy
@@ -56,8 +56,6 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - run: sh -c "sudo chown -R circleci /github
-    - run: sh -c "sudo chmod -R 777 /github
     - name: Download artifact with files to publish
       uses: actions/download-artifact@v2
       with:
