@@ -68,7 +68,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
-        source: "Poemunity-React-Query/frontend/build/*"
+        source: "./build/*"
         target: "projects/poemunity/Poemunity-React-Query/frontend/build"
         rm: true
 
