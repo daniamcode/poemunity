@@ -44,10 +44,11 @@ jobs:
     - run: pwd
     - run: ls
     - name: upload artifact with public folder
+      working-directory: Poemunity-React-Query/frontend
       uses: actions/upload-artifact@master
       with:
         name: build
-        path: ./build
+        path: build
 
   deploy:
     name: deploy
