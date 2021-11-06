@@ -17,7 +17,7 @@ function Dashboard (props) {
         <List {...props} />
       </div>
       <div className='dashboard__ranking'>
-        {/* <Ranking /> */}
+        <Ranking />
       </div>
     </main>
   )
