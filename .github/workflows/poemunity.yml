@@ -69,7 +69,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
         source: "Poemunity-React-Query/frontend/build/index.html"
-        target: "projects/poemunity/Poemunity-React-Query/backend/public/index.html"
+        target: "projects/poemunity/Poemunity-React-Query/frontend/build/index.html"
 
     # - name: executing remote ssh commands using password
     #   uses: appleboy/ssh-action@master
