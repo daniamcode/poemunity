@@ -42,6 +42,7 @@ jobs:
     - run: npm run build --verbose
     - run: echo where i am
     - run: pwd
+    - run: ls
     - name: upload artifact with public folder
       uses: actions/upload-artifact@master
       with:
