@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SKIP_PREFLIGHT_CHECK: true
-      MONGODB: ${{ secrets.MONGODB }}
+      REACT_APP_ADMIN: ${{ secrets.REACT_APP_ADMIN }}
 
     strategy:
       matrix:
