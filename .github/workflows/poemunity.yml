@@ -43,10 +43,10 @@ jobs:
     - run: npm run build --verbose
     
     - name: upload artifact with public folder
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       with:
-        name: postbuild
-        path: build/
+        name: build
+        path: build
 
   deploy:
     name: deploy
@@ -54,10 +54,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Download artifact with files to publish
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
-        name: postbuild
+        name: build
+        path: build
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
