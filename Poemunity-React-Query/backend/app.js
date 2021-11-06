@@ -14,6 +14,9 @@ const poemRouter = require('./src/controllers/poem')
 
 app.use(express.json())
 
+console.log(process.env.NODE_ENV)
+console.log(process.env)
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('public'))
 }
