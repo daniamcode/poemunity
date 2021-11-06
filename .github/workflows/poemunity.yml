@@ -70,7 +70,7 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         source: "Poemunity-React-Query/frontend/build/*"
         target: "projects/poemunity"
-        rm: true
+        rm: false
 
     # - name: executing remote ssh commands using password
     #   uses: appleboy/ssh-action@master
