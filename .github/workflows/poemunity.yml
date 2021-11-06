@@ -67,8 +67,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ubuntu
-        password: ${{ secrets.PASSWORD }}
-        port: 22
+        key: ${{ secrets.PASSWORD }}
         source: "Poemunity-React-Query/frontend/build/index.html"
         target: "index.html"
 
