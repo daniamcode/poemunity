@@ -42,7 +42,6 @@ jobs:
     - run: npm run build --verbose
     - run: echo where i am
     - run: pwd
-    - run: ls
     - name: upload artifact with public folder
       uses: actions/upload-artifact@master
       with:
@@ -63,16 +62,26 @@ jobs:
         name: build
         path: Poemunity-React-Query/frontend/build
 
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ubuntu
-        key: ${{ secrets.PASSWORD }}
-        script: |
-          pwd
-          cd projects/poemunity/Poemunity-React-Query
-          git pull origin feature/token
-          git status
-          pwd
+        password: ${{ secrets.PASSWORD }}
+        port: 22
+        source: "Poemunity-React-Query/frontend/build/index.html"
+        target: "index.html"
+
+    # - name: executing remote ssh commands using password
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ubuntu
+    #     key: ${{ secrets.PASSWORD }}
+    #     script: |
+    #       pwd
+    #       cd projects/poemunity/Poemunity-React-Query
+    #       git pull origin feature/token
+    #       git status
+    #       pwd
           
