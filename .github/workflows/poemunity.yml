@@ -61,7 +61,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: build
-        path: build
+        path: Poemunity-React-Query/frontend/build
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
@@ -75,14 +75,4 @@ jobs:
           git pull origin feature/token
           git status
           pwd
-          rm -r ./backend/public
-          echo test1
-          pwd
-          mkdir ./backend/public
-          pwd
-          mv ./frontend/build ./backend/public
-          pwd
-          mkdir ./backend/public/img
-          pwd
-          cp ./frontend/src/img/poemunity.svg ./backend/public/img
-          pwd
+          
