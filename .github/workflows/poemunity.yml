@@ -68,8 +68,8 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
-        source: "./build/*"
-        target: "projects/poemunity/Poemunity-React-Query/frontend/build"
+        source: "Poemunity-React-Query/frontend/build/*"
+        target: "projects/poemunity"
         rm: true
 
     # - name: executing remote ssh commands using password
@@ -84,4 +84,15 @@ jobs:
     #       git pull origin feature/token
     #       git status
     #       pwd
-          
+    # rm -r ./backend/public
+    # echo test1
+    # pwd
+    # mkdir ./backend/public
+    # pwd
+    # mv ./frontend/build ./backend/public
+    # pwd
+    # mkdir ./backend/public/img
+    # pwd
+    # cp ./frontend/src/img/poemunity.svg ./backend/public/img
+    # pwd
+    
