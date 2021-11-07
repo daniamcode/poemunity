@@ -7,7 +7,7 @@
 		"test": "jest",
 		"test-coverage": "nyc --reporter=html mocha src/**/*.test.js",
 		"start": "DEBUG=app,app:* nodemon index.js",
-		"prod": "forever node index.js",
+		"prod": "forever start index.js",
 		"lint": "npx standard --fix"
 	},
 	"keywords": [],
