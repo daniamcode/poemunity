@@ -8,7 +8,8 @@
 		"test-coverage": "nyc --reporter=html mocha src/**/*.test.js",
 		"start": "DEBUG=app,app:* nodemon index.js",
 		"prod": "forever start app.js",
-		"lint": "npx standard --fix"
+		"lint": "npx standard --fix",
+		"forever": "forever list"
 	},
 	"keywords": [],
 	"author": "",
