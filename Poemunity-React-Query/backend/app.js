@@ -16,6 +16,7 @@ app.use(express.json())
 
 console.log(process.env.NODE_ENV)
 console.log(process.env)
+// console.log('test')
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('public'))
