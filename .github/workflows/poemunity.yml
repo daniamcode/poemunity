@@ -12,7 +12,20 @@ jobs:
     name: pull specially for the backend
     runs-on: ubuntu-latest
 
+    defaults:
+          run:
+            working-directory: ./Poemunity-React-Query/backend
+
     steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    # - run: npm test
+    - run: npm ci
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
