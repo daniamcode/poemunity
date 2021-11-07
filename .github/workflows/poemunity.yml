@@ -8,6 +8,37 @@ on:
     branches: [ feature/token ]
 
 jobs:
+  pull:
+    name: pull specially for the backend
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ubuntu
+        key: ${{ secrets.PASSWORD }}
+        script: |
+          pwd
+          cd projects/poemunity/Poemunity-React-Query
+          git pull origin feature/token
+          git status
+          pwd
+    # rm -r ./backend/public
+    # echo test1
+    # pwd
+    # mkdir ./backend/public
+    # pwd
+    # mv ./frontend/build ./backend/public
+    # pwd
+    # mkdir ./backend/public/img
+    # pwd
+    # cp ./frontend/src/img/poemunity.svg ./backend/public/img
+    # pwd
+
+
   build:
 
     runs-on: ubuntu-latest
@@ -72,27 +103,5 @@ jobs:
         target: "projects/poemunity"
         rm: false
 
-    # - name: executing remote ssh commands using password
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.HOST }}
-    #     username: ubuntu
-    #     key: ${{ secrets.PASSWORD }}
-    #     script: |
-    #       pwd
-    #       cd projects/poemunity/Poemunity-React-Query
-    #       git pull origin feature/token
-    #       git status
-    #       pwd
-    # rm -r ./backend/public
-    # echo test1
-    # pwd
-    # mkdir ./backend/public
-    # pwd
-    # mv ./frontend/build ./backend/public
-    # pwd
-    # mkdir ./backend/public/img
-    # pwd
-    # cp ./frontend/src/img/poemunity.svg ./backend/public/img
-    # pwd
+    
     
