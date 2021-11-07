@@ -23,6 +23,7 @@ jobs:
         script: |
           pwd
           cd projects/poemunity/Poemunity-React-Query
+          git reset --hard
           git pull origin feature/token
           git status
           pwd
