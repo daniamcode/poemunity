@@ -9,7 +9,7 @@ on:
 
 jobs:
   pull:
-    name: pull specially for the backend
+    name: pull all but specially for the backend
     runs-on: ubuntu-latest
 
     defaults:
