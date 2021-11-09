@@ -5,7 +5,7 @@ name: React CI/CD
 
 on:
   push:
-    branches: [ feature/token ]
+    branches: [ development ]
 
 jobs:
   pull:
