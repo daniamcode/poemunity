@@ -51,6 +51,7 @@ jobs:
     # pwd
     # cp ./frontend/src/img/poemunity.svg ./backend/public/img
     # pwd
+    # pwd
 
 
   build:
