@@ -88,8 +88,6 @@ function List (props) {
     return <CircularProgress />
   }
 
-  console.log(poemsQuery)
-
   return (
     <>
       <Helmet>
@@ -177,16 +175,16 @@ function List (props) {
                   )}
                   <div className='separator' />
                   {context.user &&
-                    poem.author !== context.username &&
-                    poem.likes.some((id) => id === context.username) && (
+                    poem.userId !== context.userId &&
+                    poem.likes.some((id) => id === context.userId) && (
                       <Link
                         className='poem__likes-icon'
                         onClick={(event) => onLike(event, poem.id)}
                       />
                   )}
                   {context.user &&
-                    poem.author !== context.username &&
-                    !poem.likes.some((id) => id === context.username) && (
+                    poem.userId !== context.userId &&
+                    !poem.likes.some((id) => id === context.userId) && (
                       <Link
                         className='poem__unlikes-icon'
                         onClick={(event) => onLike(event, poem.id)}
