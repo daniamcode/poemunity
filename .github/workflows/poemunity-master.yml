@@ -35,9 +35,9 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         script: |
           pwd
-          cd projects/poemunity-dev/Poemunity-React-Query
+          cd projects/poemunity/Poemunity-React-Query
           git reset --hard
-          git pull origin feature/token
+          git pull origin master
           git status
           pwd
     # rm -r ./backend/public
@@ -115,7 +115,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
         source: "Poemunity-React-Query/frontend/build/*"
-        target: "projects/poemunity-dev"
+        target: "projects/poemunity"
         rm: false
 
     
