@@ -1,4 +1,4 @@
-export const WEB_SUBTITLE = 'Your poem community!'
+export const WEB_SUBTITLE = 'Your poem community!!'
 export const CATEGORIES_TITLE = 'Categories'
 export const CATEGORIES = ['Anniversary', 'Friendship', 'Funny', 'Haikus', 'Hope', 'Life', 'Love', 'Sad']
 export const ALL = 'All'
@@ -29,4 +29,3 @@ export const RANKING_TITLE = 'Poets ranking'
 export const RANKING_SUBTITLE = '3 points per poem, 1 per like'
 export const RANKING_POETS_TITLE = 'Poets'
 export const RANKING_POINTS_TITLE = 'Points'
-export const ADMIN = 'google-oauth2|102774395820207939159'

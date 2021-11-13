@@ -1,14 +1,14 @@
 import axios from 'axios'
 import { useQuery, useQueryClient } from 'react-query';
 
-export default function usePoem(_id) {
+export default function usePoem(id) {
  const queryClient = useQueryClient()
   return useQuery(
-    ['poems', _id],
-    () => axios.get(`/api/poems/${_id}`).then((res) => res.data),
+    ['poems', id],
+    () => axios.get(`/api/poems/${id}`).then((res) => res.data),
     {
       initialData: () => { 
-        return queryClient.getQueryData('poems')?.find(d => d.id === _id)
+        return queryClient.getQueryData('poems')?.find(d => d.id === id)
       },
       initialStale: true,
       onError: (error) => {

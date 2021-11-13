@@ -1,18 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
-import { AppContext } from '../App';
+import { AppContext } from '../App'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@material-ui/icons/Edit'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
-import { useAuth0 } from '@auth0/auth0-react'
 import CircularProgress from './CircularIndeterminate'
 import capitalizeFirstLetter from '../utils/capitalizeFirstLetter'
 import sortPoems from '../utils/sortPoems'
@@ -30,56 +29,62 @@ import {
   CATEGORIES_TITLE_LABEL
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
-import { useHistory } from "react-router-dom";
-
-const { REACT_APP_ADMIN } = process.env
+import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 
 function List (props) {
-  const { user, isAuthenticated, isLoading: auth0IsLoading } = useAuth0()
   const genre = props.match.params.genre
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
-  
-  const context = useContext(AppContext);
+
+  const history = useHistory()
+  const context = useContext(AppContext)
   const poemsQuery = usePoems()
 
-  useEffect(()=> {
-    if(poemsQuery.data) {
+  console.log(poemsQuery)
+
+  const [paramsData, setParamsData] = useFiltersFromQuery({
+    orderBy: null
+  })
+
+  useEffect(() => {
+    if (poemsQuery.data) {
       const newData = [...poemsQuery.data]
 
-      if(genre) {
+      if (genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
-        const poemsSorted = sortPoems(context.sortPoemsBy, poemsFiltered)
+        const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
         setPoems(poemsSorted)
-      }
-      else {
-        const poemsSorted = sortPoems(context.sortPoemsBy, newData)
+      } else {
+        const poemsSorted = sortPoems(paramsData.orderBy, newData)
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([poemsQuery.data, genre, context.sortPoemsBy])])
+  }, [JSON.stringify([poemsQuery.data, genre, paramsData])])
+
+  const handleOrderChange = (event) => {
+    addQueryParam({ id: 'orderBy', value: event.target.value })
+    setParamsData({ orderBy: event.target.value })
+  }
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
 
-  const onLike = (event, poemId, userId) => {
+  const onLike = (event, poemId) => {
     event.preventDefault()
-    likePoemMutation.mutate({poemId, userId})
+    likePoemMutation.mutate(poemId)
   }
-
-  const history = useHistory();
 
   const editPoem = (poemId) => {
     const newPath = '/profile'
-    history.push(newPath);
-    context.setState({elementToEdit: poemId})
+    history.push(newPath)
+    context.setState({ elementToEdit: poemId })
   }
 
   const handleSearchChange = (event) => {
     setFilter(normalizeString(event.target.value))
   }
 
-  if (auth0IsLoading || poemsQuery.isLoading) {
+  if (poemsQuery.isLoading) {
     return <CircularProgress />
   }
 
@@ -99,7 +104,7 @@ function List (props) {
             </p>
           )}
           <div className='list__search'>
-          <div className='separator' />
+            <div className='separator' />
             <SearchIcon style={{ fontSize: 40, fill: '#4F5D73' }} />
             <TextField
               label={SEARCH_PLACEHOLDER}
@@ -119,25 +124,23 @@ function List (props) {
                 type='submit'
                 id='sort'
                 name='sort'
-                onChange={(event) => {
-                  context.setState({sortPoemsBy: event.target.value})
-                }}
+                onChange={handleOrderChange}
               >
-                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === context.sortPoemsBy}>{ORDER_BY_LIKES}</option>
-                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === context.sortPoemsBy}>{ORDER_BY_DATE}</option>
-                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === context.sortPoemsBy}>{ORDER_BY_RANDOM}</option>
-                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === context.sortPoemsBy}>{ORDER_BY_TITLE}</option>
+                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === paramsData.orderBy}>{ORDER_BY_LIKES}</option>
+                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === paramsData.orderBy}>{ORDER_BY_DATE}</option>
+                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === paramsData.orderBy}>{ORDER_BY_RANDOM}</option>
+                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === paramsData.orderBy}>{ORDER_BY_TITLE}</option>
               </select>
             </label>
           </form>
         </div>
 
         {poems?.map((poem) => (
-          <main key={poem._id} className='poem__detail'>
+          <main key={poem.id} className='poem__detail'>
             {normalizeString(poem.author).includes(filter) && (
               <section className='poem__block'>
                 <section>
-                  <Link to={`/detail/${poem._id}`} className='poem__title'>
+                  <Link to={`/detail/${poem.id}`} className='poem__title'>
                     {poem.title}
                   </Link>
                   <div className='poem__author-container'>
@@ -152,7 +155,7 @@ function List (props) {
                   </div>
                   <div className='poems__read-more'>
                     <Link
-                      to={`/detail/${poem._id}`}
+                      to={`/detail/${poem.id}`}
                       className='poems__read-more'
                     >
                       {READ_MORE}
@@ -160,52 +163,52 @@ function List (props) {
                   </div>
                 </section>
                 <section className='poem__footer'>
-                  {poem.likes.length === 1 && (
+                  {poem.likes?.length === 1 && (
                     <div className='poem__likes'>
-                      {poem.likes.length} {LIKE}
+                      {poem.likes?.length} {LIKE}
                     </div>
                   )}
-                  {poem.likes.length !== 1 && (
+                  {poem.likes?.length !== 1 && (
                     <div className='poem__likes'>
-                      {poem.likes.length} {LIKES}
+                      {poem.likes?.length} {LIKES}
                     </div>
                   )}
                   <div className='separator' />
-                  {isAuthenticated &&
-                    poem.author !== user.name &&
-                    poem.likes.some((id) => id === user.sub) && (
+                  {context.user &&
+                    poem.userId !== context.userId &&
+                    poem.likes.some((id) => id === context.userId) && (
                       <Link
                         className='poem__likes-icon'
-                        onClick={(event) => onLike(event, poem._id, user.sub)}
+                        onClick={(event) => onLike(event, poem.id)}
                       />
                   )}
-                  {isAuthenticated &&
-                    poem.author !== user.name &&
-                    !poem.likes.some((id) => id === user.sub) && (
+                  {context.user &&
+                    poem.userId !== context.userId &&
+                    !poem.likes.some((id) => id === context.userId) && (
                       <Link
                         className='poem__unlikes-icon'
-                        onClick={(event) => onLike(event, poem._id, user.sub)}
+                        onClick={(event) => onLike(event, poem.id)}
                       />
                   )}
-                  {isAuthenticated &&
-                    (poem.author === user.name ||
-                      user.sub === REACT_APP_ADMIN) && (
-                    <EditIcon
-                    className='poem__edit-icon'
-                    onClick={(event) => editPoem(poem._id)}
-                  />
+                  {context.user &&
+                    (poem.author === context.username ||
+                      context.userId === context.adminId) && (
+                        <EditIcon
+                          className='poem__edit-icon'
+                          onClick={(event) => editPoem(poem.id)}
+                        />
                   )}
-                  {isAuthenticated &&
-                    (poem.author === user.name ||
-                      user.sub === REACT_APP_ADMIN) && (
+                  {context.user &&
+                    (poem.author === context.username ||
+                      context.userId === context.adminId) && (
                         <HighlightOffSharpIcon
                           className='poem__delete-icon'
                           style={{ fill: 'red' }}
-                          onClick={(event) => deletePoemMutation.mutate(poem._id)}
+                          onClick={(event) => deletePoemMutation.mutate(poem.id)}
                         />
                   )}
                   <Link
-                    to={`/detail/${poem._id}`}
+                    to={`/detail/${poem.id}`}
                     className='poem__comments-icon'
                   >
                     <SubjectSharpIcon style={{ fill: '#000' }} />

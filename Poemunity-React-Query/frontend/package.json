@@ -3,43 +3,41 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@auth0/auth0-react": "^1.0.0",
-    "@material-ui/core": "^4.11.0",
+    "@babel/code-frame": "^7.16.0",
+    "@babel/helper-validator-identifier": "^7.15.7",
+    "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "axios": "^0.21.4",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.24.0",
     "disqus-react": "^1.0.10",
     "dotenv": "^10.0.0",
     "enzyme-adapter-react-16": "^1.15.4",
-    "firebase": "^7.17.1",
-    "jest": "^26.4.2",
+    "firebase": "^9.2.0",
     "material-ui-icons": "^1.0.0-beta.36",
-    "node-sass": "^4.14.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "npm-check": "^5.9.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-infinite-scroll-component": "^5.0.5",
     "react-player": "^2.6.0",
     "react-query": "^3.24.4",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^3.4.3",
+    "react-scripts": "^4.0.3",
     "react-simple-infinite-loading": "^1.0.0",
-    "react-swipeable-views": "^0.13.9",
-    "react-test-renderer": "^16.13.1",
+    "react-swipeable-views": "^0.14.0",
+    "react-test-renderer": "^17.0.2",
     "rimraf": "^3.0.2",
     "router": "^1.3.5",
-    "styled-components": "^5.1.1"
+    "sass": "^1.43.4",
+    "styled-components": "^5.1.1",
+    "typescript": "^4.4.4"
   },
-  "proxy": "http://localhost:4200",
+  "proxy": "http://localhost:4200/",
   "scripts": {
     "start": "react-scripts start",
     "clean": "rimraf ../backend/public",
-    "prebuild": "npm run clean",
     "build": "react-scripts build",
-    "postbuild": "mv build ../backend/public && mkdir ../backend/public/img && cp src/img/poemunity.svg ../backend/public/img",
     "test": "react-scripts test --watchAll --coverage",
     "eject": "react-scripts eject",
     "lint": "npx standard --fix"
@@ -51,9 +49,6 @@
       "src/appDispatcher",
       "src/App"
     ]
-  },
-  "eslintConfig": {
-    "extends": "./node_modules/standard/eslintrc.json"
   },
   "standard": {
     "env": [
@@ -76,8 +71,11 @@
     ]
   },
   "devDependencies": {
+    "@types/react": "^17.0.33",
+    "@types/react-helmet": "^6.1.4",
+    "@types/react-router-dom": "^5.3.2",
     "enzyme": "^3.11.0",
-    "html-webpack-plugin": "^4.0.0-beta.11",
+    "html-webpack-plugin": "^4.5.2",
     "standard": "16.0.3"
   }
 }
