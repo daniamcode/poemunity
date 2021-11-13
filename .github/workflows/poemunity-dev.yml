@@ -37,7 +37,7 @@ jobs:
           pwd
           cd projects/poemunity-dev/Poemunity-React-Query
           git reset --hard
-          git pull origin feature/token
+          git pull origin development
           git status
           pwd
     # rm -r ./backend/public
