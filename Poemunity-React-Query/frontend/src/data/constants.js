@@ -1,4 +1,4 @@
-export const WEB_SUBTITLE = 'Your poem community-m'
+export const WEB_SUBTITLE = 'Your poem community-mas'
 export const CATEGORIES_TITLE = 'Categories'
 export const CATEGORIES = ['Anniversary', 'Friendship', 'Funny', 'Haikus', 'Hope', 'Life', 'Love', 'Sad']
 export const ALL = 'All'
