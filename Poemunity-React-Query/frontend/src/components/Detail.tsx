@@ -21,12 +21,14 @@ import { FormElement } from '../typescript/types'
 function Detail (props: any): JSX.Element {
   const [poem, setPoem] = useState<Poem>({
     id: '',
-    title: '',
-    picture: '',
     author: '',
     date: '',
-    poem: '',
+    genre: '',
     likes: [],
+    picture: '',
+    poem: '',
+    title: '',
+    userId: '',
   })
 
   const context = useContext(AppContext);
@@ -110,16 +112,16 @@ function Detail (props: any): JSX.Element {
               )}
               <div className='separator' />
               {context.user &&
-                poem.author !== context.username &&
-                poem.likes.some((id) => id === context.username) && (
+                poem.userId !== context.userId &&
+                poem.likes.some((id) => id === context.userId) && (
                   <div
                     className='poem__likes-icon'
                     onClick = {(event) => onLike(event, poem.id)}>
                   </div>
               )}
               {context.user &&
-                poem.author !== context.username &&
-                !poem.likes.some((id) => id === context.username) && (
+                poem.userId !== context.userId &&
+                !poem.likes.some((id) => id === context.userId) && (
                   <div
                     className='poem__unlikes-icon'
                     onClick={(event) => onLike(event, poem.id)}>
