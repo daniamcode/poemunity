@@ -128,7 +128,7 @@ function Detail (props: any): JSX.Element {
                   </div>
               )}
               {context.user &&
-                (poem.author === context.username ||
+                (poem.userId === context.userId ||
                   context.userId === context.adminId) && (
                     <EditIcon
                     className='poem__edit-icon'
@@ -136,7 +136,7 @@ function Detail (props: any): JSX.Element {
                     />
               )}
               {context.user &&
-                (poem.author === context.username || context.userId === context.adminId) && (
+                (poem.userId === context.userId || context.userId === context.adminId) && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
