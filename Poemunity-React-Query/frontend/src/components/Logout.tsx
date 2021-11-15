@@ -5,7 +5,7 @@ import './Header.scss'
 const Logout = () => {
   const history = useHistory()
  
-  const handleLogout = (event) => {
+  const handleLogout = (event: React.SyntheticEvent) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedUser')
     history.push('/')

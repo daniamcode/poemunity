@@ -18,7 +18,11 @@ import { useHistory } from "react-router-dom";
 import { Poem } from '../typescript/interfaces'
 import { FormElement } from '../typescript/types'
 
-function Detail (props: any): JSX.Element {
+interface Props {
+  match: {params: {poemId: string}}
+}
+
+function Detail (props: Props): JSX.Element {
   const [poem, setPoem] = useState<Poem>({
     id: '',
     author: '',
@@ -44,7 +48,7 @@ function Detail (props: any): JSX.Element {
   const deletePoemMutation: {mutate: Function} = useDeletePoem()
   const likePoemMutation: {mutate: Function} = useLikePoem()
 
-  function onLike (event: any, poemId: string) {
+  function onLike (event: React.SyntheticEvent, poemId: string) {
     event.preventDefault()
     likePoemMutation.mutate(poemId)
   }
@@ -116,7 +120,7 @@ function Detail (props: any): JSX.Element {
                 poem.likes.some((id) => id === context.userId) && (
                   <div
                     className='poem__likes-icon'
-                    onClick = {(event) => onLike(event, poem.id)}>
+                    onClick = {(event: React.SyntheticEvent) => onLike(event, poem.id)}>
                   </div>
               )}
               {context.user &&
@@ -124,7 +128,7 @@ function Detail (props: any): JSX.Element {
                 !poem.likes.some((id) => id === context.userId) && (
                   <div
                     className='poem__unlikes-icon'
-                    onClick={(event) => onLike(event, poem.id)}>
+                    onClick={(event: React.SyntheticEvent) => onLike(event, poem.id)}>
                   </div>
               )}
               {context.user &&
@@ -132,7 +136,7 @@ function Detail (props: any): JSX.Element {
                   context.userId === context.adminId) && (
                     <EditIcon
                     className='poem__edit-icon'
-                    onClick={(event) => editPoem(poem.id)}
+                    onClick={() => editPoem(poem.id)}
                     />
               )}
               {context.user &&
@@ -140,7 +144,7 @@ function Detail (props: any): JSX.Element {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
+                    onClick={() => deletePoemMutation.mutate(poem.id)}
                   />
               )}
               <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>

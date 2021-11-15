@@ -18,7 +18,7 @@ function Header () {
   const location = useLocation()
 
   useEffect(()=>{
-    const loggedUserJSON = window.localStorage.getItem('loggedUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
     context.setState({ 
       user: JSON.parse(loggedUserJSON), 
       userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
