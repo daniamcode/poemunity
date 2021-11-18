@@ -45,7 +45,7 @@ function Detail (props: Props): JSX.Element {
     }
   }, [JSON.stringify(poemQuery.data)])
 
-  const deletePoemMutation: {mutate: Function} = useDeletePoem()
+  const deletePoemMutation: {mutate: Function, status: string} = useDeletePoem()
   const likePoemMutation: {mutate: Function} = useLikePoem()
 
   function onLike (event: React.SyntheticEvent, poemId: string) {
@@ -74,7 +74,7 @@ function Detail (props: Props): JSX.Element {
 
   return (
     <>
-      {!poem && (
+      {(!poem.id || deletePoemMutation.status !== 'idle') ? (
         <main className='page-not-found__container'>
           <section className='page-not-found__message'>
             <h1 className='page-not-found__title'>Error - 404</h1>
@@ -84,8 +84,8 @@ function Detail (props: Props): JSX.Element {
             </Link>
           </section>
         </main>
-      )}
-      {poem && poem.likes && (
+      )
+      : (
         <main className='poem__detail'>
           <Helmet>
             <title>{`Poem: ${poem.title}`}</title>

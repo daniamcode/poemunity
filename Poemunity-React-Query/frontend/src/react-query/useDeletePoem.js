@@ -23,7 +23,7 @@ export default function useDeletePoem() {
         // return () => queryClient.setQueryData('poems', oldPoems)
         // queryClient.setQueryData('poems', old=>old.filter((poem) => poem !== poemDeleted))
         // debugger
-        queryClient.invalidateQueries('poems')
+        queryClient.invalidateQueries('poems', { exact: true })
       },
         // onSuccess: () => queryCache.refetchQueries('poems'),
         onError: (error) => {
