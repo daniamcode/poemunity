@@ -19,14 +19,16 @@ function Header () {
 
   useEffect(()=>{
     const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
-    context.setState({ 
-      user: JSON.parse(loggedUserJSON), 
-      userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
-      username: parseJWT(JSON.parse(loggedUserJSON))?.username,
-      config: {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(loggedUserJSON)}`
-      }}})
+    if(loggedUserJSON) {
+      context.setState({ 
+        user: JSON.parse(loggedUserJSON), 
+        userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
+        username: parseJWT(JSON.parse(loggedUserJSON))?.username,
+        config: {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(loggedUserJSON)}`
+        }}})
+    }
   }, [JSON.stringify(location)])
   
   // if (isLoading) {
