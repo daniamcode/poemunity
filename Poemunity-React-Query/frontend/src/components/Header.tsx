@@ -20,7 +20,8 @@ function Header () {
   useEffect(()=>{
     const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
     if(loggedUserJSON) {
-      context.setState({ 
+      context.setState({
+        ...context, 
         user: JSON.parse(loggedUserJSON), 
         userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
         username: parseJWT(JSON.parse(loggedUserJSON))?.username,
