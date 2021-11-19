@@ -20,6 +20,7 @@ export default function useLogin() {
       onError: (error) => {
         // setErrorMessage('Wrong credentials')
         console.log('something went wrong')
+        history.push('/')
         // setTimeout(()=> {
         //   setErrorMessage(null)
         // }, 3000)
