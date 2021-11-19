@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { AppContext } from '../App';
 import { useHistory } from 'react-router'
 import './Header.scss'
 
 const Logout = () => {
   const history = useHistory()
+  const context = useContext(AppContext);
  
   const handleLogout = (event: React.SyntheticEvent) => {
     event.preventDefault()
+    context.setState({...context, user: null })
     window.localStorage.removeItem('loggedUser')
     history.push('/')
   }

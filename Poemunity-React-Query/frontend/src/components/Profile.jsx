@@ -177,13 +177,6 @@ export default function Profile (props) {
     context.setState({...context, elementToEdit: ''})
   }
 
-  const handleLogout = (event) => {
-    event.preventDefault()
-    context.setState({ ...context, user: null })
-    
-    window.localStorage.removeItem('loggedUser')
-  }
-
   return (
     
       <main className='profile__main'>
