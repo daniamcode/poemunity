@@ -29,7 +29,7 @@ function MyPoems (props) {
   }, [JSON.stringify([poemsQuery.data, context.username])])
 
   const editPoem = (poemId) => {
-    context.setState({elementToEdit: poemId})
+    context.setState({...context, elementToEdit: poemId})
   }
 
   const deletePoemMutation = useDeletePoem()

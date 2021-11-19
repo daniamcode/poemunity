@@ -77,7 +77,7 @@ function List (props) {
   const editPoem = (poemId) => {
     const newPath = '/profile'
     history.push(newPath)
-    context.setState({ elementToEdit: poemId })
+    context.setState({ ...context, elementToEdit: poemId })
   }
 
   const handleSearchChange = (event) => {

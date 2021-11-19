@@ -58,7 +58,7 @@ function Detail (props: Props): JSX.Element {
   const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath);
-    context.setState({elementToEdit: poemId})
+    context.setState({...context, elementToEdit: poemId})
   }
 
   if (poemQuery.isLoading) {

@@ -98,10 +98,6 @@ export default function Profile (props) {
     setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
   }, [JSON.stringify([context.elementToEdit, poemQuery.data])])
 
-  const editPoem = (poemId) => {
-    context.setState({elementToEdit: poemId})
-  }
-
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
@@ -173,17 +169,17 @@ export default function Profile (props) {
             date: formattedDate,
           }, poemId: poemQuery.data.id});
         }
-        context.setState({elementToEdit: ''})
+        context.setState({...context, elementToEdit: ''})
       }
   }
 
   const handleReset = (event) => {
-    context.setState({elementToEdit: ''})
+    context.setState({...context, elementToEdit: ''})
   }
 
   const handleLogout = (event) => {
     event.preventDefault()
-    context.setState({ user: null })
+    context.setState({ ...context, user: null })
     
     window.localStorage.removeItem('loggedUser')
   }
