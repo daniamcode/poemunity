@@ -1,4 +1,4 @@
-export const normalizeSwaps = {
+export const normalizeSwaps: { [key: string]: string[] } = {
     0: ['°', '₀', '۰', '０'],
     1: ['¹', '₁', '۱', '１'],
     2: ['²', '₂', '۲', '２'],

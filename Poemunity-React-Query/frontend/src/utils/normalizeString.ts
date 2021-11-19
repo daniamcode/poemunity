@@ -5,7 +5,7 @@ import { normalizeSwaps } from '../data/normalizeSwaps';
  * @param input {string} String to be normalized
  * @returns {string}
  */
-const normalizeString = (input = '') => {
+const normalizeString = (input: string = '') => {
     let str = String(input);
     str = str.replace(/^\s+|\s+$/g, ''); // trim
     str = str.toLowerCase();
