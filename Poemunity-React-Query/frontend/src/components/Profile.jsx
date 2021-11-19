@@ -18,7 +18,8 @@ import useSavePoem from '../react-query/useSavePoem'
 import usePoem from '../react-query/usePoem'
 import {
   PROFILE_TITLE,
-  PROFILE_SUBTITLE,
+  PROFILE_SUBTITLE_CREATE,
+  PROFILE_SUBTITLE_UPDATE,
   PROFILE_POEMS,
   PROFILE_FAVOURITE_POEMS,
   CATEGORIES,
@@ -198,7 +199,11 @@ export default function Profile (props) {
           />
           <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
-              <p className='profile__insert-poem-title'>{PROFILE_SUBTITLE}</p>
+              <p className='profile__insert-poem-title'>
+                {context.elementToEdit 
+                  ? PROFILE_SUBTITLE_UPDATE 
+                  : PROFILE_SUBTITLE_CREATE}
+              </p>
               <br />
               <form
                 className='profile__insert-poem-form'
