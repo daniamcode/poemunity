@@ -13,6 +13,8 @@ export default function useCreatePoem() {
     {
       onSuccess: () => {        
         queryClient.invalidateQueries('poems')
+        queryClient.cancelQueries('poems')
+        queryClient.refetchQueries('poems')
       },
         onError: (error) => {
             console.error(error);
