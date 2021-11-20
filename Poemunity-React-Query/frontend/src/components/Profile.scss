@@ -29,7 +29,7 @@
 
 .profile__image {
     display: inline-block;
-    background-image: url(../icons/profile.svg);
+    // background-image: url(../icons/profile.svg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -132,7 +132,7 @@
     }
 
     .profile__image {
-        height: 65%;
+        height: 50%;
         width: auto;
     }
 
