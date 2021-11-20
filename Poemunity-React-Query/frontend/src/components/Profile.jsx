@@ -255,6 +255,7 @@ export default function Profile (props) {
                       id='category'
                       name='category'
                       required
+                      value={poemCategory}
                       onChange={(event) => {
                         onFieldChange(event.target.value, setPoemCategory)
                       }}
@@ -284,7 +285,13 @@ export default function Profile (props) {
                 <button className='profile__send-poem' type='submit' onClick={handleReset}>
                   {PROFILE_RESET_POEM}
                 </button>
-                <button className='profile__send-poem' type='submit' onClick={handleSend}>
+                <button 
+                  className='profile__send-poem' 
+                  type='submit' 
+                  onClick={handleSend}
+                  disabled={!poemTitle || !poemCategory || !poemContent}
+                  data-disabled={!poemTitle || !poemCategory || !poemContent}
+                >
                   {PROFILE_SEND_POEM}
                 </button>
               </form>
