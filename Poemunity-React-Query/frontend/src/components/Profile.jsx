@@ -176,6 +176,9 @@ export default function Profile (props) {
 
   const handleReset = (event) => {
     context.setState({...context, elementToEdit: ''})
+    setPoemContent('')
+    setPoemTitle('')
+    setPoemCategory('')
   }
 
   return (
@@ -290,7 +293,6 @@ export default function Profile (props) {
                   type='submit' 
                   onClick={handleSend}
                   disabled={!poemTitle || !poemCategory || !poemContent}
-                  data-disabled={!poemTitle || !poemCategory || !poemContent}
                 >
                   {PROFILE_SEND_POEM}
                 </button>

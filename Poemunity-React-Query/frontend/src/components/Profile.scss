@@ -83,7 +83,7 @@
     background-color: red;
     color: white;
     cursor: pointer;
-    &[data-disabled='true'] {
+    &[disabled] {
         background-color: #eee;
         color: black;
         cursor: not-allowed;
@@ -93,7 +93,7 @@
 .profile__send-poem:hover {
     background-color: green;
     color: white;
-    &[data-disabled='true'] {
+    &[disabled] {
         background-color: #eee;
         color: black;
         cursor: not-allowed;
