@@ -1,13 +1,12 @@
 const mongoose = require('mongoose')
 
-const { MONGODB } = process.env
-// const { MONGO_DB_URI, MONGO_DB_URI_TEST, NODE_ENV } = process.env
+const { MONGODB, MONGODB_PRE, NODE_ENV } = process.env
 
-// const connectionString = NODE_ENV === 'test'
-// ? MONGO_DB_URI_TEST
-// : MONGO_DB_URI
+const connectionString = NODE_ENV === 'development'
+? MONGODB_PRE
+: MONGODB
 
-mongoose.connect(MONGODB, {
+mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,

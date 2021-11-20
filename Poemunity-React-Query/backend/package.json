@@ -6,9 +6,9 @@
 	"scripts": {
 		"test": "jest",
 		"test-coverage": "nyc --reporter=html mocha src/**/*.test.js",
-		"dev": "DEBUG=app,app:* nodemon index.js",
-		"stg": "PORT=4200 forever start index.js",
-		"prod": "forever start index.js",
+		"dev": "export NODE_ENV=development DEBUG=app,app:* nodemon index.js",
+		"stg": "export NODE_ENV=development PORT=4200 forever start index.js",
+		"prod": "export NODE_ENV=production forever start index.js",
 		"lint": "npx standard --fix",
 		"forever-list": "forever list",
 		"forever-stop": "forever stop"
