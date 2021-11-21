@@ -29,7 +29,7 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
   const poem = req.body
   const { userId } = req
 
-  const adminId = REACT_APP_ADMIN
+  const adminId = process.env.REACT_APP_ADMIN
 
   const fakeUsers = [
     {id: 1, username: 'cathy2', name: 'Catherine Cawley', picture: 'https://cdn.getyourguide.com/img/location/5c88db055a755.jpeg/88.jpg'},
