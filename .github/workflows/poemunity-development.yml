@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SKIP_PREFLIGHT_CHECK: true
-      REACT_APP_ADMIN_PRE: ${{ secrets.REACT_APP_ADMIN_PRE }}
+      REACT_APP_ADMIN: ${{ secrets.REACT_APP_ADMIN_PRE }}
 
     strategy:
       matrix:
