@@ -18,7 +18,9 @@ function App (props) {
     userId: '',
     username: '',
     config: {},
-    adminId: process.env.REACT_APP_ADMIN,
+    adminId: process.env.NODE_ENV === 'development' 
+      ? process.env.REACT_APP_ADMIN_PRE
+      : process.env.REACT_APP_ADMIN,
     setState(data) {
         const { setState, ...res } = data;
         const newState = { ...contextState, ...res };
