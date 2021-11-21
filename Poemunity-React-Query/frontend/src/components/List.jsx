@@ -36,15 +36,14 @@ function List (props) {
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
+  const [paramsData, setParamsData] = useFiltersFromQuery({
+    orderBy: null,
+    origin: 'all'
+  })
+  
   const history = useHistory()
   const context = useContext(AppContext)
-  const poemsQuery = usePoems()
-
-  console.log(poemsQuery)
-
-  const [paramsData, setParamsData] = useFiltersFromQuery({
-    orderBy: null
-  })
+  const poemsQuery = usePoems(paramsData.origin)
 
   useEffect(() => {
     if (poemsQuery.data) {
@@ -63,7 +62,12 @@ function List (props) {
 
   const handleOrderChange = (event) => {
     addQueryParam({ id: 'orderBy', value: event.target.value })
-    setParamsData({ orderBy: event.target.value })
+    setParamsData({ ...paramsData, orderBy: event.target.value })
+  }
+
+  const handleOriginChange = (event) => {
+    addQueryParam({ id: 'origin', value: event.target.value })
+    setParamsData({ ...paramsData, origin: event.target.value })
   }
 
   const deletePoemMutation = useDeletePoem()
@@ -117,6 +121,21 @@ function List (props) {
               onChange={handleSearchChange}
             />
           </div>
+          <form className='list__sort'>
+            <label>
+              Authors:
+              <select
+                type='submit'
+                id='origin'
+                name='origin'
+                onChange={handleOriginChange}
+              >
+                <option value='all' selected={'all' === paramsData.origin}>All</option>
+                <option value='famous' selected={'famous' === paramsData.origin}>Famous</option>
+                <option value='user' selected={'user' === paramsData.origin}>User</option>
+              </select>
+            </label>
+          </form>
           <form className='list__sort'>
             <label>
               {ORDER_BY}

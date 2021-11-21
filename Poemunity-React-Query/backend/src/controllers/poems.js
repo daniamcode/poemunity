@@ -5,13 +5,23 @@ const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 
 poemsRouter.get('/', async (req, res) => {
-  Poem.find((error, poems) => {
-    if (error) {
-      res.send(error)
-    } else {
-      res.json(poems)
-    }
-  })
+  if(req.query.origin) {
+    Poem.find({origin: req.query.origin}, (error, poems) => {
+      if (error) {
+        res.send(error)
+      } else {
+        res.json(poems)
+      }
+    })  
+  } else {
+    Poem.find((error, poems) => {
+      if (error) {
+        res.send(error)
+      } else {
+        res.json(poems)
+      }
+    })
+  }
 })
 
 // create poem

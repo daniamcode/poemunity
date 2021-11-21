@@ -30,7 +30,7 @@ export default function Ranking () {
   const likePoints = 1
 
   const [poems, setPoems] = useState([])
-  const poemsQuery = usePoems()
+  const poemsQuery = usePoems('user')
 
   const [rank, setRank] = useState(
     getRanking(null)

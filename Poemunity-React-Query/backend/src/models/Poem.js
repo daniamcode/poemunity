@@ -8,7 +8,8 @@ const poemSchema = new Schema({
   genre: String,
   likes: [String],
   date: Date,
-  userId: String
+  userId: String,
+  origin: String
 })
 
 poemSchema.set('toJSON', {

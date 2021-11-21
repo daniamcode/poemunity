@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { useQuery } from 'react-query';
 
-export default function usePoems() {
+export default function usePoems(origin) {
   return useQuery(
-    'poems',
-    () => axios.get('/api/poems').then((res) => res.data),
-    {
+    ['poems', origin],
+    () => 
+      axios.get('/api/poems', origin && origin !== 'all' 
+        ? {params: {origin}} 
+        : null).then((res) => res.data),
+      {
         onError: (error) => {
             console.error(error);
       }
