@@ -16,9 +16,6 @@ import parseJWT from '../utils/parseJWT'
 function Header () {
   const context = useContext(AppContext);
   const location = useLocation()
-  console.log('w')
-  console.log(context.adminId)
-  console.log(process.env.NODE_ENV)
 
   useEffect(()=>{
     const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
