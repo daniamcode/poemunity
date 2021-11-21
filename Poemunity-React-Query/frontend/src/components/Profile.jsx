@@ -81,6 +81,7 @@ export default function Profile (props) {
   const [poemContent, setPoemContent] = useState('')
   const [poemFakeId, setPoemFakeId] = useState('')
   const [poemTitle, setPoemTitle] = useState('')
+  const [poemOrigin, setPoemOrigin] = useState('')
   const [poemCategory, setPoemCategory] = useState('')
   const [poemLikes, setPoemLikes] = useState([])
 
@@ -97,6 +98,7 @@ export default function Profile (props) {
     setPoemFakeId(context.elementToEdit ? poemQuery?.data?.userId : '')
     setPoemLikes(context.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
     setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
+    setPoemOrigin(context.elementToEdit ? poemQuery?.data?.origin : '')
   }, [JSON.stringify([context.elementToEdit, poemQuery.data])])
 
   const handleChange = (event, newValue) => {
@@ -138,6 +140,7 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
+            origin: poemOrigin
           });  
         } else {
           createPoemMutation.mutate({
@@ -146,10 +149,12 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: [],
             date: formattedDate,
+            origin: 'user'
           });
         }
         setPoemContent('')
         setPoemTitle('')
+        setPoemOrigin('')
         setPoemCategory('')
       } else {
         if(context.userId === context.adminId) {
@@ -160,6 +165,7 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
+            origin: poemOrigin,
           }, poemId: poemQuery.data.id});  
         } else {
           savePoemMutation.mutate({poem: {
@@ -178,6 +184,7 @@ export default function Profile (props) {
     context.setState({...context, elementToEdit: ''})
     setPoemContent('')
     setPoemTitle('')
+    setPoemOrigin('')
     setPoemCategory('')
   }
 
@@ -215,6 +222,17 @@ export default function Profile (props) {
                   {
                   context.userId === context.adminId && (
                   <>
+                    <label className='profile__insert-poem-input'>
+                      Origin
+                      <input
+                        className='profile__insert-poem-input'
+                        name='origin'
+                        required
+                        value={poemOrigin}
+                        onChange={(event) =>
+                          onFieldChange(event.target.value, setPoemOrigin)}
+                      />
+                    </label>
                     <label className='profile__insert-poem-input'>
                       {PROFILE_SELECT_TITLE_AUTHOR}
                       <input
