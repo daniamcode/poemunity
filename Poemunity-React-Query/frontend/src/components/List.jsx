@@ -132,7 +132,7 @@ function List (props) {
               >
                 <option value='all' selected={'all' === paramsData.origin}>All</option>
                 <option value='famous' selected={'famous' === paramsData.origin}>Famous</option>
-                <option value='user' selected={'user' === paramsData.origin}>User</option>
+                <option value='user' selected={'user' === paramsData.origin}>Users</option>
               </select>
             </label>
           </form>
