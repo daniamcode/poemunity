@@ -40,6 +40,7 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
     {id: 4, username: 'rayson', name: 'Ray Higgins', picture: 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/old-books-arranged-on-shelf-royalty-free-image-1572384534.jpg'},
     {id: 5, username: 'typp', name: 'Ty Lue', picture: 'https://volcanodiscovery.de/uploads/tx_tplink/sakurajima_j02376m.jpg'},
     {id: 6, username: 'John Donne', name: 'John Donne', picture: 'https://lh3.googleusercontent.com/-ieCqz9txEts/YOfrlyPMShI/AAAAAAAADfw/agqHfV63mu0rehEcd7mPZBnNJg8V3hlhwCLcBGAsYHQ/image.png'},
+    {id: 7, username: 'Walt Whitman', name: 'Walt Whitman', picture: 'https://static1.abc.es/media/cultura/2018/09/01/walt-whitman-personal-trainer-U30920346632mrF-U301308396057toD-620x650@abc.jpg'},
   ]
 
   const fakeUser = (poem.userId && userId === adminId) ? fakeUsers.find(user=>user.id === parseInt(poem.userId)) : null
