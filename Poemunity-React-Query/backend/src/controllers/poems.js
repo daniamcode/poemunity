@@ -63,5 +63,19 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
   } catch {}
 })
 
+// add new property to all existing poems
+poemsRouter.patch('/', async (req, res) => {
+  const newProperty = req.body
+
+  const response = await Poem.updateMany({$set: newProperty});
+
+  if (response === null) {
+    return res.status(404).json({
+    error: 'error'
+  })}
+  console.log(newProperty)
+  res.status(204).end()
+})
+
 module.exports = poemsRouter
 
