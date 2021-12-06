@@ -16,7 +16,7 @@ export default function useRegister() {
       },
       onError: (error) => {
         // setErrorMessage('Wrong credentials')
-        console.log('something went wrong')
+        console.log('something went wrong in useRegister')
         // setTimeout(()=> {
         //   setErrorMessage(null)
         // }, 3000)

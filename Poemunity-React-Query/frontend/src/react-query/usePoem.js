@@ -10,7 +10,7 @@ export default function usePoem(id) {
       initialData: () => { 
         return queryClient.getQueryData('poems')?.find(d => d.id === id)
       },
-      initialStale: true,
+      // initialStale: true,
       onError: (error) => {
           console.error(error);
       }
