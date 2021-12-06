@@ -43,10 +43,10 @@ function List (props) {
   
   const history = useHistory()
   const context = useContext(AppContext)
-  const poemsQuery = usePoems(paramsData.origin)
+  const poemsQuery = usePoems(paramsData?.origin)
 
   useEffect(() => {
-    if (poemsQuery.data) {
+    if (poemsQuery && poemsQuery.data) {
       const newData = [...poemsQuery.data]
 
       if (genre) {
