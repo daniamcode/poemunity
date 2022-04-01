@@ -46,9 +46,7 @@ function List (props) {
   const poemsQuery = usePoems(paramsData?.origin)
 
   useEffect(() => {
-    if (poemsQuery && poemsQuery.data) {
-      console.log(poemsQuery);
-      debugger
+    if (poemsQuery && poemsQuery.data && poemsQuery.data.length > 0) {
       const newData = [...poemsQuery.data]
 
       if (genre) {
