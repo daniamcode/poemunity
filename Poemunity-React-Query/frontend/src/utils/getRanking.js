@@ -32,7 +32,7 @@ export const SortObjectOfObjects = (data, attribute) => {
 
 export const getRanking = (poems, poemPoints, likePoints) => {
     let rank = {}
-    if(poems.length > 0) {
+    if(poems && poems.length > 0) {
       rank = poems.reduce(function (accumulator, item) {
           const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
   
