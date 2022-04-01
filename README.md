@@ -1,6 +1,8 @@
-## Important note
+# Important note
 
-There are two folders: flux and Poemunity-React-Query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. The app is online. Then, I created the Poemunity-React-Query folder and continued from there. Now I manage Server State (cache) with Poemunity-React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
+This App is online at https://poemunity.com 
+
+There are two folders: flux and Poemunity-React-Query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. Then, I created the Poemunity-React-Query folder and continued from there. Now I manage Server State (cache) with Poemunity-React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
 
 # Poemunity - Fullstack React Application with Flux & Node.js
 
@@ -22,6 +24,10 @@ My final Project was **Poemunity**, a social poetry website made in 2,5 weeks wi
 - SOLID principles
 
 Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
+
+
+# IMPORTANT!: FOLLOWING NOTES ARE JUST TO REMEMBER, BUT THEY ARE OLD. NOW I'M ON AMAZON WEB SERVICES AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS)
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
