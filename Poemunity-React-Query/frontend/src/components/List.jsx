@@ -47,6 +47,8 @@ function List (props) {
 
   useEffect(() => {
     if (poemsQuery && poemsQuery.data) {
+      console.log(poemsQuery);
+      debugger
       const newData = [...poemsQuery.data]
 
       if (genre) {
