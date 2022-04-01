@@ -46,7 +46,7 @@ function List (props) {
   const poemsQuery = usePoems(paramsData?.origin)
 
   useEffect(() => {
-    if (poemsQuery && poemsQuery.data) {
+    if (poemsQuery && poemsQuery.data && poemsQuery.data.length > 0) {
       const newData = [...poemsQuery.data]
 
       if (genre) {
@@ -58,7 +58,7 @@ function List (props) {
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([poemsQuery.data, genre, paramsData])])
+  }, [JSON.stringify([poemsQuery, genre, paramsData])])
 
   const handleOrderChange = (event) => {
     addQueryParam({ id: 'orderBy', value: event.target.value })
