@@ -7,7 +7,12 @@ export default function usePoems(origin) {
     () => 
       axios.get('/api/poems', origin && origin !== 'all' 
         ? {params: {origin}} 
-        : null).then((res) => res.data),
+        : null).then((res) => {
+          console.log('a')
+          console.log(res)
+          res.data
+        }
+        ),
       {
         onError: (error) => {
             console.error(error);
