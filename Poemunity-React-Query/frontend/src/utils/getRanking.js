@@ -31,19 +31,22 @@ export const SortObjectOfObjects = (data, attribute) => {
 }
 
 export const getRanking = (poems, poemPoints, likePoints) => {
-    let rank = poems?.reduce(function (accumulator, item) {
-        const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
-
-        accumulator[item.userId] = {
-        author: item.author,
-        picture: item.picture,
-        points
-        }
-
-        return accumulator
-    }, {})
-
-    rank = SortObjectOfObjects(rank, 'points')
+    let rank = {}
+    if(poems) {
+      rank = poems.reduce(function (accumulator, item) {
+          const points = (accumulator[item.userId]?.points || 0) + poemPoints + (likePoints * item.likes.length)
+  
+          accumulator[item.userId] = {
+          author: item.author,
+          picture: item.picture,
+          points
+          }
+  
+          return accumulator
+      }, {})
+  
+      rank = SortObjectOfObjects(rank, 'points')
+    }
 
 return rank
 }
