@@ -25,6 +25,7 @@ function Header () {
         user: JSON.parse(loggedUserJSON), 
         userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
         username: parseJWT(JSON.parse(loggedUserJSON))?.username,
+        picture: parseJWT(JSON.parse(loggedUserJSON))?.picture,
         config: {
           headers: {
             Authorization: `Bearer ${JSON.parse(loggedUserJSON)}`

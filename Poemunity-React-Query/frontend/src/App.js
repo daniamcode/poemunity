@@ -17,6 +17,7 @@ function App (props) {
     user: null,
     userId: '',
     username: '',
+    picture: '',
     config: {},
     adminId: process.env.REACT_APP_ADMIN,
     setState(data) {

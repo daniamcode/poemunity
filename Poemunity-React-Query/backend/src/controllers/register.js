@@ -20,9 +20,9 @@ registerRouter.post('/', async (req, res) => {
     })
     if(userExists) {
       if(userExists.username === username) {
-        res.status(401).send({error: 'This username already exists', code: '1'})
+        res.status(401).send({error: 'This username already exists. Please try with another one', code: '1'})
       } else if(userExists.email === email) {
-        res.status(401).send({error: 'This email already exists', code: '2'})
+        res.status(401).send({error: 'This email already exists. Please try with another one', code: '2'})
       } else {
         res.status(401).send({error: 'This is an unknown error', code: '3'})
       }

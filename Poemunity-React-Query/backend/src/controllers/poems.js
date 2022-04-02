@@ -51,7 +51,7 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
     ...poem,
     userId: (poem.userId && userId === adminId) ? poem.userId : user._id,
     author: (poem.userId && userId === adminId) ? fakeUser.username : user.username,
-    picture: (poem.userId && userId === adminId) ? fakeUser.picture : '',
+    picture: (poem.userId && userId === adminId) ? fakeUser.picture : user.picture,
   })
   try {
     const savedPoem = await newPoem.save()

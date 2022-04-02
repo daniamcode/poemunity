@@ -20,7 +20,8 @@ usersRouter.post('/', async (request, response) => {
   const user = new User({
     username,
     name,
-    passwordHash
+    passwordHash,
+    picture: 'https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg'
   })
 
   const savedUser = await user.save()

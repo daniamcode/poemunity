@@ -204,7 +204,7 @@ export default function Profile (props) {
         <section className='profile__intro'>
           <img
             className='profile__image'
-            src={context.user?.picture || 'https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg'}
+            src={context.picture}
             alt={context.username}
           />
           <div className='profile__personal-data'>
