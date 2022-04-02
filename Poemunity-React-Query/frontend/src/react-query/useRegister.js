@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useHistory } from 'react-router';
 import { useMutation, useQueryClient } from 'react-query';
+import { manageError } from '../utils/notifications'
 
 export default function useRegister() {
  const queryClient = useQueryClient()
@@ -16,7 +17,7 @@ export default function useRegister() {
       },
       onError: (error) => {
         // setErrorMessage('Wrong credentials')
-        console.log('something went wrong in useRegister')
+        manageError(error.response.data.error)
         // setTimeout(()=> {
         //   setErrorMessage(null)
         // }, 3000)

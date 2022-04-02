@@ -11,8 +11,25 @@ registerRouter.post('/', async (req, res) => {
       email,
       passwordHash
     })
-    const savedUser = await newUser.save()
-    res.json(savedUser)
+    const userExists = await User.findOne(
+    {
+     $or: [
+            { username },
+            { email }
+          ]
+    })
+    if(userExists) {
+      if(userExists.username === username) {
+        res.status(401).send({error: 'This username already exists', code: '1'})
+      } else if(userExists.email === email) {
+        res.status(401).send({error: 'This email already exists', code: '2'})
+      } else {
+        res.status(401).send({error: 'This is an unknown error', code: '3'})
+      }
+    } else {
+      const savedUser = await newUser.save()
+      res.json(savedUser)
+    }
   } catch {
   }
 })
