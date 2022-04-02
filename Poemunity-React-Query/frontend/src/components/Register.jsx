@@ -54,7 +54,9 @@ const Register = () => {
                 ({ target }) => setPassword(target.value)}
             />
           </div>
-          <button>
+          <button
+          disabled = {username.length === 0 || email.length === 0 || password.length === 0}
+          >
             Register
           </button>
           {/* <Notification message={errorMessage}/> */}
