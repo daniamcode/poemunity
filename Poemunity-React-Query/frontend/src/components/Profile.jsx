@@ -188,6 +188,9 @@ export default function Profile (props) {
     setPoemCategory('')
   }
 
+  console.log('a')
+  console.log(context)
+
   return (
     
       <main className='profile__main'>
