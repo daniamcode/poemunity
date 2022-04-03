@@ -188,6 +188,14 @@ export default function Profile (props) {
     setPoemCategory('')
   }
 
+  const [pictureUrl, setPictureUrl] = useState('')
+
+  useEffect(()=> {
+    if(context.picture) {
+      setPictureUrl(context.picture)
+    }
+  }, [JSON.stringify(context)])
+
   return (
     
       <main className='profile__main'>
@@ -204,8 +212,7 @@ export default function Profile (props) {
         <section className='profile__intro'>
           <img
             className='profile__image'
-            // src={context.picture}
-            src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
+            src={pictureUrl}
             alt={context.username}
           />
           <div className='profile__personal-data'>
