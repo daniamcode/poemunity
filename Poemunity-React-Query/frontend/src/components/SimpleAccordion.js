@@ -9,9 +9,9 @@ import { CATEGORIES_TITLE, CATEGORIES, ALL } from '../data/constants'
 
 export default function SimpleAccordion () {
   return (
-    <div>
       <Accordion className='accordion'>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='panel1a-content' id='panel1a-header'>
+          <div className='header__dropdown-categories-icon'></div>
           <p className='header__dropdown-categories'>{CATEGORIES_TITLE}</p>
         </AccordionSummary>
         <div>
@@ -29,6 +29,5 @@ export default function SimpleAccordion () {
           </Link>
         </AccordionDetails>
       </Accordion>
-    </div>
   )
 }
