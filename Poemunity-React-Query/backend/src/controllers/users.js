@@ -21,7 +21,7 @@ usersRouter.post('/', async (request, response) => {
     username,
     name,
     passwordHash,
-    picture: 'https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg'
+    picture: 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
   })
 
   const savedUser = await user.save()

@@ -9,7 +9,8 @@ registerRouter.post('/', async (req, res) => {
     const newUser = new User({
       username,
       email,
-      passwordHash
+      passwordHash,
+      picture: 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
     })
     const userExists = await User.findOne(
     {
