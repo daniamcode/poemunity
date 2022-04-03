@@ -204,7 +204,8 @@ export default function Profile (props) {
         <section className='profile__intro'>
           <img
             className='profile__image'
-            src={context.picture}
+            // src={context.picture}
+            src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
             alt={context.username}
           />
           <div className='profile__personal-data'>
