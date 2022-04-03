@@ -26,7 +26,7 @@ My final Project was **Poemunity**, a social poetry website made in 2,5 weeks wi
 Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
 
 
-# IMPORTANT!: FOLLOWING NOTES ARE JUST TO REMEMBER, BUT THEY ARE OLD. NOW I'M ON AMAZON WEB SERVICES AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS)
+# IMPORTANT!: FOLLOWING NOTES ARE JUST TO REMEMBER, BUT THEY ARE OLD. NOW I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS)
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
