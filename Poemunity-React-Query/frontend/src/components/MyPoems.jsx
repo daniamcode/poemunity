@@ -26,7 +26,7 @@ function MyPoems (props) {
       const poemsFiltered = getPoemsByUser(poemsQuery.data, context.username)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery.data, context.username])])
+  }, [JSON.stringify([poemsQuery, context.username])])
 
   const editPoem = (poemId) => {
     context.setState({...context, elementToEdit: poemId})
