@@ -30,6 +30,7 @@ import {
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
+import { strings } from '@daniamcode/utils'
 
 function List (props) {
   const genre = props.match.params.genre
@@ -89,6 +90,10 @@ function List (props) {
   }
 
   if (poemsQuery.isLoading) {
+    console.log('test my first npm package!')
+    console.log(strings.isLowercase('Qwerty'))
+    console.log(strings.isLowercase('qwerty'))
+    console.log(strings.isLowercase('ABC'))
     return <CircularProgress />
   }
 
