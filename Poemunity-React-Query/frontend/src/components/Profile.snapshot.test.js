@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import Profile from './Profile'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderProfile (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderProfile (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <Profile {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Profile {...props} />
+      </BrowserRouter>
+  </QueryClientProvider>
   )
 }
 

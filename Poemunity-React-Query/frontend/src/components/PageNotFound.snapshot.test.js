@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import PageNotFound from './PageNotFound'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderPageNotFound (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderPageNotFound (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <PageNotFound {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <PageNotFound {...props} />
+      </BrowserRouter>
+  </QueryClientProvider>
   )
 }
 

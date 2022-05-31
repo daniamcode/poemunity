@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import MyFavouritePoems from './MyFavouritePoems'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderMyFavouritePoems (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderMyFavouritePoems (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <MyFavouritePoems {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <MyFavouritePoems {...props} />
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

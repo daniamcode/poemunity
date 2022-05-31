@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import Logout from './Logout'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderLogout (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderLogout (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <Logout {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Logout {...props} />
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

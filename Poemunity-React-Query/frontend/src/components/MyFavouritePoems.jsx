@@ -25,10 +25,10 @@ function MyFavouritePoems (props) {
   
   useEffect(()=> {
     if(poemsQuery.data) {
-      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, context.userId)
+      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, context?.userId)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery.data, context.username])])
+  }, [JSON.stringify([poemsQuery.data, context?.username])])
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
@@ -105,23 +105,23 @@ function MyFavouritePoems (props) {
                   </div>
                 )}
                 <div className='separator' />
-                {context.user &&
-                  poem.userId !== context.userId &&
-                  poem.likes.some((id) => id === context.userId) && (
+                {context?.user &&
+                  poem.userId !== context?.userId &&
+                  poem.likes.some((id) => id === context?.userId) && (
                     <Link
                       className='poem__likes-icon'
                       onClick={(event) => onLike(event, poem.id)}
                     />
                 )}
-                {context.user &&
-                  poem.userId !== context.userId &&
-                  !poem.likes.some((id) => id === context.userId) && (
+                {context?.user &&
+                  poem.userId !== context?.userId &&
+                  !poem.likes.some((id) => id === context?.userId) && (
                     <Link
                       className='poem__unlikes-icon'
                       onClick={(event) => onLike(event, poem.id)}
                     />
                 )}
-                {context.user && poem.author === context.username && (
+                {context?.user && poem.author === context?.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}

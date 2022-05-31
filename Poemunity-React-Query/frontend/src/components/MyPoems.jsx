@@ -23,10 +23,10 @@ function MyPoems (props) {
 
   useEffect(()=> {
     if(poemsQuery.data) {
-      const poemsFiltered = getPoemsByUser(poemsQuery.data, context.username)
+      const poemsFiltered = getPoemsByUser(poemsQuery.data, context?.username)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery, context.username])])
+  }, [JSON.stringify([poemsQuery, context?.username])])
 
   const editPoem = (poemId) => {
     context.setState({...context, elementToEdit: poemId})
@@ -99,14 +99,14 @@ function MyPoems (props) {
                 )}
                 <div className='separator' />
                 {context.user &&
-                  (poem.author === context.username ||
+                  (poem.author === context?.username ||
                     context.userId === context.adminId) && (
                       <EditIcon
                       className='poem__edit-icon'
                       onClick={(event) => editPoem(poem.id)}
                       />
                 )}
-                {context.user && poem.author === context.username && (
+                {context.user && poem.author === context?.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}

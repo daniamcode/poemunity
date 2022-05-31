@@ -90,16 +90,16 @@ export default function Profile (props) {
   const savePoemMutation = useSavePoem()
 
   const context = useContext(AppContext);
-  const poemQuery = usePoem(context.elementToEdit)
+  const poemQuery = usePoem(context?.elementToEdit)
 
   useEffect(()=> {
-    setPoemTitle(context.elementToEdit ? poemQuery?.data?.title : '')
-    setPoemContent(context.elementToEdit ? poemQuery?.data?.poem : '')
-    setPoemFakeId(context.elementToEdit ? poemQuery?.data?.userId : '')
-    setPoemLikes(context.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
-    setPoemCategory(context.elementToEdit ? poemQuery?.data?.genre : '')
-    setPoemOrigin(context.elementToEdit ? poemQuery?.data?.origin : '')
-  }, [JSON.stringify([context.elementToEdit, poemQuery.data])])
+    setPoemTitle(context?.elementToEdit ? poemQuery?.data?.title : '')
+    setPoemContent(context?.elementToEdit ? poemQuery?.data?.poem : '')
+    setPoemFakeId(context?.elementToEdit ? poemQuery?.data?.userId : '')
+    setPoemLikes(context?.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
+    setPoemCategory(context?.elementToEdit ? poemQuery?.data?.genre : '')
+    setPoemOrigin(context?.elementToEdit ? poemQuery?.data?.origin : '')
+  }, [JSON.stringify([context?.elementToEdit, poemQuery.data])])
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -131,8 +131,8 @@ export default function Profile (props) {
       ':' +
       currentDatetime.getSeconds()
 
-      if(!context.elementToEdit) {
-        if(context.userId === context.adminId) {
+      if(!context?.elementToEdit) {
+        if(context?.userId === context.adminId) {
           createPoemMutation.mutate({
             userId: poemFakeId,
             poem: poemContent,
@@ -157,7 +157,7 @@ export default function Profile (props) {
         setPoemOrigin('')
         setPoemCategory('')
       } else {
-        if(context.userId === context.adminId) {
+        if(context?.userId === context.adminId) {
           savePoemMutation.mutate({poem: {
             userId: poemFakeId,
             poem: poemContent,
@@ -192,12 +192,12 @@ export default function Profile (props) {
     
       <main className='profile__main'>
         {
-          context.user ?
+          context?.user ?
           (
           <div>
           <section className='profile__title'>
           <div>
-            {context.username}
+            {context?.username}
             {PROFILE_TITLE}
           </div>
         </section>
@@ -206,12 +206,12 @@ export default function Profile (props) {
             className='profile__image'
             src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
             // src={context.picture}
-            alt={context.username}
+            alt={context?.username}
           />
           <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
               <p className='profile__insert-poem-title'>
-                {context.elementToEdit 
+                {context?.elementToEdit 
                   ? PROFILE_SUBTITLE_UPDATE 
                   : PROFILE_SUBTITLE_CREATE}
               </p>
@@ -221,7 +221,7 @@ export default function Profile (props) {
               >
                 <div className='profile__insert-poem-inputs'>
                   {
-                  context.userId === context.adminId && (
+                  context?.userId === context.adminId && (
                   <>
                     <label className='profile__insert-poem-input'>
                       Origin

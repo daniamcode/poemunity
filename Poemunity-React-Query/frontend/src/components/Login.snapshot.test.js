@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import Login from './Login'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderLogin (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderLogin (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <Login {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Login {...props} />
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

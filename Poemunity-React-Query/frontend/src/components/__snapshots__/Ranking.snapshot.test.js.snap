@@ -1,56 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Ranking should match without id 1`] = `
-<main
-  className="ranking"
+<div
+  className="makeStyles-root-2"
 >
-  <h3
-    className="ranking__title"
-  >
-    Ranking de poetas
-  </h3>
-  <h5
-    className="ranking__subtitle"
-  >
-    3 puntos por poema, 1 por like
-  </h5>
   <div
-    className="MuiPaper-root MuiTableContainer-root ranking__body MuiPaper-elevation1 MuiPaper-rounded"
+    className="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"
+    role="progressbar"
+    style={
+      Object {
+        "height": 40,
+        "width": 40,
+      }
+    }
   >
-    <table
-      aria-label="simple table"
-      className="MuiTable-root makeStyles-table-1"
-      role={null}
+    <svg
+      className="MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
     >
-      <thead
-        className="MuiTableHead-root"
-        role={null}
-      >
-        <tr
-          className="MuiTableRow-root MuiTableRow-head"
-          role={null}
-        >
-          <th
-            aria-sort={null}
-            className="MuiTableCell-root MuiTableCell-head MuiTableCell-alignCenter"
-            scope="col"
-          >
-            Poetas
-          </th>
-          <th
-            aria-sort={null}
-            className="MuiTableCell-root MuiTableCell-head MuiTableCell-alignCenter"
-            scope="col"
-          >
-            Puntos
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        className="MuiTableBody-root"
-        role={null}
+      <circle
+        className="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate"
+        cx={44}
+        cy={44}
+        fill="none"
+        r={20.2}
+        strokeWidth={3.6}
+        style={Object {}}
       />
-    </table>
+    </svg>
   </div>
-</main>
+</div>
 `;

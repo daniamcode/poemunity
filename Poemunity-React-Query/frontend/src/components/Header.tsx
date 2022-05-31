@@ -53,12 +53,12 @@ function Header () {
         </div>
         <p className='list__presentation'>{WEB_SUBTITLE}</p>
         <div className='separator' />
-        {context.user ? (
+        {context?.user ? (
           <Link to='/profile' className='header__profile' />
         ) : (
           <></>
         )}
-        {context.user ? <LogoutButton /> : <LoginButton />}
+        {context?.user ? <LogoutButton /> : <LoginButton />}
       </section>
     </>
   )

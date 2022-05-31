@@ -2,6 +2,10 @@ import React from 'react'
 import renderer from 'react-test-renderer'
 import List from './List'
 import { BrowserRouter } from 'react-router-dom'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query"
 
 function renderList (arg) {
   const defaultProps = {
@@ -11,10 +15,14 @@ function renderList (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
+  const queryClient = new QueryClient();
+
   return renderer.create(
-    <BrowserRouter>
-      <List {...props} />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <List {...props} />
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 
