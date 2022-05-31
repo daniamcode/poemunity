@@ -49,50 +49,48 @@ export default function Ranking () {
   }, [JSON.stringify([poems, poemPoints, likePoints])])
 
   if (poemsQuery.isLoading) {
-    return <CircularProgress />
+    return <CircularProgress data-test='ranking__loading'/>
   }
 
   return (
-    <>
-      <main className='ranking'>
-        <h3 className='ranking__title'>{RANKING_TITLE}</h3>
-        <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
-        <TableContainer className='ranking__body' component={Paper}>
-          <Table className={classes.table} aria-label='simple table'>
-            <TableHead>
-              <TableRow>
-                <TableCell align='center'>{RANKING_POETS_TITLE}</TableCell>
-                <TableCell align='center'>{RANKING_POINTS_TITLE}</TableCell>
+    <main className='ranking'>
+      <h3 className='ranking__title'>{RANKING_TITLE}</h3>
+      <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
+      <TableContainer className='ranking__body' component={Paper}>
+        <Table className={classes.table} aria-label='simple table'>
+          <TableHead>
+            <TableRow>
+              <TableCell align='center'>{RANKING_POETS_TITLE}</TableCell>
+              <TableCell align='center'>{RANKING_POINTS_TITLE}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.keys(rank).map((element, index) => (
+              <TableRow key={index}>
+                <TableCell
+                  className='ranking__picture-container'
+                  align='center'
+                  component='th'
+                  scope='row'
+                >
+                  <div className='ranking__picture-wrap'>
+                    <img
+                      className='ranking__picture'
+                      src={rank[element].picture}
+                    />
+                    <p className='ranking__picture-description'>
+                      {rank[element].author}
+                    </p>
+                  </div>
+                </TableCell>
+                <TableCell className='ranking__number' align='center'>
+                  {rank[element].points}
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.keys(rank).map((element, index) => (
-                <TableRow key={index}>
-                  <TableCell
-                    className='ranking__picture-container'
-                    align='center'
-                    component='th'
-                    scope='row'
-                  >
-                    <div className='ranking__picture-wrap'>
-                      <img
-                        className='ranking__picture'
-                        src={rank[element].picture}
-                      />
-                      <p className='ranking__picture-description'>
-                        {rank[element].author}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className='ranking__number' align='center'>
-                    {rank[element].points}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </main>
-    </>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </main>
   )
 }
