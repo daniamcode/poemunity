@@ -3,6 +3,7 @@
 exports[`Login should match without id 1`] = `
 <form
   className="login"
+  data-testid="login"
   onSubmit={[Function]}
 >
   <label>

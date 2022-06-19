@@ -1,6 +1,8 @@
 import React from 'react'
 import Enzyme, { mount, shallow } from 'enzyme'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import {createMemoryHistory} from 'history'
 import Ranking from './Ranking'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
@@ -8,12 +10,27 @@ import Login from './Login'
 import Logout from './Logout'
 import Profile from './Profile'
 import Header from './Header'
+import { BrowserRouter as Router } from 'react-router-dom'
+import '@testing-library/jest-dom'
+// import useLogin from '../react-query/useLogin'
+import { manageSuccess } from '../utils/notifications';
+
 import {
   QueryClient,
   QueryClientProvider,
 } from "react-query"
 
 const queryClient = new QueryClient();
+
+// these mocks seem to have to be defined before the "describe"
+jest.mock('../utils/notifications');
+// jest.mock('../react-query/useLogin', () => {
+//   return jest.fn(() => ({
+//      mutate: mockMutate,
+//   }))
+// })
+// const mockMutate = jest.fn()
+
 
 describe('Ranking component', () => {
   it('renders with mount', async () => {
@@ -70,20 +87,50 @@ describe('MyFavouritePoems component', () => {
     expect(wrapper).not.toBeNull()
   })
 })
-
+// mount is for Enzyme, render is for React Testing Library
+// todo: refactor the rest of the tests with wrapperFactory
 describe('Login component', () => {
-  let wrapper
-  beforeEach(() => {
-    wrapper = mount(
-    <QueryClientProvider client={queryClient}>
-      <Login />
-    </QueryClientProvider>
-    )
+  let wrapper = null;
+  const wrapperFactory = () => {
+    return ({ children }) => (
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          {children}
+        </Router>
+      </QueryClientProvider>
+    );
+  };
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    wrapper = null;
+  });
+
+  it('renders', async() => {
+    wrapper = wrapperFactory();
+
+    render(<Login />, { wrapper });
+
+    expect(wrapper).not.toBeNull()
+    await waitFor(() => {
+      expect(document.querySelector('.login')).toBeInTheDocument();
+    })
   })
 
-  xit('renders', () => {
-    expect(wrapper).not.toBeNull()
-  })
+  it('Should call mutate method of useLogin custom hook when clicking login', () => {  
+    wrapper = wrapperFactory();
+    
+    render(<Login />, { wrapper });
+
+    fireEvent.submit(screen.getByTestId('login'))
+
+    expect(manageSuccess).toHaveBeenCalled();    
+    expect(manageSuccess).toHaveBeenCalledTimes(1)
+    expect(manageSuccess).toHaveBeenCalledWith('Logging in...')
+
+
+    // expect(mockMutate).toHaveBeenCalled();    
+  });
 })
 
 describe('Logout component', () => {
@@ -118,15 +165,18 @@ describe('Profile component', () => {
 
 describe('Header component', () => {
   let wrapper
+  const history = createMemoryHistory()
   beforeEach(() => {
     wrapper = mount(
-      <QueryClientProvider client={queryClient}>
-        <Header />
+      <QueryClientProvider client={queryClient} >
+        <Router history={history}>
+          <Header />
+        </Router>
       </QueryClientProvider>
     )
   })
 
-  xit('renders', () => {
+  it('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
