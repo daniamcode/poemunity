@@ -12,7 +12,6 @@ import Profile from './Profile'
 import Header from './Header'
 import { BrowserRouter as Router } from 'react-router-dom'
 import '@testing-library/jest-dom'
-// import useLogin from '../react-query/useLogin'
 import { manageSuccess } from '../utils/notifications';
 
 import {
@@ -24,12 +23,6 @@ const queryClient = new QueryClient();
 
 // these mocks seem to have to be defined before the "describe"
 jest.mock('../utils/notifications');
-// jest.mock('../react-query/useLogin', () => {
-//   return jest.fn(() => ({
-//      mutate: mockMutate,
-//   }))
-// })
-// const mockMutate = jest.fn()
 
 
 describe('Ranking component', () => {
@@ -117,7 +110,7 @@ describe('Login component', () => {
     })
   })
 
-  it('Should call mutate method of useLogin custom hook when clicking login', () => {  
+  it('Should call manageSuccess when clicking login', () => {  
     wrapper = wrapperFactory();
     
     render(<Login />, { wrapper });
@@ -127,10 +120,7 @@ describe('Login component', () => {
     expect(manageSuccess).toHaveBeenCalled();    
     expect(manageSuccess).toHaveBeenCalledTimes(1)
     expect(manageSuccess).toHaveBeenCalledWith('Logging in...')
-
-
-    // expect(mockMutate).toHaveBeenCalled();    
-  });
+  });  
 })
 
 describe('Logout component', () => {
