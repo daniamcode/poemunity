@@ -14,7 +14,7 @@ jobs:
 
     defaults:
           run:
-            working-directory: ./Poemunity-React-Query/backend
+            working-directory: ./poemunity-redux/backend
 
     steps:
     - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.PASSWORD }}
         script: |
           pwd
-          cd projects/poemunity-dev/Poemunity-React-Query
+          cd projects/poemunity-dev/poemunity-redux
           git reset --hard
           git pull origin development
           git status
@@ -68,7 +68,7 @@ jobs:
 
     defaults:
           run:
-            working-directory: ./Poemunity-React-Query/frontend
+            working-directory: ./poemunity-redux/frontend
 
     steps:
     - uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: build
-        path: Poemunity-React-Query/frontend/build
+        path: poemunity-redux/frontend/build
 
   deploy:
     name: deploy
@@ -106,7 +106,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: build
-        path: Poemunity-React-Query/frontend/build
+        path: poemunity-redux/frontend/build
 
     - name: copy file via ssh password
       uses: appleboy/scp-action@master
@@ -114,7 +114,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.PASSWORD }}
-        source: "Poemunity-React-Query/frontend/build/*"
+        source: "poemunity-redux/frontend/build/*"
         target: "projects/poemunity-dev"
         rm: false
 
