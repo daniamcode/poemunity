@@ -2,7 +2,8 @@
 
 This App is online at https://poemunity.com 
 
-There are two folders: flux and Poemunity-React-Query. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. Then, I created the Poemunity-React-Query folder and continued from there. Now I manage Server State (cache) with Poemunity-React-Query and Client State with useContext. We don't need a Global State Manager like Flux or Redux anymore since we divide it into these two differenciated parts (Server State (asynchronous) and Client State). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
+There are three folders: flux, Poemunity-React-Query and poemunity-redux. In the flux folder we have the original project, made during the bootcamp and deployed afterwards. Then, I created the Poemunity-React-Query folder and continued from there, managing Server State (cache) with Poemunity-React-Query and Client State with useContext (a Global State Manager like Flux or Redux is not needed anymore with this approach since we divide it into these two differenciated parts (Server State (asynchronous) and Client State)). By the way, a middleware like Thunk manages asynchrony for Redux, and all that is now transparent to me with React Query.
+Finally, I'm starting a third approach, this time with redux
 
 # Poemunity - Fullstack React Application with Flux & Node.js
 
