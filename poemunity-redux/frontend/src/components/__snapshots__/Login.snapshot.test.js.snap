@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login should match without id 1`] = `
+<form
+  className="login"
+  data-testid="login"
+  onSubmit={[Function]}
+>
+  <label>
+    Introduce your login credentials or click "Register" if you don't have them
+  </label>
+  <div
+    className="login__username"
+  >
+    <input
+      name="Username"
+      onChange={[Function]}
+      placeholder="Username"
+      type="text"
+      value=""
+    />
+  </div>
+  <div
+    className="login__password"
+  >
+    <input
+      name="Password"
+      onChange={[Function]}
+      placeholder="Password"
+      type="password"
+      value=""
+    />
+  </div>
+  <button>
+    Login
+  </button>
+  <a
+    aria-current={null}
+    href="/register"
+    onClick={[Function]}
+  >
+    Register
+  </a>
+</form>
+`;
