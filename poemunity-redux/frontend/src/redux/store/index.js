@@ -8,7 +8,7 @@ import rootReducer      from '../reducers';
 const { NODE_ENV } = process.env
 
 
-let configureStore;
+let configureStore = undefined;
 if (NODE_ENV !== 'production') {
     const enhancer = composeWithDevTools(
         applyMiddleware(thunk, createLogger()),
