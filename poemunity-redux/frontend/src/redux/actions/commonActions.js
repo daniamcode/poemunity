@@ -60,26 +60,19 @@ import API                         from './axiosInstance';
 //     const status = data.error?.response?.status || 500;
 //     const error = data.error?.response || data.error;
 //     if (status !== 500) {
-//         // eslint-disable-next-line no-console
 //         console.error(data.error);
-//         // eslint-disable-next-line no-console
 //         console.error(data.error.stack);
-//         // eslint-disable-next-line no-console
 //         console.error(data.error.response?.data);
 //         if (!ignored) {
 //             if (isProduction || isStaging) {
 //                 data.error = error;
 //                 trackError(data);
 //             } else {
-//                 // eslint-disable-next-line no-console
 //                 console.info('Tracking error prevented, not in production environment.');
-//                 // eslint-disable-next-line no-console
 //                 console.error(data);
 //             }
 //         } else {
-//             // eslint-disable-next-line no-console
 //             console.info('Error tracking disabled for the following error.');
-//             // eslint-disable-next-line no-console
 //             console.error(data);
 //         }
 //     } else {
