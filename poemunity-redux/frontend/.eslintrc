@@ -29,6 +29,8 @@
         "describe": "readonly"
     },
     "settings": {
+        "failOnError": false,
+        "emitWarning": true, 
         "import/resolver": {
             "node": {
                 "extensions": ['.mjs', '.js', '.json', '.jsx'],
