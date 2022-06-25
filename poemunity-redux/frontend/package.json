@@ -50,10 +50,7 @@
   },
   "jest": {
     "coveragePathIgnorePatterns": [
-      "src/index",
-      "src/serviceWorker",
-      "src/appDispatcher",
-      "src/App"
+      "src/serviceWorker"
     ]
   },
   "standard": {
