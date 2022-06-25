@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import { AppContext } from '../App'
@@ -33,7 +32,7 @@ import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { getPoemsAction } from '../redux/actions/poemActions'
+import { getPoemsAction } from '../redux/actions/poemsActions'
 
 function List (props) {
   const genre = props.match.params.genre
@@ -56,8 +55,31 @@ function List (props) {
   } = useSelector(state => state);
 
   useEffect(() => {
-      dispatch(getPoemsAction({}))
+    const queryOptions = {
+        reset: true,
+        fetch: false,
+    };
+    dispatch(getPoemsAction({
+        options: queryOptions,
+    }));
   }, []);
+
+  function handleLoadPoems() {
+      if (paramsData.origin) {
+          const queryOptions = {
+              reset: true,
+              fetch: true,
+          };
+          dispatch(getPoemsAction({
+              params: paramsData.origin !== 'all' ? {origin: paramsData.origin} : null,
+              options: queryOptions,
+          }));
+      }
+  }
+
+  useEffect(() => {
+      handleLoadPoems();
+  }, [JSON.stringify(paramsData.origin)]);
 
   useEffect(() => {
     if (poemsQuery && poemsQuery.item && poemsQuery.item.length > 0) {

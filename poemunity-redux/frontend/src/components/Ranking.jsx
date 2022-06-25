@@ -8,7 +8,6 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import './Ranking.scss'
-import usePoems from '../react-query/usePoems'
 import { getRanking } from '../utils/getRanking.js'
 import CircularProgress from './CircularIndeterminate'
 import {
@@ -17,6 +16,8 @@ import {
   RANKING_POETS_TITLE,
   RANKING_POINTS_TITLE
 } from '../data/constants'
+import { useDispatch, useSelector } from 'react-redux'
+import { getRankingAction } from '../redux/actions/poemsActions'
 
 const useStyles = makeStyles({
   table: {
@@ -30,17 +31,27 @@ export default function Ranking () {
   const likePoints = 1
 
   const [poems, setPoems] = useState([])
-  const poemsQuery = usePoems('user')
 
   const [rank, setRank] = useState(
     getRanking(null)
   )
 
+  // Redux
+  const dispatch = useDispatch();
+
+  const {
+      rankingQuery,
+  } = useSelector(state => state);
+
+  useEffect(() => {
+      dispatch(getRankingAction({params: {origin: 'user'}}))
+  }, []);
+
   useEffect(()=> {
-    if(poemsQuery.data) {
-      setPoems(poemsQuery.data)
+    if(rankingQuery.item) {
+      setPoems(rankingQuery.item)
     }
-  }, [JSON.stringify(poemsQuery.data)])
+  }, [JSON.stringify(rankingQuery.item)])
 
   useEffect(()=> {
     if(poems) {
@@ -48,7 +59,7 @@ export default function Ranking () {
     }
   }, [JSON.stringify([poems, poemPoints, likePoints])])
 
-  if (poemsQuery.isLoading) {
+  if (rankingQuery.isFetching) {
     return <CircularProgress data-test='ranking__loading'/>
   }
 
