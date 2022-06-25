@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux';
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
@@ -8,23 +9,21 @@ import {
   QueryClientProvider,
 } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-
-let redirectUri = 'http://localhost:3000/profile'
-if (process.env.NODE_ENV === 'production') {
-  redirectUri = 'https://poemunity.com/profile'
-}
-
-const { REACT_APP_AUTH0_DOMAIN, REACT_APP_AUTH0_CLIENTID } = process.env
-// same as process.env.AUTH0_DOMAIN, but cleaner
+import configureStore from './redux/store';
 
 const queryClient = new QueryClient();
+const store = configureStore();
+
+console.log(`Environment is: ${process.env.NODE_ENV}`);
 
 ReactDOM.render(
   <React.StrictMode>
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
         <App />
     <ReactQueryDevtools />
     </QueryClientProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 )

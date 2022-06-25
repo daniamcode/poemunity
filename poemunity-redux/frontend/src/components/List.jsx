@@ -32,6 +32,8 @@ import normalizeString from '../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
+import { useDispatch, useSelector } from 'react-redux'
+import { getPoemsAction } from '../redux/actions/poemActions'
 
 function List (props) {
   const genre = props.match.params.genre
@@ -45,11 +47,21 @@ function List (props) {
   
   const history = useHistory()
   const context = useContext(AppContext)
-  const poemsQuery = usePoems(paramsData?.origin)
+
+  // Redux
+  const dispatch = useDispatch();
+
+  const {
+      poemsQuery,
+  } = useSelector(state => state);
 
   useEffect(() => {
-    if (poemsQuery && poemsQuery.data && poemsQuery.data.length > 0) {
-      const newData = [...poemsQuery.data]
+      dispatch(getPoemsAction({}))
+  }, []);
+
+  useEffect(() => {
+    if (poemsQuery && poemsQuery.item && poemsQuery.item.length > 0) {
+      const newData = [...poemsQuery.item]
 
       if (genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
@@ -90,7 +102,7 @@ function List (props) {
     setFilter(normalizeString(event.target.value))
   }
 
-  if (poemsQuery.isLoading) {
+  if (poemsQuery.isFetching) {
     console.log('test my first npm package!')
     console.log(strings.isLowercase('Qwerty'))
     console.log(strings.isLowercase('qwerty'))
@@ -160,7 +172,7 @@ function List (props) {
           </form>
         </div>
 
-        {poems?.map((poem) => (
+        {poems.map((poem) => (
           <ListItem 
             poem={poem}
             filter={filter}
