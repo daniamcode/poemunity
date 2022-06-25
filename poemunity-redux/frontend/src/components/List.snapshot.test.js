@@ -6,6 +6,8 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "react-query"
+import configureStore from '../redux/store';
+import { Provider } from 'react-redux';
 
 function renderList (arg) {
   const defaultProps = {
@@ -17,12 +19,16 @@ function renderList (arg) {
   const props = { ...defaultProps, ...arg }
   const queryClient = new QueryClient();
 
+  const store = configureStore();
+
   return renderer.create(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <List {...props} />
       </BrowserRouter>
     </QueryClientProvider>
+    </Provider>
   )
 }
 

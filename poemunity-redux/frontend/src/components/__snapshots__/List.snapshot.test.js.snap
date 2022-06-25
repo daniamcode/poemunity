@@ -2,32 +2,141 @@
 
 exports[`List should match without id 1`] = `
 <div
-  className="makeStyles-root-1"
+  className="list__container"
 >
   <div
-    className="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"
-    role="progressbar"
-    style={
-      Object {
-        "height": 40,
-        "width": 40,
-      }
-    }
+    className="list__intro"
   >
-    <svg
-      className="MuiCircularProgress-svg"
-      viewBox="22 22 44 44"
+    <div
+      className="list__search"
     >
-      <circle
-        className="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate"
-        cx={44}
-        cy={44}
-        fill="none"
-        r={20.2}
-        strokeWidth={3.6}
-        style={Object {}}
+      <div
+        className="separator"
       />
-    </svg>
+      <svg
+        aria-hidden={true}
+        className="MuiSvgIcon-root"
+        focusable="false"
+        style={
+          Object {
+            "fill": "#4F5D73",
+            "fontSize": 40,
+          }
+        }
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+        />
+      </svg>
+      <div
+        className="MuiFormControl-root MuiTextField-root"
+      >
+        <label
+          className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
+          data-shrink={false}
+          style={
+            Object {
+              "color": "#4F5D73",
+            }
+          }
+        >
+          Search an author
+        </label>
+        <div
+          className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "#4F5D73",
+            }
+          }
+        >
+          <input
+            aria-invalid={false}
+            autoFocus={false}
+            className="MuiInputBase-input MuiInput-input"
+            disabled={false}
+            onAnimationStart={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            required={false}
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+    <form
+      className="list__sort"
+    >
+      <label>
+        Authors:
+        <select
+          id="origin"
+          name="origin"
+          onChange={[Function]}
+          type="submit"
+        >
+          <option
+            selected={true}
+            value="all"
+          >
+            All
+          </option>
+          <option
+            selected={false}
+            value="famous"
+          >
+            Famous
+          </option>
+          <option
+            selected={false}
+            value="user"
+          >
+            Users
+          </option>
+        </select>
+      </label>
+    </form>
+    <form
+      className="list__sort"
+    >
+      <label>
+        Order poems by: 
+        <select
+          id="sort"
+          name="sort"
+          onChange={[Function]}
+          type="submit"
+        >
+          <option
+            selected={false}
+            value="Likes"
+          >
+            Likes
+          </option>
+          <option
+            selected={false}
+            value="Date"
+          >
+            Date
+          </option>
+          <option
+            selected={false}
+            value="Random"
+          >
+            Random
+          </option>
+          <option
+            selected={false}
+            value="Title"
+          >
+            Title
+          </option>
+        </select>
+      </label>
+    </form>
   </div>
 </div>
 `;

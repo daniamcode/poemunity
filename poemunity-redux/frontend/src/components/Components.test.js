@@ -13,6 +13,8 @@ import Header from './Header'
 import { BrowserRouter as Router } from 'react-router-dom'
 import '@testing-library/jest-dom'
 import { manageSuccess } from '../utils/notifications';
+import configureStore from '../redux/store';
+import { Provider } from 'react-redux';
 
 import {
   QueryClient,
@@ -20,6 +22,7 @@ import {
 } from "react-query"
 
 const queryClient = new QueryClient();
+const store = configureStore();
 
 // these mocks seem to have to be defined before the "describe"
 jest.mock('../utils/notifications');
@@ -28,9 +31,11 @@ jest.mock('../utils/notifications');
 describe('Ranking component', () => {
   it('renders with mount', async () => {
     const wrapper = mount(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <Ranking />
     </QueryClientProvider>
+    </Provider>
     )
     expect(wrapper).not.toBeNull()
     // this debug is great to see what is inside the component. For example, shallow doesn't render the children but mount does. There's another method called render
@@ -42,9 +47,11 @@ describe('Ranking component', () => {
   })
   it('also renders with shallow', () => {
     const wrapper = shallow(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <Ranking />
     </QueryClientProvider>
+    </Provider>
     )
     expect(wrapper).not.toBeNull()
 
@@ -55,9 +62,11 @@ describe('MyPoems component', () => {
   let wrapper
   beforeEach(() => {
     wrapper = mount(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <MyPoems />
     </QueryClientProvider>
+    </Provider>
     )
   })
 
@@ -70,9 +79,11 @@ describe('MyFavouritePoems component', () => {
   let wrapper
   beforeEach(() => {
     wrapper = mount(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <MyFavouritePoems />
     </QueryClientProvider>
+    </Provider>
     )
   })
 
@@ -86,11 +97,13 @@ describe('Login component', () => {
   let wrapper = null;
   const wrapperFactory = () => {
     return ({ children }) => (
+    <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <Router>
           {children}
         </Router>
       </QueryClientProvider>
+    </Provider>
     );
   };
 
@@ -127,9 +140,11 @@ describe('Logout component', () => {
   let wrapper
   beforeEach(() => {
     wrapper = mount(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <Logout />
     </QueryClientProvider>
+    </Provider>
     )
   })
 
@@ -142,9 +157,11 @@ describe('Profile component', () => {
   let wrapper
   beforeEach(() => {
     wrapper = mount(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <Profile />
     </QueryClientProvider>
+    </Provider>
     )
   })
 
@@ -158,11 +175,13 @@ describe('Header component', () => {
   const history = createMemoryHistory()
   beforeEach(() => {
     wrapper = mount(
+    <Provider store={store}>
       <QueryClientProvider client={queryClient} >
         <Router history={history}>
           <Header />
         </Router>
       </QueryClientProvider>
+    </Provider>
     )
   })
 
