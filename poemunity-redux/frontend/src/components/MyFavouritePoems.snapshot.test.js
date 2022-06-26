@@ -6,6 +6,9 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "react-query"
+import { Provider } from 'react-redux';
+import configureStore from '../redux/store';
+
 
 function renderMyFavouritePoems (arg) {
   const defaultProps = {
@@ -16,13 +19,16 @@ function renderMyFavouritePoems (arg) {
 
   const props = { ...defaultProps, ...arg }
   const queryClient = new QueryClient();
+  const store = configureStore();
 
   return renderer.create(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <MyFavouritePoems {...props} />
       </BrowserRouter>
     </QueryClientProvider>
+    </Provider>
   )
 }
 

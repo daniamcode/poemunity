@@ -16,17 +16,21 @@ export const store = configureStore();
 
 console.log(`Environment is: ${process.env.NODE_ENV}`);
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-        <App />
-    <ReactQueryDevtools />
-    </QueryClientProvider>
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+const root = document.getElementById('root');
+
+if(root) {
+  ReactDOM.render(
+    <React.StrictMode>
+      <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+          <App />
+      <ReactQueryDevtools />
+      </QueryClientProvider>
+      </Provider>
+    </React.StrictMode>,
+    root
+  )
+}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

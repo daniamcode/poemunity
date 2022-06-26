@@ -15,7 +15,7 @@ const Login = (): JSX.Element => {
   const loginQuery: {mutate: Function} = useLogin()
 
   const handleLogin = (event: any) => {
-    manageSuccess('Logging in...')
+    // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
     event.preventDefault()
     loginQuery?.mutate({username, password})
     setUsername('')
