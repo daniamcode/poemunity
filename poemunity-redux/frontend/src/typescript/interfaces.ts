@@ -9,3 +9,17 @@ export interface Poem {
     title: string,
     userId: string,
   }
+
+export interface PoemQuery {
+    isFetching: boolean,
+    isError: boolean,
+    item: Poem,
+  }
+
+export interface IRootState {
+    poemQuery: PoemQuery
+  }
+
+export interface Props {
+    match: {params: {poemId: string}}
+  }
