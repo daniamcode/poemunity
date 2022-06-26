@@ -2,6 +2,7 @@ import API                         from './axiosInstance';
 // import { LogLevels, trackError }   from 'utils/errorUtils';
 // import { isProduction, isStaging } from 'constants/environments';
 // import { navigateToLanding }       from 'utils/navigationManager';
+import { manageError } from '../../utils/notifications'
 
 // const allowedErrorConfig = [
 //     {
@@ -145,26 +146,27 @@ export function getAction({
                     type: rejectedAction,
                     payload: error?.response?.data || error,
                 });
-                manageError(error, () => {
-                    if (callbacks.error) {
-                        callbacks.error(error?.response?.data || error);
-                    }
-                });
-                actionTrackError({
-                    logLevel: LogLevels.INFO,
-                    extraData: {
-                        type,
-                        url,
-                        params,
-                        options,
-                    },
-                    error,
-                });
+                manageError(error);
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         params,
+                //         options,
+                //     },
+                //     error,
+                // });
             });
     }
 }
 
-export function postAction(
+export function postAction({
     type,
     url,
     data,
@@ -173,7 +175,7 @@ export function postAction(
     callbacks = {},
     headers,
     config,
-) {
+}) {
     const {
         requestAction,
         fulfilledAction,
@@ -217,27 +219,37 @@ export function postAction(
                     type: rejectedAction,
                     payload: error?.response?.data || error,
                 });
-                manageError(error, () => {
-                    if (callbacks.error) {
-                        callbacks.error(error?.response?.data || error);
-                    }
-                });
-                actionTrackError({
-                    logLevel: LogLevels.INFO,
-                    extraData: {
-                        type,
-                        url,
-                        data,
-                        options,
-                    },
-                    error,
-                });
+                manageError(error);
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         data,
+                //         options,
+                //     },
+                //     error,
+                // });
             });
     }
 }
 
 
-export function putAction(type, url, data, dispatch, callbacks, options = { reset: false, update: false, fetch: true }) {
+export function putAction({
+    type, 
+    url, 
+    data = {}, 
+    dispatch, 
+    callbacks, 
+    options = { reset: false, update: false, fetch: true },
+    // in config we pass the jwt
+    config
+}) {
     // console.log('listingAction type : ' + type);
     const {
         requestAction,
@@ -256,14 +268,14 @@ export function putAction(type, url, data, dispatch, callbacks, options = { rese
         }
     }
     dispatch({ type: requestAction });
-    API().put(url, data)
+    API().put(url, data, config)
         .then((response) => {
             dispatch({
                 type: fulfilledAction,
                 payload: response.data,
             });
 
-            if (callbacks.success) {
+            if (callbacks?.success) {
                 callbacks.success(response.data);
             }
         })
@@ -272,20 +284,21 @@ export function putAction(type, url, data, dispatch, callbacks, options = { rese
                 type: rejectedAction,
                 payload: error?.response?.data || error,
             });
-            manageError(error, () => {
-                if (callbacks.error) {
-                    callbacks.error(error?.response?.data || error);
-                }
-            });
-            actionTrackError({
-                logLevel: LogLevels.INFO,
-                extraData: {
-                    type,
-                    url,
-                    data,
-                    options,
-                },
-                error,
-            });
+            manageError(error);
+            // manageError(error, () => {
+            //     if (callbacks.error) {
+            //         callbacks.error(error?.response?.data || error);
+            //     }
+            // });
+            // actionTrackError({
+            //     logLevel: LogLevels.INFO,
+            //     extraData: {
+            //         type,
+            //         url,
+            //         data,
+            //         options,
+            //     },
+            //     error,
+            // });
         });
 }

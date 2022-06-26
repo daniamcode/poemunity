@@ -10,11 +10,11 @@ import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import useDeletePoem from '../react-query/useDeletePoem'
-import useLikePoem from '../react-query/useLikePoem'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 import parseJWT from '../utils/parseJWT'
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllPoemsAction } from '../redux/actions/poemsActions';
+import { getAllPoemsAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
+import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 
 function MyFavouritePoems (props) {
   const context = useContext(AppContext)
@@ -41,11 +41,21 @@ function MyFavouritePoems (props) {
   }, [JSON.stringify([allPoemsQuery.item, context?.username])])
 
   const deletePoemMutation = useDeletePoem()
-  const likePoemMutation = useLikePoem()
 
   function onLike (event, poemId) {
     event.preventDefault()
-    likePoemMutation.mutate(poemId)
+    dispatch(likePoemAction({
+      params: { poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updatePoemCacheAfterLikePoemAction({context}))
+        }
+      }
+    }))
   }
 
   const LIKE = 'Like'

@@ -11,16 +11,19 @@ import CircularProgress from './CircularIndeterminate'
 import './PageNotFound.scss'
 import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
-import usePoem from '../react-query/usePoem'
 import useDeletePoem from '../react-query/useDeletePoem'
-import useLikePoem from '../react-query/useLikePoem'
 import { useHistory } from "react-router-dom";
-import { Poem } from '../typescript/interfaces'
+import { Poem, IRootState, Props } from '../typescript/interfaces'
 import { FormElement } from '../typescript/types'
+import { useDispatch, useSelector } from 'react-redux';
+import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
+import { Dispatch } from 'redux';
+import { 
+  updateAllPoemsCacheAfterLikePoemAction, 
+  updatePoemsListCacheAfterLikePoemAction,
+  updateRankingCacheAfterLikePoemAction
+} from '../redux/actions/poemsActions';
 
-interface Props {
-  match: {params: {poemId: string}}
-}
 
 function Detail (props: Props): JSX.Element {
   const [poem, setPoem] = useState<Poem>({
@@ -34,23 +37,65 @@ function Detail (props: Props): JSX.Element {
     title: '',
     userId: '',
   })
+  
+  // Redux
+  const dispatch = useDispatch();
+
+  const poemQuery = useSelector((state: IRootState) => state.poemQuery);
+
+  useEffect(() => {
+    const queryOptions = {
+        reset: true,
+        fetch: false,
+    };
+    dispatch<any>(getPoemAction({
+        options: queryOptions,
+    }));
+  }, []);
+
+  function handleLoadPoem() {
+      if (props.match.params.poemId) {
+          const queryOptions = {
+              reset: true,
+              fetch: true,
+          };
+          dispatch<any>(getPoemAction({
+              params: props.match.params,
+              options: queryOptions,
+          }));
+      }
+  }
+
+  useEffect(() => {
+      handleLoadPoem();
+  }, [JSON.stringify(props.match.params.poemId)]);
 
   const context = useContext(AppContext);
 
-  const poemQuery = usePoem(props.match.params.poemId)
-
   useEffect(()=> {
-    if(poemQuery.data) {
-      setPoem(poemQuery.data)
+    if(poemQuery?.item) {
+      setPoem(poemQuery?.item)
     }
-  }, [JSON.stringify(poemQuery.data)])
+  }, [JSON.stringify(poemQuery?.item)])
 
   const deletePoemMutation: {mutate: Function, status: string} = useDeletePoem()
-  const likePoemMutation: {mutate: Function} = useLikePoem()
 
   function onLike (event: React.SyntheticEvent, poemId: string) {
     event.preventDefault()
-    likePoemMutation.mutate(poemId)
+    dispatch<any>(likePoemAction({
+      params: { poemId: props.match.params.poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          // todo: when I update this cache, it has effects on many queries. 
+          // Maybe I need some optimisation, in the frontend or in the backend
+          dispatch<any>(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updateRankingCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updatePoemCacheAfterLikePoemAction({context}))
+        }
+      }
+    }))
   }
   
   const history = useHistory();
@@ -61,7 +106,7 @@ function Detail (props: Props): JSX.Element {
     context.setState({...context, elementToEdit: poemId})
   }
 
-  if (poemQuery.isLoading) {
+  if (poemQuery.isFetching) {
     return <CircularProgress />
   }
 
