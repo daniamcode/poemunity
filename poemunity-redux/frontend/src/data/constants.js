@@ -30,3 +30,5 @@ export const RANKING_TITLE = 'Poets ranking'
 export const RANKING_SUBTITLE = '3 points per poem, 1 per like'
 export const RANKING_POETS_TITLE = 'Poets'
 export const RANKING_POINTS_TITLE = 'Points'
+export const POEM_POINTS = 3
+export const LIKE_POINTS = 1

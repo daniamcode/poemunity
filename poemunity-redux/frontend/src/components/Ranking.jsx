@@ -14,7 +14,9 @@ import {
   RANKING_TITLE,
   RANKING_SUBTITLE,
   RANKING_POETS_TITLE,
-  RANKING_POINTS_TITLE
+  RANKING_POINTS_TITLE,
+  POEM_POINTS,
+  LIKE_POINTS,
 } from '../data/constants'
 import { useDispatch, useSelector } from 'react-redux'
 import { getRankingAction } from '../redux/actions/poemsActions'
@@ -27,8 +29,6 @@ const useStyles = makeStyles({
 
 export default function Ranking () {
   const classes = useStyles()
-  const poemPoints = 3
-  const likePoints = 1
 
   const [poems, setPoems] = useState([])
 
@@ -55,9 +55,9 @@ export default function Ranking () {
 
   useEffect(()=> {
     if(poems) {
-      setRank(getRanking(poems, poemPoints, likePoints))
+      setRank(getRanking(poems, POEM_POINTS, LIKE_POINTS))
     }
-  }, [JSON.stringify([poems, poemPoints, likePoints])])
+  }, [JSON.stringify([poems, POEM_POINTS, LIKE_POINTS])])
 
   if (rankingQuery.isFetching) {
     return <CircularProgress data-test='ranking__loading'/>
