@@ -15,7 +15,6 @@ import MyFavouritePoems from './MyFavouritePoems'
 import CircularProgress from './CircularIndeterminate'
 import useCreatePoem from '../react-query/useCreatePoem'
 import useSavePoem from '../react-query/useSavePoem'
-import usePoem from '../react-query/usePoem'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE_CREATE,
@@ -33,6 +32,8 @@ import {
   PROFILE_SEND_POEM,
   PROFILE_RESET_POEM
 } from '../data/constants'
+import { useDispatch, useSelector } from 'react-redux';
+import { getPoemAction } from '../redux/actions/poemActions';
 
 function TabPanel (props) {
   const { children, value, index, ...other } = props
@@ -90,16 +91,49 @@ export default function Profile (props) {
   const savePoemMutation = useSavePoem()
 
   const context = useContext(AppContext);
-  const poemQuery = usePoem(context?.elementToEdit)
+
+  // Redux
+  const dispatch = useDispatch();
+
+  const { poemQuery } = useSelector(state => state);
+
+  useEffect(() => {
+    const queryOptions = {
+        reset: true,
+        fetch: false,
+    };
+    dispatch(getPoemAction({
+        options: queryOptions,
+    }));
+  }, []);
+
+  function handleLoadPoem() {
+      if (context?.elementToEdit) {
+          const queryOptions = {
+              reset: true,
+              fetch: true,
+          };
+          dispatch(getPoemAction({
+              params: {poemId: context?.elementToEdit},
+              options: queryOptions,
+          }));
+      }
+  }
+
+  useEffect(() => {
+      handleLoadPoem();
+  }, [JSON.stringify(context?.elementToEdit)]);
 
   useEffect(()=> {
-    setPoemTitle(context?.elementToEdit ? poemQuery?.data?.title : '')
-    setPoemContent(context?.elementToEdit ? poemQuery?.data?.poem : '')
-    setPoemFakeId(context?.elementToEdit ? poemQuery?.data?.userId : '')
-    setPoemLikes(context?.elementToEdit ? poemQuery?.data?.likes?.toString() : [])
-    setPoemCategory(context?.elementToEdit ? poemQuery?.data?.genre : '')
-    setPoemOrigin(context?.elementToEdit ? poemQuery?.data?.origin : '')
-  }, [JSON.stringify([context?.elementToEdit, poemQuery.data])])
+    if(poemQuery?.item) {
+      setPoemTitle(context?.elementToEdit ? poemQuery?.item?.title : '')
+      setPoemContent(context?.elementToEdit ? poemQuery?.item?.poem : '')
+      setPoemFakeId(context?.elementToEdit ? poemQuery?.item?.userId : '')
+      setPoemLikes(context?.elementToEdit ? poemQuery?.item?.likes?.toString() : [])
+      setPoemCategory(context?.elementToEdit ? poemQuery?.item?.genre : '')
+      setPoemOrigin(context?.elementToEdit ? poemQuery?.item?.origin : '')
+    }
+  }, [JSON.stringify([context?.elementToEdit, poemQuery?.item])])
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -166,7 +200,7 @@ export default function Profile (props) {
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
             origin: poemOrigin,
-          }, poemId: poemQuery.data.id});  
+          }, poemId: poemQuery.item.id});  
         } else {
           savePoemMutation.mutate({poem: {
             poem: poemContent,
@@ -174,7 +208,7 @@ export default function Profile (props) {
             genre: poemCategory,
             likes: [],
             date: formattedDate,
-          }, poemId: poemQuery.data.id});
+          }, poemId: poemQuery.item.id});
         }
         context.setState({...context, elementToEdit: ''})
       }
@@ -284,7 +318,7 @@ export default function Profile (props) {
                     >
                       <option value=''>{PROFILE_SELECT_CATEGORY}</option>
                       {CATEGORIES?.map((category) => (
-                        <option value={category.toLowerCase()} selected={poemQuery?.data?.genre === category.toLowerCase()}>
+                        <option value={category.toLowerCase()} selected={poemQuery?.item?.genre === category.toLowerCase()}>
                           {category}
                         </option>
                       ))}
