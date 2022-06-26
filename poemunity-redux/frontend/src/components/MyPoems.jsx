@@ -10,23 +10,34 @@ import EditIcon from '@material-ui/icons/Edit';
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
-import usePoems from '../react-query/usePoems'
 import getPoemsByUser from '../utils/getPoemsByUser'
 import useDeletePoem from '../react-query/useDeletePoem'
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllPoemsAction } from '../redux/actions/poemsActions';
 
 function MyPoems (props) {
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
   const context = useContext(AppContext);
-  const poemsQuery = usePoems()
+
+  // Redux
+  const dispatch = useDispatch();
+
+  const {
+      allPoemsQuery,
+  } = useSelector(state => state);
+
+  useEffect(() => {
+      dispatch(getAllPoemsAction({}))
+  }, []);
 
   useEffect(()=> {
-    if(poemsQuery.data) {
-      const poemsFiltered = getPoemsByUser(poemsQuery.data, context?.username)
+    if(allPoemsQuery.item) {
+      const poemsFiltered = getPoemsByUser(allPoemsQuery.item, context?.username)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery, context?.username])])
+  }, [JSON.stringify([allPoemsQuery, context?.username])])
 
   const editPoem = (poemId) => {
     context.setState({...context, elementToEdit: poemId})

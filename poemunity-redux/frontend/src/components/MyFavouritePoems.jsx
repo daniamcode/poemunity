@@ -9,11 +9,12 @@ import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
-import usePoems from '../react-query/usePoems'
 import useDeletePoem from '../react-query/useDeletePoem'
 import useLikePoem from '../react-query/useLikePoem'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 import parseJWT from '../utils/parseJWT'
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllPoemsAction } from '../redux/actions/poemsActions';
 
 function MyFavouritePoems (props) {
   const context = useContext(AppContext)
@@ -21,14 +22,23 @@ function MyFavouritePoems (props) {
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
-  const poemsQuery = usePoems()
-  
+  // Redux
+  const dispatch = useDispatch();
+
+  const {
+      allPoemsQuery,
+  } = useSelector(state => state);
+
+  useEffect(() => {
+      dispatch(getAllPoemsAction({}))
+  }, []);
+
   useEffect(()=> {
-    if(poemsQuery.data) {
-      const poemsFiltered = getFavouritePoemsByUser(poemsQuery.data, context?.userId)
+    if(allPoemsQuery.item) {
+      const poemsFiltered = getFavouritePoemsByUser(allPoemsQuery.item, context?.userId)
       setPoems(poemsFiltered)
     }
-  }, [JSON.stringify([poemsQuery.data, context?.username])])
+  }, [JSON.stringify([allPoemsQuery.item, context?.username])])
 
   const deletePoemMutation = useDeletePoem()
   const likePoemMutation = useLikePoem()
