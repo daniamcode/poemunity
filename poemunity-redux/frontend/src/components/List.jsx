@@ -1,24 +1,16 @@
-import React, { useEffect, useState, useContext } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import useDeletePoem from '../react-query/useDeletePoem'
-import useLikePoem from '../react-query/useLikePoem'
+import { useEffect, useState, useContext } from 'react'
+import { useHistory } from 'react-router-dom'
 import { AppContext } from '../App'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
-import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
-import EditIcon from '@material-ui/icons/Edit'
-import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import capitalizeFirstLetter from '../utils/capitalizeFirstLetter'
 import sortPoems from '../utils/sortPoems'
 import { Helmet } from 'react-helmet'
 import {
-  LIKE,
-  LIKES,
-  READ_MORE,
   SEARCH_PLACEHOLDER,
   ORDER_BY,
   ORDER_BY_DATE,
@@ -32,7 +24,7 @@ import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
 import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { getPoemsAction } from '../redux/actions/poemsActions'
+import { getPoemsListAction } from '../redux/actions/poemsActions'
 
 function List (props) {
   const genre = props.match.params.genre
@@ -51,7 +43,7 @@ function List (props) {
   const dispatch = useDispatch();
 
   const {
-      poemsQuery,
+      poemsListQuery,
   } = useSelector(state => state);
 
   useEffect(() => {
@@ -59,7 +51,7 @@ function List (props) {
         reset: true,
         fetch: false,
     };
-    dispatch(getPoemsAction({
+    dispatch(getPoemsListAction({
         options: queryOptions,
     }));
   }, []);
@@ -70,7 +62,7 @@ function List (props) {
               reset: true,
               fetch: true,
           };
-          dispatch(getPoemsAction({
+          dispatch(getPoemsListAction({
               params: paramsData.origin !== 'all' ? {origin: paramsData.origin} : null,
               options: queryOptions,
           }));
@@ -82,8 +74,8 @@ function List (props) {
   }, [JSON.stringify(paramsData.origin)]);
 
   useEffect(() => {
-    if (poemsQuery && poemsQuery.item && poemsQuery.item.length > 0) {
-      const newData = [...poemsQuery.item]
+    if (poemsListQuery && poemsListQuery.item && poemsListQuery.item.length > 0) {
+      const newData = [...poemsListQuery.item]
 
       if (genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)
@@ -94,7 +86,7 @@ function List (props) {
         setPoems(poemsSorted)
       }
     }
-  }, [JSON.stringify([poemsQuery, genre, paramsData])])
+  }, [JSON.stringify([poemsListQuery, genre, paramsData])])
 
   const handleOrderChange = (event) => {
     addQueryParam({ id: 'orderBy', value: event.target.value })
@@ -106,25 +98,11 @@ function List (props) {
     setParamsData({ ...paramsData, origin: event.target.value })
   }
 
-  const deletePoemMutation = useDeletePoem()
-  const likePoemMutation = useLikePoem()
-
-  const onLike = (event, poemId) => {
-    event.preventDefault()
-    likePoemMutation.mutate(poemId)
-  }
-
-  const editPoem = (poemId) => {
-    const newPath = '/profile'
-    history.push(newPath)
-    context.setState({ ...context, elementToEdit: poemId })
-  }
-
   const handleSearchChange = (event) => {
     setFilter(normalizeString(event.target.value))
   }
 
-  if (poemsQuery.isFetching) {
+  if (poemsListQuery.isFetching) {
     console.log('test my first npm package!')
     console.log(strings.isLowercase('Qwerty'))
     console.log(strings.isLowercase('qwerty'))

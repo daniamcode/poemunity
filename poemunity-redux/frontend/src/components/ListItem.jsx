@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
+import useDeletePoem from '../react-query/useDeletePoem'
+import useLikePoem from '../react-query/useLikePoem'
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
@@ -20,6 +22,20 @@ function ListItem ({
    filter,
    context
 }) {
+  const deletePoemMutation = useDeletePoem()
+  const likePoemMutation = useLikePoem()
+
+  const onLike = (event, poemId) => {
+    event.preventDefault()
+    likePoemMutation.mutate(poemId)
+  }
+
+  const editPoem = (poemId) => {
+    const newPath = '/profile'
+    history.push(newPath)
+    context.setState({ ...context, elementToEdit: poemId })
+  }
+
   return (    
     <main key={poem.id} className='poem__detail'>
       {normalizeString(poem.author).includes(filter) && (
