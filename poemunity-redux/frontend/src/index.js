@@ -12,7 +12,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import configureStore from './redux/store';
 
 const queryClient = new QueryClient();
-const store = configureStore();
+export const store = configureStore();
 
 console.log(`Environment is: ${process.env.NODE_ENV}`);
 
