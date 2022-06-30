@@ -4,9 +4,9 @@ import * as poemReducers from './poemReducers';
 import * as poemsReducers from './poemsReducers';
 
 
-const poemunityState = combineReducers({
+const rootReducer = combineReducers({
     ...poemReducers,
     ...poemsReducers,
 });
 
-export default poemunityState;
+export default rootReducer;
