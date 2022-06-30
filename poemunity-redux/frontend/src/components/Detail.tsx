@@ -13,11 +13,10 @@ import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
 import useDeletePoem from '../react-query/useDeletePoem'
 import { useHistory } from "react-router-dom";
-import { Poem, IRootState, Props } from '../typescript/interfaces'
+import { Poem, RootState, Props } from '../typescript/interfaces'
 import { FormElement } from '../typescript/types'
 import { useDispatch, useSelector } from 'react-redux';
 import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
-import { Dispatch } from 'redux';
 import { 
   updateAllPoemsCacheAfterLikePoemAction, 
   updatePoemsListCacheAfterLikePoemAction,
@@ -41,7 +40,7 @@ function Detail (props: Props): JSX.Element {
   // Redux
   const dispatch = useDispatch();
 
-  const poemQuery = useSelector((state: IRootState) => state.poemQuery);
+  const poemQuery = useSelector((state: RootState) => state.poemQuery);
 
   useEffect(() => {
     const queryOptions = {
