@@ -7,7 +7,6 @@ export function commonReducer(state = INITIAL, action, actionType, abortRequests
         rejectedAction,
         requestAction,
         fulfilledAction,
-        updateAction,
         resetAction,
     } = getTypes(actionType);
 
@@ -33,17 +32,6 @@ export function commonReducer(state = INITIAL, action, actionType, abortRequests
                 isFetching: false,
                 isError: false,
                 item,
-                err: undefined,
-                abortController: undefined,
-            });
-        }
-        case updateAction: {
-            const isOneAttrObj = typeof action.payload === 'object' && !Array.isArray(action.payload) && Object.keys(action.payload).length === 1;
-            const data = isOneAttrObj ? Object.values(action.payload)[0] : action.payload;
-            return Object.assign({}, state, {
-                isFetching: false,
-                isError: false,
-                item: data,
                 err: undefined,
                 abortController: undefined,
             });
