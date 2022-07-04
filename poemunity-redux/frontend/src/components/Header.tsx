@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import './Header.scss'
 import '../App.scss'
 import Accordion from './SimpleAccordion'
-import CircularProgress from './CircularIndeterminate'
+// import CircularProgress from './CircularIndeterminate'
 import LoginButton from './LoginButton'
 import LogoutButton from './Logout'
 import {
