@@ -88,7 +88,7 @@ export function getTypes(baseType) {
         fulfilledAction: `${baseType}_fulfilled`,
         rejectedAction: `${baseType}_rejected`,
         resetAction: `${baseType}_reset`,
-        updateAction: `${baseType}_update`,
+        // updateAction: `${baseType}_update`,
     };
 }
 
