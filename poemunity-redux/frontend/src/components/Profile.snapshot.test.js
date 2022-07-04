@@ -39,7 +39,7 @@ describe('Profile', () => {
     ProfileTree = renderProfile()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(ProfileTree).toMatchSnapshot()
   })
 })

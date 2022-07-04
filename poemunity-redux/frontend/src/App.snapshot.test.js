@@ -21,7 +21,7 @@ describe('App snapshot', () => {
     </Provider>
   )
 
-  it('should match', () => {
+  test('should match', () => {
     expect(tree.toJSON()).toMatchSnapshot()
   })
 })

@@ -33,7 +33,7 @@ describe('Logout', () => {
     LogoutTree = renderLogout()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(LogoutTree).toMatchSnapshot()
   })
 })

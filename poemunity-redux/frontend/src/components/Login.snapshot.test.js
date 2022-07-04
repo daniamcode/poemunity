@@ -33,7 +33,7 @@ describe('Login', () => {
     LoginTree = renderLogin()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(LoginTree).toMatchSnapshot()
   })
 })

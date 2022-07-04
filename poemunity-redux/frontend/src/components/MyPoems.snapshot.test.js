@@ -39,7 +39,7 @@ describe('MyPoems', () => {
     MyPoemsTree = renderMyPoems()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(MyPoemsTree).toMatchSnapshot()
   })
 })

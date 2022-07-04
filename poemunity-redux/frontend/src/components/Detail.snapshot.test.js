@@ -39,7 +39,7 @@ describe('Detail', () => {
     DetailTree = renderDetail()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(DetailTree).toMatchSnapshot()
   })
 })

@@ -38,7 +38,7 @@ describe('Ranking', () => {
     RankingTree = renderRanking()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(RankingTree).toMatchSnapshot()
   })
 })

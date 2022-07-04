@@ -39,7 +39,7 @@ describe('List', () => {
     ListTree = renderList()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(ListTree).toMatchSnapshot()
   })
 })

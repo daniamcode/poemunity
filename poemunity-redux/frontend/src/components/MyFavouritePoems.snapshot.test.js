@@ -39,7 +39,7 @@ describe('MyFavouritePoems', () => {
     MyFavouritePoemsTree = renderMyFavouritePoems()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(MyFavouritePoemsTree).toMatchSnapshot()
   })
 })

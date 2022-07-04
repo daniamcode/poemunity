@@ -33,7 +33,7 @@ describe('Header', () => {
     HeaderTree = renderHeader()
   })
 
-  it('should match without id', async () => {
+  test('should match without id', async () => {
     expect(HeaderTree).toMatchSnapshot()
   })
 })
