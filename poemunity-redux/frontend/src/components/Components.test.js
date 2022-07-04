@@ -29,7 +29,7 @@ jest.mock('../utils/notifications');
 
 
 describe('Ranking component', () => {
-  it('renders with mount', async () => {
+  test('renders with mount', async () => {
     const wrapper = mount(
     <Provider store={store}>
     <QueryClientProvider client={queryClient}>
@@ -45,7 +45,7 @@ describe('Ranking component', () => {
     const ranking = wrapper.find(`[data-test='ranking__loading']`)
     expect(ranking.length).toBe(1)
   })
-  it('also renders with shallow', () => {
+  test('also renders with shallow', () => {
     const wrapper = shallow(
     <Provider store={store}>
     <QueryClientProvider client={queryClient}>
@@ -70,7 +70,7 @@ describe('MyPoems component', () => {
     )
   })
 
-  it('renders', () => {
+  test('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
@@ -87,7 +87,7 @@ describe('MyFavouritePoems component', () => {
     )
   })
 
-  it('renders', () => {
+  test('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
@@ -112,7 +112,7 @@ describe('Login component', () => {
     wrapper = null;
   });
 
-  it('renders', async() => {
+  test('renders', async() => {
     wrapper = wrapperFactory();
 
     render(<Login />, { wrapper });
@@ -123,7 +123,7 @@ describe('Login component', () => {
     })
   })
 
-  xit('Should call manageSuccess when clicking login', () => {  
+  xtest('Should call manageSuccess when clicking login', () => {  
     wrapper = wrapperFactory();
     
     render(<Login />, { wrapper });
@@ -148,7 +148,7 @@ describe('Logout component', () => {
     )
   })
 
-  it('renders', () => {
+  test('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
@@ -165,7 +165,7 @@ describe('Profile component', () => {
     )
   })
 
-  it('renders', () => {
+  test('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
@@ -185,7 +185,7 @@ describe('Header component', () => {
     )
   })
 
-  it('renders', () => {
+  test('renders', () => {
     expect(wrapper).not.toBeNull()
   })
 })
