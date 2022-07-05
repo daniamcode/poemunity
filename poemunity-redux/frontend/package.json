@@ -44,7 +44,7 @@
   "scripts": {
     "start": "react-scripts start",
     "clean": "rimraf ../backend/public",
-    "build": "ESLINT_NO_DEV_ERRORS=true DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test --watchAll --coverage",
     "eject": "react-scripts eject",
     "lint": "npx standard --fix"
