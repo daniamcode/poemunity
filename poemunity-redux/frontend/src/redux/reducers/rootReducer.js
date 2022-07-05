@@ -9,4 +9,4 @@ const rootReducer = combineReducers({
     ...poemsReducers,
 });
 
-export default rootReducer;
+export {rootReducer};

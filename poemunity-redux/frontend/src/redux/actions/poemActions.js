@@ -1,12 +1,9 @@
-import {store} from '../../index';
+import store from '../store';
 import { getAction, getTypes, putAction } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import cloneDeep from 'lodash/cloneDeep';
+import { ACTIONS } from '../reducers/poemReducers';
 
-export const ACTIONS = {
-    POEM: 'poem',
-    LIKE_POEM: 'like-poem',
-};
 
 export function getPoemAction({ params = {}, options, callbacks = {} } = {}) {
     return function dispatcher(dispatch) {

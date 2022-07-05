@@ -1,9 +1,9 @@
 import * as commonReducers from './commonReducers';
 import * as poemsReducers from './poemsReducers';
-import { combineReducers } from 'redux';
-import { ACTIONS }                    from '../actions/poemsActions';
+import { ACTIONS }                    from './poemsReducers';
 
-jest.mock('redux');
+
+// jest.mock('redux');
 
 describe('Poems reducer - allPoemsQuery', () => {
     test('should call commonReducer', () => {

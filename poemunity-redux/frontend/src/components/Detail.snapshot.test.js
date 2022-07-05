@@ -7,7 +7,7 @@ import {
   QueryClientProvider,
 } from "react-query"
 import { Provider } from 'react-redux';
-import configureStore from '../redux/store';
+import store from '../redux/store';
 
 
 function renderDetail (arg) {
@@ -19,7 +19,6 @@ function renderDetail (arg) {
 
   const props = { ...defaultProps, ...arg }
   const queryClient = new QueryClient();
-  const store = configureStore();
 
   return renderer.create(
     <Provider store={store}>

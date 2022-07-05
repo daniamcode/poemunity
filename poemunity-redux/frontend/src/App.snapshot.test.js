@@ -6,9 +6,8 @@ import {
   QueryClientProvider,
 } from "react-query"
 import { Provider } from 'react-redux';
-import configureStore from './redux/store';
+import store from './redux/store';
 
-const store = configureStore();
 
 describe('App snapshot', () => {
   const queryClient = new QueryClient();

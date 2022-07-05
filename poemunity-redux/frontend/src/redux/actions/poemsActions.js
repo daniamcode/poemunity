@@ -1,13 +1,9 @@
-import {store} from '../../index';
+import store from '../store/index';
 import { getAction, getTypes } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import cloneDeep from 'lodash/cloneDeep';
+import {ACTIONS} from '../reducers/poemsReducers';
 
-export const ACTIONS = {
-    ALL_POEMS: 'all-poems',
-    POEMS_LIST: 'poems-list',
-    RANKING: 'ranking'            
-};
 
 export function getAllPoemsAction({ params, options, callbacks = {} } = {}) {
     return function dispatcher(dispatch) {

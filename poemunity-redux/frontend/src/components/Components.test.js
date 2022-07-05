@@ -13,7 +13,7 @@ import Header from './Header'
 import { BrowserRouter as Router } from 'react-router-dom'
 import '@testing-library/jest-dom'
 import { manageSuccess } from '../utils/notifications';
-import configureStore from '../redux/store';
+import store from '../redux/store';
 import { Provider } from 'react-redux';
 
 import {
@@ -22,7 +22,6 @@ import {
 } from "react-query"
 
 const queryClient = new QueryClient();
-const store = configureStore();
 
 // these mocks seem to have to be defined before the "describe"
 jest.mock('../utils/notifications');
@@ -123,7 +122,7 @@ describe('Login component', () => {
     })
   })
 
-  xtest('Should call manageSuccess when clicking login', () => {  
+  test.skip('Should call manageSuccess when clicking login', () => {  
     wrapper = wrapperFactory();
     
     render(<Login />, { wrapper });
