@@ -525,7 +525,6 @@ exports[`App snapshot should match 1`] = `
                   id="origin"
                   name="origin"
                   onChange={[Function]}
-                  type="submit"
                 >
                   <option
                     selected={true}
@@ -557,7 +556,6 @@ exports[`App snapshot should match 1`] = `
                   id="sort"
                   name="sort"
                   onChange={[Function]}
-                  type="submit"
                 >
                   <option
                     selected={false}

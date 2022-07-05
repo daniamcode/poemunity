@@ -76,7 +76,6 @@ exports[`List should match without id 1`] = `
           id="origin"
           name="origin"
           onChange={[Function]}
-          type="submit"
         >
           <option
             selected={true}
@@ -108,7 +107,6 @@ exports[`List should match without id 1`] = `
           id="sort"
           name="sort"
           onChange={[Function]}
-          type="submit"
         >
           <option
             selected={false}
