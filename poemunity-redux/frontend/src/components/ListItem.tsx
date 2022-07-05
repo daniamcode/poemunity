@@ -1,9 +1,10 @@
-import useDeletePoem from '../react-query/useDeletePoem'
+// import useDeletePoem from '../react-query/useDeletePoem'
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
+import { useHistory } from 'react-router-dom'
 import EditIcon from '@material-ui/icons/Edit'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import {
@@ -12,41 +13,49 @@ import {
   READ_MORE,
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import { updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions'
+import { Poem, Context } from '../typescript/interfaces'
 
+interface Props {
+  poem: Poem
+  filter: string
+  context: Context
+}
 
-function ListItem ({
+const ListItem = ({
    poem,
    filter,
    context
-}) {
-  const deletePoemMutation = useDeletePoem()
+}: Props) => {
+  // const deletePoemMutation = useDeletePoem()
+
+  const history = useHistory()
 
   // Redux
   const dispatch = useDispatch();
 
-  const onLike = (event, poemId) => {
+  const onLike = (event:React.MouseEvent<HTMLAnchorElement, MouseEvent>, poemId:string) => {
     event.preventDefault()
-    dispatch(likePoemAction({
+    dispatch<any>(likePoemAction({
       params: { poemId }, 
       context,
       callbacks: {
         success: () => {
           // todo: when I update this cache, it has effects on many queries. 
           // Maybe I need some optimisation, in the frontend or in the backend
-          dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updatePoemCacheAfterLikePoemAction({context}))
+          dispatch<any>(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updateRankingCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
+          dispatch<any>(updatePoemCacheAfterLikePoemAction({context}))
         }
       }
     }))
   }
 
-  const editPoem = (poemId) => {
+  const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath)
     context.setState({ ...context, elementToEdit: poemId })
@@ -97,6 +106,7 @@ function ListItem ({
                 <Link
                   className='poem__likes-icon'
                   onClick={(event) => onLike(event, poem.id)}
+                  to
                 />
             )}
             {context.user &&
@@ -105,6 +115,7 @@ function ListItem ({
                 <Link
                   className='poem__unlikes-icon'
                   onClick={(event) => onLike(event, poem.id)}
+                  to
                 />
             )}
             {context.user &&
@@ -121,7 +132,7 @@ function ListItem ({
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
+                    // onClick={(event) => deletePoemMutation.mutate(poem.id)}
                   />
             )}
             <Link
@@ -137,10 +148,11 @@ function ListItem ({
   )
 }
 
-ListItem.propTypes = {
-  poem: PropTypes.object.isRequired,
-  filter: PropTypes.string.isRequired,
-  context: PropTypes.object.isRequired,
-}
+// PropTypes no longer needed when working with Typescript
+// ListItem.propTypes = {
+//   poem: PropTypes.object.isRequired,
+//   filter: PropTypes.string.isRequired,
+//   context: PropTypes.object.isRequired,
+// }
 
 export default ListItem

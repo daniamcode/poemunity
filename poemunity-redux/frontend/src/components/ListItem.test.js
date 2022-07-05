@@ -2,7 +2,7 @@ import checkPropTypes from 'check-prop-types';
 import ListItem from './ListItem';
 
 describe('ListItem component', () => {
-    it('Check PropTypes', () => {
+    test('Check PropTypes', () => {
         // we can validate that the test fails just by changing for instance, expectedProps.filter into a number
         const expectedProps = {
             poem: {},

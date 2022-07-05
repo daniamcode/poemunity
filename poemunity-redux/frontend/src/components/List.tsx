@@ -1,5 +1,4 @@
 import { useEffect, useState, useContext } from 'react'
-import { useHistory } from 'react-router-dom'
 import { AppContext } from '../App'
 import './List.scss'
 import './Detail.scss'
@@ -20,23 +19,36 @@ import {
   CATEGORIES_TITLE_LABEL
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
-import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
-import { strings, arrays, dom, objects } from '@daniamcode/utils'
+import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils'
+// import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
+import { Poem, RootState } from '../typescript/interfaces'
 
-function List (props) {
+
+interface Props {
+  match: {
+    params: {
+      genre: string
+    }
+  }
+}
+
+function List (props: Props) {
+  interface ListStates {
+    poems: Poem[]
+    filter: string
+  }
   const genre = props.match.params.genre
-  const [poems, setPoems] = useState([])
-  const [filter, setFilter] = useState('')
+  const [poems, setPoems] = useState<ListStates["poems"]>([])
+  const [filter, setFilter] = useState<ListStates["filter"]>('')
 
   const [paramsData, setParamsData] = useFiltersFromQuery({
-    orderBy: null,
+    orderBy: '',
     origin: 'all'
   })
   
-  const history = useHistory()
   const context = useContext(AppContext)
 
   // Redux
@@ -44,15 +56,16 @@ function List (props) {
 
   const {
       poemsListQuery,
-  } = useSelector(state => state);
+  } = useSelector((state: RootState) => state);
 
   useEffect(() => {
     const queryOptions = {
         reset: true,
         fetch: false,
     };
-    dispatch(getPoemsListAction({
+    dispatch<any>(getPoemsListAction({
         options: queryOptions,
+        params: {}
     }));
   }, []);
 
@@ -62,7 +75,7 @@ function List (props) {
               reset: true,
               fetch: true,
           };
-          dispatch(getPoemsListAction({
+          dispatch<any>(getPoemsListAction({
               params: paramsData.origin !== 'all' ? {origin: paramsData.origin} : null,
               options: queryOptions,
           }));
@@ -88,25 +101,25 @@ function List (props) {
     }
   }, [JSON.stringify([poemsListQuery, genre, paramsData])])
 
-  const handleOrderChange = (event) => {
+  const handleOrderChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
     addQueryParam({ id: 'orderBy', value: event.target.value })
     setParamsData({ ...paramsData, orderBy: event.target.value })
   }
 
-  const handleOriginChange = (event) => {
+  const handleOriginChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
     addQueryParam({ id: 'origin', value: event.target.value })
     setParamsData({ ...paramsData, origin: event.target.value })
   }
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = (event:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFilter(normalizeString(event.target.value))
   }
 
-  if (poemsListQuery.isFetching) {
-    console.log('test my first npm package!')
-    console.log(strings.isLowercase('Qwerty'))
-    console.log(strings.isLowercase('qwerty'))
-    console.log(strings.isLowercase('ABC'))
+  if (poemsListQuery?.isFetching) {
+    // console.log('test my first npm package!')
+    // console.log(strings.isLowercase('Qwerty'))
+    // console.log(strings.isLowercase('qwerty'))
+    // console.log(strings.isLowercase('ABC'))
     return <CircularProgress />
   }
 
@@ -143,7 +156,6 @@ function List (props) {
             <label>
               Authors:
               <select
-                type='submit'
                 id='origin'
                 name='origin'
                 onChange={handleOriginChange}
@@ -158,7 +170,6 @@ function List (props) {
             <label>
               {ORDER_BY}
               <select
-                type='submit'
                 id='sort'
                 name='sort'
                 onChange={handleOrderChange}

@@ -1,13 +1,13 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 import './Login.scss'
-import { useHistory } from 'react-router'
+// import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import useLogin from '../react-query/useLogin'
-import { FormElement } from '../typescript/types'
-import { manageSuccess } from '../utils/notifications'
+// import { FormElement } from '../typescript/types'
+// import { manageSuccess } from '../utils/notifications'
 
 const Login = (): JSX.Element => {
-  const history = useHistory()
+  // const history = useHistory()
   
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')

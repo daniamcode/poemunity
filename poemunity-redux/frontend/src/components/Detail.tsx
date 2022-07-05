@@ -13,8 +13,8 @@ import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
 import useDeletePoem from '../react-query/useDeletePoem'
 import { useHistory } from "react-router-dom";
-import { Poem, RootState, Props } from '../typescript/interfaces'
-import { FormElement } from '../typescript/types'
+import { Poem, RootState } from '../typescript/interfaces'
+// import { FormElement } from '../typescript/types'
 import { useDispatch, useSelector } from 'react-redux';
 import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 import { 
@@ -23,8 +23,15 @@ import {
   updateRankingCacheAfterLikePoemAction
 } from '../redux/actions/poemsActions';
 
+interface Props {
+  match: {
+    params: {
+      poemId: string
+    }
+  }
+}
 
-function Detail (props: Props): JSX.Element {
+function Detail (props: Props) {
   const [poem, setPoem] = useState<Poem>({
     id: '',
     author: '',

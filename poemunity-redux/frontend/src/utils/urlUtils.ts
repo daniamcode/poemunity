@@ -3,11 +3,12 @@ import { createBrowserHistory } from 'history';
 
 const history = createBrowserHistory();
 
-export function parseQuery(url = window.location.search) {
+export function parseQuery(url: string = window.location.search) {
     const urlParams = new URLSearchParams(url);
     return Array.from(urlParams.keys()).reduce((acc, key) => {
         if (key !== '__proto__') {
-            acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)) : null;
+            // we use non-null assertion operator by now to bypass typescript's error 
+            acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null;
         }
         return acc;
     }, {});
@@ -35,7 +36,13 @@ export function urlTail(url = '') {
  * @param {string} id - Query key id to be set or updated
  * @param {any} value - Query value to be assigned
  */
-export function addQueryParam({ id, value }) {
+
+interface addQueryParamProps {
+    id: string;
+    value: string;
+}
+
+export function addQueryParam({ id, value }: addQueryParamProps) {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const parsedValue = JSON.stringify(value);
@@ -44,7 +51,7 @@ export function addQueryParam({ id, value }) {
             search: urlParams.toString(),
             pathname: history.location.pathname,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error.stack);
     }
 }
@@ -54,7 +61,7 @@ export function addQueryParam({ id, value }) {
  * @param {array} data - Query key id to be set or updated.
  * @param {array} keysToDelete - An array of keys to delete.
  */
-export function addQueryParams(data = [], keysToDelete = []) {
+export function addQueryParams(data: {key: string, value: string}[], keysToDelete: string[]) {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         keysToDelete.forEach(key => urlParams.delete(key));
@@ -71,13 +78,15 @@ export function addQueryParams(data = [], keysToDelete = []) {
                 pathname: history.location.pathname,
             });
         }
-    } catch (error) {
+    } catch (error:any) {
         console.error(error.stack);
     }
 }
 
-export function getQueryParam(key) {
-    const { [key]: value } = parseQuery();
+export function getQueryParam(key: string) {
+    const result = parseQuery()
+    // check this typescript's type assertion
+    const { [key as keyof typeof result]: value } = result;
     return value;
 }
 
@@ -98,7 +107,7 @@ export function decodeRedirectQuery(query = '') {
  * @description A hook to manage filters that load data from url query
  * @param {object} defaultValue - The object with the properties
  */
-export function useFiltersFromQuery(defaultValue) {
+export function useFiltersFromQuery(defaultValue:any) {
     const [data, setData] = useState(defaultValue);
     useEffect(() => {
         const keys = Object.keys(defaultValue);
@@ -116,7 +125,7 @@ export function useFiltersFromQuery(defaultValue) {
     }, []);
     useEffect(() => {
         const keysData = Object.keys(data).map(key => ({ key, value: data[key] }));
-        const keysToDelete = [];
+        const keysToDelete: string[] = [];
         const filteredData = keysData.filter(({ key, value }) => {
             const currentValue = getQueryParam(key);
             const isNewValue = currentValue !== value;
@@ -135,11 +144,10 @@ export function useFiltersFromQuery(defaultValue) {
     return [data, setData];
 }
 
-
-export function queryMatch(key, value) {
+export function queryMatch(key: string, value: string) {
     return getQueryParam(key) === value;
 }
 
-export function getEncodedUri(rawUri) {
+export function getEncodedUri(rawUri: string) {
     return encodeURI(rawUri);
 }

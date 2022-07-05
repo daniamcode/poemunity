@@ -7,8 +7,10 @@
     "jsx": "react-jsx",
     "lib": [
       "es6",
-      "DOM"
+      "DOM",
+      "dom.iterable"
     ],
+    "downlevelIteration": true,
     "moduleResolution": "node",
     "noEmit": true,
     "target": "ES6",
@@ -18,7 +20,13 @@
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "resolveJsonModule": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "importHelpers": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules",
