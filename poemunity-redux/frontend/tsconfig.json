@@ -35,6 +35,6 @@
     "jest.config.js"
   ],
   "include": [
-    "src"
+    "./src/**/*.ts"
   ]
 }
