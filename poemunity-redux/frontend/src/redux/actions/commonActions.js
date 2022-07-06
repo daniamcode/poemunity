@@ -144,9 +144,13 @@ export function getAction({
             .catch((error) => {
                 dispatch({
                     type: rejectedAction,
+                    // if there's a network error, for example, we don't get a response in error
                     payload: error?.response?.data || error,
                 });
                 manageError(error);
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error);
+                }
                 // manageError(error, () => {
                 //     if (callbacks.error) {
                 //         callbacks.error(error?.response?.data || error);

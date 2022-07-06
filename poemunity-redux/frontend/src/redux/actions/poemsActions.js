@@ -12,8 +12,8 @@ export function getAllPoemsAction({ params, options, callbacks = {} } = {}) {
             url: API_ENDPOINTS.POEMS,
             dispatch,
             params,
-            options
-            // actionCallbacks,
+            options,
+            callbacks,
         });
     };
 }

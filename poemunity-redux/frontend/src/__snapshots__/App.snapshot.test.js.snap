@@ -232,7 +232,7 @@ exports[`App snapshot should match 1`] = `
     <p
       className="list__presentation"
     >
-      Your poem community!!!!
+      Your poem community!!!
     </p>
     <div
       className="separator"
