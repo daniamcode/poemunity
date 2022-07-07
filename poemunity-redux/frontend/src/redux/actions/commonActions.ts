@@ -3,6 +3,8 @@ import API                         from './axiosInstance';
 // import { isProduction, isStaging } from 'constants/environments';
 // import { navigateToLanding }       from 'utils/navigationManager';
 import { manageError } from '../../utils/notifications'
+import { ReduxOptions, ReduxCallbacks } from '../../typescript/interfaces'
+
 
 // const allowedErrorConfig = [
 //     {
@@ -82,7 +84,7 @@ import { manageError } from '../../utils/notifications'
 //     }
 // }
 
-export function getTypes(baseType) {
+export function getTypes(baseType: string | undefined) {
     return {
         requestAction: `${baseType}_request`,
         fulfilledAction: `${baseType}_fulfilled`,
@@ -92,21 +94,32 @@ export function getTypes(baseType) {
     };
 }
 
+interface GetActionProps {
+    type: string
+    url: string
+    params: object
+    dispatch: any
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    extraConfig?: object
+}
+
 export function getAction({
     type,
     url,
     params,
     dispatch,
     options = { reset: false, update: false, fetch: true },
-    callbacks = {},
+    callbacks,
     extraConfig = {},
-}) {
+}: GetActionProps) {
     const {
         requestAction,
         fulfilledAction,
         rejectedAction,
         resetAction,
-        updateAction,
+        // updateAction is used with commonListReducers, but with commonReducer is not used for now
+        // updateAction,
     } = getTypes(type);
     options.reset = options.reset !== undefined ? options.reset : false;
     options.update = options.update !== undefined ? options.update : false;
@@ -114,7 +127,7 @@ export function getAction({
     const { transformResponse } = options;
     if (options.reset) {
         dispatch({ type: resetAction });
-        if (callbacks.reset) {
+        if (callbacks?.reset) {
             callbacks.reset();
         }
     }
@@ -126,18 +139,18 @@ export function getAction({
                 if (transformResponse && typeof transformResponse === 'function') {
                     responseData = transformResponse(responseData);
                 }
-                if (options.update) {
-                    dispatch({
-                        type: updateAction,
-                        payload: responseData,
-                    });
-                } else {
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: responseData,
+                //     });
+                // } else {
                     dispatch({
                         type: fulfilledAction,
                         payload: responseData,
                     });
-                }
-                if (callbacks.success) {
+                // }
+                if (callbacks?.success) {
                     callbacks.success(responseData);
                 }
             })
@@ -170,22 +183,33 @@ export function getAction({
     }
 }
 
+interface PostActionProps {
+    type: string
+    url: string
+    data: object
+    dispatch: any
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
+    headers?: object
+    config?: object
+}
+
 export function postAction({
     type,
     url,
     data,
     dispatch,
     options = { reset: false, update: false, fetch: true },
-    callbacks = {},
+    callbacks,
     headers,
     config,
-}) {
+}: PostActionProps) {
     const {
         requestAction,
         fulfilledAction,
         rejectedAction,
         resetAction,
-        updateAction,
+        // updateAction,
     } = getTypes(type);
     // default data
     options.reset = options.reset !== undefined ? options.reset : false;
@@ -203,17 +227,17 @@ export function postAction({
         dispatch({ type: requestAction });
         API(headers, config).post(url, data)
             .then((response) => {
-                if (options.update) {
-                    dispatch({
-                        type: updateAction,
-                        payload: response.data,
-                    });
-                } else {
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: response.data,
+                //     });
+                // } else {
                     dispatch({
                         type: fulfilledAction,
                         payload: response.data,
                     });
-                }
+                // }
                 if (callbacks.success) {
                     callbacks.success(response.data);
                 }
@@ -243,17 +267,26 @@ export function postAction({
     }
 }
 
+interface PutActionProps {
+    type: string
+    url: string
+    data: object
+    dispatch: any
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
+    config?: object
+}
 
 export function putAction({
     type, 
     url, 
-    data = {}, 
+    data, 
     dispatch, 
-    callbacks, 
     options = { reset: false, update: false, fetch: true },
+    callbacks, 
     // in config we pass the jwt
     config
-}) {
+}: PutActionProps) {
     // console.log('listingAction type : ' + type);
     const {
         requestAction,

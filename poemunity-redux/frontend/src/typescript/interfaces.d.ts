@@ -37,3 +37,16 @@ export interface Context {
   adminId: string
   setState: (state: Context) => void
 }
+
+export interface ReduxOptions {
+  reset: boolean
+  update: boolean
+  fetch: boolean
+  transformResponse?: (response: any) => any
+}
+
+export interface ReduxCallbacks {
+  success?: (response: any) => void
+  error?: (error: any) => void
+  reset?: () => void
+}

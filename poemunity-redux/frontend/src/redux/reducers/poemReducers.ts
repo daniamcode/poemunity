@@ -12,5 +12,5 @@ interface Action {
 }
 
 export function poemQuery(state = INITIAL, action: Action) {
-    return commonReducer({ state, action, actionType: ACTIONS?.POEM} );
+    return commonReducer({ state, action, actionType: ACTIONS?.POEM });
 }

@@ -2,7 +2,7 @@ import { getTypes } from '../actions/commonActions';
 
 export const INITIAL = { isFetching: false, isError: false };
 
-interface Props {
+interface CommonReducerProps {
     state?: {
         isFetching: boolean;
         isError: boolean;
@@ -17,7 +17,7 @@ interface Props {
     abortRequests?: boolean
 }
 
-export function commonReducer({ state = INITIAL, action, actionType, abortRequests = true }: Props) {
+export function commonReducer({ state = INITIAL, action, actionType, abortRequests = true }: CommonReducerProps) {
     const {
         rejectedAction,
         requestAction,
