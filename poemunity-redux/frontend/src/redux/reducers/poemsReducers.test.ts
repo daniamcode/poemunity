@@ -6,12 +6,15 @@ import { ACTIONS }                    from './poemsReducers';
 // jest.mock('redux');
 
 describe('Poems reducer - allPoemsQuery', () => {
+    const poem1 = {id: '1', author: 'author1', date: 'date1', genre: 'genre1', likes: ['1'], picture: 'picture1', poem: 'poem1', title: 'title1', userId: 'userId1'}
+    const poem2 = {id: '2', author: 'author2', date: 'date2', genre: 'genre2', likes: ['2'], picture: 'picture2', poem: 'poem2', title: 'title2', userId: 'userId2'}
+    const poem3 = {id: '3', author: 'author3', date: 'date3', genre: 'genre3', likes: ['3'], picture: 'picture3', poem: 'poem3', title: 'title3', userId: 'userId3'}
     test('should call commonReducer', () => {
         const spy = jest.spyOn(commonReducers, 'commonReducer');
-        poemsReducers.allPoemsQuery(undefined, 'whatever')
+        poemsReducers.allPoemsQuery(undefined, {type: 'whatever'})
         expect(spy).toHaveBeenCalled();
         expect(spy).toBeCalledTimes(1)
-        expect(spy).toHaveBeenCalledWith({isFetching: false, isError: false}, 'whatever', ACTIONS.ALL_POEMS);
+        expect(spy).toHaveBeenCalledWith({state: {isFetching: false, isError: false}, action: {type: 'whatever'}, actionType: ACTIONS.ALL_POEMS});
         spy.mockRestore()
     })
     test('should return the initial state with resetAction', () => {
@@ -39,13 +42,18 @@ describe('Poems reducer - allPoemsQuery', () => {
             {
                 type: `${ACTIONS.ALL_POEMS}_fulfilled`,
                 payload: [
-                    {id: 1, title: 'title1'},
-                    {id: 2, title: 'title2'},
+                    poem1,
+                    poem2,
                 ]
             }
         )
-        expect(result).toEqual({isFetching: false, isError: false, item: [{id: 1, title: 'title1'}, {id: 2, title: 'title2'}]});
-        expect(result).toStrictEqual({err: undefined, abortController: undefined, isFetching: false, isError: false, item: [{id: 1, title: 'title1'}, {id: 2, title: 'title2'}]});
+        expect(result).toEqual({isFetching: false, isError: false, item: [poem1, poem2]});
+        expect(result).toStrictEqual({
+            err: undefined, 
+            abortController: undefined, 
+            isFetching: false, 
+            isError: false, 
+            item: [poem1, poem2]});
     })
     test('should return correct state with fulfilledAction - with previous state', () => {
         const prevState =  {isFetching: false, isError: false, item: [{id: 1, title: 'title1'}]}
@@ -54,13 +62,13 @@ describe('Poems reducer - allPoemsQuery', () => {
             {
                 type: `${ACTIONS.ALL_POEMS}_fulfilled`,
                 payload: [
-                    {id: 2, title: 'title2'},
-                    {id: 3, title: 'title3'},
+                    poem2,
+                    poem3,
                 ]
             }
         )
         // the previous state is not considered
-        expect(result).toEqual({isFetching: false, isError: false, item: [{id: 2, title: 'title2'}, {id: 3, title: 'title3'}]});
+        expect(result).toEqual({isFetching: false, isError: false, item: [poem2, poem3]});
     })
     test('should return correct state with rejectedAction', () => {
         const result = poemsReducers.allPoemsQuery(
@@ -68,12 +76,16 @@ describe('Poems reducer - allPoemsQuery', () => {
             {
                 type: `${ACTIONS.ALL_POEMS}_rejected`,
                 payload: [
-                    {id: 1, title: 'title1'},
-                    {id: 2, title: 'title2'},
+                    poem1,
+                    poem2,
                 ]
             }
         )
-        expect(result).toEqual({isFetching: false, isError: true, err: [{id: 1, title: 'title1'}, {id: 2, title: 'title2'}]});
-        expect(result).toStrictEqual({abortController: undefined, isFetching: false, isError: true, err: [{id: 1, title: 'title1'}, {id: 2, title: 'title2'}]});
+        expect(result).toEqual({isFetching: false, isError: true, err: [poem1, poem2]});
+        expect(result).toStrictEqual({
+            abortController: undefined, 
+            isFetching: false, 
+            isError: true, 
+            err: [poem1, poem2]});
     })
 })
