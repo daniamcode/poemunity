@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import './PageNotFound.scss'
 
-function PageNotFound (props) {
+function PageNotFound () {
   return (
     <main className='page-not-found__container'>
       <section className='page-not-found__message'>
