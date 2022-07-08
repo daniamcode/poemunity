@@ -12,7 +12,8 @@ import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import getPoemsByUser from '../utils/getPoemsByUser'
 import useDeletePoem from '../react-query/useDeletePoem'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
 import { getAllPoemsAction } from '../redux/actions/poemsActions';
 
 function MyPoems (props) {
@@ -22,7 +23,7 @@ function MyPoems (props) {
   const context = useContext(AppContext);
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
       allPoemsQuery,

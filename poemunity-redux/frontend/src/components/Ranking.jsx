@@ -18,7 +18,8 @@ import {
   POEM_POINTS,
   LIKE_POINTS,
 } from '../data/constants'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../redux/store';
 import { getRankingAction } from '../redux/actions/poemsActions'
 
 const useStyles = makeStyles({
@@ -37,7 +38,7 @@ export default function Ranking () {
   )
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
       rankingQuery,

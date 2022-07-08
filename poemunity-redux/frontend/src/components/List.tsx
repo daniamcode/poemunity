@@ -22,12 +22,13 @@ import normalizeString from '../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils'
 // import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../redux/store'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
 import { Poem, RootState } from '../typescript/interfaces'
 
 
-interface Props {
+interface ListProps {
   match: {
     params: {
       genre: string
@@ -35,7 +36,7 @@ interface Props {
   }
 }
 
-function List (props: Props) {
+function List (props: ListProps) {
   interface ListStates {
     poems: Poem[]
     filter: string
@@ -52,7 +53,7 @@ function List (props: Props) {
   const context = useContext(AppContext)
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
       poemsListQuery,
@@ -63,7 +64,7 @@ function List (props: Props) {
         reset: true,
         fetch: false,
     };
-    dispatch<any>(getPoemsListAction({
+    dispatch(getPoemsListAction({
         options: queryOptions,
         params: {}
     }));
@@ -75,7 +76,7 @@ function List (props: Props) {
               reset: true,
               fetch: true,
           };
-          dispatch<any>(getPoemsListAction({
+          dispatch(getPoemsListAction({
               params: paramsData.origin !== 'all' ? {origin: paramsData.origin} : null,
               options: queryOptions,
           }));

@@ -14,7 +14,7 @@ import {
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
 // import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '../redux/store'
 import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import { updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions'
 import { Poem, Context } from '../typescript/interfaces'
@@ -35,21 +35,21 @@ const ListItem = ({
   const history = useHistory()
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onLike = (event:React.MouseEvent<HTMLAnchorElement, MouseEvent>, poemId:string) => {
     event.preventDefault()
-    dispatch<any>(likePoemAction({
+    dispatch(likePoemAction({
       params: { poemId }, 
       context,
       callbacks: {
         success: () => {
           // todo: when I update this cache, it has effects on many queries. 
           // Maybe I need some optimisation, in the frontend or in the backend
-          dispatch<any>(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updateRankingCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updatePoemCacheAfterLikePoemAction({context}))
+          dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updatePoemCacheAfterLikePoemAction({context}))
         }
       }
     }))

@@ -4,7 +4,7 @@ import API                         from './axiosInstance';
 // import { navigateToLanding }       from 'utils/navigationManager';
 import { manageError } from '../../utils/notifications'
 import { ReduxOptions, ReduxCallbacks } from '../../typescript/interfaces'
-
+import { AppDispatch } from '../store';
 
 // const allowedErrorConfig = [
 //     {
@@ -98,7 +98,7 @@ interface GetActionProps {
     type: string
     url: string
     params: object
-    dispatch: any
+    dispatch: AppDispatch
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
     extraConfig?: object
@@ -187,7 +187,7 @@ interface PostActionProps {
     type: string
     url: string
     data: object
-    dispatch: any
+    dispatch: AppDispatch
     options?: ReduxOptions
     callbacks: ReduxCallbacks
     headers?: object
@@ -271,7 +271,7 @@ interface PutActionProps {
     type: string
     url: string
     data: object
-    dispatch: any
+    dispatch: AppDispatch
     options?: ReduxOptions
     callbacks: ReduxCallbacks
     config?: object

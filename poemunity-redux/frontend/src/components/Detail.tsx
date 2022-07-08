@@ -15,13 +15,15 @@ import useDeletePoem from '../react-query/useDeletePoem'
 import { useHistory } from "react-router-dom";
 import { Poem, RootState } from '../typescript/interfaces'
 // import { FormElement } from '../typescript/types'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
 import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 import { 
   updateAllPoemsCacheAfterLikePoemAction, 
   updatePoemsListCacheAfterLikePoemAction,
   updateRankingCacheAfterLikePoemAction
 } from '../redux/actions/poemsActions';
+
 
 interface Props {
   match: {
@@ -45,7 +47,7 @@ function Detail (props: Props) {
   })
   
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const poemQuery = useSelector((state: RootState) => state.poemQuery);
 
@@ -54,7 +56,7 @@ function Detail (props: Props) {
         reset: true,
         fetch: false,
     };
-    dispatch<any>(getPoemAction({
+    dispatch(getPoemAction({
         options: queryOptions,
     }));
   }, []);
@@ -65,7 +67,7 @@ function Detail (props: Props) {
               reset: true,
               fetch: true,
           };
-          dispatch<any>(getPoemAction({
+          dispatch(getPoemAction({
               params: props.match.params,
               options: queryOptions,
           }));
@@ -88,17 +90,17 @@ function Detail (props: Props) {
 
   function onLike (event: React.SyntheticEvent, poemId: string) {
     event.preventDefault()
-    dispatch<any>(likePoemAction({
+    dispatch(likePoemAction({
       params: { poemId: props.match.params.poemId }, 
       context,
       callbacks: {
         success: () => {
           // todo: when I update this cache, it has effects on many queries. 
           // Maybe I need some optimisation, in the frontend or in the backend
-          dispatch<any>(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updateRankingCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
-          dispatch<any>(updatePoemCacheAfterLikePoemAction({context}))
+          dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
+          dispatch(updatePoemCacheAfterLikePoemAction({context}))
         }
       }
     }))

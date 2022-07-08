@@ -12,7 +12,8 @@ import CircularProgress from './CircularIndeterminate'
 import useDeletePoem from '../react-query/useDeletePoem'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 import parseJWT from '../utils/parseJWT'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
 import { getAllPoemsAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
 import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 
@@ -23,7 +24,7 @@ function MyFavouritePoems (props) {
   const [filter, setFilter] = useState('')
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
       allPoemsQuery,

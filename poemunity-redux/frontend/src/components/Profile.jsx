@@ -32,7 +32,8 @@ import {
   PROFILE_SEND_POEM,
   PROFILE_RESET_POEM
 } from '../data/constants'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
 import { getPoemAction } from '../redux/actions/poemActions';
 
 function TabPanel (props) {
@@ -93,7 +94,7 @@ export default function Profile (props) {
   const context = useContext(AppContext);
 
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { poemQuery } = useSelector(state => state);
 
