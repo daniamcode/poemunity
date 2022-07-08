@@ -1,10 +1,13 @@
 import { Poem } from '../../typescript/interfaces';
 import { commonReducer, INITIAL } from './commonReducers';
+import {StateItem} from '../../typescript/interfaces'
+
 
 export const ACTIONS = {
     ALL_POEMS: 'all-poems',
     POEMS_LIST: 'poems-list',
-    RANKING: 'ranking'            
+    RANKING: 'ranking',
+    CREATE_POEM: 'create-poem',            
 };
 
 interface Action {
@@ -13,14 +16,18 @@ interface Action {
 }
 
 // used for MyFavouritePoems and for MyPoems
-export function allPoemsQuery(state = INITIAL, action: Action) {
+export function allPoemsQuery(state: StateItem = INITIAL, action: Action) {
     return commonReducer({ state, action, actionType: ACTIONS?.ALL_POEMS });
 }
 
-export function poemsListQuery(state = INITIAL, action: Action) {
+export function poemsListQuery(state: StateItem = INITIAL, action: Action) {
     return commonReducer({ state, action, actionType: ACTIONS?.POEMS_LIST });
 }
 
-export function rankingQuery(state = INITIAL, action: Action) {
+export function rankingQuery(state: StateItem = INITIAL, action: Action) {
     return commonReducer({ state, action, actionType: ACTIONS?.RANKING });
+}
+
+export function createPoemQuery(state: StateItem = INITIAL, action: Action) {
+    return commonReducer({ state, action, actionType: ACTIONS?.CREATE_POEM });
 }

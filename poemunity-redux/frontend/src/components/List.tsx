@@ -23,9 +23,10 @@ import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils'
 // import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
 import { useSelector } from 'react-redux'
-import { useAppDispatch } from '../redux/store'
+import { useAppDispatch, RootState } from '../redux/store'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
-import { Poem, RootState } from '../typescript/interfaces'
+import { Poem } from '../typescript/interfaces'
+
 
 
 interface ListProps {
@@ -56,8 +57,8 @@ function List (props: ListProps) {
   const dispatch = useAppDispatch();
 
   const {
-      poemsListQuery,
-  } = useSelector((state: RootState) => state);
+      poemsListQuery
+  } = useSelector((state: RootState) => state)
 
   useEffect(() => {
     const queryOptions = {

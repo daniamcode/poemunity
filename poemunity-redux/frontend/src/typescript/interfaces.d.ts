@@ -22,9 +22,16 @@ export interface PoemsListQuery {
   item?: Poem[]
 }
 
-export interface RootState {
-  poemQuery: PoemQuery
-  poemsListQuery: PoemsListQuery
+// export interface RootState {
+//   poemQuery: PoemQuery
+//   poemsListQuery: PoemsListQuery
+// }
+
+export interface StateItem {
+  isFetching: boolean
+  isError: boolean
+  item?: object[]
+  abortController?: AbortController;
 }
 
 export interface Context {
@@ -33,7 +40,7 @@ export interface Context {
   userId: string
   username: string
   picture: string
-  config: {},
+  config: object,
   adminId: string
   setState: (state: Context) => void
 }

@@ -1,14 +1,10 @@
 import { getTypes } from '../actions/commonActions';
+import {StateItem} from '../../typescript/interfaces'
 
 export const INITIAL = { isFetching: false, isError: false };
 
 interface CommonReducerProps {
-    state?: {
-        isFetching: boolean;
-        isError: boolean;
-        item?: object[];
-        abortController?: AbortController;
-    }
+    state: StateItem
     action: {
         type: string
         payload?: object[]

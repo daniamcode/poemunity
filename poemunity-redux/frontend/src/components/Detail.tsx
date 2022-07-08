@@ -13,10 +13,10 @@ import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
 import useDeletePoem from '../react-query/useDeletePoem'
 import { useHistory } from "react-router-dom";
-import { Poem, RootState } from '../typescript/interfaces'
+import { Poem } from '../typescript/interfaces'
 // import { FormElement } from '../typescript/types'
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../redux/store';
+import { useAppDispatch, RootState } from '../redux/store';
 import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 import { 
   updateAllPoemsCacheAfterLikePoemAction, 
