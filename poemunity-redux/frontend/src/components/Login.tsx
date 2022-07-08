@@ -1,23 +1,49 @@
-import {useState} from 'react'
+import {useState, useContext} from 'react'
+import { AppContext } from '../App';
 import './Login.scss'
-// import { useHistory } from 'react-router'
+import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
-import useLogin from '../react-query/useLogin'
 // import { FormElement } from '../typescript/types'
 // import { manageSuccess } from '../utils/notifications'
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../redux/store';
+import { loginAction } from '../redux/actions/loginActions';
+
 
 const Login = (): JSX.Element => {
-  // const history = useHistory()
+  const history = useHistory()
   
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const loginQuery: {mutate: Function} = useLogin()
+  const context = useContext(AppContext);
 
-  const handleLogin = (event: any) => {
+  // Redux
+  const dispatch = useAppDispatch();
+
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
     event.preventDefault()
-    loginQuery?.mutate({username, password})
+    dispatch(loginAction({
+      data: {username, password},
+      context,
+      callbacks: {
+        success: (data) => {
+          window.localStorage.setItem(
+            'loggedUser', JSON.stringify(data)
+          )
+          history.push('profile')
+        },
+        error: (error) => {
+          // setErrorMessage('Wrong credentials')
+          console.log('something went wrong in login!')
+          // history.push('/')
+          // setTimeout(()=> {
+          //   setErrorMessage(null)
+          // }, 3000)
+        }
+      }
+  }));
     setUsername('')
     setPassword('')
   }

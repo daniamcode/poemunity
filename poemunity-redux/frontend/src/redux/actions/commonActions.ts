@@ -248,6 +248,9 @@ export function postAction({
                     payload: error?.response?.data || error,
                 });
                 manageError(error);
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error);
+                }
                 // manageError(error, () => {
                 //     if (callbacks.error) {
                 //         callbacks.error(error?.response?.data || error);
@@ -322,6 +325,9 @@ export function putAction({
                 payload: error?.response?.data || error,
             });
             manageError(error);
+            if (callbacks?.error) {
+                callbacks.error(error?.response?.data || error);
+            }
             // manageError(error, () => {
             //     if (callbacks.error) {
             //         callbacks.error(error?.response?.data || error);
