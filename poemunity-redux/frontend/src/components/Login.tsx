@@ -1,11 +1,9 @@
-import {useState, useContext} from 'react'
-import { AppContext } from '../App';
+import {useState} from 'react'
 import './Login.scss'
 import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
 // import { FormElement } from '../typescript/types'
 // import { manageSuccess } from '../utils/notifications'
-import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../redux/store';
 import { loginAction } from '../redux/actions/loginActions';
 
@@ -16,8 +14,6 @@ const Login = (): JSX.Element => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const context = useContext(AppContext);
-
   // Redux
   const dispatch = useAppDispatch();
 
@@ -26,7 +22,6 @@ const Login = (): JSX.Element => {
     event.preventDefault()
     dispatch(loginAction({
       data: {username, password},
-      context,
       callbacks: {
         success: (data) => {
           window.localStorage.setItem(
@@ -43,7 +38,7 @@ const Login = (): JSX.Element => {
           // }, 3000)
         }
       }
-  }));
+    }));
     setUsername('')
     setPassword('')
   }

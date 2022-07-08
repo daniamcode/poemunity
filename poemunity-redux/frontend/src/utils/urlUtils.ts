@@ -107,7 +107,7 @@ export function decodeRedirectQuery(query = '') {
  * @description A hook to manage filters that load data from url query
  * @param {object} defaultValue - The object with the properties
  */
-export function useFiltersFromQuery(defaultValue:any) {
+export function useFiltersFromQuery(defaultValue: any) {
     const [data, setData] = useState(defaultValue);
     useEffect(() => {
         const keys = Object.keys(defaultValue);

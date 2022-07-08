@@ -1,7 +1,7 @@
 import { postAction } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import { ACTIONS } from '../reducers/loginReducers';
-import { ReduxOptions, ReduxCallbacks, Context } from '../../typescript/interfaces'
+import { ReduxOptions, ReduxCallbacks } from '../../typescript/interfaces'
 import { AppDispatch} from '../store'
 
 
@@ -9,10 +9,9 @@ interface LoginActionProps {
     data: object
     options?: ReduxOptions
     callbacks: ReduxCallbacks
-    context: Context
 }
 
-export function loginAction({ data, context, callbacks }: LoginActionProps) {
+export function loginAction({ data, callbacks }: LoginActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return postAction({
             type: ACTIONS.LOGIN,
@@ -20,7 +19,18 @@ export function loginAction({ data, context, callbacks }: LoginActionProps) {
             dispatch,
             data,
             callbacks,
-            config: context.config,
+        })
+    };
+}
+
+export function registerAction({ data, callbacks }: LoginActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        return postAction({
+            type: ACTIONS.REGISTER,
+            url: `${API_ENDPOINTS.REGISTER}`,
+            dispatch,
+            data,
+            callbacks,
         })
     };
 }

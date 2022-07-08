@@ -1,19 +1,38 @@
 import React, { useState } from 'react'
-import useRegister from '../react-query/useRegister'
 import { NavLink } from 'react-router-dom'
 import './Register.scss'
+import { registerAction } from '../redux/actions/loginActions'
+import { useHistory } from 'react-router';
+import { useAppDispatch } from '../redux/store';
+
 
 const Register = () => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  
-  const registerMutation = useRegister()
+  const history = useHistory()
+
+  // Redux
+  const dispatch = useAppDispatch();
 
   const handleRegister = (event) => {
     event.preventDefault()
-
-    registerMutation.mutate({username, email, password})
+    dispatch(registerAction({
+      data: {username, email, password},
+      callbacks: {
+        success: () => {
+          history.push('/login')
+        },
+        error: (error) => {
+          // setErrorMessage('Wrong credentials')
+          // manageError(error.response.data.error)
+          console.log('Something went wrong')
+          // setTimeout(()=> {
+          //   setErrorMessage(null)
+          // }, 3000)
+        }
+      }
+    }));
     
     // setUsername('')
     // setEmail('')
