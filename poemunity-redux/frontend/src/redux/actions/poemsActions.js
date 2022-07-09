@@ -1,5 +1,5 @@
 import store from '../store/index';
-import { getAction, getTypes } from './commonActions';
+import { getAction, postAction, getTypes } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import cloneDeep from 'lodash/cloneDeep';
 import {ACTIONS} from '../reducers/poemsReducers';
@@ -64,9 +64,9 @@ export function updatePoemsListCacheAfterLikePoemAction({ poemId, context } = {}
             return acc;
         }, []);
 
-        const { updateAction } = getTypes(ACTIONS.POEMS_LIST);
+        const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST);
         dispatch({
-            type: updateAction,
+            type: fulfilledAction,
             payload: poemsListQueryUpdated,
         });
     };
@@ -93,9 +93,9 @@ export function updateRankingCacheAfterLikePoemAction({ poemId, context } = {}) 
             return acc;
         }, []);
 
-        const { updateAction } = getTypes(ACTIONS.RANKING);
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING);
         dispatch({
-            type: updateAction,
+            type: fulfilledAction,
             payload: rankingQueryUpdated,
         });
     };
@@ -122,10 +122,39 @@ export function updateAllPoemsCacheAfterLikePoemAction({ poemId, context } = {})
             return acc;
         }, []);
 
-        const { updateAction } = getTypes(ACTIONS.ALL_POEMS);
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS);
         dispatch({
-            type: updateAction,
+            type: fulfilledAction,
             payload: allPoemsQueryUpdated,
+        });
+    };
+}
+
+export function createPoemAction({ poem, context, callbacks = {} }) {
+    return function dispatcher(dispatch) {
+        return postAction({
+            type: ACTIONS.CREATE_POEM,
+            url: `${API_ENDPOINTS.POEMS}`,
+            dispatch,
+            data: poem,
+            callbacks,
+            config: context.config,
+        })
+    };
+}
+
+export function updateAllPoemsCacheAfterCreatePoemAction({ response }) {
+    return function dispatcher(dispatch) {
+        const { allPoemsQuery: { item: allPoemsQuery }  } = store.getState();
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery);
+
+        newAllPoemsQuery.push(response);
+
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS);
+        console.log(newAllPoemsQuery)
+        dispatch({
+            type: fulfilledAction,
+            payload: newAllPoemsQuery,
         });
     };
 }

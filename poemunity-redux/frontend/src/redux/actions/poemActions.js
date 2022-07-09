@@ -43,9 +43,9 @@ export function updatePoemCacheAfterLikePoemAction({ context } = {}) {
             newPoemQuery.likes.push(context.userId);
         }            
 
-        const { updateAction } = getTypes(ACTIONS.POEM);
+        const { fulfilledAction } = getTypes(ACTIONS.POEM);
         dispatch({
-            type: updateAction,
+            type: fulfilledAction,
             payload: newPoemQuery,
         });
     };

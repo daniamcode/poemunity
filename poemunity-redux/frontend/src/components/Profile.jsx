@@ -13,7 +13,6 @@ import '../App.scss'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
 import CircularProgress from './CircularIndeterminate'
-import useCreatePoem from '../react-query/useCreatePoem'
 import useSavePoem from '../react-query/useSavePoem'
 import {
   PROFILE_TITLE,
@@ -35,6 +34,7 @@ import {
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../redux/store';
 import { getPoemAction } from '../redux/actions/poemActions';
+import { createPoemAction, updateAllPoemsCacheAfterCreatePoemAction } from '../redux/actions/poemsActions';
 
 function TabPanel (props) {
   const { children, value, index, ...other } = props
@@ -88,7 +88,6 @@ export default function Profile (props) {
   const [poemLikes, setPoemLikes] = useState([])
 
   // const [errorMessage, setErrorMessage] = useState(null)
-  const createPoemMutation = useCreatePoem()
   const savePoemMutation = useSavePoem()
 
   const context = useContext(AppContext);
@@ -168,7 +167,7 @@ export default function Profile (props) {
 
       if(!context?.elementToEdit) {
         if(context?.userId === context.adminId) {
-          createPoemMutation.mutate({
+          const poem = {
             userId: poemFakeId,
             poem: poemContent,
             title: poemTitle,
@@ -176,16 +175,40 @@ export default function Profile (props) {
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
             origin: poemOrigin
-          });  
+          }
+          dispatch(createPoemAction({
+            poem,
+            context,
+            callbacks: {
+              success: (response) => {
+                dispatch(updateAllPoemsCacheAfterCreatePoemAction({response}));
+              },
+              error: () => {
+                console.log('something went wrong creating a poem!')
+              }
+            }
+          }))
         } else {
-          createPoemMutation.mutate({
+          const poem = {
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: [],
             date: formattedDate,
             origin: 'user'
-          });
+          }
+          dispatch(createPoemAction({
+            poem,
+            context,
+            callbacks: {
+              success: (response) => {
+                dispatch(updateAllPoemsCacheAfterCreatePoemAction({response}));
+              },
+              error: (error) => {
+                console.log('something went wrong creating a poem!')
+              }
+            }
+          }))
         }
         setPoemContent('')
         setPoemTitle('')

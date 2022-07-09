@@ -219,7 +219,7 @@ export function postAction({
     // initialize logic
     if (options.reset) {
         dispatch({ type: resetAction });
-        if (callbacks.reset) {
+        if (callbacks?.reset) {
             callbacks.reset();
         }
     }
@@ -233,12 +233,12 @@ export function postAction({
                 //         payload: response.data,
                 //     });
                 // } else {
-                    dispatch({
-                        type: fulfilledAction,
-                        payload: response.data,
-                    });
+                dispatch({
+                    type: fulfilledAction,
+                    payload: response.data,
+                });
                 // }
-                if (callbacks.success) {
+                if (callbacks?.success) {
                     callbacks.success(response.data);
                 }
             })
@@ -303,7 +303,7 @@ export function putAction({
     options.fetch = options.fetch !== undefined ? options.fetch : true;
     if (options.reset) {
         dispatch({ type: resetAction });
-        if (callbacks.reset) {
+        if (callbacks?.reset) {
             callbacks.reset();
         }
     }
