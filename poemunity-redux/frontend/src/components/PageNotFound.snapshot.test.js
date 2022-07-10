@@ -6,6 +6,9 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "react-query"
+import { Provider } from 'react-redux';
+import store from '../redux/store';
+
 
 function renderPageNotFound (arg) {
   const defaultProps = {
@@ -18,11 +21,13 @@ function renderPageNotFound (arg) {
   const queryClient = new QueryClient();
 
   return renderer.create(
+    <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <PageNotFound {...props} />
       </BrowserRouter>
-  </QueryClientProvider>
+    </QueryClientProvider>
+    </Provider>
   )
 }
 
