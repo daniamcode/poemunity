@@ -10,7 +10,7 @@ export const ACTIONS = {
 
 interface Action {
     type: string
-    payload?: Poem[]
+    payload?: Poem
 }
 
 export function poemQuery(state: StateItem = INITIAL, action: Action) {

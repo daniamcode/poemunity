@@ -56,7 +56,7 @@ describe('Poems reducer - allPoemsQuery', () => {
             item: [poem1, poem2]});
     })
     test('should return correct state with fulfilledAction - with previous state', () => {
-        const prevState =  {isFetching: false, isError: false, item: [{id: 1, title: 'title1'}]}
+        const prevState =  {isFetching: false, isError: false, item: [poem1]}
         const result = poemsReducers.allPoemsQuery(
             prevState, 
             {
@@ -86,6 +86,7 @@ describe('Poems reducer - allPoemsQuery', () => {
             abortController: undefined, 
             isFetching: false, 
             isError: true, 
+            item: undefined,
             err: [poem1, poem2]});
     })
 })

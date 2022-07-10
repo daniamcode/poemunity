@@ -97,7 +97,7 @@ export function getTypes(baseType: string | undefined) {
 interface GetActionProps {
     type: string
     url: string
-    params: object
+    params?: object
     dispatch: AppDispatch
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
@@ -189,7 +189,7 @@ interface PostActionProps {
     data: object
     dispatch: AppDispatch
     options?: ReduxOptions
-    callbacks: ReduxCallbacks
+    callbacks?: ReduxCallbacks
     headers?: object
     config?: object
 }
@@ -273,10 +273,10 @@ export function postAction({
 interface PutActionProps {
     type: string
     url: string
-    data: object
+    data?: object
     dispatch: AppDispatch
     options?: ReduxOptions
-    callbacks: ReduxCallbacks
+    callbacks?: ReduxCallbacks
     config?: object
 }
 

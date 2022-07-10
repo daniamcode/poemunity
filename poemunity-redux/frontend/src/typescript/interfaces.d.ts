@@ -30,7 +30,7 @@ export interface PoemsListQuery {
 export interface StateItem {
   isFetching: boolean
   isError: boolean
-  item?: object[]
+  item?: object[] | object
   abortController?: AbortController;
 }
 
@@ -46,9 +46,9 @@ export interface Context {
 }
 
 export interface ReduxOptions {
-  reset: boolean
-  update: boolean
-  fetch: boolean
+  reset?: boolean
+  update?: boolean
+  fetch?: boolean
   transformResponse?: (response: any) => any
 }
 
