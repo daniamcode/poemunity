@@ -13,6 +13,6 @@ interface Action {
     payload?: Poem
 }
 
-export function poemQuery(state: StateItem = INITIAL, action: Action) {
+export function poemQuery(state: StateItem = INITIAL, action: Action): StateItem {
     return commonReducer({ state, action, actionType: ACTIONS?.POEM });
 }

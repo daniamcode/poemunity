@@ -86,7 +86,6 @@ describe('Poems reducer - allPoemsQuery', () => {
             abortController: undefined, 
             isFetching: false, 
             isError: true, 
-            item: undefined,
             err: [poem1, poem2]});
     })
 })

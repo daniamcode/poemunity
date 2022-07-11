@@ -72,7 +72,7 @@ interface UpdatePoemsListCacheAfterLikePoemActionProps {
 export function updatePoemsListCacheAfterLikePoemAction({ poemId, context }: UpdatePoemsListCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { poemsListQuery: { item: poemsListQuery }  } = store.getState();
-        const newPoemsListQuery = cloneDeep(poemsListQuery);
+        const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[]);
 
         const poemsListQueryUpdated = newPoemsListQuery?.reduce((acc: Poem[], poem: Poem) => {
             let coincidence = poem.id === poemId;
@@ -106,7 +106,7 @@ interface UpdateRankingCacheAfterLikePoemActionProps {
 export function updateRankingCacheAfterLikePoemAction({ poemId, context }: UpdateRankingCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { rankingQuery: { item: rankingQuery }  } = store.getState();
-        const newRankingQuery = cloneDeep(rankingQuery);
+        const newRankingQuery = cloneDeep(rankingQuery as Poem[]);
 
         const rankingQueryUpdated = newRankingQuery?.reduce((acc: Poem[], poem: Poem) => {
             let coincidence = poem.id === poemId;
@@ -140,7 +140,7 @@ interface UpdateAllPoemsCacheAfterLikePoemActionProps {
 export function updateAllPoemsCacheAfterLikePoemAction({ poemId, context }: UpdateAllPoemsCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { allPoemsQuery: { item: allPoemsQuery }  } = store.getState();
-        const newAllPoemsQuery = cloneDeep(allPoemsQuery);
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[]);
 
         const allPoemsQueryUpdated = newAllPoemsQuery?.reduce((acc: Poem[], poem: Poem) => {
             let coincidence = poem.id === poemId;
@@ -191,7 +191,7 @@ interface UpdateAllPoemsCacheAfterCreatePoemActionProps {
 export function updateAllPoemsCacheAfterCreatePoemAction({ response }: UpdateAllPoemsCacheAfterCreatePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { allPoemsQuery: { item: allPoemsQuery }  } = store.getState();
-        const newAllPoemsQuery = cloneDeep(allPoemsQuery);
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[]);
 
         newAllPoemsQuery.push(response);
 

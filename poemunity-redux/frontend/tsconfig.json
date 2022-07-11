@@ -13,7 +13,7 @@
     "downlevelIteration": true,
     "moduleResolution": "node",
     "noEmit": true,
-    "target": "ES6",
+    "target": "esnext",
     "noImplicitAny": true,
     "strict": true,
     "skipLibCheck": true,

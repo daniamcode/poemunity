@@ -3,7 +3,7 @@ import { getAction, getTypes, putAction } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import cloneDeep from 'lodash.clonedeep';
 import { ACTIONS } from '../reducers/poemReducers';
-import { ReduxOptions, ReduxCallbacks, Context } from '../../typescript/interfaces'
+import { ReduxOptions, ReduxCallbacks, Context, Poem } from '../../typescript/interfaces'
 import { AppDispatch} from '../store'
 
 interface getPoemActionProps {
@@ -54,7 +54,7 @@ interface updatePoemCacheAfterLikePoemActionProps {
 export function updatePoemCacheAfterLikePoemAction({ context }: updatePoemCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { poemQuery: { item: poemQuery }  } = store.getState();
-        const newPoemQuery = cloneDeep(poemQuery);
+        const newPoemQuery = cloneDeep(poemQuery as Poem);
 
         const index = newPoemQuery?.likes?.indexOf(context.userId);
         if(index !== -1) {
