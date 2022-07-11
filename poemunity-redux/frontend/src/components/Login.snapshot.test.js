@@ -1,5 +1,5 @@
 import React from 'react'
-import renderer from 'react-test-renderer'
+import { render } from '@testing-library/react';
 import Login from './Login'
 import { BrowserRouter } from 'react-router-dom'
 import {
@@ -20,7 +20,7 @@ function renderLogin (arg) {
   const props = { ...defaultProps, ...arg }
   const queryClient = new QueryClient();
 
-  return renderer.create(
+  return render(
     <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
