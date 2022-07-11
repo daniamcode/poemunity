@@ -1,4 +1,3 @@
-import React from 'react'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
@@ -7,14 +6,15 @@ import Accordion from './SimpleAccordion'
 import Ranking from './Ranking'
 import List from './List'
 
-function Dashboard (props) {
+
+function Dashboard () {
   return (
     <main className='dashboard'>
       <div className='dashboard__accordion'>
         <Accordion />
       </div>
       <div className='dashboard__list'>
-        <List {...props} />
+        <List />
       </div>
       <div className='dashboard__ranking'>
         <Ranking />
