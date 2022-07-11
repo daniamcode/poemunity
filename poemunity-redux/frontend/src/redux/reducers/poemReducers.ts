@@ -1,6 +1,5 @@
-import { Poem } from '../../typescript/interfaces';
+import { Poem, StateItem } from '../../typescript/interfaces';
 import { commonReducer, INITIAL } from './commonReducers';
-import {StateItem} from '../../typescript/interfaces'
 
 
 export const ACTIONS = {
@@ -13,6 +12,6 @@ interface Action {
     payload?: Poem
 }
 
-export function poemQuery(state: StateItem = INITIAL, action: Action): StateItem {
+export function poemQuery(state: StateItem<Poem> = INITIAL, action: Action): StateItem<Poem> {
     return commonReducer({ state, action, actionType: ACTIONS?.POEM });
 }

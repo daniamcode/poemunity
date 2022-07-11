@@ -2,10 +2,10 @@ import { getTypes } from '../actions/commonActions';
 import {StateItem} from '../../typescript/interfaces'
 
 
-export const INITIAL: StateItem = { isFetching: false, isError: false };
+export const INITIAL: StateItem<any> = { isFetching: false, isError: false };
 
 interface CommonReducerProps {
-    state: StateItem
+    state: StateItem<unknown>
     action: {
         type: string
         payload?: object[] | object

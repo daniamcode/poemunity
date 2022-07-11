@@ -12,10 +12,10 @@ interface Action {
     payload?: object[]
 }
 
-export function loginQuery(state: StateItem = INITIAL, action: Action): StateItem {
+export function loginQuery(state: StateItem<any> = INITIAL, action: Action): StateItem<any> {
     return commonReducer({ state, action, actionType: ACTIONS?.LOGIN} );
 }
 
-export function registerQuery(state: StateItem = INITIAL, action: Action): StateItem {
+export function registerQuery(state: StateItem<any> = INITIAL, action: Action): StateItem<any> {
     return commonReducer({ state, action, actionType: ACTIONS?.REGISTER} );
 }
