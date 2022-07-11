@@ -1,242 +1,462 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Header should match without id 1`] = `
-<section
-  className="header"
->
-  <div
-    className="header__dropdown"
-  >
-    <div
-      className="MuiPaper-root MuiAccordion-root accordion MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded"
-    >
-      <div
-        aria-controls="panel1a-content"
-        aria-disabled={false}
-        aria-expanded={false}
-        className="MuiButtonBase-root MuiAccordionSummary-root"
-        id="panel1a-header"
-        onBlur={[Function]}
-        onClick={[Function]}
-        onDragLeave={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onKeyUp={[Function]}
-        onMouseDown={[Function]}
-        onMouseLeave={[Function]}
-        onMouseUp={[Function]}
-        onTouchEnd={[Function]}
-        onTouchMove={[Function]}
-        onTouchStart={[Function]}
-        role="button"
-        tabIndex={0}
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <section
+        class="header"
       >
         <div
-          className="MuiAccordionSummary-content"
+          class="header__dropdown"
         >
           <div
-            className="header__dropdown-categories-icon"
-          />
-          <p
-            className="header__dropdown-categories"
-          >
-            Categories
-          </p>
-        </div>
-        <div
-          aria-disabled={false}
-          aria-hidden={true}
-          className="MuiButtonBase-root MuiIconButton-root MuiAccordionSummary-expandIcon MuiIconButton-edgeEnd"
-          onBlur={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          role={null}
-          tabIndex={null}
-        >
-          <span
-            className="MuiIconButton-label"
-          >
-            <svg
-              aria-hidden={true}
-              className="MuiSvgIcon-root"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
-              />
-            </svg>
-          </span>
-        </div>
-      </div>
-      <div
-        className="MuiCollapse-root MuiCollapse-hidden"
-        style={
-          Object {
-            "minHeight": "0px",
-          }
-        }
-      >
-        <div
-          className="MuiCollapse-wrapper"
-        >
-          <div
-            className="MuiCollapse-wrapperInner"
+            class="MuiPaper-root MuiAccordion-root accordion MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded"
           >
             <div
-              aria-labelledby="panel1a-header"
-              id="panel1a-content"
-              role="region"
+              aria-controls="panel1a-content"
+              aria-disabled="false"
+              aria-expanded="false"
+              class="MuiButtonBase-root MuiAccordionSummary-root"
+              id="panel1a-header"
+              role="button"
+              tabindex="0"
             >
-              <div>
+              <div
+                class="MuiAccordionSummary-content"
+              >
                 <div
-                  className="MuiAccordionDetails-root"
+                  class="header__dropdown-categories-icon"
+                />
+                <p
+                  class="header__dropdown-categories"
                 >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/anniversary"
-                    onClick={[Function]}
-                  >
-                    Anniversary
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/friendship"
-                    onClick={[Function]}
-                  >
-                    Friendship
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/funny"
-                    onClick={[Function]}
-                  >
-                    Funny
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/haikus"
-                    onClick={[Function]}
-                  >
-                    Haikus
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/hope"
-                    onClick={[Function]}
-                  >
-                    Hope
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/life"
-                    onClick={[Function]}
-                  >
-                    Life
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/love"
-                    onClick={[Function]}
-                  >
-                    Love
-                  </a>
-                </div>
-                <div
-                  className="MuiAccordionDetails-root"
-                >
-                  <a
-                    className="header__dropdown-subcategories"
-                    href="/sad"
-                    onClick={[Function]}
-                  >
-                    Sad
-                  </a>
-                </div>
+                  Categories
+                </p>
               </div>
               <div
-                className="MuiAccordionDetails-root"
+                aria-disabled="false"
+                aria-hidden="true"
+                class="MuiButtonBase-root MuiIconButton-root MuiAccordionSummary-expandIcon MuiIconButton-edgeEnd"
               >
-                <a
-                  className="header__dropdown-subcategories"
-                  href="/"
-                  onClick={[Function]}
+                <span
+                  class="MuiIconButton-label"
                 >
-                  All
-                </a>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+                    />
+                  </svg>
+                </span>
+                <span
+                  class="MuiTouchRipple-root"
+                />
+              </div>
+            </div>
+            <div
+              class="MuiCollapse-root MuiCollapse-hidden"
+              style="min-height: 0px;"
+            >
+              <div
+                class="MuiCollapse-wrapper"
+              >
+                <div
+                  class="MuiCollapse-wrapperInner"
+                >
+                  <div
+                    aria-labelledby="panel1a-header"
+                    id="panel1a-content"
+                    role="region"
+                  >
+                    <div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/anniversary"
+                        >
+                          Anniversary
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/friendship"
+                        >
+                          Friendship
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/funny"
+                        >
+                          Funny
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/haikus"
+                        >
+                          Haikus
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/hope"
+                        >
+                          Hope
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/life"
+                        >
+                          Life
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/love"
+                        >
+                          Love
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/sad"
+                        >
+                          Sad
+                        </a>
+                      </div>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/"
+                      >
+                        All
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="header__logo"
+        >
+          <a
+            class="header__text-logo-first"
+            href="/"
+          >
+            P
+          </a>
+          <a
+            class="header__logo-icon"
+            href="/"
+          />
+          <a
+            class="header__text-logo-second"
+            href="/"
+          >
+            emunity
+          </a>
+        </div>
+        <p
+          class="list__presentation"
+        >
+          Your poem community!!!
+        </p>
+        <div
+          class="separator"
+        />
+        <button
+          class="header__login"
+        />
+      </section>
+    </div>
+  </body>,
+  "container": <div>
+    <section
+      class="header"
+    >
+      <div
+        class="header__dropdown"
+      >
+        <div
+          class="MuiPaper-root MuiAccordion-root accordion MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded"
+        >
+          <div
+            aria-controls="panel1a-content"
+            aria-disabled="false"
+            aria-expanded="false"
+            class="MuiButtonBase-root MuiAccordionSummary-root"
+            id="panel1a-header"
+            role="button"
+            tabindex="0"
+          >
+            <div
+              class="MuiAccordionSummary-content"
+            >
+              <div
+                class="header__dropdown-categories-icon"
+              />
+              <p
+                class="header__dropdown-categories"
+              >
+                Categories
+              </p>
+            </div>
+            <div
+              aria-disabled="false"
+              aria-hidden="true"
+              class="MuiButtonBase-root MuiIconButton-root MuiAccordionSummary-expandIcon MuiIconButton-edgeEnd"
+            >
+              <span
+                class="MuiIconButton-label"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+                  />
+                </svg>
+              </span>
+              <span
+                class="MuiTouchRipple-root"
+              />
+            </div>
+          </div>
+          <div
+            class="MuiCollapse-root MuiCollapse-hidden"
+            style="min-height: 0px;"
+          >
+            <div
+              class="MuiCollapse-wrapper"
+            >
+              <div
+                class="MuiCollapse-wrapperInner"
+              >
+                <div
+                  aria-labelledby="panel1a-header"
+                  id="panel1a-content"
+                  role="region"
+                >
+                  <div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/anniversary"
+                      >
+                        Anniversary
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/friendship"
+                      >
+                        Friendship
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/funny"
+                      >
+                        Funny
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/haikus"
+                      >
+                        Haikus
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/hope"
+                      >
+                        Hope
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/life"
+                      >
+                        Life
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/love"
+                      >
+                        Love
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/sad"
+                      >
+                        Sad
+                      </a>
+                    </div>
+                  </div>
+                  <div
+                    class="MuiAccordionDetails-root"
+                  >
+                    <a
+                      class="header__dropdown-subcategories"
+                      href="/"
+                    >
+                      All
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div
-    className="header__logo"
-  >
-    <a
-      className="header__text-logo-first"
-      href="/"
-      onClick={[Function]}
-    >
-      P
-    </a>
-    <a
-      className="header__logo-icon"
-      href="/"
-      onClick={[Function]}
-    />
-    <a
-      className="header__text-logo-second"
-      href="/"
-      onClick={[Function]}
-    >
-      emunity
-    </a>
-  </div>
-  <p
-    className="list__presentation"
-  >
-    Your poem community!!!
-  </p>
-  <div
-    className="separator"
-  />
-  <button
-    className="header__login"
-    onClick={[Function]}
-  />
-</section>
+      <div
+        class="header__logo"
+      >
+        <a
+          class="header__text-logo-first"
+          href="/"
+        >
+          P
+        </a>
+        <a
+          class="header__logo-icon"
+          href="/"
+        />
+        <a
+          class="header__text-logo-second"
+          href="/"
+        >
+          emunity
+        </a>
+      </div>
+      <p
+        class="list__presentation"
+      >
+        Your poem community!!!
+      </p>
+      <div
+        class="separator"
+      />
+      <button
+        class="header__login"
+      />
+    </section>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
 `;
