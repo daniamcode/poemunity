@@ -1,5 +1,4 @@
-import renderer from 'react-test-renderer'
-import React from 'react'
+import { render } from '@testing-library/react';
 import App from './App'
 import {
   QueryClient,
@@ -12,7 +11,7 @@ import store from './redux/store';
 describe('App snapshot', () => {
   const queryClient = new QueryClient();
 
-  const tree = renderer.create(
+  const tree = render(
     <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <App />
@@ -21,6 +20,6 @@ describe('App snapshot', () => {
   )
 
   test('should match', () => {
-    expect(tree.toJSON()).toMatchSnapshot()
+    expect(tree.asFragment()).toMatchSnapshot()
   })
 })

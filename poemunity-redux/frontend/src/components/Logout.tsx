@@ -9,7 +9,7 @@ const Logout = () => {
  
   const handleLogout = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
-    context.setState({...context, user: null })
+    context.setState({...context, user: '' })
     window.localStorage.removeItem('loggedUser')
     history.push('/')
   }

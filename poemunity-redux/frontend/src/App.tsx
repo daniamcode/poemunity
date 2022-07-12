@@ -8,24 +8,35 @@ import Profile from './components/Profile'
 import Login from './components/Login'
 import Register from './components/Register'
 import PageNotFound from './components/PageNotFound'
+import { Context } from './typescript/interfaces'
 
-export const AppContext = React.createContext();
-
-function App (props) {
-  const [contextState, setContextState] = useState({
+export const AppContext = React.createContext<Context>({
     elementToEdit: '',
-    user: null,
+    user: '',
     userId: '',
     username: '',
     picture: '',
     config: {},
-    adminId: process.env.REACT_APP_ADMIN,
-    setState(data) {
-        const { setState, ...res } = data;
-        const newState = { ...contextState, ...res };
-        setContextState(newState);
+    adminId: '',
+    setState: () => {},
+})
+
+function App () {
+  const [contextState, setContextState] = useState({
+    elementToEdit: '',
+    user: '',
+    userId: '',
+    username: '',
+    picture: '',
+    config: {},
+    adminId: process.env.REACT_APP_ADMIN ?? '',
+    setState(data: Context) {
+      const { setState, ...res } = data;
+      const newState = { ...contextState, ...res };
+      setContextState(newState);
     },
   });
+
   return (
     <AppContext.Provider value={contextState}>
       <Router>
