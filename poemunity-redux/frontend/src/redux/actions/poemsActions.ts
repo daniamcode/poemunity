@@ -27,7 +27,7 @@ export function getAllPoemsAction({ params, options, callbacks }: GetAllPoemsAct
 }
 
 interface GetPoemsListActionProps {
-    params?: object
+    params?: object | null
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
 }

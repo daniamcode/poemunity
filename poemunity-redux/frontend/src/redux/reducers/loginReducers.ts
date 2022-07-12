@@ -1,5 +1,5 @@
 import { commonReducer, INITIAL } from './commonReducers';
-import {StateItem} from '../../typescript/interfaces'
+import {StateItem, User} from '../../typescript/interfaces'
 
 
 export const ACTIONS = {
@@ -12,10 +12,10 @@ interface Action {
     payload?: object[]
 }
 
-export function loginQuery(state: StateItem<any> = INITIAL, action: Action): StateItem<any> {
+export function loginQuery(state: StateItem<string> = INITIAL, action: Action): StateItem<string> {
     return commonReducer({ state, action, actionType: ACTIONS?.LOGIN} );
 }
 
-export function registerQuery(state: StateItem<any> = INITIAL, action: Action): StateItem<any> {
+export function registerQuery(state: StateItem<User> = INITIAL, action: Action): StateItem<User> {
     return commonReducer({ state, action, actionType: ACTIONS?.REGISTER} );
 }

@@ -97,7 +97,7 @@ export function getTypes(baseType: string | undefined) {
 interface GetActionProps {
     type: string
     url: string
-    params?: object
+    params?: unknown
     dispatch: AppDispatch
     options?: ReduxOptions
     callbacks?: ReduxCallbacks

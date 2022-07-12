@@ -26,23 +26,19 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../redux/store'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
 import { Poem } from '../typescript/interfaces'
+import { RouteComponentProps } from 'react-router';
 
 
-
-interface ListProps {
-  match: {
-    params: {
-      genre: string
-    }
-  }
+interface MatchParams {
+  genre: string;
 }
 
-function List (props: ListProps) {
+function List (props: Partial<RouteComponentProps<MatchParams>>) {
   interface ListStates {
     poems: Poem[]
     filter: string
   }
-  const genre = props.match.params.genre
+  const genre = props?.match?.params?.genre
   const [poems, setPoems] = useState<ListStates["poems"]>([])
   const [filter, setFilter] = useState<ListStates["filter"]>('')
 
@@ -67,7 +63,6 @@ function List (props: ListProps) {
     };
     dispatch(getPoemsListAction({
         options: queryOptions,
-        params: {}
     }));
   }, []);
 
@@ -89,8 +84,8 @@ function List (props: ListProps) {
   }, [JSON.stringify(paramsData.origin)]);
 
   useEffect(() => {
-    if (poemsListQuery && poemsListQuery.item && poemsListQuery.item.length > 0) {
-      const newData = [...poemsListQuery.item]
+    if (poemsListQuery && poemsListQuery?.item && poemsListQuery?.item?.length > 0) {
+      const newData = [...poemsListQuery?.item]
 
       if (genre) {
         const poemsFiltered = newData.filter((poems) => poems.genre === genre)

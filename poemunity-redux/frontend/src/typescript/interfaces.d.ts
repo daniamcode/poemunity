@@ -10,23 +10,13 @@ export interface Poem {
   userId: string
 }
 
-// export interface PoemQuery {
-//   isFetching: boolean
-//   isError: boolean
-//   item?: Poem
-//   abortController?: AbortController;
-// }
-
-// export interface PoemsListQuery {
-//   isFetching: boolean
-//   isError: boolean
-//   item?: Poem[]
-// }
-
-// export interface RootState {
-//   poemQuery: PoemQuery
-//   poemsListQuery: PoemsListQuery
-// }
+export interface User {
+  id: string
+  username: string
+  email: string,
+  picture: string,
+  poems: Poem[]
+}
 
 export interface StateItem<T> {
   isFetching: boolean
@@ -37,17 +27,6 @@ export interface StateItem<T> {
   // another option is to use generic T
   item?: T
   abortController?: AbortController;
-}
-
-export interface Context {
-  elementToEdit: string
-  user: string
-  userId: string
-  username: string
-  picture: string
-  config: object,
-  adminId: string
-  setState: (state: Context) => void
 }
 
 export interface ReduxOptions {
@@ -61,4 +40,15 @@ export interface ReduxCallbacks {
   success?: (response: any) => void
   error?: (error: any) => void
   reset?: () => void
+}
+
+export interface Context {
+  elementToEdit: string
+  user: string
+  userId: string
+  username: string
+  picture: string
+  config: object,
+  adminId: string
+  setState: (state: Context) => void
 }
