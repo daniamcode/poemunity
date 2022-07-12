@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -8,7 +8,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import './Ranking.scss'
-import { getRanking } from '../utils/getRanking.js'
+import { getRanking } from '../utils/getRanking'
 import CircularProgress from './CircularIndeterminate'
 import {
   RANKING_TITLE,
@@ -19,8 +19,10 @@ import {
   LIKE_POINTS,
 } from '../data/constants'
 import { useSelector } from 'react-redux'
-import { useAppDispatch } from '../redux/store';
+import { useAppDispatch, RootState } from '../redux/store';
 import { getRankingAction } from '../redux/actions/poemsActions'
+import { Poem } from '../typescript/interfaces'
+
 
 const useStyles = makeStyles({
   table: {
@@ -29,30 +31,32 @@ const useStyles = makeStyles({
 })
 
 export default function Ranking () {
+  interface RankingStates {
+    poems: Poem[]
+    rank: object
+  }
   const classes = useStyles()
 
-  const [poems, setPoems] = useState([])
+  const [poems, setPoems] = useState<RankingStates["poems"]>([])
 
-  const [rank, setRank] = useState(
-    getRanking(null)
-  )
+  const [rank, setRank] = useState<RankingStates["rank"]>({})
 
   // Redux
   const dispatch = useAppDispatch();
 
   const {
-      rankingQuery,
-  } = useSelector(state => state);
+      rankingQuery
+  } = useSelector((state: RootState) => state);
 
   useEffect(() => {
       dispatch(getRankingAction({params: {origin: 'user'}}))
   }, []);
 
   useEffect(()=> {
-    if(rankingQuery.item) {
-      setPoems(rankingQuery.item)
+    if(rankingQuery?.item) {
+      setPoems(rankingQuery?.item)
     }
-  }, [JSON.stringify(rankingQuery.item)])
+  }, [JSON.stringify(rankingQuery?.item)])
 
   useEffect(()=> {
     if(poems) {
@@ -88,15 +92,15 @@ export default function Ranking () {
                   <div className='ranking__picture-wrap'>
                     <img
                       className='ranking__picture'
-                      src={rank[element].picture}
+                      src={rank[element]?.picture}
                     />
                     <p className='ranking__picture-description'>
-                      {rank[element].author}
+                      {rank[element]?.author}
                     </p>
                   </div>
                 </TableCell>
                 <TableCell className='ranking__number' align='center'>
-                  {rank[element].points}
+                  {rank[element]?.points}
                 </TableCell>
               </TableRow>
             ))}
