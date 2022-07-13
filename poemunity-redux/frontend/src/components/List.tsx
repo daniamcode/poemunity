@@ -170,11 +170,12 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
                 id='sort'
                 name='sort'
                 onChange={handleOrderChange}
+                data-testid='order-select'
               >
-                <option value={ORDER_BY_LIKES} selected={ORDER_BY_LIKES === paramsData.orderBy}>{ORDER_BY_LIKES}</option>
-                <option value={ORDER_BY_DATE} selected={ORDER_BY_DATE === paramsData.orderBy}>{ORDER_BY_DATE}</option>
-                <option value={ORDER_BY_RANDOM} selected={ORDER_BY_RANDOM === paramsData.orderBy}>{ORDER_BY_RANDOM}</option>
-                <option value={ORDER_BY_TITLE} selected={ORDER_BY_TITLE === paramsData.orderBy}>{ORDER_BY_TITLE}</option>
+                <option value={ORDER_BY_LIKES} data-testid='select-option' selected={ORDER_BY_LIKES === paramsData.orderBy}>{ORDER_BY_LIKES}</option>
+                <option value={ORDER_BY_DATE} data-testid='select-option' selected={ORDER_BY_DATE === paramsData.orderBy}>{ORDER_BY_DATE}</option>
+                <option value={ORDER_BY_RANDOM} data-testid='select-option' selected={ORDER_BY_RANDOM === paramsData.orderBy}>{ORDER_BY_RANDOM}</option>
+                <option value={ORDER_BY_TITLE} data-testid='select-option' selected={ORDER_BY_TITLE === paramsData.orderBy}>{ORDER_BY_TITLE}</option>
               </select>
             </label>
           </form>

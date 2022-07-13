@@ -16,10 +16,12 @@ jest.mock("axios", () => ({
 
 describe('dispatch getAllPoemsAction', () => {
     let dispatch: AppDispatch;
-    beforeAll(() => {
+    beforeEach(() => {
         dispatch = jest.fn();
     });    
-    afterAll(() => {
+    afterEach(() => {
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         (dispatch as jest.Mock).mockClear();
     });
 
