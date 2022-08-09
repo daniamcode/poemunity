@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import * as Redux from 'react-redux'
 import { ORDER_BY_RANDOM } from '../data/constants'
 
-
+// we cannot mock the whole react-redux; we need the store, so we require everyting except useSelector
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
     useSelector: jest.fn(),
@@ -17,7 +17,7 @@ describe('List', () => {
         poemsListQuery: { isFetching: false }
     };
     beforeEach(() => {
-        Redux.useSelector.mockImplementation((callback) => {
+        (Redux.useSelector as jest.Mock).mockImplementation((callback) => {
             return callback(mockedState);
         });
     });
@@ -28,7 +28,7 @@ describe('List', () => {
             </Provider>
         );
         
-        const options = screen.getAllByTestId('select-option')
+        const options = screen.getAllByTestId('select-option') as HTMLOptionElement[];
         
         act(() => {
             // random is the third option
