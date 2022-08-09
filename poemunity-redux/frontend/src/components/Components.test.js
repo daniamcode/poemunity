@@ -38,9 +38,7 @@ describe('Ranking component', () => {
   test('also renders with shallow', () => {
     const wrapper = shallow(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <Ranking />
-    </QueryClientProvider>
     </Provider>
     )
     expect(wrapper).not.toBeNull()
@@ -53,9 +51,7 @@ describe('MyPoems component', () => {
   beforeEach(() => {
     wrapper = mount(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <MyPoems />
-    </QueryClientProvider>
     </Provider>
     )
   })
@@ -70,9 +66,7 @@ describe('MyFavouritePoems component', () => {
   beforeEach(() => {
     wrapper = mount(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <MyFavouritePoems />
-    </QueryClientProvider>
     </Provider>
     )
   })
@@ -88,11 +82,9 @@ describe('Login component', () => {
   const wrapperFactory = () => {
     return ({ children }) => (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
         <Router>
           {children}
         </Router>
-      </QueryClientProvider>
     </Provider>
     );
   };
@@ -131,9 +123,7 @@ describe('Logout component', () => {
   beforeEach(() => {
     wrapper = mount(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <Logout />
-    </QueryClientProvider>
     </Provider>
     )
   })
@@ -148,9 +138,7 @@ describe('Profile component', () => {
   beforeEach(() => {
     wrapper = mount(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <Profile />
-    </QueryClientProvider>
     </Provider>
     )
   })
@@ -166,11 +154,9 @@ describe('Header component', () => {
   beforeEach(() => {
     wrapper = mount(
     <Provider store={store}>
-      <QueryClientProvider client={queryClient} >
         <Router history={history}>
           <Header />
         </Router>
-      </QueryClientProvider>
     </Provider>
     )
   })
