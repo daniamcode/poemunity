@@ -260,3 +260,27 @@ export function updateRankingCacheAfterDeletePoemAction({ poemId }: UpdateRankin
         });
     };
 }
+
+interface updateAllPoemsCacheAfterSavePoemActionProps {
+    poem: Poem
+    poemId: string
+}
+
+export function updateAllPoemsCacheAfterSavePoemAction({ poem, poemId }: updateAllPoemsCacheAfterSavePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { allPoemsQuery: { item: allPoemsQuery }  } = store.getState();
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[]);
+
+        // todo: refactor with a reduce
+        const allPoemsQueryUpdated = newAllPoemsQuery?.filter(poem=> poem.id !== poemId);
+        const poemToUpdate = newAllPoemsQuery?.find(poem=> poem.id === poemId);
+        const poemUpdated = {...poemToUpdate, ...poem};
+        allPoemsQueryUpdated.push(poemUpdated);
+
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS);
+        dispatch({
+            type: fulfilledAction,
+            payload: allPoemsQueryUpdated,
+        });
+    };
+}

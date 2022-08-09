@@ -1,10 +1,6 @@
 import { render } from '@testing-library/react';
 import Detail from './Detail'
 import { BrowserRouter } from 'react-router-dom'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "react-query"
 import { Provider } from 'react-redux';
 import store from '../redux/store';
 
@@ -19,15 +15,12 @@ function renderDetail(arg?: object) {
   }
 
   const props = { ...defaultProps, ...arg }
-  const queryClient = new QueryClient();
 
   return render(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Detail {...props} />
       </BrowserRouter>
-    </QueryClientProvider>
     </Provider>
   )
 }

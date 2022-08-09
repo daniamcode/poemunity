@@ -1,5 +1,5 @@
 import store from '../store';
-import { getAction, getTypes, putAction, deleteAction } from './commonActions';
+import { getAction, getTypes, putAction, patchAction, deleteAction } from './commonActions';
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS';
 import cloneDeep from 'lodash.clonedeep';
 import { ACTIONS } from '../reducers/poemReducers';
@@ -87,6 +87,31 @@ export function deletePoemAction({ params, context, options, callbacks }: delete
             url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
             // context.config is basically the jwt token
             config: context.config,
+            dispatch,
+            options,
+            callbacks,
+        });
+    };
+}
+
+interface savePoemActionProps {
+    params: {
+        poemId: string
+    },
+    data: Poem
+    context: Context
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
+}
+
+export function savePoemAction({ params, context, data, options, callbacks }: savePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        return patchAction({
+            type: ACTIONS.SAVE_POEM,
+            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            // context.config is basically the jwt token
+            config: context.config,
+            data,
             dispatch,
             options,
             callbacks,

@@ -432,3 +432,79 @@ export function deleteAction({
             });
     }
 }
+
+interface PatchActionProps {
+    type: string
+    url: string
+    data?: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    config?: object
+}
+
+export function patchAction({
+    type, 
+    url, 
+    data, 
+    dispatch, 
+    options = { reset: false, update: false, fetch: true },
+    callbacks, 
+    // in config we pass the jwt
+    config
+}: PatchActionProps) {
+    // console.log('listingAction type : ' + type);
+    const {
+        requestAction,
+        fulfilledAction,
+        rejectedAction,
+        resetAction,
+    } = getTypes(type);
+
+    options.reset = options.reset !== undefined ? options.reset : false;
+    options.update = options.update !== undefined ? options.update : false;
+    options.fetch = options.fetch !== undefined ? options.fetch : true;
+    if (options.reset) {
+        dispatch({ type: resetAction });
+        if (callbacks?.reset) {
+            callbacks.reset();
+        }
+    }
+    dispatch({ type: requestAction });
+    API().patch(url, data, config)
+        .then((response) => {
+            dispatch({
+                type: fulfilledAction,
+                payload: response.data,
+            });
+
+            if (callbacks?.success) {
+                callbacks.success(response.data);
+            }
+        })
+        .catch((error) => {
+            dispatch({
+                type: rejectedAction,
+                payload: error?.response?.data || error,
+            });
+            manageError(error);
+            if (callbacks?.error) {
+                callbacks.error(error?.response?.data || error);
+            }
+            // manageError(error, () => {
+            //     if (callbacks.error) {
+            //         callbacks.error(error?.response?.data || error);
+            //     }
+            // });
+            // actionTrackError({
+            //     logLevel: LogLevels.INFO,
+            //     extraData: {
+            //         type,
+            //         url,
+            //         data,
+            //         options,
+            //     },
+            //     error,
+            // });
+        });
+}

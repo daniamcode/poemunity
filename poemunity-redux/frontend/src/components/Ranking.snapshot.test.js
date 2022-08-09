@@ -2,10 +2,6 @@ import React from 'react'
 import { render } from '@testing-library/react';
 import Ranking from './Ranking'
 import { BrowserRouter } from 'react-router-dom'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "react-query"
 import store from '../redux/store';
 import { Provider } from 'react-redux';
 
@@ -17,15 +13,12 @@ function renderRanking (arg) {
   }
 
   const props = { ...defaultProps, ...arg }
-  const queryClient = new QueryClient();
 
   return render(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Ranking {...props} />
       </BrowserRouter>
-    </QueryClientProvider>
     </Provider>
   )
 }

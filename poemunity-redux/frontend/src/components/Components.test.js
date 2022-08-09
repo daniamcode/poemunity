@@ -16,24 +16,15 @@ import { manageSuccess } from '../utils/notifications';
 import store from '../redux/store';
 import { Provider } from 'react-redux';
 
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "react-query"
-
-const queryClient = new QueryClient();
 
 // these mocks seem to have to be defined before the "describe"
 jest.mock('../utils/notifications');
-
 
 describe('Ranking component', () => {
   test('renders with mount', async () => {
     const wrapper = mount(
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
       <Ranking />
-    </QueryClientProvider>
     </Provider>
     )
     expect(wrapper).not.toBeNull()

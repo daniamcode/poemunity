@@ -13,7 +13,6 @@ import '../App.scss'
 import MyPoems from './MyPoems'
 import MyFavouritePoems from './MyFavouritePoems'
 import CircularProgress from './CircularIndeterminate'
-import useSavePoem from '../react-query/useSavePoem'
 import {
   PROFILE_TITLE,
   PROFILE_SUBTITLE_CREATE,
@@ -33,8 +32,9 @@ import {
 } from '../data/constants'
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../redux/store';
-import { getPoemAction } from '../redux/actions/poemActions';
-import { createPoemAction, updateAllPoemsCacheAfterCreatePoemAction } from '../redux/actions/poemsActions';
+import { getPoemAction, savePoemAction } from '../redux/actions/poemActions';
+import { createPoemAction, updateAllPoemsCacheAfterCreatePoemAction, updateAllPoemsCacheAfterSavePoemAction } from '../redux/actions/poemsActions';
+import { manageError, manageSuccess } from '../utils/notifications';
 
 function TabPanel (props) {
   const { children, value, index, ...other } = props
@@ -88,9 +88,28 @@ export default function Profile (props) {
   const [poemLikes, setPoemLikes] = useState([])
 
   // const [errorMessage, setErrorMessage] = useState(null)
-  const savePoemMutation = useSavePoem()
 
   const context = useContext(AppContext);
+
+  function onSave ({event, poem, poemId}) {
+    event.preventDefault()
+    dispatch(savePoemAction({
+      params: { poemId }, 
+      context,
+      data: poem,
+      callbacks: {
+        success: () => {
+          // todo: when I update this cache, it has effects on many queries. 
+          // Maybe I need some optimisation, in the frontend or in the backend
+          dispatch(updateAllPoemsCacheAfterSavePoemAction({poem, poemId}))
+          manageSuccess('Poem saved')
+        },
+        error: () => {
+          manageError('Sorry. There was an error saving the poem')
+        }
+      }
+    }))
+  }
 
   // Redux
   const dispatch = useAppDispatch();
@@ -216,23 +235,31 @@ export default function Profile (props) {
         setPoemCategory('')
       } else {
         if(context?.userId === context.adminId) {
-          savePoemMutation.mutate({poem: {
-            userId: poemFakeId,
-            poem: poemContent,
-            title: poemTitle,
-            genre: poemCategory,
-            likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
-            date: formattedDate,
-            origin: poemOrigin,
-          }, poemId: poemQuery.item.id});  
+          onSave({
+            event, 
+            poem: 
+              {
+                userId: poemFakeId,
+                poem: poemContent,
+                title: poemTitle,
+                genre: poemCategory,
+                likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+                date: formattedDate,
+                origin: poemOrigin,
+              }, 
+            poemId: poemQuery.item.id});  
         } else {
-          savePoemMutation.mutate({poem: {
-            poem: poemContent,
-            title: poemTitle,
-            genre: poemCategory,
-            likes: [],
-            date: formattedDate,
-          }, poemId: poemQuery.item.id});
+          onSave({
+            event,
+            poem: 
+            {
+              poem: poemContent,
+              title: poemTitle,
+              genre: poemCategory,
+              likes: [],
+              date: formattedDate,
+            },
+            poemId: poemQuery.item.id});
         }
         context.setState({...context, elementToEdit: ''})
       }

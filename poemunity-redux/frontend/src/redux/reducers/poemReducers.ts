@@ -5,6 +5,7 @@ import { commonReducer, INITIAL } from './commonReducers';
 export const ACTIONS = {
     POEM: 'poem',
     LIKE_POEM: 'like-poem',
+    SAVE_POEM: 'save-poem',
     DELETE_POEM: 'delete-poem',
 };
 

@@ -4,14 +4,8 @@ import { Provider } from 'react-redux';
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
 import store from './redux/store';
 
-const queryClient = new QueryClient();
 // export const store = configureStore();
 
 console.log(`Environment is: ${process.env.NODE_ENV}`);
@@ -22,10 +16,7 @@ if(root) {
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
           <App />
-      <ReactQueryDevtools />
-      </QueryClientProvider>
       </Provider>
     </React.StrictMode>,
     root
