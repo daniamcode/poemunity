@@ -2,9 +2,9 @@
 
 This App is online at https://poemunity.com 
 
-I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS
+I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS.
 
-I made the frontend with React, and the backend with Node.js
+I made the frontend with React, and the backend with Node.js. I keep adding Typescript and Testing with Jest and React Testing Library.
 
 There are three folders: flux, Poemunity-React-Query and poemunity-redux (this last one is the only one valid right now). 
 
