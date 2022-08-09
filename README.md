@@ -31,7 +31,7 @@ My final Project was **Poemunity**, a social poetry website made in 2,5 weeks wi
 Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
 
 ## React-Query
-Then, I created the Poemunity-React-Query folder and continued from there, managing Server State (cache) with Poemunity-React-Query and Client State with useContext (a Global State Manager like Flux or Redux is not needed anymore with this approach since we divide it into these two differenciated parts (Server State (asynchronous) and Client State)). By the way, a middleware like Thunk manages asynchrony for Redux, and all that becomes transparent to me with React Query.
+Then, I created the Poemunity-React-Query folder and continued from there, managing Server State (cache) with React-Query and Client State with useContext (a Global State Manager like Flux or Redux is not needed anymore with this approach since we divide it into these two differenciated parts (Server State (asynchronous) and Client State)). By the way, a middleware like Thunk manages asynchrony for Redux, and all that becomes transparent to me with React Query.
 
 ## Redux
-Finally, I implemented Redux. The other two folders (Flux and React-Query) are now deprecated.
+Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
