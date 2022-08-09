@@ -345,3 +345,90 @@ export function putAction({
             // });
         });
 }
+
+interface DeleteActionProps {
+    type: string
+    url: string
+    data?: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    headers?: object
+    config?: object
+}
+
+export function deleteAction({
+    type,
+    url,
+    data,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    headers,
+    config,
+}: DeleteActionProps) {
+    const {
+        requestAction,
+        fulfilledAction,
+        rejectedAction,
+        resetAction,
+        // updateAction,
+    } = getTypes(type);
+    // default data
+    options.reset = options.reset !== undefined ? options.reset : false;
+    options.update = options.update !== undefined ? options.update : false;
+    options.fetch = options.fetch !== undefined ? options.fetch : true;
+
+    // initialize logic
+    if (options.reset) {
+        dispatch({ type: resetAction });
+        if (callbacks?.reset) {
+            callbacks.reset();
+        }
+    }
+    if (options.fetch) {
+        dispatch({ type: requestAction });
+        API(headers, config).delete(url, data)
+            .then((response) => {
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: response.data,
+                //     });
+                // } else {
+                dispatch({
+                    type: fulfilledAction,
+                    payload: response.data,
+                });
+                // }
+                if (callbacks?.success) {
+                    callbacks.success(response.data);
+                }
+            })
+            .catch((error) => {
+                dispatch({
+                    type: rejectedAction,
+                    payload: error?.response?.data || error,
+                });
+                manageError(error);
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error);
+                }
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         data,
+                //         options,
+                //     },
+                //     error,
+                // });
+            });
+    }
+}
