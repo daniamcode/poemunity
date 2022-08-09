@@ -9,13 +9,14 @@ import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
-import useDeletePoem from '../react-query/useDeletePoem'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 import parseJWT from '../utils/parseJWT'
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../redux/store';
-import { getAllPoemsAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
-import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
+import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
+import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
+import { manageError, manageSuccess } from '../utils/notifications';
+
 
 function MyFavouritePoems (props) {
   const context = useContext(AppContext)
@@ -41,7 +42,24 @@ function MyFavouritePoems (props) {
     }
   }, [JSON.stringify([allPoemsQuery.item, context?.username])])
 
-  const deletePoemMutation = useDeletePoem()
+  function onDelete (event, poemId) {
+    event.preventDefault()
+    dispatch(deletePoemAction({
+      params: { poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
+          // if I delete a poem that's being edited, I need to reset the state
+          context.setState({...context, elementToEdit: ''})
+          manageSuccess('Poem deleted')
+        },
+        error: () => {
+          manageError('Sorry. There was an error deleting the poem')
+        }
+      }
+    }))
+  }
 
   function onLike (event, poemId) {
     event.preventDefault()
@@ -146,7 +164,7 @@ function MyFavouritePoems (props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
+                    onClick={(event) => onDelete(event, poem.id)}
                   />
                 )}
                 <Link

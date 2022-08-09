@@ -202,3 +202,61 @@ export function updateAllPoemsCacheAfterCreatePoemAction({ response }: UpdateAll
         });
     };
 }
+
+interface updateAllPoemsCacheAfterDeletePoemActionProps {
+    poemId: string
+}
+
+export function updateAllPoemsCacheAfterDeletePoemAction({ poemId }: updateAllPoemsCacheAfterDeletePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { allPoemsQuery: { item: allPoemsQuery }  } = store.getState();
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[]);
+
+        const allPoemsQueryUpdated = newAllPoemsQuery?.filter(poem=> poem.id !== poemId);
+
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS);
+        dispatch({
+            type: fulfilledAction,
+            payload: allPoemsQueryUpdated,
+        });
+    };
+}
+
+interface UpdatePoemsListCacheAfterDeletePoemActionProps {
+    poemId: string
+}
+
+export function updatePoemsListCacheAfterDeletePoemAction({ poemId }: UpdatePoemsListCacheAfterDeletePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { poemsListQuery: { item: poemsListQuery }  } = store.getState();
+        const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[]);
+
+        const poemsListQueryUpdated = newPoemsListQuery?.filter(poem=> poem.id !== poemId);
+
+        const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST);
+        dispatch({
+            type: fulfilledAction,
+            payload: poemsListQueryUpdated,
+        });
+    };
+}
+
+interface UpdateRankingCacheAfterDeletePoemActionProps {
+    poemId: string
+}
+
+// todo: refactor (this function is very similar to updatePoemsListCacheAfterDeletePoemAction)
+export function updateRankingCacheAfterDeletePoemAction({ poemId }: UpdateRankingCacheAfterDeletePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { rankingQuery: { item: rankingQuery }  } = store.getState();
+        const newRankingQuery = cloneDeep(rankingQuery as Poem[]);
+
+        const rankingQueryUpdated = newRankingQuery?.filter(poem=> poem.id !== poemId);
+
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING);
+        dispatch({
+            type: fulfilledAction,
+            payload: rankingQueryUpdated,
+        });
+    };
+}

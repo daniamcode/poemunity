@@ -1,4 +1,3 @@
-// import useDeletePoem from '../react-query/useDeletePoem'
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
@@ -15,9 +14,10 @@ import {
 import normalizeString from '../utils/normalizeString'
 // import PropTypes from 'prop-types'
 import { useAppDispatch } from '../redux/store'
-import { likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
-import { updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions'
+import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
+import { updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterDeletePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterDeletePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions'
 import { Poem, Context } from '../typescript/interfaces'
+import { manageError, manageSuccess } from '../utils/notifications'
 
 interface Props {
   poem: Poem
@@ -30,7 +30,27 @@ const ListItem = ({
    filter,
    context
 }: Props) => {
-  // const deletePoemMutation = useDeletePoem()
+
+  function onDelete (event: React.SyntheticEvent, poemId: string) {
+    event.preventDefault()
+    dispatch(deletePoemAction({
+      params: { poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          // todo: when I update this cache, it has effects on many queries. 
+          // Maybe I need some optimisation, in the frontend or in the backend
+          // for now I update the cache needed for this page, but I need to update the cache for the other pages too if I don't query the backend when navigating
+          dispatch(updatePoemsListCacheAfterDeletePoemAction({poemId}))
+          dispatch(updateRankingCacheAfterDeletePoemAction({poemId}))
+          manageSuccess('Poem deleted')
+        },
+        error: () => {
+          manageError('Sorry. There was an error deleting the poem')
+        }
+      }
+    }))
+  }
 
   const history = useHistory()
 
@@ -132,7 +152,7 @@ const ListItem = ({
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    // onClick={(event) => deletePoemMutation.mutate(poem.id)}
+                    onClick={(event) => onDelete(event, poem.id)}
                   />
             )}
             <Link

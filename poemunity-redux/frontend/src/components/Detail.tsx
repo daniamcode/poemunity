@@ -11,18 +11,17 @@ import CircularProgress from './CircularIndeterminate'
 import './PageNotFound.scss'
 import { Helmet } from 'react-helmet'
 import { LIKE, LIKES } from '../data/constants'
-import useDeletePoem from '../react-query/useDeletePoem'
 import { useHistory } from "react-router-dom";
 import { Poem } from '../typescript/interfaces'
-// import { FormElement } from '../typescript/types'
 import { useSelector } from 'react-redux';
 import { useAppDispatch, RootState } from '../redux/store';
-import { getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
+import { deletePoemAction, getPoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 import { 
   updateAllPoemsCacheAfterLikePoemAction, 
   updatePoemsListCacheAfterLikePoemAction,
   updateRankingCacheAfterLikePoemAction
 } from '../redux/actions/poemsActions';
+import { manageError, manageSuccess } from '../utils/notifications';
 
 
 interface Props {
@@ -79,14 +78,13 @@ function Detail (props: Props) {
   }, [JSON.stringify(props.match.params.poemId)]);
 
   const context = useContext(AppContext);
+  const history = useHistory();
 
   useEffect(()=> {
     if(poemQuery?.item) {
       setPoem(poemQuery?.item)
     }
   }, [JSON.stringify(poemQuery?.item)])
-
-  const deletePoemMutation: {mutate: Function, status: string} = useDeletePoem()
 
   function onLike (event: React.SyntheticEvent, poemId: string) {
     event.preventDefault()
@@ -105,9 +103,25 @@ function Detail (props: Props) {
       }
     }))
   }
-  
-  const history = useHistory();
 
+  function onDelete (event: React.SyntheticEvent, poemId: string) {
+    event.preventDefault()
+    dispatch(deletePoemAction({
+      params: { poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          const newPath = '/'
+          history.push(newPath);
+          manageSuccess('Poem deleted')
+        },
+        error: () => {
+          manageError('Sorry. There was an error deleting the poem')
+        }
+      }
+    }))
+  }
+  
   const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath);
@@ -127,7 +141,7 @@ function Detail (props: Props) {
 
   return (
     <>
-      {(!poem.id || deletePoemMutation.status !== 'idle') ? (
+      {!poem.id ? (
         <main className='page-not-found__container'>
           <section className='page-not-found__message'>
             <h1 className='page-not-found__title'>Error - 404</h1>
@@ -197,7 +211,7 @@ function Detail (props: Props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={() => deletePoemMutation.mutate(poem.id)}
+                    onClick={(event) => onDelete(event, poem.id)}
                   />
               )}
               <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>

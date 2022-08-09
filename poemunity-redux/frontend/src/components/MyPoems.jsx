@@ -11,10 +11,11 @@ import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import getPoemsByUser from '../utils/getPoemsByUser'
-import useDeletePoem from '../react-query/useDeletePoem'
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../redux/store';
-import { getAllPoemsAction } from '../redux/actions/poemsActions';
+import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction } from '../redux/actions/poemsActions';
+import { deletePoemAction } from '../redux/actions/poemActions';
+import { manageError, manageSuccess } from '../utils/notifications';
 
 function MyPoems (props) {
   const [poems, setPoems] = useState([])
@@ -44,7 +45,24 @@ function MyPoems (props) {
     context.setState({...context, elementToEdit: poemId})
   }
 
-  const deletePoemMutation = useDeletePoem()
+  function onDelete (event, poemId) {
+    event.preventDefault()
+    dispatch(deletePoemAction({
+      params: { poemId }, 
+      context,
+      callbacks: {
+        success: () => {
+          dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
+          // if I delete a poem that's being edited, I need to reset the state
+          context.setState({...context, elementToEdit: ''})
+          manageSuccess('Poem deleted')
+        },
+        error: () => {
+          manageError('Sorry. There was an error deleting the poem')
+        }
+      }
+    }))
+  }
 
   const LIKE = 'Like'
   const LIKES = 'Likes'
@@ -122,7 +140,7 @@ function MyPoems (props) {
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
-                    onClick={(event) => deletePoemMutation.mutate(poem.id)}
+                    onClick={(event) => onDelete(event, poem.id)}
                   />
                 )}
                 <Link
