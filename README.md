@@ -6,7 +6,7 @@ I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTI
 
 The frontend is made with React, and the backend is made with Node.js
 
-There are three folders: flux, Poemunity-React-Query and poemunity-redux.
+There are three folders: flux, Poemunity-React-Query and poemunity-redux (this last one is the only one valid right now). 
 
 ## Flux 
 In the flux folder we have the original project, made during the bootcamp and deployed afterwards. 
