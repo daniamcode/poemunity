@@ -82,7 +82,7 @@ describe('dispatch getAllPoemsAction', () => {
         //     }, 300);
         // })
         
-        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledTimes(1);// probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2);
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`);
         expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error');
@@ -106,7 +106,7 @@ describe('dispatch getAllPoemsAction', () => {
         //     }, 300);
         // })
         
-        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledTimes(1);// probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2);
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`);
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe('Network error');
@@ -116,7 +116,7 @@ describe('dispatch getAllPoemsAction', () => {
     test('Should dispatch response when axios returns data correctly', async() => {
         // this is beacuse we use Axios.create
         (axios.create as jest.Mock).mockReturnThis();
-        (axios.get as jest.Mock).mockReturnValueOnce(Promise.resolve({data:'yavendras.com'}));
+        (axios.get as jest.Mock).mockReturnValueOnce(Promise.resolve({data:'poem1'}));
           
         const options = {fetch: true}
         await waitFor(() => 
@@ -126,6 +126,6 @@ describe('dispatch getAllPoemsAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_request`);
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2);
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`);
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('yavendras.com');
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1');
     });
 })

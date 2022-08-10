@@ -1,6 +1,6 @@
 import React from 'react'
 import Enzyme, { mount, shallow } from 'enzyme'
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import {createMemoryHistory} from 'history'
 import Ranking from './Ranking'
@@ -12,13 +12,9 @@ import Profile from './Profile'
 import Header from './Header'
 import { BrowserRouter as Router } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { manageSuccess } from '../utils/notifications';
 import store from '../redux/store';
 import { Provider } from 'react-redux';
 
-
-// these mocks seem to have to be defined before the "describe"
-jest.mock('../utils/notifications');
 
 describe('Ranking component', () => {
   test('renders with mount', async () => {
@@ -103,19 +99,7 @@ describe('Login component', () => {
     await waitFor(() => {
       expect(document.querySelector('.login')).toBeInTheDocument();
     })
-  })
-
-  test.skip('Should call manageSuccess when clicking login', () => {  
-    wrapper = wrapperFactory();
-    
-    render(<Login />, { wrapper });
-
-    fireEvent.submit(screen.getByTestId('login'))
-
-    expect(manageSuccess).toHaveBeenCalled();    
-    expect(manageSuccess).toHaveBeenCalledTimes(1)
-    expect(manageSuccess).toHaveBeenCalledWith('Logging in...')
-  });  
+  })  
 })
 
 describe('Logout component', () => {

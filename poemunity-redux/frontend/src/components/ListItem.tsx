@@ -30,6 +30,8 @@ const ListItem = ({
    filter,
    context
 }: Props) => {
+  // Redux
+  const dispatch = useAppDispatch();
 
   function onDelete (event: React.SyntheticEvent, poemId: string) {
     event.preventDefault()
@@ -53,9 +55,6 @@ const ListItem = ({
   }
 
   const history = useHistory()
-
-  // Redux
-  const dispatch = useAppDispatch();
 
   const onLike = (event:React.MouseEvent<HTMLAnchorElement, MouseEvent>, poemId:string) => {
     event.preventDefault()
@@ -152,6 +151,7 @@ const ListItem = ({
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
                     style={{ fill: 'red' }}
+                    data-testid='delete-poem'
                     onClick={(event) => onDelete(event, poem.id)}
                   />
             )}
