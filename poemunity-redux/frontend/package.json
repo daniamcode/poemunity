@@ -6,7 +6,8 @@
     "start": "ESLINT_NO_DEV_ERRORS=true react-scripts start",
     "clean": "rimraf ../backend/public",
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "test": "react-scripts test --watchAll --coverage",
+    "test": "react-scripts test --watchAll",
+    "coverage": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "lint": "eslint .*"
   },
