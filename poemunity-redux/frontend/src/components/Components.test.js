@@ -86,6 +86,7 @@ describe('Login component', () => {
   };
 
   afterEach(() => {
+    //very important, restoreAllMocks works, but clearAllMocks doesn't
     jest.restoreAllMocks();
     wrapper = null;
   });
