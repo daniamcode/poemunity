@@ -33,7 +33,7 @@ Object {
               data-shrink="false"
               style="color: rgb(85, 26, 139);"
             >
-              Buscar autor
+              Search author
             </label>
             <div
               class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
@@ -80,7 +80,7 @@ Object {
             data-shrink="false"
             style="color: rgb(85, 26, 139);"
           >
-            Buscar autor
+            Search author
           </label>
           <div
             class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"

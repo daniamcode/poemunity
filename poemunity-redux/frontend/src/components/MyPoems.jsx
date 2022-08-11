@@ -83,7 +83,7 @@ function MyPoems (props) {
         <div className='list__intro'>
           <SearchIcon style={{ fontSize: 40, fill: '#551A8B' }} />
           <TextField
-            label='Buscar autor'
+            label='Search author'
             InputLabelProps={{
               style: { color: '#551A8B' }
             }}
