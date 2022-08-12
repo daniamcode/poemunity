@@ -24,6 +24,9 @@ describe('List', () => {
             return callback(mockedState);
         });
     });
+    afterEach(() => {
+        jest.restoreAllMocks();
+      });
     test('Should select order', () => {
         render(
             <Provider store={store}>
