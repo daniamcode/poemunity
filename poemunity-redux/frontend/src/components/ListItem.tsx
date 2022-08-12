@@ -82,7 +82,7 @@ const ListItem = ({
 
   return (    
     <main key={poem.id} className='poem__detail'>
-      {normalizeString(poem.author).includes(filter) && (
+      {normalizeString(poem.author).includes(filter) ? (
         <section className='poem__block' id='poem__block'>
           <section>
             <Link to={`/detail/${poem.id}`} className='poem__title'>
@@ -163,7 +163,7 @@ const ListItem = ({
             </Link>
           </section>
         </section>
-      )}
+      ) : null}
     </main>
   )
 }

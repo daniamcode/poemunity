@@ -4,12 +4,15 @@ import store from '../redux/store';
 import { Provider } from 'react-redux';
 import * as Redux from 'react-redux'
 import { ORDER_BY_RANDOM } from '../data/constants'
+import { Helmet } from 'react-helmet'
+
 
 // we cannot mock the whole react-redux; we need the store, so we require everyting except useSelector
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
     useSelector: jest.fn(),
 }));
+jest.mock('react-helmet')
 
 describe('List', () => {
     // first we need to avoid the DOM with the Spinner
@@ -40,4 +43,13 @@ describe('List', () => {
         expect(options[2].selected).toBeTruthy();
         expect(options[3].selected).toBeFalsy();
     });
+    test('Should call Helmet', () => {
+        render(
+            <Provider store={store}>
+                <List />
+            </Provider>
+        );
+        expect(Helmet).toHaveBeenCalled();
+        expect((Helmet as unknown as jest.Mock).mock.calls[0][0]).toBeTruthy();
+    })
 })
