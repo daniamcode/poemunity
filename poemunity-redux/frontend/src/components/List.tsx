@@ -26,7 +26,7 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../redux/store'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
 import { Poem } from '../typescript/interfaces'
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 
 interface MatchParams {
@@ -192,4 +192,4 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
     </>
   )
 }
-export default List
+export default withRouter(List)
