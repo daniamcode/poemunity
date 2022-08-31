@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import * as Redux from 'react-redux'
 import { ORDER_BY_RANDOM } from '../data/constants'
 import { Helmet } from 'react-helmet'
+import { BrowserRouter } from 'react-router-dom';
 
 
 // we cannot mock the whole react-redux; we need the store, so we require everyting except useSelector
@@ -30,7 +31,9 @@ describe('List', () => {
     test('Should select order', () => {
         render(
             <Provider store={store}>
-                <List />
+                <BrowserRouter>
+                    <List />
+                </BrowserRouter>
             </Provider>
         );
         
@@ -49,7 +52,9 @@ describe('List', () => {
     test('Should call Helmet', () => {
         render(
             <Provider store={store}>
-                <List />
+                <BrowserRouter>
+                    <List />
+                </BrowserRouter>
             </Provider>
         );
         expect(Helmet).toHaveBeenCalled();
