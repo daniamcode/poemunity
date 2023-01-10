@@ -18,6 +18,7 @@ import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } 
 import { updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterDeletePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterDeletePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions'
 import { Poem, Context } from '../typescript/interfaces'
 import { manageError, manageSuccess } from '../utils/notifications'
+import { format } from 'date-fns'
 
 interface Props {
   poem: Poem
@@ -92,7 +93,7 @@ const ListItem = ({
               <img className='poem__picture' src={poem.picture} />
               <p className='poem__author'>{poem.author}</p>
             </div>
-            <div className='poem__date'>{poem.date}</div>
+            <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
           </section>
           <section>
             <div className='poem__content poems__content'>

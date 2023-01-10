@@ -16,6 +16,8 @@ import { useAppDispatch } from '../redux/store';
 import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction } from '../redux/actions/poemsActions';
 import { deletePoemAction } from '../redux/actions/poemActions';
 import { manageError, manageSuccess } from '../utils/notifications';
+import { format } from 'date-fns'
+
 
 function MyPoems (props) {
   const [poems, setPoems] = useState([])
@@ -103,7 +105,7 @@ function MyPoems (props) {
                   {poem.title}
                 </Link>
                 <p className='poem__author'>{poem?.author}</p>
-                <div className='poem__date'>{poem.date}</div>
+                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
               </section>
               <section>
                 <div className='poem__content poems__content'>{poem.poem}</div>

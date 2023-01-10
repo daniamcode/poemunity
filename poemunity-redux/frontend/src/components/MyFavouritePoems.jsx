@@ -16,6 +16,7 @@ import { useAppDispatch } from '../redux/store';
 import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
 import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
 import { manageError, manageSuccess } from '../utils/notifications';
+import { format } from 'date-fns'
 
 
 function MyFavouritePoems (props) {
@@ -119,7 +120,7 @@ function MyFavouritePoems (props) {
                   <img className='poem__picture' src={poem.picture} />
                   <p className='poem__author'>{poem.author}</p>
                 </div>
-                <div className='poem__date'>{poem.date}</div>
+                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
               </section>
               <section>
                 <div className='poem__content poems__content'>{poem.poem}</div>

@@ -22,6 +22,7 @@ import {
   updateRankingCacheAfterLikePoemAction
 } from '../redux/actions/poemsActions';
 import { manageError, manageSuccess } from '../utils/notifications';
+import { format } from 'date-fns'
 
 
 interface Props {
@@ -164,7 +165,7 @@ function Detail (props: Props) {
                 <img className='poem__picture' src={poem.picture} />
                 <p className='poem__author'>{poem.author}</p>
               </div>
-              <div className='poem__date'>{poem.date}</div>
+              <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
             </section>
             <section>
               <div className='poem__content'>{poem.poem}</div>
