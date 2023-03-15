@@ -26,8 +26,7 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../redux/store'
 import { getPoemsListAction } from '../redux/actions/poemsActions'
 import { Poem } from '../typescript/interfaces'
-import { RouteComponentProps, withRouter } from 'react-router';
-
+import { RouteComponentProps, withRouter } from 'react-router'
 
 interface MatchParams {
   genre: string;
@@ -35,7 +34,7 @@ interface MatchParams {
 
 function List (props: Partial<RouteComponentProps<MatchParams>>) {
   interface ListStates {
-    poems: Poem[]
+    poems: Poem[];
     filter: string
   }
   const genre = props?.match?.params?.genre
@@ -46,42 +45,42 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
     orderBy: '',
     origin: 'all'
   })
-  
+
   const context = useContext(AppContext)
 
   // Redux
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   const {
-      poemsListQuery
+    poemsListQuery
   } = useSelector((state: RootState) => state)
 
   useEffect(() => {
     const queryOptions = {
-        reset: true,
-        fetch: false,
-    };
+      reset: true,
+      fetch: false
+    }
     dispatch(getPoemsListAction({
-        options: queryOptions,
-    }));
-  }, []);
-
-  function handleLoadPoems() {
-      if (paramsData.origin) {
-          const queryOptions = {
-              reset: true,
-              fetch: true,
-          };
-          dispatch(getPoemsListAction({
-              params: paramsData.origin !== 'all' ? {origin: paramsData.origin} : null,
-              options: queryOptions,
-          }));
-      }
-  }
+      options: queryOptions
+    }))
+  }, [dispatch])
 
   useEffect(() => {
-      handleLoadPoems();
-  }, [JSON.stringify(paramsData.origin)]);
+    function handleLoadPoems () {
+      if (paramsData.origin) {
+        const queryOptions = {
+          reset: true,
+          fetch: true
+        }
+        dispatch(getPoemsListAction({
+          params: paramsData.origin !== 'all' ? { origin: paramsData.origin } : null,
+          options: queryOptions
+        }))
+      }
+    }
+    handleLoadPoems()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(paramsData.origin), dispatch])
 
   useEffect(() => {
     if (poemsListQuery && poemsListQuery?.item && poemsListQuery?.item?.length > 0) {
@@ -96,6 +95,7 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
         setPoems(poemsSorted)
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify([poemsListQuery, genre, paramsData])])
 
   const handleOrderChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
@@ -157,9 +157,9 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
                 name='origin'
                 onChange={handleOriginChange}
               >
-                <option value='all' selected={'all' === paramsData.origin}>All</option>
-                <option value='famous' selected={'famous' === paramsData.origin}>Famous</option>
-                <option value='user' selected={'user' === paramsData.origin}>Users</option>
+                <option value='all' selected={paramsData.origin === 'all'}>All</option>
+                <option value='famous' selected={paramsData.origin === 'famous'}>Famous</option>
+                <option value='user' selected={paramsData.origin === 'user'}>Users</option>
               </select>
             </label>
           </form>
@@ -182,7 +182,8 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
         </div>
 
         {poems.map((poem) => (
-          <ListItem 
+          <ListItem
+            key={poem?.id}
             poem={poem}
             filter={filter}
             context={context}
