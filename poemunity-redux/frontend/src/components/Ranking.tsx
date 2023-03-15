@@ -16,13 +16,12 @@ import {
   RANKING_POETS_TITLE,
   RANKING_POINTS_TITLE,
   POEM_POINTS,
-  LIKE_POINTS,
+  LIKE_POINTS
 } from '../data/constants'
 import { useSelector } from 'react-redux'
-import { useAppDispatch, RootState } from '../redux/store';
+import { useAppDispatch, RootState } from '../redux/store'
 import { getRankingAction } from '../redux/actions/poemsActions'
 import { Poem } from '../typescript/interfaces'
-
 
 const useStyles = makeStyles({
   table: {
@@ -32,7 +31,7 @@ const useStyles = makeStyles({
 
 export default function Ranking () {
   interface RankingStates {
-    poems: Poem[]
+    poems: Poem[],
     rank: object
   }
   const classes = useStyles()
@@ -42,30 +41,32 @@ export default function Ranking () {
   const [rank, setRank] = useState<RankingStates["rank"]>({})
 
   // Redux
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   const {
-      rankingQuery
-  } = useSelector((state: RootState) => state);
+    rankingQuery
+  } = useSelector((state: RootState) => state)
 
   useEffect(() => {
-      dispatch(getRankingAction({params: {origin: 'user'}}))
-  }, []);
+    dispatch(getRankingAction({ params: { origin: 'user' } }))
+  }, [dispatch])
 
-  useEffect(()=> {
-    if(rankingQuery?.item) {
+  useEffect(() => {
+    if (rankingQuery?.item) {
       setPoems(rankingQuery?.item)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(rankingQuery?.item)])
 
-  useEffect(()=> {
-    if(poems) {
+  useEffect(() => {
+    if (poems) {
       setRank(getRanking(poems, POEM_POINTS, LIKE_POINTS))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify([poems, POEM_POINTS, LIKE_POINTS])])
 
   if (rankingQuery.isFetching) {
-    return <CircularProgress data-test='ranking__loading'/>
+    return <CircularProgress data-test='ranking__loading' />
   }
 
   return (
