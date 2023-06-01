@@ -201,7 +201,7 @@ export function postAction({
     dispatch,
     options = { reset: false, update: false, fetch: true },
     callbacks,
-    headers,
+    headers = {},
     config,
 }: PostActionProps) {
     const {

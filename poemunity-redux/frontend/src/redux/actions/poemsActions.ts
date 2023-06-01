@@ -169,9 +169,10 @@ interface CreatePoemActionProps {
     poem: Poem
     callbacks?: ReduxCallbacks
     context: Context
+    options?: ReduxOptions
 }
 
-export function createPoemAction({ poem, context, callbacks }: CreatePoemActionProps) {
+export function createPoemAction({ poem, context, callbacks, options = {} }: CreatePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return postAction({
             type: ACTIONS.CREATE_POEM,
@@ -180,6 +181,7 @@ export function createPoemAction({ poem, context, callbacks }: CreatePoemActionP
             data: poem,
             callbacks,
             config: context.config,
+            options
         })
     };
 }

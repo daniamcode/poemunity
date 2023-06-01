@@ -95,7 +95,7 @@ function Detail (props: Props) {
       callbacks: {
         success: () => {
           // todo: when I update this cache, it has effects on many queries. 
-          // Maybe I need some optimisation, in the frontend or in the backend
+          // Maybe I need some optimization, in the frontend or in the backend
           dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
           dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
           dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))

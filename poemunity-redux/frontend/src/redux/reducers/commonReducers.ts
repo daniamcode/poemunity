@@ -5,7 +5,7 @@ import {StateItem} from '../../typescript/interfaces'
 export const INITIAL = { isFetching: false, isError: false };
 
 interface CommonReducerProps {
-    state: StateItem<unknown>
+    state?: StateItem<unknown>
     action: {
         type: string
         payload?: object[] | object

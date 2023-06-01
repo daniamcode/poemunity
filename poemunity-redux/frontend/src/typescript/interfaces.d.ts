@@ -27,6 +27,7 @@ export interface StateItem<T> {
   // another option is to use generic T
   item?: T
   abortController?: AbortController;
+  abortRequests?: boolean
 }
 
 export interface ReduxOptions {

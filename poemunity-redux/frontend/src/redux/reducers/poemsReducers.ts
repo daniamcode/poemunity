@@ -17,7 +17,12 @@ interface Action {
 
 // used for MyFavouritePoems and for MyPoems
 export function allPoemsQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
-    return commonReducer({ state, action, actionType: ACTIONS?.ALL_POEMS });
+    return commonReducer({ 
+        state,
+        action, 
+        actionType: ACTIONS?.ALL_POEMS, 
+        ...(state?.abortRequests !== undefined && {abortRequests: state?.abortRequests})
+    });
 }
 
 export function poemsListQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
