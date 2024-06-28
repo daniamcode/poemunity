@@ -1,6 +1,6 @@
 # Poemunity
 
-This App is online at https://poemunity.com 
+This App WAS online at https://poemunity.com 
 
 I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS.
 
