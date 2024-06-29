@@ -193,9 +193,6 @@ devDependencies:
   npm:
     specifier: ^8.11.0
     version: 8.19.4
-  plugin-proposal-function-bind:
-    specifier: "link:\e@babel/plugin-proposal-function-bind"
-    version: "link:\e@babel/plugin-proposal-function-bind"
   standard:
     specifier: ^17.0.0
     version: 17.1.0(@typescript-eslint/parser@5.62.0)
