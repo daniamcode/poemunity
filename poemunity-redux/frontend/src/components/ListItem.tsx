@@ -126,7 +126,7 @@ const ListItem = ({
                 <Link
                   className='poem__likes-icon'
                   onClick={(event) => onLike(event, poem.id)}
-                  to
+                  to="#" // Add a dummy path. TODO: Remove Link and use a button or Navigate 
                 />
             )}
             {context.user &&
@@ -135,7 +135,7 @@ const ListItem = ({
                 <Link
                   className='poem__unlikes-icon'
                   onClick={(event) => onLike(event, poem.id)}
-                  to
+                  to="#" // Add a dummy path. TODO: Remove Link and use a button or Navigate 
                 />
             )}
             {context.user &&
