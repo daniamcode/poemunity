@@ -310,14 +310,17 @@ export default function Profile (props) {
                   <>
                     <label className='profile__insert-poem-input'>
                       Origin
-                      <input
-                        className='profile__insert-poem-input'
-                        name='origin'
+                      <select
+                        className="profile__insert-poem-input"
+                        name="origin"
                         required
                         value={poemOrigin}
-                        onChange={(event) =>
-                          onFieldChange(event.target.value, setPoemOrigin)}
-                      />
+                        onChange={(event) => onFieldChange(event.target.value, setPoemOrigin)}
+                      >
+                        <option value=''>{PROFILE_SELECT_CATEGORY}</option>
+                        <option value="famous">Famous</option>
+                        <option value="user">User</option>
+                      </select>
                     </label>
                     <label className='profile__insert-poem-input'>
                       {PROFILE_SELECT_TITLE_AUTHOR}
@@ -396,7 +399,7 @@ export default function Profile (props) {
                   className='profile__send-poem' 
                   type='submit' 
                   onClick={handleSend}
-                  disabled={!poemTitle || !poemCategory || !poemContent}
+                  disabled={!poemTitle || !poemCategory || !poemContent || ((context?.userId === context.adminId) && !poemOrigin)}
                 >
                   {PROFILE_SEND_POEM}
                 </button>
