@@ -30,7 +30,7 @@ import {
 } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../utils/urlUtils.js'
-import { strings, arrays, dom, objects } from '@daniamcode/utils'
+// import { strings, arrays, dom, objects } from '@daniamcode/utils'
 import ListItem from './ListItem'
 
 function List (props) {
