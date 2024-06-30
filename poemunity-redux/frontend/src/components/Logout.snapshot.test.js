@@ -1,12 +1,11 @@
 import React from 'react'
-import { render } from '@testing-library/react';
+import { render } from '@testing-library/react'
 import Logout from './Logout'
 import { BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux';
-import store from '../redux/store';
+import { Provider } from 'react-redux'
+import store from '../redux/store'
 
-
-function renderLogout (arg) {
+function renderLogout(arg) {
   const defaultProps = {
     match: {
       params: {}

@@ -1,6 +1,15 @@
 export const WEB_SUBTITLE = 'Your poem community!!'
 export const CATEGORIES_TITLE = 'Categories'
-export const CATEGORIES = ['Anniversary', 'Friendship', 'Funny', 'Haikus', 'Hope', 'Life', 'Love', 'Sad']
+export const CATEGORIES = [
+  'Anniversary',
+  'Friendship',
+  'Funny',
+  'Haikus',
+  'Hope',
+  'Life',
+  'Love',
+  'Sad'
+]
 export const ALL = 'All'
 export const PROFILE_TITLE = "'s Profile"
 export const PROFILE_SUBTITLE_CREATE = 'Insert a poem:'

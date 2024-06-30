@@ -4,11 +4,11 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   width: 100%;
   height: 70px;
   border-bottom: 1px solid black;
@@ -73,7 +73,7 @@
 
 .header__dropdown-subcategories {
   color: #000;
-  font-size: .9rem;
+  font-size: 0.9rem;
   text-decoration: none;
 }
 
@@ -82,8 +82,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: end;
-      -ms-flex-align: end;
-          align-items: flex-end;
+  -ms-flex-align: end;
+  align-items: flex-end;
 }
 
 .header__logo-icon {
@@ -100,7 +100,7 @@
 .header__text-logo-second {
   font-family: 'Quattrocento', serif;
   font-size: 35px;
-  color: #4F5D73;
+  color: #4f5d73;
 }
 
 .header__text-logo-first {

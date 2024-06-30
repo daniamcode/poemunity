@@ -27,9 +27,7 @@ describe('ListItem component', () => {
   const wrapperFactory = () => {
     return ({ children }) => (
       <Provider store={store}>
-        <Router>
-          {children}
-        </Router>
+        <Router>{children}</Router>
       </Provider>
     )
   }
@@ -59,7 +57,12 @@ describe('ListItem component', () => {
       filter: '',
       context: {}
     }
-    const propsErr = checkPropTypes(ListItem.propTypes, expectedProps, 'props', ListItem.name)
+    const propsErr = checkPropTypes(
+      ListItem.propTypes,
+      expectedProps,
+      'props',
+      ListItem.name
+    )
     expect(propsErr).toBeUndefined()
   })
   test('Should call manageSuccess when deleting poem', async () => {
@@ -67,7 +70,9 @@ describe('ListItem component', () => {
 
     const spy = jest.spyOn(commonActions, 'deleteAction')
 
-    render(<ListItem poem={poem} filter={filter} context={context} />, { wrapper })
+    render(<ListItem poem={poem} filter={filter} context={context} />, {
+      wrapper
+    })
 
     // this is beacuse we use Axios.create
     axios.create.mockReturnThis()
@@ -87,7 +92,9 @@ describe('ListItem component', () => {
 
     const spy = jest.spyOn(commonActions, 'deleteAction')
 
-    render(<ListItem poem={poem} filter={filter} context={context} />, { wrapper })
+    render(<ListItem poem={poem} filter={filter} context={context} />, {
+      wrapper
+    })
 
     // this is beacuse we use Axios.create
     axios.create.mockReturnThis()
@@ -101,6 +108,8 @@ describe('ListItem component', () => {
 
     expect(manageError).toHaveBeenCalled()
     expect(manageError).toHaveBeenCalledTimes(2) // review the innecessary call in deleteAction
-    expect(manageError).toHaveBeenCalledWith('Sorry. There was an error deleting the poem')
+    expect(manageError).toHaveBeenCalledWith(
+      'Sorry. There was an error deleting the poem'
+    )
   })
 })

@@ -19,41 +19,42 @@ const Login = (): JSX.Element => {
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
     event.preventDefault()
-    dispatch(loginAction({
-      data: { username, password },
-      callbacks: {
-        success: (data) => {
-          window.localStorage.setItem(
-            'loggedUser', JSON.stringify(data)
-          )
-          history.push('profile')
-        },
-        error: () => {
-          // setErrorMessage('Wrong credentials')
-          console.log('something went wrong in login!')
-          // history.push('/')
-          // setTimeout(()=> {
-          //   setErrorMessage(null)
-          // }, 3000)
+    dispatch(
+      loginAction({
+        data: { username, password },
+        callbacks: {
+          success: (data) => {
+            window.localStorage.setItem('loggedUser', JSON.stringify(data))
+            history.push('profile')
+          },
+          error: () => {
+            // setErrorMessage('Wrong credentials')
+            console.log('something went wrong in login!')
+            // history.push('/')
+            // setTimeout(()=> {
+            //   setErrorMessage(null)
+            // }, 3000)
+          }
         }
-      }
-    }))
+      })
+    )
     setUsername('')
     setPassword('')
   }
 
   return (
     <form className='login' onSubmit={handleLogin} data-testid='login'>
-      <label>Introduce your login credentials or click "Register" if you don't have them</label>
+      <label>
+        Introduce your login credentials or click "Register" if you don't have
+        them
+      </label>
       <div className='login__username'>
         <input
           type='text'
           value={username}
           name='Username'
           placeholder='Username'
-          onChange={
-                (event) => setUsername(event.target.value)
-}
+          onChange={(event) => setUsername(event.target.value)}
         />
       </div>
       <div className='login__password'>
@@ -62,17 +63,12 @@ const Login = (): JSX.Element => {
           value={password}
           name='Password'
           placeholder='Password'
-          onChange={
-                (event) => setPassword(event.target.value)
-}
+          onChange={(event) => setPassword(event.target.value)}
         />
       </div>
-      <button>
-        Login
-      </button>
+      <button>Login</button>
       <NavLink to='/register'>Register</NavLink>
       {/* <Notification message={errorMessage}/> */}
-
     </form>
   )
 }

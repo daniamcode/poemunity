@@ -1,69 +1,74 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { AppContext } from '../App';
+import { AppContext } from '../App'
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
 import '../App.scss'
 import { TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@material-ui/icons/Edit'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import getPoemsByUser from '../utils/getPoemsByUser'
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../redux/store';
-import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction } from '../redux/actions/poemsActions';
-import { deletePoemAction } from '../redux/actions/poemActions';
-import { manageError, manageSuccess } from '../utils/notifications';
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../redux/store'
+import {
+  getAllPoemsAction,
+  updateAllPoemsCacheAfterDeletePoemAction
+} from '../redux/actions/poemsActions'
+import { deletePoemAction } from '../redux/actions/poemActions'
+import { manageError, manageSuccess } from '../utils/notifications'
 import { format } from 'date-fns'
 
-
-function MyPoems (props) {
+function MyPoems(props) {
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
-  const context = useContext(AppContext);
+  const context = useContext(AppContext)
 
   // Redux
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const {
-      allPoemsQuery,
-  } = useSelector(state => state);
+  const { allPoemsQuery } = useSelector((state) => state)
 
   useEffect(() => {
-      dispatch(getAllPoemsAction({}))
-  }, []);
+    dispatch(getAllPoemsAction({}))
+  }, [])
 
-  useEffect(()=> {
-    if(allPoemsQuery.item) {
-      const poemsFiltered = getPoemsByUser(allPoemsQuery.item, context?.username)
+  useEffect(() => {
+    if (allPoemsQuery.item) {
+      const poemsFiltered = getPoemsByUser(
+        allPoemsQuery.item,
+        context?.username
+      )
       setPoems(poemsFiltered)
     }
   }, [JSON.stringify([allPoemsQuery, context?.username])])
 
   const editPoem = (poemId) => {
-    context.setState({...context, elementToEdit: poemId})
+    context.setState({ ...context, elementToEdit: poemId })
   }
 
-  function onDelete (event, poemId) {
+  function onDelete(event, poemId) {
     event.preventDefault()
-    dispatch(deletePoemAction({
-      params: { poemId }, 
-      context,
-      callbacks: {
-        success: () => {
-          dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
-          // if I delete a poem that's being edited, I need to reset the state
-          context.setState({...context, elementToEdit: ''})
-          manageSuccess('Poem deleted')
-        },
-        error: () => {
-          manageError('Sorry. There was an error deleting the poem')
+    dispatch(
+      deletePoemAction({
+        params: { poemId },
+        context,
+        callbacks: {
+          success: () => {
+            dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
+            // if I delete a poem that's being edited, I need to reset the state
+            context.setState({ ...context, elementToEdit: '' })
+            manageSuccess('Poem deleted')
+          },
+          error: () => {
+            manageError('Sorry. There was an error deleting the poem')
+          }
         }
-      }
-    }))
+      })
+    )
   }
 
   const LIKE = 'Like'
@@ -105,15 +110,14 @@ function MyPoems (props) {
                   {poem.title}
                 </Link>
                 <p className='poem__author'>{poem?.author}</p>
-                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
+                <div className='poem__date'>
+                  {format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}
+                </div>
               </section>
               <section>
                 <div className='poem__content poems__content'>{poem.poem}</div>
                 <div className='poems__read-more'>
-                  <Link
-                    to={`/detail/${poem.id}`}
-                    className='poems__read-more'
-                  >
+                  <Link to={`/detail/${poem.id}`} className='poems__read-more'>
                     {READ_MORE}
                   </Link>
                 </div>
@@ -133,11 +137,11 @@ function MyPoems (props) {
                 {context.user &&
                   (poem.author === context?.username ||
                     context.userId === context.adminId) && (
-                      <EditIcon
+                    <EditIcon
                       className='poem__edit-icon'
                       onClick={(event) => editPoem(poem.id)}
-                      />
-                )}
+                    />
+                  )}
                 {context.user && poem.author === context?.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
@@ -145,10 +149,7 @@ function MyPoems (props) {
                     onClick={(event) => onDelete(event, poem.id)}
                   />
                 )}
-                <Link
-                  to={`/detail/${poem.id}`}
-                  className='poem__comments-icon'
-                >
+                <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
                   <SubjectSharpIcon style={{ fill: '#000' }} />
                 </Link>
               </section>

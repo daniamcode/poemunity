@@ -1,22 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux';
+import { Provider } from 'react-redux'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import store from './redux/store';
+import store from './redux/store'
 
 // export const store = configureStore();
 
-console.log(`Environment is: ${process.env.NODE_ENV}`);
+console.log(`Environment is: ${process.env.NODE_ENV}`)
 
-const root = document.getElementById('root');
+const root = document.getElementById('root')
 
-if(root) {
+if (root) {
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-          <App />
+        <App />
       </Provider>
     </React.StrictMode>,
     root

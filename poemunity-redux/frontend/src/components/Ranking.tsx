@@ -29,23 +29,21 @@ const useStyles = makeStyles({
   }
 })
 
-export default function Ranking () {
+export default function Ranking() {
   interface RankingStates {
-    poems: Poem[],
+    poems: Poem[]
     rank: object
   }
   const classes = useStyles()
 
-  const [poems, setPoems] = useState<RankingStates["poems"]>([])
+  const [poems, setPoems] = useState<RankingStates['poems']>([])
 
-  const [rank, setRank] = useState<RankingStates["rank"]>({})
+  const [rank, setRank] = useState<RankingStates['rank']>({})
 
   // Redux
   const dispatch = useAppDispatch()
 
-  const {
-    rankingQuery
-  } = useSelector((state: RootState) => state)
+  const { rankingQuery } = useSelector((state: RootState) => state)
 
   useEffect(() => {
     dispatch(getRankingAction({ params: { origin: 'user' } }))
@@ -55,14 +53,14 @@ export default function Ranking () {
     if (rankingQuery?.item) {
       setPoems(rankingQuery?.item)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(rankingQuery?.item)])
 
   useEffect(() => {
     if (poems) {
       setRank(getRanking(poems, POEM_POINTS, LIKE_POINTS))
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify([poems, POEM_POINTS, LIKE_POINTS])])
 
   if (rankingQuery.isFetching) {

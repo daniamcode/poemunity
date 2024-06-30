@@ -1,11 +1,11 @@
 import React from 'react'
-import { render } from '@testing-library/react';
+import { render } from '@testing-library/react'
 import List from './List'
 import { BrowserRouter } from 'react-router-dom'
-import store from '../redux/store';
-import { Provider } from 'react-redux';
+import store from '../redux/store'
+import { Provider } from 'react-redux'
 
-function renderList (arg) {
+function renderList(arg) {
   const defaultProps = {
     match: {
       params: {}

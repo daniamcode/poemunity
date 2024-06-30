@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { AppContext } from '../App';
+import { AppContext } from '../App'
 import { Link } from 'react-router-dom'
 import './List.scss'
 import './Detail.scss'
@@ -11,71 +11,89 @@ import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from './CircularIndeterminate'
 import getFavouritePoemsByUser from '../utils/getFavouritePoemsByUser'
 import parseJWT from '../utils/parseJWT'
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../redux/store';
-import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction, updateAllPoemsCacheAfterLikePoemAction, updatePoemsListCacheAfterLikePoemAction, updateRankingCacheAfterLikePoemAction } from '../redux/actions/poemsActions';
-import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions';
-import { manageError, manageSuccess } from '../utils/notifications';
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../redux/store'
+import {
+  getAllPoemsAction,
+  updateAllPoemsCacheAfterDeletePoemAction,
+  updateAllPoemsCacheAfterLikePoemAction,
+  updatePoemsListCacheAfterLikePoemAction,
+  updateRankingCacheAfterLikePoemAction
+} from '../redux/actions/poemsActions'
+import {
+  deletePoemAction,
+  likePoemAction,
+  updatePoemCacheAfterLikePoemAction
+} from '../redux/actions/poemActions'
+import { manageError, manageSuccess } from '../utils/notifications'
 import { format } from 'date-fns'
 
-
-function MyFavouritePoems (props) {
+function MyFavouritePoems(props) {
   const context = useContext(AppContext)
 
   const [poems, setPoems] = useState([])
   const [filter, setFilter] = useState('')
 
   // Redux
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const {
-      allPoemsQuery,
-  } = useSelector(state => state);
+  const { allPoemsQuery } = useSelector((state) => state)
 
   useEffect(() => {
-      dispatch(getAllPoemsAction({}))
-  }, []);
+    dispatch(getAllPoemsAction({}))
+  }, [])
 
-  useEffect(()=> {
-    if(allPoemsQuery.item) {
-      const poemsFiltered = getFavouritePoemsByUser(allPoemsQuery.item, context?.userId)
+  useEffect(() => {
+    if (allPoemsQuery.item) {
+      const poemsFiltered = getFavouritePoemsByUser(
+        allPoemsQuery.item,
+        context?.userId
+      )
       setPoems(poemsFiltered)
     }
   }, [JSON.stringify([allPoemsQuery.item, context?.username])])
 
-  function onDelete (event, poemId) {
+  function onDelete(event, poemId) {
     event.preventDefault()
-    dispatch(deletePoemAction({
-      params: { poemId }, 
-      context,
-      callbacks: {
-        success: () => {
-          dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
-          // if I delete a poem that's being edited, I need to reset the state
-          context.setState({...context, elementToEdit: ''})
-          manageSuccess('Poem deleted')
-        },
-        error: () => {
-          manageError('Sorry. There was an error deleting the poem')
+    dispatch(
+      deletePoemAction({
+        params: { poemId },
+        context,
+        callbacks: {
+          success: () => {
+            dispatch(updateAllPoemsCacheAfterDeletePoemAction({ poemId }))
+            // if I delete a poem that's being edited, I need to reset the state
+            context.setState({ ...context, elementToEdit: '' })
+            manageSuccess('Poem deleted')
+          },
+          error: () => {
+            manageError('Sorry. There was an error deleting the poem')
+          }
         }
-      }
-    }))
+      })
+    )
   }
 
-  function onLike (event, poemId) {
+  function onLike(event, poemId) {
     event.preventDefault()
-    dispatch(likePoemAction({
-      params: { poemId }, 
-      context,
-      callbacks: {
-        success: () => {
-          dispatch(updatePoemsListCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updateRankingCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updateAllPoemsCacheAfterLikePoemAction({poemId, context}))
-          dispatch(updatePoemCacheAfterLikePoemAction({context}))
+    dispatch(
+      likePoemAction({
+        params: { poemId },
+        context,
+        callbacks: {
+          success: () => {
+            dispatch(
+              updatePoemsListCacheAfterLikePoemAction({ poemId, context })
+            )
+            dispatch(updateRankingCacheAfterLikePoemAction({ poemId, context }))
+            dispatch(
+              updateAllPoemsCacheAfterLikePoemAction({ poemId, context })
+            )
+            dispatch(updatePoemCacheAfterLikePoemAction({ context }))
+          }
         }
-      }
-    }))
+      })
+    )
   }
 
   const LIKE = 'Like'
@@ -120,15 +138,14 @@ function MyFavouritePoems (props) {
                   <img className='poem__picture' src={poem.picture} />
                   <p className='poem__author'>{poem.author}</p>
                 </div>
-                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
+                <div className='poem__date'>
+                  {format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}
+                </div>
               </section>
               <section>
                 <div className='poem__content poems__content'>{poem.poem}</div>
                 <div className='poems__read-more'>
-                  <Link
-                    to={`/detail/${poem.id}`}
-                    className='poems__read-more'
-                  >
+                  <Link to={`/detail/${poem.id}`} className='poems__read-more'>
                     {READ_MORE}
                   </Link>
                 </div>
@@ -151,9 +168,9 @@ function MyFavouritePoems (props) {
                     <Link
                       className='poem__likes-icon'
                       onClick={(event) => onLike(event, poem.id)}
-                      to="#" // Add a dummy path. TODO: Remove Link and use a button or Navigate 
+                      to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
                     />
-                )}
+                  )}
                 {context?.user &&
                   poem.userId !== context?.userId &&
                   !poem.likes.some((id) => id === context?.userId) && (
@@ -161,7 +178,7 @@ function MyFavouritePoems (props) {
                       className='poem__unlikes-icon'
                       onClick={(event) => onLike(event, poem.id)}
                     />
-                )}
+                  )}
                 {context?.user && poem.author === context?.username && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
@@ -169,10 +186,7 @@ function MyFavouritePoems (props) {
                     onClick={(event) => onDelete(event, poem.id)}
                   />
                 )}
-                <Link
-                  to={`/detail/${poem.id}`}
-                  className='poem__comments-icon'
-                >
+                <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
                   <SubjectSharpIcon style={{ fill: '#000' }} />
                 </Link>
               </section>

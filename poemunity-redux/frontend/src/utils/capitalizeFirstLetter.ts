@@ -1,8 +1,8 @@
-/** 
+/**
  * @param {string} string - string to capitalize first letter
  * @returns {string} string with first letter capitalized
  */
-function capitalizeFirstLetter (string: string) {
+function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 

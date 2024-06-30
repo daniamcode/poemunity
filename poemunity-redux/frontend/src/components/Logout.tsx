@@ -7,16 +7,16 @@ const Logout = () => {
   const history = useHistory()
   const context = useContext(AppContext)
 
-  const handleLogout = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleLogout = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault()
     context.setState({ ...context, user: '' })
     window.localStorage.removeItem('loggedUser')
     history.push('/')
   }
 
-  return (
-    <button className='header__logout' onClick={handleLogout} />
-  )
+  return <button className='header__logout' onClick={handleLogout} />
 }
 
 export default Logout

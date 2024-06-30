@@ -6,33 +6,33 @@ import Accordion from './SimpleAccordion'
 // import CircularProgress from './CircularIndeterminate'
 import LoginButton from './LoginButton'
 import LogoutButton from './Logout'
-import {
-  WEB_SUBTITLE,
-} from '../data/constants'
-import { AppContext } from '../App';
-import {useLocation} from 'react-router-dom'
+import { WEB_SUBTITLE } from '../data/constants'
+import { AppContext } from '../App'
+import { useLocation } from 'react-router-dom'
 import parseJWT from '../utils/parseJWT'
 
-function Header () {
-  const context = useContext(AppContext);
+function Header() {
+  const context = useContext(AppContext)
   const location = useLocation()
 
-  useEffect(()=>{
+  useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
-    if(loggedUserJSON) {
+    if (loggedUserJSON) {
       context.setState({
-        ...context, 
-        user: JSON.parse(loggedUserJSON), 
+        ...context,
+        user: JSON.parse(loggedUserJSON),
         userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
         username: parseJWT(JSON.parse(loggedUserJSON))?.username,
         picture: parseJWT(JSON.parse(loggedUserJSON))?.picture,
         config: {
           headers: {
             Authorization: `Bearer ${JSON.parse(loggedUserJSON)}`
-        }}})
+          }
+        }
+      })
     }
   }, [JSON.stringify(location)])
-  
+
   // if (isLoading) {
   //   return <CircularProgress />
   // }

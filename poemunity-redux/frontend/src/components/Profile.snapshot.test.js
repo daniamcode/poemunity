@@ -1,12 +1,11 @@
 import React from 'react'
-import { render } from '@testing-library/react';
+import { render } from '@testing-library/react'
 import Profile from './Profile'
 import { BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux';
-import store from '../redux/store';
+import { Provider } from 'react-redux'
+import store from '../redux/store'
 
-
-function renderProfile (arg) {
+function renderProfile(arg) {
   const defaultProps = {
     match: {
       params: {}

@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import Accordion from '@material-ui/core/Accordion'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
@@ -15,9 +15,9 @@ export default function SimpleAccordion() {
   }
   return (
     <Accordion className='accordion' expanded={expanded}>
-      <AccordionSummary 
-        expandIcon={<ExpandMoreIcon />} 
-        aria-controls='panel1a-content' 
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls='panel1a-content'
         id='panel1a-header'
         onClick={toggleExpanded}
       >
@@ -27,8 +27,8 @@ export default function SimpleAccordion() {
       <div>
         {CATEGORIES?.sort().map((category) => (
           <AccordionDetails key={category}>
-            <Link 
-              className='header__dropdown-subcategories' 
+            <Link
+              className='header__dropdown-subcategories'
               to={`/${category.toLowerCase()}`}
               onClick={toggleExpanded}
             >
@@ -38,8 +38,8 @@ export default function SimpleAccordion() {
         ))}
       </div>
       <AccordionDetails>
-        <Link 
-          className='header__dropdown-subcategories' 
+        <Link
+          className='header__dropdown-subcategories'
           to='/'
           onClick={toggleExpanded}
         >

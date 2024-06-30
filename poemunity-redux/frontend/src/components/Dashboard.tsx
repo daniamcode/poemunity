@@ -6,8 +6,7 @@ import Accordion from './SimpleAccordion'
 import Ranking from './Ranking'
 import List from './List'
 
-
-function Dashboard () {
+function Dashboard() {
   return (
     <main className='dashboard'>
       <div className='dashboard__accordion'>

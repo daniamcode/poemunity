@@ -11,17 +11,17 @@ import PageNotFound from './components/PageNotFound'
 import { Context } from './typescript/interfaces'
 
 export const AppContext = React.createContext<Context>({
-    elementToEdit: '',
-    user: '',
-    userId: '',
-    username: '',
-    picture: '',
-    config: {},
-    adminId: '',
-    setState: () => {},
+  elementToEdit: '',
+  user: '',
+  userId: '',
+  username: '',
+  picture: '',
+  config: {},
+  adminId: '',
+  setState: () => {}
 })
 
-function App () {
+function App() {
   const [contextState, setContextState] = useState({
     elementToEdit: '',
     user: '',
@@ -31,11 +31,11 @@ function App () {
     config: {},
     adminId: process.env.REACT_APP_ADMIN ?? '',
     setState(data: Context) {
-      const { setState, ...res } = data;
-      const newState = { ...contextState, ...res };
-      setContextState(newState);
-    },
-  });
+      const { setState, ...res } = data
+      const newState = { ...contextState, ...res }
+      setContextState(newState)
+    }
+  })
 
   return (
     <AppContext.Provider value={contextState}>
@@ -57,9 +57,7 @@ function App () {
         </div>
       </Router>
     </AppContext.Provider>
-
   )
 }
-
 
 export default App

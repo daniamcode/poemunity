@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { AppContext } from '../App';
+import { AppContext } from '../App'
 import PropTypes from 'prop-types'
 import SwipeableViews from 'react-swipeable-views'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
@@ -30,13 +30,17 @@ import {
   PROFILE_SEND_POEM,
   PROFILE_RESET_POEM
 } from '../data/constants'
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../redux/store';
-import { getPoemAction, savePoemAction } from '../redux/actions/poemActions';
-import { createPoemAction, updateAllPoemsCacheAfterCreatePoemAction, updateAllPoemsCacheAfterSavePoemAction } from '../redux/actions/poemsActions';
-import { manageError, manageSuccess } from '../utils/notifications';
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../redux/store'
+import { getPoemAction, savePoemAction } from '../redux/actions/poemActions'
+import {
+  createPoemAction,
+  updateAllPoemsCacheAfterCreatePoemAction,
+  updateAllPoemsCacheAfterSavePoemAction
+} from '../redux/actions/poemsActions'
+import { manageError, manageSuccess } from '../utils/notifications'
 
-function TabPanel (props) {
+function TabPanel(props) {
   const { children, value, index, ...other } = props
 
   return (
@@ -62,7 +66,7 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 }
 
-function a11yProps (index) {
+function a11yProps(index) {
   return {
     id: `full-width-tab-${index}`,
     'aria-controls': `full-width-tabpanel-${index}`
@@ -76,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function Profile (props) {
+export default function Profile(props) {
   const theme = useTheme()
   const [value, setValue] = React.useState(0)
 
@@ -89,66 +93,74 @@ export default function Profile (props) {
 
   // const [errorMessage, setErrorMessage] = useState(null)
 
-  const context = useContext(AppContext);
+  const context = useContext(AppContext)
 
-  function onSave ({event, poem, poemId}) {
+  function onSave({ event, poem, poemId }) {
     event.preventDefault()
-    dispatch(savePoemAction({
-      params: { poemId }, 
-      context,
-      data: poem,
-      callbacks: {
-        success: () => {
-          // todo: when I update this cache, it has effects on many queries. 
-          // Maybe I need some optimisation, in the frontend or in the backend
-          dispatch(updateAllPoemsCacheAfterSavePoemAction({poem, poemId}))
-          manageSuccess('Poem saved')
-        },
-        error: () => {
-          manageError('Sorry. There was an error saving the poem')
+    dispatch(
+      savePoemAction({
+        params: { poemId },
+        context,
+        data: poem,
+        callbacks: {
+          success: () => {
+            // todo: when I update this cache, it has effects on many queries.
+            // Maybe I need some optimisation, in the frontend or in the backend
+            dispatch(updateAllPoemsCacheAfterSavePoemAction({ poem, poemId }))
+            manageSuccess('Poem saved')
+          },
+          error: () => {
+            manageError('Sorry. There was an error saving the poem')
+          }
         }
-      }
-    }))
+      })
+    )
   }
 
   // Redux
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const { poemQuery } = useSelector(state => state);
+  const { poemQuery } = useSelector((state) => state)
 
   useEffect(() => {
     const queryOptions = {
-        reset: true,
-        fetch: false,
-    };
-    dispatch(getPoemAction({
-        options: queryOptions,
-    }));
-  }, []);
+      reset: true,
+      fetch: false
+    }
+    dispatch(
+      getPoemAction({
+        options: queryOptions
+      })
+    )
+  }, [])
 
   function handleLoadPoem() {
-      if (context?.elementToEdit) {
-          const queryOptions = {
-              reset: true,
-              fetch: true,
-          };
-          dispatch(getPoemAction({
-              params: {poemId: context?.elementToEdit},
-              options: queryOptions,
-          }));
+    if (context?.elementToEdit) {
+      const queryOptions = {
+        reset: true,
+        fetch: true
       }
+      dispatch(
+        getPoemAction({
+          params: { poemId: context?.elementToEdit },
+          options: queryOptions
+        })
+      )
+    }
   }
 
   useEffect(() => {
-      handleLoadPoem();
-  }, [JSON.stringify(context?.elementToEdit)]);
+    handleLoadPoem()
+  }, [JSON.stringify(context?.elementToEdit)])
 
-  useEffect(()=> {
-    if(poemQuery?.item) {
+  useEffect(() => {
+    if (poemQuery?.item) {
       setPoemTitle(context?.elementToEdit ? poemQuery?.item?.title : '')
       setPoemContent(context?.elementToEdit ? poemQuery?.item?.poem : '')
       setPoemFakeId(context?.elementToEdit ? poemQuery?.item?.userId : '')
-      setPoemLikes(context?.elementToEdit ? poemQuery?.item?.likes?.toString() : [])
+      setPoemLikes(
+        context?.elementToEdit ? poemQuery?.item?.likes?.toString() : []
+      )
       setPoemCategory(context?.elementToEdit ? poemQuery?.item?.genre : '')
       setPoemOrigin(context?.elementToEdit ? poemQuery?.item?.origin : '')
     }
@@ -162,7 +174,7 @@ export default function Profile (props) {
     setValue(index)
   }
 
-  function onFieldChange (value, setValue) {
+  function onFieldChange(value, setValue) {
     setValue(value)
   }
 
@@ -184,9 +196,64 @@ export default function Profile (props) {
       ':' +
       currentDatetime.getSeconds()
 
-      if(!context?.elementToEdit) {
-        if(context?.userId === context.adminId) {
-          const poem = {
+    if (!context?.elementToEdit) {
+      if (context?.userId === context.adminId) {
+        const poem = {
+          userId: poemFakeId,
+          poem: poemContent,
+          title: poemTitle,
+          genre: poemCategory,
+          likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+          date: formattedDate,
+          origin: poemOrigin
+        }
+        dispatch(
+          createPoemAction({
+            poem,
+            context,
+            callbacks: {
+              success: (response) => {
+                dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
+              },
+              error: () => {
+                console.log('something went wrong creating a poem!')
+              }
+            }
+          })
+        )
+      } else {
+        const poem = {
+          poem: poemContent,
+          title: poemTitle,
+          genre: poemCategory,
+          likes: [],
+          date: formattedDate,
+          origin: 'user'
+        }
+        dispatch(
+          createPoemAction({
+            poem,
+            context,
+            callbacks: {
+              success: (response) => {
+                dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
+              },
+              error: (error) => {
+                console.log('something went wrong creating a poem!')
+              }
+            }
+          })
+        )
+      }
+      setPoemContent('')
+      setPoemTitle('')
+      setPoemOrigin('')
+      setPoemCategory('')
+    } else {
+      if (context?.userId === context.adminId) {
+        onSave({
+          event,
+          poem: {
             userId: poemFakeId,
             poem: poemContent,
             title: poemTitle,
@@ -194,79 +261,28 @@ export default function Profile (props) {
             likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
             date: formattedDate,
             origin: poemOrigin
-          }
-          dispatch(createPoemAction({
-            poem,
-            context,
-            callbacks: {
-              success: (response) => {
-                dispatch(updateAllPoemsCacheAfterCreatePoemAction({response}));
-              },
-              error: () => {
-                console.log('something went wrong creating a poem!')
-              }
-            }
-          }))
-        } else {
-          const poem = {
+          },
+          poemId: poemQuery.item.id
+        })
+      } else {
+        onSave({
+          event,
+          poem: {
             poem: poemContent,
             title: poemTitle,
             genre: poemCategory,
             likes: [],
-            date: formattedDate,
-            origin: 'user'
-          }
-          dispatch(createPoemAction({
-            poem,
-            context,
-            callbacks: {
-              success: (response) => {
-                dispatch(updateAllPoemsCacheAfterCreatePoemAction({response}));
-              },
-              error: (error) => {
-                console.log('something went wrong creating a poem!')
-              }
-            }
-          }))
-        }
-        setPoemContent('')
-        setPoemTitle('')
-        setPoemOrigin('')
-        setPoemCategory('')
-      } else {
-        if(context?.userId === context.adminId) {
-          onSave({
-            event, 
-            poem: 
-              {
-                userId: poemFakeId,
-                poem: poemContent,
-                title: poemTitle,
-                genre: poemCategory,
-                likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
-                date: formattedDate,
-                origin: poemOrigin,
-              }, 
-            poemId: poemQuery.item.id});  
-        } else {
-          onSave({
-            event,
-            poem: 
-            {
-              poem: poemContent,
-              title: poemTitle,
-              genre: poemCategory,
-              likes: [],
-              date: formattedDate,
-            },
-            poemId: poemQuery.item.id});
-        }
-        context.setState({...context, elementToEdit: ''})
+            date: formattedDate
+          },
+          poemId: poemQuery.item.id
+        })
       }
+      context.setState({ ...context, elementToEdit: '' })
+    }
   }
 
   const handleReset = (event) => {
-    context.setState({...context, elementToEdit: ''})
+    context.setState({ ...context, elementToEdit: '' })
     setPoemContent('')
     setPoemTitle('')
     setPoemOrigin('')
@@ -274,185 +290,193 @@ export default function Profile (props) {
   }
 
   return (
-    
-      <main className='profile__main'>
-        {
-          context?.user ?
-          (
-          <div>
+    <main className='profile__main'>
+      {context?.user ? (
+        <div>
           <section className='profile__title'>
-          <div>
-            {context?.username}
-            {PROFILE_TITLE}
-          </div>
-        </section>
-        <section className='profile__intro'>
-          <img
-            className='profile__image'
-            src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
-            // src={context.picture}
-            alt={context?.username}
-          />
-          <div className='profile__personal-data'>
-            <div className='profile__insert-poem'>
-              <p className='profile__insert-poem-title'>
-                {context?.elementToEdit 
-                  ? PROFILE_SUBTITLE_UPDATE 
-                  : PROFILE_SUBTITLE_CREATE}
-              </p>
-              <br />
-              <form
-                className='profile__insert-poem-form'
-              >
-                <div className='profile__insert-poem-inputs'>
-                  {
-                  context?.userId === context.adminId && (
-                  <>
+            <div>
+              {context?.username}
+              {PROFILE_TITLE}
+            </div>
+          </section>
+          <section className='profile__intro'>
+            <img
+              className='profile__image'
+              src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
+              // src={context.picture}
+              alt={context?.username}
+            />
+            <div className='profile__personal-data'>
+              <div className='profile__insert-poem'>
+                <p className='profile__insert-poem-title'>
+                  {context?.elementToEdit
+                    ? PROFILE_SUBTITLE_UPDATE
+                    : PROFILE_SUBTITLE_CREATE}
+                </p>
+                <br />
+                <form className='profile__insert-poem-form'>
+                  <div className='profile__insert-poem-inputs'>
+                    {context?.userId === context.adminId && (
+                      <>
+                        <label className='profile__insert-poem-input'>
+                          Origin
+                          <select
+                            className='profile__insert-poem-input'
+                            name='origin'
+                            required
+                            value={poemOrigin}
+                            onChange={(event) =>
+                              onFieldChange(event.target.value, setPoemOrigin)
+                            }
+                          >
+                            <option value=''>{PROFILE_SELECT_CATEGORY}</option>
+                            <option value='famous'>Famous</option>
+                            <option value='user'>User</option>
+                          </select>
+                        </label>
+                        <label className='profile__insert-poem-input'>
+                          {PROFILE_SELECT_TITLE_AUTHOR}
+                          <input
+                            className='profile__insert-poem-input'
+                            name='author'
+                            required
+                            value={poemFakeId}
+                            onChange={(event) =>
+                              onFieldChange(event.target.value, setPoemFakeId)
+                            }
+                          />
+                        </label>
+                        <label className='profile__insert-poem-input'>
+                          {PROFILE_SELECT_LIKES}
+                          <input
+                            className='profile__insert-poem-input'
+                            name='likes'
+                            value={poemLikes}
+                            onChange={(event) =>
+                              onFieldChange(event.target.value, setPoemLikes)
+                            }
+                          />
+                        </label>
+                      </>
+                    )}
                     <label className='profile__insert-poem-input'>
-                      Origin
-                      <select
-                        className="profile__insert-poem-input"
-                        name="origin"
-                        required
-                        value={poemOrigin}
-                        onChange={(event) => onFieldChange(event.target.value, setPoemOrigin)}
-                      >
-                        <option value=''>{PROFILE_SELECT_CATEGORY}</option>
-                        <option value="famous">Famous</option>
-                        <option value="user">User</option>
-                      </select>
-                    </label>
-                    <label className='profile__insert-poem-input'>
-                      {PROFILE_SELECT_TITLE_AUTHOR}
+                      {PROFILE_SELECT_TITLE_TITLE}
                       <input
                         className='profile__insert-poem-input'
-                        name='author'
+                        placeholder={PROFILE_SELECT_TITLE}
+                        name='title'
                         required
-                        value={poemFakeId}
+                        value={poemTitle}
                         onChange={(event) =>
-                          onFieldChange(event.target.value, setPoemFakeId)}
+                          onFieldChange(event.target.value, setPoemTitle)
+                        }
                       />
                     </label>
                     <label className='profile__insert-poem-input'>
-                    {PROFILE_SELECT_LIKES}
-                    <input
-                      className='profile__insert-poem-input'
-                      name='likes'
-                      value={poemLikes}
-                      onChange={(event) =>
-                        onFieldChange(event.target.value, setPoemLikes)}
-                    />
-                  </label>
-                </>
-                  )
-                  }
-                  <label className='profile__insert-poem-input'>
-                    {PROFILE_SELECT_TITLE_TITLE}
-                    <input
-                      className='profile__insert-poem-input'
-                      placeholder={PROFILE_SELECT_TITLE}
-                      name='title'
+                      {PROFILE_SELECT_CATEGORY_TITLE}
+                      <select
+                        className='profile__insert-poem-input'
+                        id='category'
+                        name='category'
+                        required
+                        value={poemCategory}
+                        onChange={(event) => {
+                          onFieldChange(event.target.value, setPoemCategory)
+                        }}
+                      >
+                        <option value=''>{PROFILE_SELECT_CATEGORY}</option>
+                        {CATEGORIES?.map((category) => (
+                          <option
+                            value={category.toLowerCase()}
+                            selected={
+                              poemQuery?.item?.genre === category.toLowerCase()
+                            }
+                          >
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div>
+                    <textarea
+                      className='profile__text-area'
+                      id='poem'
+                      name='poem'
                       required
-                      value={poemTitle}
+                      placeholder={PROFILE_POEM_PLACEHOLDER}
+                      value={poemContent}
                       onChange={(event) =>
-                        onFieldChange(event.target.value, setPoemTitle)}
+                        onFieldChange(event.target.value, setPoemContent)
+                      }
                     />
-                  </label>
-                  <label className='profile__insert-poem-input'>
-                    {PROFILE_SELECT_CATEGORY_TITLE}
-                    <select
-                      className='profile__insert-poem-input'
-                      id='category'
-                      name='category'
-                      required
-                      value={poemCategory}
-                      onChange={(event) => {
-                        onFieldChange(event.target.value, setPoemCategory)
-                      }}
-                    >
-                      <option value=''>{PROFILE_SELECT_CATEGORY}</option>
-                      {CATEGORIES?.map((category) => (
-                        <option value={category.toLowerCase()} selected={poemQuery?.item?.genre === category.toLowerCase()}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <div>
-                  <textarea
-                    className='profile__text-area'
-                    id='poem'
-                    name='poem'
-                    required
-                    placeholder={PROFILE_POEM_PLACEHOLDER}
-                    value={poemContent}
-                    onChange={(event) =>
-                      onFieldChange(event.target.value, setPoemContent)}
-                  />
-                </div>
+                  </div>
 
-                <button className='profile__send-poem' type='submit' onClick={handleReset}>
-                  {PROFILE_RESET_POEM}
-                </button>
-                <button 
-                  className='profile__send-poem' 
-                  type='submit' 
-                  onClick={handleSend}
-                  disabled={!poemTitle || !poemCategory || !poemContent || ((context?.userId === context.adminId) && !poemOrigin)}
-                >
-                  {PROFILE_SEND_POEM}
-                </button>
-              </form>
+                  <button
+                    className='profile__send-poem'
+                    type='submit'
+                    onClick={handleReset}
+                  >
+                    {PROFILE_RESET_POEM}
+                  </button>
+                  <button
+                    className='profile__send-poem'
+                    type='submit'
+                    onClick={handleSend}
+                    disabled={
+                      !poemTitle ||
+                      !poemCategory ||
+                      !poemContent ||
+                      (context?.userId === context.adminId && !poemOrigin)
+                    }
+                  >
+                    {PROFILE_SEND_POEM}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
-        </section>
-        <section className='profile__outro'>
-          <div className='profile__tabs'>
-            <AppBar position='static' color='default'>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                indicatorColor='primary'
-                textColor='primary'
-                variant='fullWidth'
-                aria-label='full width tabs example'
+          </section>
+          <section className='profile__outro'>
+            <div className='profile__tabs'>
+              <AppBar position='static' color='default'>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  indicatorColor='primary'
+                  textColor='primary'
+                  variant='fullWidth'
+                  aria-label='full width tabs example'
+                >
+                  <Tab label={PROFILE_POEMS} {...a11yProps(0)} />
+                  <Tab label={PROFILE_FAVOURITE_POEMS} {...a11yProps(1)} />
+                </Tabs>
+              </AppBar>
+              <SwipeableViews
+                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                index={value}
+                onChangeIndex={handleChangeIndex}
               >
-                <Tab label={PROFILE_POEMS} {...a11yProps(0)} />
-                <Tab label={PROFILE_FAVOURITE_POEMS} {...a11yProps(1)} />
-              </Tabs>
-            </AppBar>
-            <SwipeableViews
-              axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-              index={value}
-              onChangeIndex={handleChangeIndex}
-            >
-              <TabPanel
-                className='profile__myPoems'
-                value={value}
-                index={0}
-                dir={theme.direction}
-              >
-                <MyPoems />
-              </TabPanel>
-              <TabPanel
-                className='profile__myPoems'
-                value={value}
-                index={1}
-                dir={theme.direction}
-              >
-                <MyFavouritePoems />
-              </TabPanel>
-            </SwipeableViews>
-          </div>
-        </section>
+                <TabPanel
+                  className='profile__myPoems'
+                  value={value}
+                  index={0}
+                  dir={theme.direction}
+                >
+                  <MyPoems />
+                </TabPanel>
+                <TabPanel
+                  className='profile__myPoems'
+                  value={value}
+                  index={1}
+                  dir={theme.direction}
+                >
+                  <MyFavouritePoems />
+                </TabPanel>
+              </SwipeableViews>
+            </div>
+          </section>
         </div>
-
-        ) : null
-        }
-        
-        
-      </main>
-    
+      ) : null}
+    </main>
   )
 }

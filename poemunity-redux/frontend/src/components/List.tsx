@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { useEffect, useState, useContext } from 'react'
 import { AppContext } from '../App'
 import './List.scss'
@@ -29,17 +31,17 @@ import { Poem } from '../typescript/interfaces'
 import { RouteComponentProps } from 'react-router'
 
 interface MatchParams {
-  genre: string;
+  genre: string
 }
 
-function List (props: Partial<RouteComponentProps<MatchParams>>) {
+function List(props: Partial<RouteComponentProps<MatchParams>>) {
   interface ListStates {
-    poems: Poem[];
+    poems: Poem[]
     filter: string
   }
   const genre = props?.match?.params?.genre
-  const [poems, setPoems] = useState<ListStates["poems"]>([])
-  const [filter, setFilter] = useState<ListStates["filter"]>('')
+  const [poems, setPoems] = useState<ListStates['poems']>([])
+  const [filter, setFilter] = useState<ListStates['filter']>('')
 
   const [paramsData, setParamsData] = useFiltersFromQuery({
     orderBy: '',
@@ -51,39 +53,48 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
   // Redux
   const dispatch = useAppDispatch()
 
-  const {
-    poemsListQuery
-  } = useSelector((state: RootState) => state)
+  const { poemsListQuery } = useSelector((state: RootState) => state)
 
   useEffect(() => {
     const queryOptions = {
       reset: true,
       fetch: false
     }
-    dispatch(getPoemsListAction({
-      options: queryOptions
-    }))
+    dispatch(
+      getPoemsListAction({
+        options: queryOptions
+      })
+    )
   }, [dispatch])
 
   useEffect(() => {
-    function handleLoadPoems () {
+    function handleLoadPoems() {
       if (paramsData.origin) {
         const queryOptions = {
           reset: true,
           fetch: true
         }
-        dispatch(getPoemsListAction({
-          params: paramsData.origin !== 'all' ? { origin: paramsData.origin } : null,
-          options: queryOptions
-        }))
+        dispatch(
+          getPoemsListAction({
+            params:
+              paramsData.origin !== 'all'
+                ? { origin: paramsData.origin }
+                : null,
+            options: queryOptions
+          })
+        )
       }
     }
     handleLoadPoems()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(paramsData.origin), dispatch])
 
   useEffect(() => {
-    if (poemsListQuery && poemsListQuery?.item && poemsListQuery?.item?.length > 0) {
+    if (
+      poemsListQuery &&
+      poemsListQuery?.item &&
+      poemsListQuery?.item?.length > 0
+    ) {
       const newData = [...poemsListQuery?.item]
 
       if (genre) {
@@ -95,20 +106,22 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
         setPoems(poemsSorted)
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify([poemsListQuery, genre, paramsData])])
 
-  const handleOrderChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
+  const handleOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     addQueryParam({ id: 'orderBy', value: event.target.value })
     setParamsData({ ...paramsData, orderBy: event.target.value })
   }
 
-  const handleOriginChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
+  const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     addQueryParam({ id: 'origin', value: event.target.value })
     setParamsData({ ...paramsData, origin: event.target.value })
   }
 
-  const handleSearchChange = (event:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSearchChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFilter(normalizeString(event.target.value))
   }
 
@@ -152,14 +165,19 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
           <form className='list__sort'>
             <label>
               Authors:
-              <select
-                id='origin'
-                name='origin'
-                onChange={handleOriginChange}
-              >
-                <option value='all' selected={paramsData.origin === 'all'}>All</option>
-                <option value='famous' selected={paramsData.origin === 'famous'}>Famous</option>
-                <option value='user' selected={paramsData.origin === 'user'}>Users</option>
+              <select id='origin' name='origin' onChange={handleOriginChange}>
+                <option value='all' selected={paramsData.origin === 'all'}>
+                  All
+                </option>
+                <option
+                  value='famous'
+                  selected={paramsData.origin === 'famous'}
+                >
+                  Famous
+                </option>
+                <option value='user' selected={paramsData.origin === 'user'}>
+                  Users
+                </option>
               </select>
             </label>
           </form>
@@ -172,10 +190,34 @@ function List (props: Partial<RouteComponentProps<MatchParams>>) {
                 onChange={handleOrderChange}
                 data-testid='order-select'
               >
-                <option value={ORDER_BY_LIKES} data-testid='select-option' selected={ORDER_BY_LIKES === paramsData.orderBy}>{ORDER_BY_LIKES}</option>
-                <option value={ORDER_BY_DATE} data-testid='select-option' selected={ORDER_BY_DATE === paramsData.orderBy}>{ORDER_BY_DATE}</option>
-                <option value={ORDER_BY_RANDOM} data-testid='select-option' selected={ORDER_BY_RANDOM === paramsData.orderBy}>{ORDER_BY_RANDOM}</option>
-                <option value={ORDER_BY_TITLE} data-testid='select-option' selected={ORDER_BY_TITLE === paramsData.orderBy}>{ORDER_BY_TITLE}</option>
+                <option
+                  value={ORDER_BY_LIKES}
+                  data-testid='select-option'
+                  selected={ORDER_BY_LIKES === paramsData.orderBy}
+                >
+                  {ORDER_BY_LIKES}
+                </option>
+                <option
+                  value={ORDER_BY_DATE}
+                  data-testid='select-option'
+                  selected={ORDER_BY_DATE === paramsData.orderBy}
+                >
+                  {ORDER_BY_DATE}
+                </option>
+                <option
+                  value={ORDER_BY_RANDOM}
+                  data-testid='select-option'
+                  selected={ORDER_BY_RANDOM === paramsData.orderBy}
+                >
+                  {ORDER_BY_RANDOM}
+                </option>
+                <option
+                  value={ORDER_BY_TITLE}
+                  data-testid='select-option'
+                  selected={ORDER_BY_TITLE === paramsData.orderBy}
+                >
+                  {ORDER_BY_TITLE}
+                </option>
               </select>
             </label>
           </form>
