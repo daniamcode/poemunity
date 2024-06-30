@@ -97,7 +97,7 @@ export function updatePoemsListCacheAfterLikePoemAction({
 
     const poemsListQueryUpdated = newPoemsListQuery?.reduce(
       (acc: Poem[], poem: Poem) => {
-        let coincidence = poem.id === poemId
+        const coincidence = poem.id === poemId
         if (coincidence) {
           const index = poem?.likes?.indexOf(context.userId)
           if (index !== -1) {
@@ -139,7 +139,7 @@ export function updateRankingCacheAfterLikePoemAction({
 
     const rankingQueryUpdated = newRankingQuery?.reduce(
       (acc: Poem[], poem: Poem) => {
-        let coincidence = poem.id === poemId
+        const coincidence = poem.id === poemId
         if (coincidence) {
           const index = poem?.likes?.indexOf(context.userId)
           if (index !== -1) {
@@ -181,7 +181,7 @@ export function updateAllPoemsCacheAfterLikePoemAction({
 
     const allPoemsQueryUpdated = newAllPoemsQuery?.reduce(
       (acc: Poem[], poem: Poem) => {
-        let coincidence = poem.id === poemId
+        const coincidence = poem.id === poemId
         if (coincidence) {
           const index = poem?.likes?.indexOf(context.userId)
           if (index !== -1) {

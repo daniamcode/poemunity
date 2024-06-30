@@ -536,7 +536,7 @@ describe('createPoemAction', () => {
     userId: '1'
   }
 
-  let callbacks = {
+  const callbacks = {
     error: () => {
       console.log('error')
     },
