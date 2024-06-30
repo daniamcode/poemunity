@@ -11,8 +11,6 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "@babel/code-frame": "^7.24.7",
-    "@babel/helper-validator-identifier": "^7.24.7",
     "@daniamcode/utils": "^1.0.4",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
@@ -53,10 +51,6 @@
       "src/serviceWorker"
     ]
   },
-  "babel": {
-      "presets": ["@babel/preset-env"],
-      "configFile": false
-  },
   "standard": {
     "env": [
       "jest"
@@ -78,9 +72,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.24.7",
+    "@babel/cli": "^7.24.7",
     "@babel/core": "^7.24.7",
-    "@babel/eslint-parser": "^7.24.7",
-    "@babel/preset-typescript": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react-hooks": "^8.0.0",
     "@types/lodash.clonedeep": "^4.5.7",
