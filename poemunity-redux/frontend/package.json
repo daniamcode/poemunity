@@ -103,7 +103,7 @@
     "globals": "^15.6.0",
     "history": "^5.3.0",
     "html-webpack-plugin": "^5.5.0",
-    "jest": "^26.6.3",
+    "jest": "^29.7.0",
     "jest-enzyme": "^7.1.2",
     "npm": "^8.11.0",
     "prettier": "^3.3.2",
