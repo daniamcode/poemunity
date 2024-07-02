@@ -3,11 +3,14 @@
 This App WAS online at https://poemunity.com 
 
 I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS.
+I'M REMOVING CREATE-REACT-APP AND MANAGING ESBUILD, ESLINT etc on my own.
 
 I made the frontend with React, and the backend with Node.js. I keep adding Typescript and Testing with Jest and React Testing Library.
 
-There are three folders: flux, Poemunity-React-Query and poemunity-redux (this last one is the only one valid right now). 
+In the branch name "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
 
+
+# TL;DR:
 ## Flux 
 In the flux folder we have the original project, made during the bootcamp and deployed afterwards. 
 
@@ -37,4 +40,4 @@ Then, I created the Poemunity-React-Query folder and continued from there, manag
 Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
 
 ### Own build
-Previously I was on create-react-app. I'm moving to custom build with esbuild
+Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
