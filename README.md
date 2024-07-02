@@ -7,7 +7,7 @@ I'M REMOVING CREATE-REACT-APP AND MANAGING ESBUILD, ESLINT etc on my own.
 
 I made the frontend with React, and the backend with Node.js. I keep adding Typescript and Testing with Jest and React Testing Library.
 
-In the branch name "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
+In the branch named "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
 
 
 # TL;DR:
