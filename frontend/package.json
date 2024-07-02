@@ -35,6 +35,5 @@
     "esbuild-sass-plugin": "^3.3.1",
     "rimraf": "^5.0.7",
     "servor": "^4.0.2"
-  },
-  "proxy": "http://localhost:4200/"
+  }
 }
