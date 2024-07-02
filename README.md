@@ -7,7 +7,7 @@ I'M REMOVING CREATE-REACT-APP AND MANAGING ESBUILD, ESLINT etc on my own.
 
 I made the frontend with React, and the backend with Node.js. I keep adding Typescript and Testing with Jest and React Testing Library.
 
-In the branch named "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
+In the branch named "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
 
 
 # TL;DR:
@@ -40,4 +40,4 @@ Then, I created the Poemunity-React-Query folder and continued from there, manag
 Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
 
 ### Own build
-Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch, I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
+Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
