@@ -2,6 +2,7 @@ require('./mongo')
 
 const express = require('express')
 const app = express()
+const cors = require('cors')
 const debug = require('debug')('app')
 const path = require('path')
 const port = process.env.PORT || 8080
@@ -13,6 +14,11 @@ const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
 
 app.use(express.json())
+app.use(cors({
+  origin: 'http://localhost:3000', // or the origin of your frontend
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}))
 
 console.log(process.env.NODE_ENV)
 console.log(process.env)

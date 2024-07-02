@@ -41,6 +41,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
   }
   const genre = props?.match?.params?.genre
   const [poems, setPoems] = useState<ListStates['poems']>([])
+
   const [filter, setFilter] = useState<ListStates['filter']>('')
 
   const [paramsData, setParamsData] = useFiltersFromQuery({

@@ -35,3 +35,6 @@ Then, I created the Poemunity-React-Query folder and continued from there, manag
 
 ## Redux
 Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
+
+### Own build
+Previously I was on create-react-app. I'm moving to custom build with esbuild

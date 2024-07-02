@@ -37,5 +37,5 @@
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx"
-  ]
+, "src/App.js"  ]
 }
