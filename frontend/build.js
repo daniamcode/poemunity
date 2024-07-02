@@ -4,7 +4,7 @@ const { sassPlugin } = require('esbuild-sass-plugin')
 
 const {
     esbuildPluginLiveReload,
-} = require('./utils/webserver')
+} = require('./utils/webserver.js')
 
 const { createEsbuildDefaultConfig } = require('./conf/esbuild.config.ts')
 
