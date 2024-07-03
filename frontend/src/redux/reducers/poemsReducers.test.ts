@@ -41,12 +41,19 @@ describe('Poems reducer - allPoemsQuery', () => {
 
   test('should call commonReducer', () => {
     const spy = jest.spyOn(commonReducers, 'commonReducer')
-    poemsReducers.allPoemsQuery(undefined, { type: 'whatever' })
+    poemsReducers.allPoemsQuery(undefined, {
+      type: 'whatever'
+    })
     expect(spy).toHaveBeenCalled()
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith({
-      state: { isFetching: false, isError: false },
-      action: { type: 'whatever' },
+      state: {
+        isFetching: false,
+        isError: false
+      },
+      action: {
+        type: 'whatever'
+      },
       actionType: ACTIONS.ALL_POEMS
     })
     spy.mockRestore()
@@ -55,7 +62,10 @@ describe('Poems reducer - allPoemsQuery', () => {
     const result = poemsReducers.allPoemsQuery(undefined, {
       type: `${ACTIONS.ALL_POEMS}_reset`
     })
-    expect(result).toEqual({ isFetching: false, isError: false })
+    expect(result).toEqual({
+      isFetching: false,
+      isError: false
+    })
   })
   test('should return the initial state with resetAction calling abort', () => {
     const prevState = {
@@ -69,7 +79,10 @@ describe('Poems reducer - allPoemsQuery', () => {
       type: `${ACTIONS.ALL_POEMS}_reset`
     })
 
-    expect(result).toEqual({ isFetching: false, isError: false })
+    expect(result).toEqual({
+      isFetching: false,
+      isError: false
+    })
     expect(abortSpy).toHaveBeenCalledTimes(1)
     abortSpy.mockRestore()
   })
@@ -78,7 +91,10 @@ describe('Poems reducer - allPoemsQuery', () => {
       type: `${ACTIONS.ALL_POEMS}_request`
     })
 
-    expect(result).toEqual({ isFetching: true, isError: false })
+    expect(result).toEqual({
+      isFetching: true,
+      isError: false
+    })
   })
   test('should return loading true with requestAction when calling abort, and abort should be called', () => {
     const prevState = {
@@ -92,7 +108,10 @@ describe('Poems reducer - allPoemsQuery', () => {
       type: `${ACTIONS.ALL_POEMS}_request`
     })
 
-    expect(result).toEqual({ ...prevState, isFetching: true })
+    expect(result).toEqual({
+      ...prevState,
+      isFetching: true
+    })
     expect(abortSpy).toHaveBeenCalledTimes(1)
     abortSpy.mockRestore()
   })
@@ -115,7 +134,11 @@ describe('Poems reducer - allPoemsQuery', () => {
     })
   })
   test('should return correct state with fulfilledAction - with previous state', () => {
-    const prevState = { isFetching: false, isError: false, item: [poem1] }
+    const prevState = {
+      isFetching: false,
+      isError: false,
+      item: [poem1]
+    }
     const result = poemsReducers.allPoemsQuery(prevState, {
       type: `${ACTIONS.ALL_POEMS}_fulfilled`,
       payload: [poem2, poem3]

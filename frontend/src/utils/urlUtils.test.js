@@ -5,7 +5,11 @@ import { act } from '@testing-library/react'
 // this is how custom hooks are tested. Watch https://www.youtube.com/watch?v=qRw3qKRBW4M&list=LL
 describe('useFiltersFromQuery', () => {
   test('should match', () => {
-    const { result } = renderHook(() => useFiltersFromQuery({ test: 'test' }))
+    const { result } = renderHook(() =>
+      useFiltersFromQuery({
+        test: 'test'
+      })
+    )
 
     //if the returned value contains a function we could do this to execute it:
     // act(()=> {
@@ -13,6 +17,8 @@ describe('useFiltersFromQuery', () => {
     // })
 
     //the first element of the array is "data" ans the second one is "setData"
-    expect(result.current[0]).toEqual({ test: 'test' })
+    expect(result.current[0]).toEqual({
+      test: 'test'
+    })
   })
 })

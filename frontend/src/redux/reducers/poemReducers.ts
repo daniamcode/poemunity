@@ -17,5 +17,9 @@ export function poemQuery(
   state: StateItem<Poem> = INITIAL,
   action: Action
 ): StateItem<Poem> {
-  return commonReducer({ state, action, actionType: ACTIONS?.POEM })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.POEM
+  })
 }

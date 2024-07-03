@@ -32,7 +32,10 @@ function App() {
     adminId: process.env.REACT_APP_ADMIN ?? '',
     setState(data: Context) {
       const { setState, ...res } = data
-      const newState = { ...contextState, ...res }
+      const newState = {
+        ...contextState,
+        ...res
+      }
       setContextState(newState)
     }
   })

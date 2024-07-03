@@ -46,7 +46,13 @@ export default function Ranking() {
   const { rankingQuery } = useSelector((state: RootState) => state)
 
   useEffect(() => {
-    dispatch(getRankingAction({ params: { origin: 'user' } }))
+    dispatch(
+      getRankingAction({
+        params: {
+          origin: 'user'
+        }
+      })
+    )
   }, [dispatch])
 
   useEffect(() => {

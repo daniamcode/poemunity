@@ -15,12 +15,20 @@ export function loginQuery(
   state: StateItem<string> = INITIAL,
   action: Action
 ): StateItem<string> {
-  return commonReducer({ state, action, actionType: ACTIONS?.LOGIN })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.LOGIN
+  })
 }
 
 export function registerQuery(
   state: StateItem<User> = INITIAL,
   action: Action
 ): StateItem<User> {
-  return commonReducer({ state, action, actionType: ACTIONS?.REGISTER })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.REGISTER
+  })
 }

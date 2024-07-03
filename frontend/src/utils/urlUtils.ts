@@ -67,7 +67,7 @@ export function addQueryParams(
 ) {
   try {
     const urlParams = new URLSearchParams(window.location.search)
-    keysToDelete.forEach((key) => urlParams.delete(key))
+    keysToDelete.forEach(key => urlParams.delete(key))
     console.log(keysToDelete)
     data.forEach(({ key, value }) => {
       const parsedValue = JSON.stringify(value)
@@ -115,7 +115,7 @@ export function useFiltersFromQuery(defaultValue: any) {
   useEffect(() => {
     const keys = Object.keys(defaultValue)
     const accumulatedQuery = {}
-    keys.forEach((key) => {
+    keys.forEach(key => {
       const value = getQueryParam(key)
       if (value !== undefined) {
         accumulatedQuery[key] = value
@@ -127,7 +127,10 @@ export function useFiltersFromQuery(defaultValue: any) {
     })
   }, [])
   useEffect(() => {
-    const keysData = Object.keys(data).map((key) => ({ key, value: data[key] }))
+    const keysData = Object.keys(data).map(key => ({
+      key,
+      value: data[key]
+    }))
     const keysToDelete: string[] = []
     const filteredData = keysData.filter(({ key, value }) => {
       const currentValue = getQueryParam(key)

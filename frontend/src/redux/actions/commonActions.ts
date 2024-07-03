@@ -134,8 +134,10 @@ export function getAction({
   if (options.fetch) {
     dispatch({ type: requestAction })
     API({}, extraConfig)
-      .get(url, { params })
-      .then((response) => {
+      .get(url, {
+        params
+      })
+      .then(response => {
         let responseData = response.data
         if (transformResponse && typeof transformResponse === 'function') {
           responseData = transformResponse(responseData)
@@ -155,7 +157,7 @@ export function getAction({
           callbacks.success(responseData)
         }
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: rejectedAction,
           // if there's a network error, for example, we don't get a response in error
@@ -228,7 +230,7 @@ export function postAction({
     dispatch({ type: requestAction })
     API(headers, config)
       .post(url, data)
-      .then((response) => {
+      .then(response => {
         // if (options.update) {
         //     dispatch({
         //         type: updateAction,
@@ -244,7 +246,7 @@ export function postAction({
           callbacks.success(response.data)
         }
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: rejectedAction,
           payload: error?.response?.data || error
@@ -308,7 +310,7 @@ export function putAction({
   dispatch({ type: requestAction })
   API()
     .put(url, data, config)
-    .then((response) => {
+    .then(response => {
       dispatch({
         type: fulfilledAction,
         payload: response.data
@@ -318,7 +320,7 @@ export function putAction({
         callbacks.success(response.data)
       }
     })
-    .catch((error) => {
+    .catch(error => {
       dispatch({
         type: rejectedAction,
         payload: error?.response?.data || error
@@ -389,7 +391,7 @@ export function deleteAction({
     dispatch({ type: requestAction })
     API(headers, config)
       .delete(url, data)
-      .then((response) => {
+      .then(response => {
         // if (options.update) {
         //     dispatch({
         //         type: updateAction,
@@ -405,7 +407,7 @@ export function deleteAction({
           callbacks.success(response.data)
         }
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: rejectedAction,
           payload: error?.response?.data || error
@@ -469,7 +471,7 @@ export function patchAction({
   dispatch({ type: requestAction })
   API()
     .patch(url, data, config)
-    .then((response) => {
+    .then(response => {
       dispatch({
         type: fulfilledAction,
         payload: response.data
@@ -479,7 +481,7 @@ export function patchAction({
         callbacks.success(response.data)
       }
     })
-    .catch((error) => {
+    .catch(error => {
       dispatch({
         type: rejectedAction,
         payload: error?.response?.data || error

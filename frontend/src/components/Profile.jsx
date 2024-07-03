@@ -73,7 +73,7 @@ function a11yProps(index) {
   }
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.paper,
     width: 500
@@ -99,14 +99,21 @@ export default function Profile(props) {
     event.preventDefault()
     dispatch(
       savePoemAction({
-        params: { poemId },
+        params: {
+          poemId
+        },
         context,
         data: poem,
         callbacks: {
           success: () => {
             // todo: when I update this cache, it has effects on many queries.
             // Maybe I need some optimisation, in the frontend or in the backend
-            dispatch(updateAllPoemsCacheAfterSavePoemAction({ poem, poemId }))
+            dispatch(
+              updateAllPoemsCacheAfterSavePoemAction({
+                poem,
+                poemId
+              })
+            )
             manageSuccess('Poem saved')
           },
           error: () => {
@@ -120,7 +127,7 @@ export default function Profile(props) {
   // Redux
   const dispatch = useAppDispatch()
 
-  const { poemQuery } = useSelector((state) => state)
+  const { poemQuery } = useSelector(state => state)
 
   useEffect(() => {
     const queryOptions = {
@@ -142,7 +149,9 @@ export default function Profile(props) {
       }
       dispatch(
         getPoemAction({
-          params: { poemId: context?.elementToEdit },
+          params: {
+            poemId: context?.elementToEdit
+          },
           options: queryOptions
         })
       )
@@ -170,7 +179,7 @@ export default function Profile(props) {
     setValue(newValue)
   }
 
-  const handleChangeIndex = (index) => {
+  const handleChangeIndex = index => {
     setValue(index)
   }
 
@@ -178,7 +187,7 @@ export default function Profile(props) {
     setValue(value)
   }
 
-  const handleSend = (event) => {
+  const handleSend = event => {
     event.preventDefault()
     // event.target.reset()
 
@@ -212,8 +221,12 @@ export default function Profile(props) {
             poem,
             context,
             callbacks: {
-              success: (response) => {
-                dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
+              success: response => {
+                dispatch(
+                  updateAllPoemsCacheAfterCreatePoemAction({
+                    response
+                  })
+                )
               },
               error: () => {
                 console.log('something went wrong creating a poem!')
@@ -235,10 +248,14 @@ export default function Profile(props) {
             poem,
             context,
             callbacks: {
-              success: (response) => {
-                dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
+              success: response => {
+                dispatch(
+                  updateAllPoemsCacheAfterCreatePoemAction({
+                    response
+                  })
+                )
               },
-              error: (error) => {
+              error: error => {
                 console.log('something went wrong creating a poem!')
               }
             }
@@ -277,12 +294,18 @@ export default function Profile(props) {
           poemId: poemQuery.item.id
         })
       }
-      context.setState({ ...context, elementToEdit: '' })
+      context.setState({
+        ...context,
+        elementToEdit: ''
+      })
     }
   }
 
-  const handleReset = (event) => {
-    context.setState({ ...context, elementToEdit: '' })
+  const handleReset = event => {
+    context.setState({
+      ...context,
+      elementToEdit: ''
+    })
     setPoemContent('')
     setPoemTitle('')
     setPoemOrigin('')
@@ -325,7 +348,7 @@ export default function Profile(props) {
                             name='origin'
                             required
                             value={poemOrigin}
-                            onChange={(event) =>
+                            onChange={event =>
                               onFieldChange(event.target.value, setPoemOrigin)
                             }
                           >
@@ -341,7 +364,7 @@ export default function Profile(props) {
                             name='author'
                             required
                             value={poemFakeId}
-                            onChange={(event) =>
+                            onChange={event =>
                               onFieldChange(event.target.value, setPoemFakeId)
                             }
                           />
@@ -352,7 +375,7 @@ export default function Profile(props) {
                             className='profile__insert-poem-input'
                             name='likes'
                             value={poemLikes}
-                            onChange={(event) =>
+                            onChange={event =>
                               onFieldChange(event.target.value, setPoemLikes)
                             }
                           />
@@ -367,7 +390,7 @@ export default function Profile(props) {
                         name='title'
                         required
                         value={poemTitle}
-                        onChange={(event) =>
+                        onChange={event =>
                           onFieldChange(event.target.value, setPoemTitle)
                         }
                       />
@@ -380,12 +403,12 @@ export default function Profile(props) {
                         name='category'
                         required
                         value={poemCategory}
-                        onChange={(event) => {
+                        onChange={event => {
                           onFieldChange(event.target.value, setPoemCategory)
                         }}
                       >
                         <option value=''>{PROFILE_SELECT_CATEGORY}</option>
-                        {CATEGORIES?.map((category) => (
+                        {CATEGORIES?.map(category => (
                           <option
                             value={category.toLowerCase()}
                             selected={
@@ -406,7 +429,7 @@ export default function Profile(props) {
                       required
                       placeholder={PROFILE_POEM_PLACEHOLDER}
                       value={poemContent}
-                      onChange={(event) =>
+                      onChange={event =>
                         onFieldChange(event.target.value, setPoemContent)
                       }
                     />

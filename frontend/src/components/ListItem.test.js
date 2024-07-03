@@ -32,7 +32,12 @@ describe('ListItem component', () => {
     )
   }
 
-  const poem = { id: 1, title: 'test', author: 'test', likes: ['1'] }
+  const poem = {
+    id: 1,
+    title: 'test',
+    author: 'test',
+    likes: ['1']
+  }
   const filter = 'test'
   const context = {
     user: {
@@ -76,7 +81,11 @@ describe('ListItem component', () => {
 
     // this is beacuse we use Axios.create
     axios.create.mockReturnThis()
-    axios.delete.mockReturnValueOnce(Promise.resolve({ data: 'poem1' }))
+    axios.delete.mockReturnValueOnce(
+      Promise.resolve({
+        data: 'poem1'
+      })
+    )
     await waitFor(() => {
       fireEvent.click(screen.getByTestId('delete-poem'))
     })

@@ -33,19 +33,31 @@ export function poemsListQuery(
   state: StateItem<Poem[]> = INITIAL,
   action: Action
 ): StateItem<Poem[]> {
-  return commonReducer({ state, action, actionType: ACTIONS?.POEMS_LIST })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.POEMS_LIST
+  })
 }
 
 export function rankingQuery(
   state: StateItem<Poem[]> = INITIAL,
   action: Action
 ): StateItem<Poem[]> {
-  return commonReducer({ state, action, actionType: ACTIONS?.RANKING })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.RANKING
+  })
 }
 
 export function createPoemQuery(
   state: StateItem<Poem[]> = INITIAL,
   action: Action
 ): StateItem<Poem[]> {
-  return commonReducer({ state, action, actionType: ACTIONS?.CREATE_POEM })
+  return commonReducer({
+    state,
+    action,
+    actionType: ACTIONS?.CREATE_POEM
+  })
 }

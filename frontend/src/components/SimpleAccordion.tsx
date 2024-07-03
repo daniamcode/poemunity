@@ -25,7 +25,7 @@ export default function SimpleAccordion() {
         <p className='header__dropdown-categories'>{CATEGORIES_TITLE}</p>
       </AccordionSummary>
       <div>
-        {CATEGORIES?.sort().map((category) => (
+        {CATEGORIES?.sort().map(category => (
           <AccordionDetails key={category}>
             <Link
               className='header__dropdown-subcategories'

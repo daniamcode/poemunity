@@ -79,7 +79,9 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
           getPoemsListAction({
             params:
               paramsData.origin !== 'all'
-                ? { origin: paramsData.origin }
+                ? {
+                    origin: paramsData.origin
+                  }
                 : null,
             options: queryOptions
           })
@@ -99,7 +101,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
       const newData = [...poemsListQuery?.item]
 
       if (genre) {
-        const poemsFiltered = newData.filter((poems) => poems.genre === genre)
+        const poemsFiltered = newData.filter(poems => poems.genre === genre)
         const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
         setPoems(poemsSorted)
       } else {
@@ -111,13 +113,25 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
   }, [JSON.stringify([poemsListQuery, genre, paramsData])])
 
   const handleOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    addQueryParam({ id: 'orderBy', value: event.target.value })
-    setParamsData({ ...paramsData, orderBy: event.target.value })
+    addQueryParam({
+      id: 'orderBy',
+      value: event.target.value
+    })
+    setParamsData({
+      ...paramsData,
+      orderBy: event.target.value
+    })
   }
 
   const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    addQueryParam({ id: 'origin', value: event.target.value })
-    setParamsData({ ...paramsData, origin: event.target.value })
+    addQueryParam({
+      id: 'origin',
+      value: event.target.value
+    })
+    setParamsData({
+      ...paramsData,
+      origin: event.target.value
+    })
   }
 
   const handleSearchChange = (
@@ -151,14 +165,23 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
           )}
           <div className='list__search'>
             <div className='separator' />
-            <SearchIcon style={{ fontSize: 40, fill: '#4F5D73' }} />
+            <SearchIcon
+              style={{
+                fontSize: 40,
+                fill: '#4F5D73'
+              }}
+            />
             <TextField
               label={SEARCH_PLACEHOLDER}
               InputLabelProps={{
-                style: { color: '#4F5D73' }
+                style: {
+                  color: '#4F5D73'
+                }
               }}
               InputProps={{
-                style: { color: '#4F5D73' }
+                style: {
+                  color: '#4F5D73'
+                }
               }}
               onChange={handleSearchChange}
             />
@@ -224,7 +247,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
           </form>
         </div>
 
-        {poems.map((poem) => (
+        {poems.map(poem => (
           <ListItem
             key={poem?.id}
             poem={poem}

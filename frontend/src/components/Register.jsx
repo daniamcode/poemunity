@@ -14,11 +14,15 @@ const Register = () => {
   // Redux
   const dispatch = useAppDispatch()
 
-  const handleRegister = (event) => {
+  const handleRegister = event => {
     event.preventDefault()
     dispatch(
       registerAction({
-        data: { username, email, password },
+        data: {
+          username,
+          email,
+          password
+        },
         callbacks: {
           success: () => {
             history.push('/login')

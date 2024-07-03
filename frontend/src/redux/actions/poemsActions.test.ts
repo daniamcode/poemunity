@@ -50,7 +50,11 @@ describe('getAllPoemsAction', () => {
     const spy = jest.spyOn(commonActions, 'getAction')
     const options = { fetch: false }
 
-    getAllPoemsAction({ params: {}, options, callbacks })(dispatch)
+    getAllPoemsAction({
+      params: {},
+      options,
+      callbacks
+    })(dispatch)
 
     expect(spy).toHaveBeenCalled()
     expect(spy).toBeCalledTimes(1)
@@ -66,17 +70,30 @@ describe('getAllPoemsAction', () => {
   })
 
   test('dispatches - reset', () => {
-    const options = { fetch: false, reset: true }
+    const options = {
+      fetch: false,
+      reset: true
+    }
 
-    getAllPoemsAction({ params: {}, options, callbacks })(dispatch)
+    getAllPoemsAction({
+      params: {},
+      options,
+      callbacks
+    })(dispatch)
 
     expect(dispatch).toHaveBeenCalled()
   })
 
   test('Should dispatch right type - reset', () => {
-    const options = { fetch: false, reset: true }
+    const options = {
+      fetch: false,
+      reset: true
+    }
 
-    getAllPoemsAction({ params: {}, options })(dispatch)
+    getAllPoemsAction({
+      params: {},
+      options
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(
       `${ACTIONS.ALL_POEMS}_reset`
@@ -86,13 +103,20 @@ describe('getAllPoemsAction', () => {
   test('Should dispatch error when axios throws a generic error', async () => {
     ;(axios.create as jest.Mock).mockReturnThis()
     ;(axios.get as jest.Mock).mockReturnValueOnce(
-      Promise.reject({ response: 'some error' })
+      Promise.reject({
+        response: 'some error'
+      })
     )
 
     const options = { fetch: true }
 
     // this is done to give time to the test to wait until the second dispatch occurs. We can also use "act"
-    await waitFor(() => getAllPoemsAction({ params: {}, options })(dispatch))
+    await waitFor(() =>
+      getAllPoemsAction({
+        params: {},
+        options
+      })(dispatch)
+    )
     // another alternative:
     // await new Promise(resolve=> {
     //     setTimeout(() => {
@@ -120,7 +144,12 @@ describe('getAllPoemsAction', () => {
     const options = { fetch: true }
 
     // this is done to give time to the test to wait until the second dispatch occurs. We can also use "act"
-    await waitFor(() => getAllPoemsAction({ params: {}, options })(dispatch))
+    await waitFor(() =>
+      getAllPoemsAction({
+        params: {},
+        options
+      })(dispatch)
+    )
     // another alternative:
     // await new Promise(resolve=> {
     //     setTimeout(() => {
@@ -142,11 +171,18 @@ describe('getAllPoemsAction', () => {
     // this is beacuse we use Axios.create
     ;(axios.create as jest.Mock).mockReturnThis()
     ;(axios.get as jest.Mock).mockReturnValueOnce(
-      Promise.resolve({ data: 'poem1' })
+      Promise.resolve({
+        data: 'poem1'
+      })
     )
 
     const options = { fetch: true }
-    await waitFor(() => getAllPoemsAction({ params: {}, options })(dispatch))
+    await waitFor(() =>
+      getAllPoemsAction({
+        params: {},
+        options
+      })(dispatch)
+    )
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.ALL_POEMS}_request`
@@ -204,10 +240,15 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      poemsListQuery: { item: initialState }
+      poemsListQuery: {
+        item: initialState
+      }
     })
 
-    updatePoemsListCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updatePoemsListCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.POEMS_LIST}_fulfilled`
@@ -248,10 +289,15 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      poemsListQuery: { item: initialState }
+      poemsListQuery: {
+        item: initialState
+      }
     })
 
-    updatePoemsListCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updatePoemsListCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.POEMS_LIST}_fulfilled`
@@ -292,10 +338,15 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      poemsListQuery: { item: initialState }
+      poemsListQuery: {
+        item: initialState
+      }
     })
 
-    updatePoemsListCacheAfterLikePoemAction({ poemId: '3', context })(dispatch)
+    updatePoemsListCacheAfterLikePoemAction({
+      poemId: '3',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.POEMS_LIST}_fulfilled`
@@ -349,10 +400,15 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      rankingQuery: { item: initialState }
+      rankingQuery: {
+        item: initialState
+      }
     })
 
-    updateRankingCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updateRankingCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.RANKING}_fulfilled`
@@ -393,10 +449,15 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      rankingQuery: { item: initialState }
+      rankingQuery: {
+        item: initialState
+      }
     })
 
-    updateRankingCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updateRankingCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.RANKING}_fulfilled`
@@ -450,10 +511,15 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      allPoemsQuery: { item: initialState }
+      allPoemsQuery: {
+        item: initialState
+      }
     })
 
-    updateAllPoemsCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updateAllPoemsCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.ALL_POEMS}_fulfilled`
@@ -494,10 +560,15 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
     ]
 
     ;(store.getState as jest.Mock).mockReturnValueOnce({
-      allPoemsQuery: { item: initialState }
+      allPoemsQuery: {
+        item: initialState
+      }
     })
 
-    updateAllPoemsCacheAfterLikePoemAction({ poemId: '1', context })(dispatch)
+    updateAllPoemsCacheAfterLikePoemAction({
+      poemId: '1',
+      context
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
       `${ACTIONS.ALL_POEMS}_fulfilled`
@@ -561,7 +632,12 @@ describe('createPoemAction', () => {
     const spy = jest.spyOn(commonActions, 'postAction')
     const options = { fetch: false }
 
-    createPoemAction({ poem, context, callbacks, options })(dispatch)
+    createPoemAction({
+      poem,
+      context,
+      callbacks,
+      options
+    })(dispatch)
 
     expect(spy).toHaveBeenCalled()
     expect(spy).toBeCalledTimes(1)
@@ -578,17 +654,33 @@ describe('createPoemAction', () => {
   })
 
   test('dispatches - reset', () => {
-    const options = { fetch: false, reset: true }
+    const options = {
+      fetch: false,
+      reset: true
+    }
 
-    createPoemAction({ poem, context, callbacks, options })(dispatch)
+    createPoemAction({
+      poem,
+      context,
+      callbacks,
+      options
+    })(dispatch)
 
     expect(dispatch).toHaveBeenCalled()
   })
 
   test('Should dispatch right type - reset', () => {
-    const options = { fetch: false, reset: true }
+    const options = {
+      fetch: false,
+      reset: true
+    }
 
-    createPoemAction({ poem, context, callbacks, options })(dispatch)
+    createPoemAction({
+      poem,
+      context,
+      callbacks,
+      options
+    })(dispatch)
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(
       `${ACTIONS.CREATE_POEM}_reset`
@@ -598,14 +690,21 @@ describe('createPoemAction', () => {
   test('Should dispatch error when axios throws a generic error', async () => {
     ;(axios.create as jest.Mock).mockReturnThis()
     ;(axios.post as jest.Mock).mockReturnValueOnce(
-      Promise.reject({ response: 'some error' })
+      Promise.reject({
+        response: 'some error'
+      })
     )
 
     const options = { fetch: true }
 
     // this is done to give time to the test to wait until the second dispatch occurs. We can also use "act"
     await waitFor(() =>
-      createPoemAction({ poem, context, callbacks, options })(dispatch)
+      createPoemAction({
+        poem,
+        context,
+        callbacks,
+        options
+      })(dispatch)
     )
 
     expect(axios.post).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'postAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
@@ -622,12 +721,19 @@ describe('createPoemAction', () => {
     // this is beacuse we use Axios.create
     ;(axios.create as jest.Mock).mockReturnThis()
     ;(axios.post as jest.Mock).mockReturnValueOnce(
-      Promise.resolve({ data: 'poem1' })
+      Promise.resolve({
+        data: 'poem1'
+      })
     )
 
     const options = { fetch: true }
     await waitFor(() =>
-      createPoemAction({ poem, context, callbacks, options })(dispatch)
+      createPoemAction({
+        poem,
+        context,
+        callbacks,
+        options
+      })(dispatch)
     )
 
     expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(

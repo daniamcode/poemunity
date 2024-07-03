@@ -11,8 +11,8 @@ const normalizeString = (input: string = '') => {
   str = str.toLowerCase()
 
   // remove accents, swap ñ for n, etc
-  Object.keys(normalizeSwaps).forEach((swap) => {
-    normalizeSwaps[swap].forEach((s) => {
+  Object.keys(normalizeSwaps).forEach(swap => {
+    normalizeSwaps[swap].forEach(s => {
       str = str.replace(new RegExp(s, 'g'), swap)
     })
   })

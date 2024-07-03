@@ -20,7 +20,7 @@ describe('List', () => {
     poemsListQuery: { isFetching: false }
   }
   beforeEach(() => {
-    ;(Redux.useSelector as jest.Mock).mockImplementation((callback) => {
+    ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
       return callback(mockedState)
     })
   })
@@ -43,7 +43,9 @@ describe('List', () => {
     act(() => {
       // random is the third option
       fireEvent.change(screen.getByTestId('order-select'), {
-        target: { value: ORDER_BY_RANDOM }
+        target: {
+          value: ORDER_BY_RANDOM
+        }
       })
     })
 

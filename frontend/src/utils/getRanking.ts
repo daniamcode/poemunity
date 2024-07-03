@@ -4,7 +4,11 @@ export const SortObjectOfObjects = (data: object, attribute: string) => {
   const array = []
   for (const prop in data) {
     if (data.hasOwnProperty(prop)) {
-      const object: { tempSortName?: string } = { tempSortName: '' }
+      const object: {
+        tempSortName?: string
+      } = {
+        tempSortName: ''
+      }
       object[prop] = data[prop]
       object.tempSortName = data[prop][attribute]
       array.push(object)

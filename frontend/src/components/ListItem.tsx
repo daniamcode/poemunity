@@ -40,15 +40,25 @@ const ListItem = ({ poem, filter, context }: Props) => {
     event.preventDefault()
     dispatch(
       deletePoemAction({
-        params: { poemId },
+        params: {
+          poemId
+        },
         context,
         callbacks: {
           success: () => {
             // todo: when I update this cache, it has effects on many queries.
             // Maybe I need some optimisation, in the frontend or in the backend
             // for now I update the cache needed for this page, but I need to update the cache for the other pages too if I don't query the backend when navigating
-            dispatch(updatePoemsListCacheAfterDeletePoemAction({ poemId }))
-            dispatch(updateRankingCacheAfterDeletePoemAction({ poemId }))
+            dispatch(
+              updatePoemsListCacheAfterDeletePoemAction({
+                poemId
+              })
+            )
+            dispatch(
+              updateRankingCacheAfterDeletePoemAction({
+                poemId
+              })
+            )
             manageSuccess('Poem deleted')
           },
           error: () => {
@@ -68,20 +78,37 @@ const ListItem = ({ poem, filter, context }: Props) => {
     event.preventDefault()
     dispatch(
       likePoemAction({
-        params: { poemId },
+        params: {
+          poemId
+        },
         context,
         callbacks: {
           success: () => {
             // todo: when I update this cache, it has effects on many queries.
             // Maybe I need some optimisation, in the frontend or in the backend
             dispatch(
-              updatePoemsListCacheAfterLikePoemAction({ poemId, context })
+              updatePoemsListCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
             )
-            dispatch(updateRankingCacheAfterLikePoemAction({ poemId, context }))
             dispatch(
-              updateAllPoemsCacheAfterLikePoemAction({ poemId, context })
+              updateRankingCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
             )
-            dispatch(updatePoemCacheAfterLikePoemAction({ context }))
+            dispatch(
+              updateAllPoemsCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
+            )
+            dispatch(
+              updatePoemCacheAfterLikePoemAction({
+                context
+              })
+            )
           }
         }
       })
@@ -91,7 +118,10 @@ const ListItem = ({ poem, filter, context }: Props) => {
   const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath)
-    context.setState({ ...context, elementToEdit: poemId })
+    context.setState({
+      ...context,
+      elementToEdit: poemId
+    })
   }
 
   return (
@@ -132,19 +162,19 @@ const ListItem = ({ poem, filter, context }: Props) => {
             <div className='separator' />
             {context.user &&
               poem.userId !== context.userId &&
-              poem.likes.some((id) => id === context.userId) && (
+              poem.likes.some(id => id === context.userId) && (
                 <Link
                   className='poem__likes-icon'
-                  onClick={(event) => onLike(event, poem.id)}
+                  onClick={event => onLike(event, poem.id)}
                   to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
                 />
               )}
             {context.user &&
               poem.userId !== context.userId &&
-              !poem.likes.some((id) => id === context.userId) && (
+              !poem.likes.some(id => id === context.userId) && (
                 <Link
                   className='poem__unlikes-icon'
-                  onClick={(event) => onLike(event, poem.id)}
+                  onClick={event => onLike(event, poem.id)}
                   to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
                 />
               )}
@@ -153,7 +183,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
                 context.userId === context.adminId) && (
                 <EditIcon
                   className='poem__edit-icon'
-                  onClick={(event) => editPoem(poem.id)}
+                  onClick={event => editPoem(poem.id)}
                 />
               )}
             {context.user &&
@@ -161,13 +191,19 @@ const ListItem = ({ poem, filter, context }: Props) => {
                 context.userId === context.adminId) && (
                 <HighlightOffSharpIcon
                   className='poem__delete-icon'
-                  style={{ fill: 'red' }}
+                  style={{
+                    fill: 'red'
+                  }}
                   data-testid='delete-poem'
-                  onClick={(event) => onDelete(event, poem.id)}
+                  onClick={event => onDelete(event, poem.id)}
                 />
               )}
             <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
-              <SubjectSharpIcon style={{ fill: '#000' }} />
+              <SubjectSharpIcon
+                style={{
+                  fill: '#000'
+                }}
+              />
             </Link>
           </section>
         </section>

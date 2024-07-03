@@ -99,20 +99,37 @@ function Detail(props: Props) {
     event.preventDefault()
     dispatch(
       likePoemAction({
-        params: { poemId: props.match.params.poemId },
+        params: {
+          poemId: props.match.params.poemId
+        },
         context,
         callbacks: {
           success: () => {
             // todo: when I update this cache, it has effects on many queries.
             // Maybe I need some optimization, in the frontend or in the backend
             dispatch(
-              updatePoemsListCacheAfterLikePoemAction({ poemId, context })
+              updatePoemsListCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
             )
-            dispatch(updateRankingCacheAfterLikePoemAction({ poemId, context }))
             dispatch(
-              updateAllPoemsCacheAfterLikePoemAction({ poemId, context })
+              updateRankingCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
             )
-            dispatch(updatePoemCacheAfterLikePoemAction({ context }))
+            dispatch(
+              updateAllPoemsCacheAfterLikePoemAction({
+                poemId,
+                context
+              })
+            )
+            dispatch(
+              updatePoemCacheAfterLikePoemAction({
+                context
+              })
+            )
           }
         }
       })
@@ -123,7 +140,9 @@ function Detail(props: Props) {
     event.preventDefault()
     dispatch(
       deletePoemAction({
-        params: { poemId },
+        params: {
+          poemId
+        },
         context,
         callbacks: {
           success: () => {
@@ -142,7 +161,10 @@ function Detail(props: Props) {
   const editPoem = (poemId: string) => {
     const newPath = '/profile'
     history.push(newPath)
-    context.setState({ ...context, elementToEdit: poemId })
+    context.setState({
+      ...context,
+      elementToEdit: poemId
+    })
   }
 
   if (poemQuery.isFetching) {
@@ -202,7 +224,7 @@ function Detail(props: Props) {
               <div className='separator' />
               {context.user &&
                 poem.userId !== context.userId &&
-                poem.likes.some((id) => id === context.userId) && (
+                poem.likes.some(id => id === context.userId) && (
                   <div
                     className='poem__likes-icon'
                     onClick={(event: React.SyntheticEvent) =>
@@ -212,7 +234,7 @@ function Detail(props: Props) {
                 )}
               {context.user &&
                 poem.userId !== context.userId &&
-                !poem.likes.some((id) => id === context.userId) && (
+                !poem.likes.some(id => id === context.userId) && (
                   <div
                     className='poem__unlikes-icon'
                     onClick={(event: React.SyntheticEvent) =>
@@ -233,12 +255,18 @@ function Detail(props: Props) {
                   context.userId === context.adminId) && (
                   <HighlightOffSharpIcon
                     className='poem__delete-icon'
-                    style={{ fill: 'red' }}
-                    onClick={(event) => onDelete(event, poem.id)}
+                    style={{
+                      fill: 'red'
+                    }}
+                    onClick={event => onDelete(event, poem.id)}
                   />
                 )}
               <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
-                <SubjectSharpIcon style={{ fill: '#000' }} />
+                <SubjectSharpIcon
+                  style={{
+                    fill: '#000'
+                  }}
+                />
               </Link>
             </section>
           </section>

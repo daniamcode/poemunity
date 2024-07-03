@@ -268,7 +268,7 @@ export function updateAllPoemsCacheAfterDeletePoemAction({
     const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
     const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
-      (poem) => poem.id !== poemId
+      poem => poem.id !== poemId
     )
 
     const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
@@ -293,7 +293,7 @@ export function updatePoemsListCacheAfterDeletePoemAction({
     const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[])
 
     const poemsListQueryUpdated = newPoemsListQuery?.filter(
-      (poem) => poem.id !== poemId
+      poem => poem.id !== poemId
     )
 
     const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
@@ -319,7 +319,7 @@ export function updateRankingCacheAfterDeletePoemAction({
     const newRankingQuery = cloneDeep(rankingQuery as Poem[])
 
     const rankingQueryUpdated = newRankingQuery?.filter(
-      (poem) => poem.id !== poemId
+      poem => poem.id !== poemId
     )
 
     const { fulfilledAction } = getTypes(ACTIONS.RANKING)
@@ -347,10 +347,13 @@ export function updateAllPoemsCacheAfterSavePoemAction({
 
     // todo: refactor with a reduce
     const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
-      (poem) => poem.id !== poemId
+      poem => poem.id !== poemId
     )
-    const poemToUpdate = newAllPoemsQuery?.find((poem) => poem.id === poemId)
-    const poemUpdated = { ...poemToUpdate, ...poem }
+    const poemToUpdate = newAllPoemsQuery?.find(poem => poem.id === poemId)
+    const poemUpdated = {
+      ...poemToUpdate,
+      ...poem
+    }
     allPoemsQueryUpdated.push(poemUpdated)
 
     const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)

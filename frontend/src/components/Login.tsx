@@ -21,9 +21,12 @@ const Login = (): JSX.Element => {
     event.preventDefault()
     dispatch(
       loginAction({
-        data: { username, password },
+        data: {
+          username,
+          password
+        },
         callbacks: {
-          success: (data) => {
+          success: data => {
             window.localStorage.setItem('loggedUser', JSON.stringify(data))
             history.push('profile')
           },
@@ -54,7 +57,7 @@ const Login = (): JSX.Element => {
           value={username}
           name='Username'
           placeholder='Username'
-          onChange={(event) => setUsername(event.target.value)}
+          onChange={event => setUsername(event.target.value)}
         />
       </div>
       <div className='login__password'>
@@ -63,7 +66,7 @@ const Login = (): JSX.Element => {
           value={password}
           name='Password'
           placeholder='Password'
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={event => setPassword(event.target.value)}
         />
       </div>
       <button>Login</button>
