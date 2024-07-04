@@ -17,6 +17,9 @@ function parseArguments() {
 const config = parseArguments()
 const isWatchMode = config['watch'] !== undefined
 const isDev = process.env.NODE_ENV !== 'production'
+console.log(process.argv)
+console.log(isWatchMode)
+console.log(isDev)
 
 const esbuildConfig = {
   define: {
@@ -25,7 +28,8 @@ const esbuildConfig = {
   },
   entryPoints: ['src/index.tsx'],
   outdir: './build',
-  bundle: true,
+  // bundle: !isDev,
+  minify: !isDev,
   format: 'esm',
   loader: { 
     '.js': 'jsx',
