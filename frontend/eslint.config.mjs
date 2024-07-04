@@ -21,7 +21,7 @@ export default [
         rules: {
         // Common rules
             'accessor-pairs': 2, // enforce getter and setter pairs in objects
-            'arrow-parens': [2, 'always'], // require parentheses around arrow function arguments
+            'arrow-parens': 'off', // remove parentheses around arrow function arguments
             'arrow-spacing': [
                 2,
                 {
