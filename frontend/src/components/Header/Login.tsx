@@ -46,30 +46,34 @@ const Login = (): JSX.Element => {
     }
 
     return (
-        <form className='login' onSubmit={handleLogin} data-testid='login'>
-            <label>Introduce your login credentials or click "Register" if you don't have them</label>
-            <div className='login__username'>
-                <input
-                    type='text'
-                    value={username}
-                    name='Username'
-                    placeholder='Username'
-                    onChange={event => setUsername(event.target.value)}
-                />
+        <div className='login-container'>
+            <div className='login-card'>
+                <form className='login' onSubmit={handleLogin} data-testid='login'>
+                    <label>Introduce your login credentials or click "Register" if you don't have them</label>
+                    <div className='login__username'>
+                        <input
+                            type='text'
+                            value={username}
+                            name='Username'
+                            placeholder='Username'
+                            onChange={event => setUsername(event.target.value)}
+                        />
+                    </div>
+                    <div className='login__password'>
+                        <input
+                            type='password'
+                            value={password}
+                            name='Password'
+                            placeholder='Password'
+                            onChange={event => setPassword(event.target.value)}
+                        />
+                    </div>
+                    <button>Login</button>
+                    <NavLink to='/register'>Register</NavLink>
+                    {/* <Notification message={errorMessage}/> */}
+                </form>
             </div>
-            <div className='login__password'>
-                <input
-                    type='password'
-                    value={password}
-                    name='Password'
-                    placeholder='Password'
-                    onChange={event => setPassword(event.target.value)}
-                />
-            </div>
-            <button>Login</button>
-            <NavLink to='/register'>Register</NavLink>
-            {/* <Notification message={errorMessage}/> */}
-        </form>
+        </div>
     )
 }
 
