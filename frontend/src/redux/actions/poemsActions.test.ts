@@ -27,13 +27,13 @@ describe('getAllPoemsAction', () => {
 
     const callbacks = {
         error: () => {
-            console.log('error')
+            console.error('error')
         },
         reset: () => {
-            console.log('error')
+            console.info('reset')
         },
         success: () => {
-            console.log('success')
+            console.info('success')
         }
     }
 
@@ -579,13 +579,13 @@ describe('createPoemAction', () => {
 
     const callbacks = {
         error: () => {
-            console.log('error')
+            console.error('error')
         },
         reset: () => {
-            console.log('reset')
+            console.info('reset')
         },
         success: () => {
-            console.log('success')
+            console.info('success')
         }
     }
 

@@ -12,7 +12,6 @@ import './Profile.scss'
 import '../../App.scss'
 import MyPoems from '../MyPoems/MyPoems'
 import MyFavouritePoems from '../MyFavouritePoems/MyFavouritePoems'
-import CircularProgress from '../CircularIndeterminate'
 import {
     PROFILE_TITLE,
     PROFILE_SUBTITLE_CREATE,
@@ -227,7 +226,7 @@ export default function Profile(props) {
                                 )
                             },
                             error: () => {
-                                console.log('something went wrong creating a poem!')
+                                console.error('something went wrong creating a poem!')
                             }
                         }
                     })
@@ -255,7 +254,7 @@ export default function Profile(props) {
                                 )
                             },
                             error: error => {
-                                console.log('something went wrong creating a poem!')
+                                console.error('something went wrong creating a poem!')
                             }
                         }
                     })

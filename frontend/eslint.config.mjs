@@ -19,7 +19,7 @@ export default [
     ...fixupConfigRules(pluginReactConfig),
     {
         rules: {
-        // Common rules
+            // Common rules
             'accessor-pairs': 2, // enforce getter and setter pairs in objects
             'arrow-parens': 'off', // remove parentheses around arrow function arguments
             'arrow-spacing': [
@@ -114,7 +114,7 @@ export default [
                 2,
                 {
                 // disallow the use of console
-                    'allow': ['error', 'warn']
+                    'allow': ['error', 'warn', 'info']
                 }
             ],
             'no-const-assign': 2, // disallow reassigning const variables
@@ -235,7 +235,13 @@ export default [
             'valid-typeof': 2, // enforce comparing typeof expressions against valid strings
             'wrap-iife': [2, 'any'], // require parentheses around immediate function invocations
             'yield-star-spacing': [2, 'both'], // require or disallow spacing around the * in yield* expressions
-            'yoda': [2, 'never'] // require or disallow “Yoda” conditions
+            'yoda': [2, 'never'], // require or disallow “Yoda” conditions
+
+            // React
+            'react/react-in-jsx-scope': 0, // After React 17 importing react is not needed
+
+            // Typescript
+            '@typescript-eslint/no-explicit-any': 'off' // Maybe in the future I can remove this
         }
     }
 ]

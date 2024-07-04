@@ -1,4 +1,4 @@
-import React from 'react'
+
 import Enzyme, { mount, shallow } from 'enzyme'
 import { render, waitFor } from '@testing-library/react'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'

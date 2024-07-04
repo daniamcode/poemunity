@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Register.scss'
 import { registerAction } from '../../redux/actions/loginActions'
@@ -30,7 +30,7 @@ const Register = () => {
                     error: () => {
                         // setErrorMessage('Wrong credentials')
                         // manageError(error.response.data.error)
-                        console.log('Something went wrong')
+                        console.error('Something went wrong')
                         // setTimeout(()=> {
                         //   setErrorMessage(null)
                         // }, 3000)

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { render } from '@testing-library/react'
 import Profile from './Profile'
 import { BrowserRouter } from 'react-router-dom'

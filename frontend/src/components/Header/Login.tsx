@@ -32,7 +32,7 @@ const Login = (): JSX.Element => {
                     },
                     error: () => {
                         // setErrorMessage('Wrong credentials')
-                        console.log('something went wrong in login!')
+                        console.error('something went wrong in login!')
                         // history.push('/')
                         // setTimeout(()=> {
                         //   setErrorMessage(null)
