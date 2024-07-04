@@ -53,11 +53,7 @@ function App() {
                             <Route path='/login' component={Login} />
                             <Route path='/register' component={Register} />
                             <Route path='/:genre' exact component={Dashboard} />
-                            <Route
-                                path='/detail/:poemId'
-                                exact
-                                component={Detail}
-                            />
+                            <Route path='/detail/:poemId' exact component={Detail} />
                             <Route component={PageNotFound} />
                         </Switch>
                     </div>

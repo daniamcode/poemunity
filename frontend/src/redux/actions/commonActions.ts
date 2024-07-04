@@ -139,10 +139,7 @@ export function getAction({
             })
             .then(response => {
                 let responseData = response.data
-                if (
-                    transformResponse &&
-                    typeof transformResponse === 'function'
-                ) {
+                if (transformResponse && typeof transformResponse === 'function') {
                     responseData = transformResponse(responseData)
                 }
                 // if (options.update) {
@@ -298,8 +295,7 @@ export function putAction({
     config
 }: PutActionProps) {
     // console.log('listingAction type : ' + type);
-    const { requestAction, fulfilledAction, rejectedAction, resetAction } =
-        getTypes(type)
+    const { requestAction, fulfilledAction, rejectedAction, resetAction } = getTypes(type)
 
     options.reset = options.reset !== undefined ? options.reset : false
     options.update = options.update !== undefined ? options.update : false
@@ -459,8 +455,7 @@ export function patchAction({
     config
 }: PatchActionProps) {
     // console.log('listingAction type : ' + type);
-    const { requestAction, fulfilledAction, rejectedAction, resetAction } =
-        getTypes(type)
+    const { requestAction, fulfilledAction, rejectedAction, resetAction } = getTypes(type)
 
     options.reset = options.reset !== undefined ? options.reset : false
     options.update = options.update !== undefined ? options.update : false

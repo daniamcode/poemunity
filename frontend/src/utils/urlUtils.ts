@@ -8,9 +8,7 @@ export function parseQuery(url: string = window.location.search) {
     return Array.from(urlParams.keys()).reduce((acc, key) => {
         if (key !== '__proto__') {
             // we use non-null assertion operator by now to bypass typescript's error
-            acc[key] = urlParams.has(key)
-                ? JSON.parse(urlParams.get(key)!)
-                : null
+            acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null
         }
         return acc
     }, {})
@@ -53,7 +51,8 @@ export function addQueryParam({ id, value }: addQueryParamProps) {
             search: urlParams.toString(),
             pathname: history.location.pathname
         })
-    } catch (error: any) {
+    }
+    catch (error: any) {
         console.error(error.stack)
     }
 }
@@ -63,10 +62,7 @@ export function addQueryParam({ id, value }: addQueryParamProps) {
  * @param {array} data - Query key id to be set or updated.
  * @param {array} keysToDelete - An array of keys to delete.
  */
-export function addQueryParams(
-    data: { key: string; value: string }[],
-    keysToDelete: string[]
-) {
+export function addQueryParams(data: { key: string; value: string }[], keysToDelete: string[]) {
     try {
         const urlParams = new URLSearchParams(window.location.search)
         keysToDelete.forEach(key => urlParams.delete(key))
@@ -83,7 +79,8 @@ export function addQueryParams(
                 pathname: history.location.pathname
             })
         }
-    } catch (error: any) {
+    }
+    catch (error: any) {
         console.error(error.stack)
     }
 }
@@ -98,13 +95,7 @@ export function getQueryParam(key: string) {
 export function decodeRedirectQuery(query = '') {
     const urlParams = new URLSearchParams(query)
     const encodedQuery = urlParams.toString()
-    const decodedQuery = encodedQuery
-        .split('%3F')
-        .join('?')
-        .split('%3D')
-        .join('=')
-        .split('%26')
-        .join('&')
+    const decodedQuery = encodedQuery.split('%3F').join('?').split('%3D').join('=').split('%26').join('&')
     return decodedQuery
 }
 

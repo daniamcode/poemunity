@@ -20,11 +20,7 @@ import {
     updatePoemsListCacheAfterLikePoemAction,
     updateRankingCacheAfterLikePoemAction
 } from '../redux/actions/poemsActions'
-import {
-    deletePoemAction,
-    likePoemAction,
-    updatePoemCacheAfterLikePoemAction
-} from '../redux/actions/poemActions'
+import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import { manageError, manageSuccess } from '../utils/notifications'
 import { format } from 'date-fns'
 
@@ -45,10 +41,7 @@ function MyFavouritePoems(props) {
 
     useEffect(() => {
         if (allPoemsQuery.item) {
-            const poemsFiltered = getFavouritePoemsByUser(
-                allPoemsQuery.item,
-                context?.userId
-            )
+            const poemsFiltered = getFavouritePoemsByUser(allPoemsQuery.item, context?.userId)
             setPoems(poemsFiltered)
         }
     }, [JSON.stringify([allPoemsQuery.item, context?.username])])
@@ -76,9 +69,7 @@ function MyFavouritePoems(props) {
                         manageSuccess('Poem deleted')
                     },
                     error: () => {
-                        manageError(
-                            'Sorry. There was an error deleting the poem'
-                        )
+                        manageError('Sorry. There was an error deleting the poem')
                     }
                 }
             })
@@ -168,37 +159,19 @@ function MyFavouritePoems(props) {
                     {poem.author.includes(filter) && (
                         <section className='poem__block'>
                             <section>
-                                <Link
-                                    to={`/detail/${poem.id}`}
-                                    className='poem__title'
-                                >
+                                <Link to={`/detail/${poem.id}`} className='poem__title'>
                                     {poem.title}
                                 </Link>
                                 <div className='poem__author-container'>
-                                    <img
-                                        className='poem__picture'
-                                        src={poem.picture}
-                                    />
-                                    <p className='poem__author'>
-                                        {poem.author}
-                                    </p>
+                                    <img className='poem__picture' src={poem.picture} />
+                                    <p className='poem__author'>{poem.author}</p>
                                 </div>
-                                <div className='poem__date'>
-                                    {format(
-                                        new Date(poem.date),
-                                        "MM/dd/yyyy HH:mm'h'"
-                                    )}
-                                </div>
+                                <div className='poem__date'>{format(new Date(poem.date), 'MM/dd/yyyy HH:mm\'h\'')}</div>
                             </section>
                             <section>
-                                <div className='poem__content poems__content'>
-                                    {poem.poem}
-                                </div>
+                                <div className='poem__content poems__content'>{poem.poem}</div>
                                 <div className='poems__read-more'>
-                                    <Link
-                                        to={`/detail/${poem.id}`}
-                                        className='poems__read-more'
-                                    >
+                                    <Link to={`/detail/${poem.id}`} className='poems__read-more'>
                                         {READ_MORE}
                                     </Link>
                                 </div>
@@ -217,45 +190,31 @@ function MyFavouritePoems(props) {
                                 <div className='separator' />
                                 {context?.user &&
                                     poem.userId !== context?.userId &&
-                                    poem.likes.some(
-                                        id => id === context?.userId
-                                    ) && (
-                                        <Link
-                                            className='poem__likes-icon'
-                                            onClick={event =>
-                                                onLike(event, poem.id)
-                                            }
-                                            to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                        />
-                                    )}
+                                    poem.likes.some(id => id === context?.userId) && (
+                                    <Link
+                                        className='poem__likes-icon'
+                                        onClick={event => onLike(event, poem.id)}
+                                        to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                    />
+                                )}
                                 {context?.user &&
                                     poem.userId !== context?.userId &&
-                                    !poem.likes.some(
-                                        id => id === context?.userId
-                                    ) && (
-                                        <Link
-                                            className='poem__unlikes-icon'
-                                            onClick={event =>
-                                                onLike(event, poem.id)
-                                            }
-                                        />
-                                    )}
-                                {context?.user &&
-                                    poem.author === context?.username && (
-                                        <HighlightOffSharpIcon
-                                            className='poem__delete-icon'
-                                            style={{
-                                                fill: 'red'
-                                            }}
-                                            onClick={event =>
-                                                onDelete(event, poem.id)
-                                            }
-                                        />
-                                    )}
-                                <Link
-                                    to={`/detail/${poem.id}`}
-                                    className='poem__comments-icon'
-                                >
+                                    !poem.likes.some(id => id === context?.userId) && (
+                                    <Link
+                                        className='poem__unlikes-icon'
+                                        onClick={event => onLike(event, poem.id)}
+                                    />
+                                )}
+                                {context?.user && poem.author === context?.username && (
+                                    <HighlightOffSharpIcon
+                                        className='poem__delete-icon'
+                                        style={{
+                                            fill: 'red'
+                                        }}
+                                        onClick={event => onDelete(event, poem.id)}
+                                    />
+                                )}
+                                <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
                                     <SubjectSharpIcon
                                         style={{
                                             fill: '#000'

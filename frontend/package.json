@@ -4,7 +4,7 @@
   "scripts": {
     "build": "node build.js",
     "dev": "NODE_ENV=development node build3.js --watch --reload",
-    "start": "NODE_ENV=production node build3.js --watch --reload && lint:fix && prettier",
+    "start": "NODE_ENV=production node build3.js --watch --reload && lint:fix",
     "prod": "NODE_ENV=production node build3.js",
     "clean:build": "rimraf ./build",
     "test": "to-do",

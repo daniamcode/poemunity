@@ -15,10 +15,7 @@ interface Action {
 }
 
 // used for MyFavouritePoems and for MyPoems
-export function allPoemsQuery(
-    state: StateItem<Poem[]> = INITIAL,
-    action: Action
-): StateItem<Poem[]> {
+export function allPoemsQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
     return commonReducer({
         state,
         action,
@@ -29,10 +26,7 @@ export function allPoemsQuery(
     })
 }
 
-export function poemsListQuery(
-    state: StateItem<Poem[]> = INITIAL,
-    action: Action
-): StateItem<Poem[]> {
+export function poemsListQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
     return commonReducer({
         state,
         action,
@@ -40,10 +34,7 @@ export function poemsListQuery(
     })
 }
 
-export function rankingQuery(
-    state: StateItem<Poem[]> = INITIAL,
-    action: Action
-): StateItem<Poem[]> {
+export function rankingQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
     return commonReducer({
         state,
         action,
@@ -51,10 +42,7 @@ export function rankingQuery(
     })
 }
 
-export function createPoemQuery(
-    state: StateItem<Poem[]> = INITIAL,
-    action: Action
-): StateItem<Poem[]> {
+export function createPoemQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
     return commonReducer({
         state,
         action,

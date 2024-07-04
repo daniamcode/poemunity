@@ -46,10 +46,7 @@ const Register = () => {
 
     return (
         <form className='register' onSubmit={handleRegister}>
-            <label>
-                Introduce your new credentials or click "Login" if you already
-                have them
-            </label>
+            <label>Introduce your new credentials or click "Login" if you already have them</label>
             <div className='register__username'>
                 <input
                     type='text'
@@ -77,15 +74,7 @@ const Register = () => {
                     onChange={({ target }) => setPassword(target.value)}
                 />
             </div>
-            <button
-                disabled={
-                    username.length === 0 ||
-                    email.length === 0 ||
-                    password.length === 0
-                }
-            >
-                Register
-            </button>
+            <button disabled={username.length === 0 || email.length === 0 || password.length === 0}>Register</button>
             {/* <Notification message={errorMessage}/> */}
             <NavLink to='/login'>Login</NavLink>
         </form>

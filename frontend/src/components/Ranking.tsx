@@ -81,12 +81,8 @@ export default function Ranking() {
                 <Table className={classes.table} aria-label='simple table'>
                     <TableHead>
                         <TableRow>
-                            <TableCell align='center'>
-                                {RANKING_POETS_TITLE}
-                            </TableCell>
-                            <TableCell align='center'>
-                                {RANKING_POINTS_TITLE}
-                            </TableCell>
+                            <TableCell align='center'>{RANKING_POETS_TITLE}</TableCell>
+                            <TableCell align='center'>{RANKING_POINTS_TITLE}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -99,19 +95,11 @@ export default function Ranking() {
                                     scope='row'
                                 >
                                     <div className='ranking__picture-wrap'>
-                                        <img
-                                            className='ranking__picture'
-                                            src={rank[element]?.picture}
-                                        />
-                                        <p className='ranking__picture-description'>
-                                            {rank[element]?.author}
-                                        </p>
+                                        <img className='ranking__picture' src={rank[element]?.picture} />
+                                        <p className='ranking__picture-description'>{rank[element]?.author}</p>
                                     </div>
                                 </TableCell>
-                                <TableCell
-                                    className='ranking__number'
-                                    align='center'
-                                >
+                                <TableCell className='ranking__number' align='center'>
                                     {rank[element]?.points}
                                 </TableCell>
                             </TableRow>

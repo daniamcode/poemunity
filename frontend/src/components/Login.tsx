@@ -27,10 +27,7 @@ const Login = (): JSX.Element => {
                 },
                 callbacks: {
                     success: data => {
-                        window.localStorage.setItem(
-                            'loggedUser',
-                            JSON.stringify(data)
-                        )
+                        window.localStorage.setItem('loggedUser', JSON.stringify(data))
                         history.push('profile')
                     },
                     error: () => {
@@ -50,10 +47,7 @@ const Login = (): JSX.Element => {
 
     return (
         <form className='login' onSubmit={handleLogin} data-testid='login'>
-            <label>
-                Introduce your login credentials or click "Register" if you
-                don't have them
-            </label>
+            <label>Introduce your login credentials or click "Register" if you don't have them</label>
             <div className='login__username'>
                 <input
                     type='text'

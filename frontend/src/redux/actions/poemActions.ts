@@ -1,20 +1,9 @@
 import store from '../store'
-import {
-    getAction,
-    getTypes,
-    putAction,
-    patchAction,
-    deleteAction
-} from './commonActions'
+import { getAction, getTypes, putAction, patchAction, deleteAction } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import cloneDeep from 'lodash.clonedeep'
 import { ACTIONS } from '../reducers/poemReducers'
-import {
-    ReduxOptions,
-    ReduxCallbacks,
-    Context,
-    Poem
-} from '../../typescript/interfaces'
+import { ReduxOptions, ReduxCallbacks, Context, Poem } from '../../typescript/interfaces'
 import { AppDispatch } from '../store'
 
 interface getPoemActionProps {
@@ -44,12 +33,7 @@ interface likePoemActionProps {
     callbacks: ReduxCallbacks
 }
 
-export function likePoemAction({
-    params,
-    context,
-    options,
-    callbacks
-}: likePoemActionProps) {
+export function likePoemAction({ params, context, options, callbacks }: likePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return putAction({
             type: ACTIONS.LIKE_POEM,
@@ -67,9 +51,7 @@ interface updatePoemCacheAfterLikePoemActionProps {
     context: Context
 }
 
-export function updatePoemCacheAfterLikePoemAction({
-    context
-}: updatePoemCacheAfterLikePoemActionProps) {
+export function updatePoemCacheAfterLikePoemAction({ context }: updatePoemCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const {
             poemQuery: { item: poemQuery }
@@ -79,7 +61,8 @@ export function updatePoemCacheAfterLikePoemAction({
         const index = newPoemQuery?.likes?.indexOf(context.userId)
         if (index !== -1) {
             newPoemQuery?.likes.splice(index, 1)
-        } else {
+        }
+        else {
             newPoemQuery?.likes.push(context.userId)
         }
 
@@ -100,12 +83,7 @@ interface deletePoemActionProps {
     callbacks: ReduxCallbacks
 }
 
-export function deletePoemAction({
-    params,
-    context,
-    options,
-    callbacks
-}: deletePoemActionProps) {
+export function deletePoemAction({ params, context, options, callbacks }: deletePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return deleteAction({
             type: ACTIONS.DELETE_POEM,
@@ -129,13 +107,7 @@ interface savePoemActionProps {
     callbacks: ReduxCallbacks
 }
 
-export function savePoemAction({
-    params,
-    context,
-    data,
-    options,
-    callbacks
-}: savePoemActionProps) {
+export function savePoemAction({ params, context, data, options, callbacks }: savePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return patchAction({
             type: ACTIONS.SAVE_POEM,

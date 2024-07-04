@@ -13,10 +13,7 @@ interface Action {
     payload?: Poem
 }
 
-export function poemQuery(
-    state: StateItem<Poem> = INITIAL,
-    action: Action
-): StateItem<Poem> {
+export function poemQuery(state: StateItem<Poem> = INITIAL, action: Action): StateItem<Poem> {
     return commonReducer({
         state,
         action,

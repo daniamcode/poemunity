@@ -16,7 +16,7 @@ import store from '../redux/store'
 import { Provider } from 'react-redux'
 
 describe('Ranking component', () => {
-    test('renders with mount', async () => {
+    test('renders with mount', async() => {
         const wrapper = mount(
             <Provider store={store}>
                 <Ranking />
@@ -87,7 +87,7 @@ describe('Login component', () => {
         wrapper = null
     })
 
-    test('renders', async () => {
+    test('renders', async() => {
         wrapper = wrapperFactory()
 
         render(<Login />, { wrapper })

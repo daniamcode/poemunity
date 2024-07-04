@@ -26,11 +26,11 @@ function renderPageNotFound(arg) {
 describe('PageNotFound', () => {
     let PageNotFoundTree
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         PageNotFoundTree = renderPageNotFound()
     })
 
-    test('should match without id', async () => {
+    test('should match without id', async() => {
         expect(PageNotFoundTree).toMatchSnapshot()
     })
 })

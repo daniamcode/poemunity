@@ -26,11 +26,11 @@ function renderHeader(arg) {
 describe('Header', () => {
     let HeaderTree
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         HeaderTree = renderHeader()
     })
 
-    test('should match without id', async () => {
+    test('should match without id', async() => {
         expect(HeaderTree).toMatchSnapshot()
     })
 })

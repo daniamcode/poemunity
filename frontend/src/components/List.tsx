@@ -80,8 +80,8 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                         params:
                             paramsData.origin !== 'all'
                                 ? {
-                                      origin: paramsData.origin
-                                  }
+                                    origin: paramsData.origin
+                                }
                                 : null,
                         options: queryOptions
                     })
@@ -93,20 +93,15 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
     }, [JSON.stringify(paramsData.origin), dispatch])
 
     useEffect(() => {
-        if (
-            poemsListQuery &&
-            poemsListQuery?.item &&
-            poemsListQuery?.item?.length > 0
-        ) {
+        if (poemsListQuery && poemsListQuery?.item && poemsListQuery?.item?.length > 0) {
             const newData = [...poemsListQuery?.item]
 
             if (genre) {
-                const poemsFiltered = newData.filter(
-                    poems => poems.genre === genre
-                )
+                const poemsFiltered = newData.filter(poems => poems.genre === genre)
                 const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
                 setPoems(poemsSorted)
-            } else {
+            }
+            else {
                 const poemsSorted = sortPoems(paramsData.orderBy, newData)
                 setPoems(poemsSorted)
             }
@@ -125,9 +120,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
         })
     }
 
-    const handleOriginChange = (
-        event: React.ChangeEvent<HTMLSelectElement>
-    ) => {
+    const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         addQueryParam({
             id: 'origin',
             value: event.target.value
@@ -138,9 +131,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
         })
     }
 
-    const handleSearchChange = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFilter(normalizeString(event.target.value))
     }
 
@@ -155,11 +146,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
     return (
         <>
             <Helmet>
-                <title>
-                    {genre
-                        ? `${capitalizeFirstLetter(genre)} poems`
-                        : 'Poemunity'}
-                </title>
+                <title>{genre ? `${capitalizeFirstLetter(genre)} poems` : 'Poemunity'}</title>
             </Helmet>
             <div className='list__container'>
                 <div className='list__intro'>
@@ -195,27 +182,14 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                     <form className='list__sort'>
                         <label>
                             Authors:
-                            <select
-                                id='origin'
-                                name='origin'
-                                onChange={handleOriginChange}
-                            >
-                                <option
-                                    value='all'
-                                    selected={paramsData.origin === 'all'}
-                                >
+                            <select id='origin' name='origin' onChange={handleOriginChange}>
+                                <option value='all' selected={paramsData.origin === 'all'}>
                                     All
                                 </option>
-                                <option
-                                    value='famous'
-                                    selected={paramsData.origin === 'famous'}
-                                >
+                                <option value='famous' selected={paramsData.origin === 'famous'}>
                                     Famous
                                 </option>
-                                <option
-                                    value='user'
-                                    selected={paramsData.origin === 'user'}
-                                >
+                                <option value='user' selected={paramsData.origin === 'user'}>
                                     Users
                                 </option>
                             </select>
@@ -224,45 +198,32 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                     <form className='list__sort'>
                         <label>
                             {ORDER_BY}
-                            <select
-                                id='sort'
-                                name='sort'
-                                onChange={handleOrderChange}
-                                data-testid='order-select'
-                            >
+                            <select id='sort' name='sort' onChange={handleOrderChange} data-testid='order-select'>
                                 <option
                                     value={ORDER_BY_LIKES}
                                     data-testid='select-option'
-                                    selected={
-                                        ORDER_BY_LIKES === paramsData.orderBy
-                                    }
+                                    selected={ORDER_BY_LIKES === paramsData.orderBy}
                                 >
                                     {ORDER_BY_LIKES}
                                 </option>
                                 <option
                                     value={ORDER_BY_DATE}
                                     data-testid='select-option'
-                                    selected={
-                                        ORDER_BY_DATE === paramsData.orderBy
-                                    }
+                                    selected={ORDER_BY_DATE === paramsData.orderBy}
                                 >
                                     {ORDER_BY_DATE}
                                 </option>
                                 <option
                                     value={ORDER_BY_RANDOM}
                                     data-testid='select-option'
-                                    selected={
-                                        ORDER_BY_RANDOM === paramsData.orderBy
-                                    }
+                                    selected={ORDER_BY_RANDOM === paramsData.orderBy}
                                 >
                                     {ORDER_BY_RANDOM}
                                 </option>
                                 <option
                                     value={ORDER_BY_TITLE}
                                     data-testid='select-option'
-                                    selected={
-                                        ORDER_BY_TITLE === paramsData.orderBy
-                                    }
+                                    selected={ORDER_BY_TITLE === paramsData.orderBy}
                                 >
                                     {ORDER_BY_TITLE}
                                 </option>
@@ -272,12 +233,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                 </div>
 
                 {poems.map(poem => (
-                    <ListItem
-                        key={poem?.id}
-                        poem={poem}
-                        filter={filter}
-                        context={context}
-                    />
+                    <ListItem key={poem?.id} poem={poem} filter={filter} context={context} />
                 ))}
             </div>
         </>

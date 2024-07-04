@@ -10,11 +10,7 @@ import { LIKE, LIKES, READ_MORE } from '../data/constants'
 import normalizeString from '../utils/normalizeString'
 // import PropTypes from 'prop-types'
 import { useAppDispatch } from '../redux/store'
-import {
-    deletePoemAction,
-    likePoemAction,
-    updatePoemCacheAfterLikePoemAction
-} from '../redux/actions/poemActions'
+import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import {
     updateAllPoemsCacheAfterLikePoemAction,
     updatePoemsListCacheAfterDeletePoemAction,
@@ -62,9 +58,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
                         manageSuccess('Poem deleted')
                     },
                     error: () => {
-                        manageError(
-                            'Sorry. There was an error deleting the poem'
-                        )
+                        manageError('Sorry. There was an error deleting the poem')
                     }
                 }
             })
@@ -73,10 +67,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
 
     const history = useHistory()
 
-    const onLike = (
-        event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-        poemId: string
-    ) => {
+    const onLike = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, poemId: string) => {
         event.preventDefault()
         dispatch(
             likePoemAction({
@@ -138,19 +129,12 @@ const ListItem = ({ poem, filter, context }: Props) => {
                             <img className='poem__picture' src={poem.picture} />
                             <p className='poem__author'>{poem.author}</p>
                         </div>
-                        <div className='poem__date'>
-                            {format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}
-                        </div>
+                        <div className='poem__date'>{format(new Date(poem.date), 'MM/dd/yyyy HH:mm\'h\'')}</div>
                     </section>
                     <section>
-                        <div className='poem__content poems__content'>
-                            {poem.poem}
-                        </div>
+                        <div className='poem__content poems__content'>{poem.poem}</div>
                         <div className='poems__read-more'>
-                            <Link
-                                to={`/detail/${poem.id}`}
-                                className='poems__read-more'
-                            >
+                            <Link to={`/detail/${poem.id}`} className='poems__read-more'>
                                 {READ_MORE}
                             </Link>
                         </div>
@@ -170,45 +154,35 @@ const ListItem = ({ poem, filter, context }: Props) => {
                         {context.user &&
                             poem.userId !== context.userId &&
                             poem.likes.some(id => id === context.userId) && (
-                                <Link
-                                    className='poem__likes-icon'
-                                    onClick={event => onLike(event, poem.id)}
-                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                />
-                            )}
+                            <Link
+                                className='poem__likes-icon'
+                                onClick={event => onLike(event, poem.id)}
+                                to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                            />
+                        )}
                         {context.user &&
                             poem.userId !== context.userId &&
                             !poem.likes.some(id => id === context.userId) && (
-                                <Link
-                                    className='poem__unlikes-icon'
-                                    onClick={event => onLike(event, poem.id)}
-                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                />
-                            )}
-                        {context.user &&
-                            (poem.userId === context.userId ||
-                                context.userId === context.adminId) && (
-                                <EditIcon
-                                    className='poem__edit-icon'
-                                    onClick={event => editPoem(poem.id)}
-                                />
-                            )}
-                        {context.user &&
-                            (poem.userId === context.userId ||
-                                context.userId === context.adminId) && (
-                                <HighlightOffSharpIcon
-                                    className='poem__delete-icon'
-                                    style={{
-                                        fill: 'red'
-                                    }}
-                                    data-testid='delete-poem'
-                                    onClick={event => onDelete(event, poem.id)}
-                                />
-                            )}
-                        <Link
-                            to={`/detail/${poem.id}`}
-                            className='poem__comments-icon'
-                        >
+                            <Link
+                                className='poem__unlikes-icon'
+                                onClick={event => onLike(event, poem.id)}
+                                to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                            />
+                        )}
+                        {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
+                            <EditIcon className='poem__edit-icon' onClick={event => editPoem(poem.id)} />
+                        )}
+                        {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
+                            <HighlightOffSharpIcon
+                                className='poem__delete-icon'
+                                style={{
+                                    fill: 'red'
+                                }}
+                                data-testid='delete-poem'
+                                onClick={event => onDelete(event, poem.id)}
+                            />
+                        )}
+                        <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
                             <SubjectSharpIcon
                                 style={{
                                     fill: '#000'

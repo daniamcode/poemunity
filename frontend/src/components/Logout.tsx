@@ -7,9 +7,7 @@ const Logout = () => {
     const history = useHistory()
     const context = useContext(AppContext)
 
-    const handleLogout = (
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-    ) => {
+    const handleLogout = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault()
         context.setState({
             ...context,

@@ -36,9 +36,7 @@ describe('List', () => {
             </Provider>
         )
 
-        const options = screen.getAllByTestId(
-            'select-option'
-        ) as HTMLOptionElement[]
+        const options = screen.getAllByTestId('select-option') as HTMLOptionElement[]
 
         act(() => {
             // random is the third option

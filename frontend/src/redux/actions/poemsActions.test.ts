@@ -95,12 +95,10 @@ describe('getAllPoemsAction', () => {
             options
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(
-            `${ACTIONS.ALL_POEMS}_reset`
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.ALL_POEMS}_reset`)
     })
 
-    test('Should dispatch error when axios throws a generic error', async () => {
+    test('Should dispatch error when axios throws a generic error', async() => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -126,20 +124,14 @@ describe('getAllPoemsAction', () => {
 
         expect(axios.get).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(
-            `${ACTIONS.ALL_POEMS}_rejected`
-        )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe(
-            'some error'
-        )
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
     })
 
     // a network error is diferent beacause we don't get an error as an object with a reponse property
-    test('Should dispatch error when axios throws a network error', async () => {
+    test('Should dispatch error when axios throws a network error', async() => {
         ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.get as jest.Mock).mockReturnValueOnce(
-            Promise.reject('Network error')
-        )
+        ;(axios.get as jest.Mock).mockReturnValueOnce(Promise.reject('Network error'))
 
         const options = { fetch: true }
 
@@ -159,15 +151,11 @@ describe('getAllPoemsAction', () => {
 
         expect(axios.get).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(
-            `${ACTIONS.ALL_POEMS}_rejected`
-        )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe(
-            'Network error'
-        )
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe('Network error')
     })
 
-    test('Should dispatch response when axios returns data correctly', async () => {
+    test('Should dispatch response when axios returns data correctly', async() => {
         // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
@@ -184,16 +172,10 @@ describe('getAllPoemsAction', () => {
             })(dispatch)
         )
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.ALL_POEMS}_request`
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_request`)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(
-            `${ACTIONS.ALL_POEMS}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual(
-            'poem1'
-        )
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
     })
 })
 
@@ -252,12 +234,8 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.POEMS_LIST}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -303,12 +281,8 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.POEMS_LIST}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
     test('Should do nothing when liking a poem that does not exist', () => {
         const context = {
@@ -354,12 +328,8 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.POEMS_LIST}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
 })
 
@@ -418,12 +388,8 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.RANKING}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.RANKING}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -469,12 +435,8 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.RANKING}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.RANKING}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
 })
 
@@ -533,12 +495,8 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.ALL_POEMS}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -584,12 +542,8 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             context
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.ALL_POEMS}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
-            finalState
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
     })
 })
 
@@ -698,12 +652,10 @@ describe('createPoemAction', () => {
             options
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(
-            `${ACTIONS.CREATE_POEM}_reset`
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.CREATE_POEM}_reset`)
     })
 
-    test('Should dispatch error when axios throws a generic error', async () => {
+    test('Should dispatch error when axios throws a generic error', async() => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -725,15 +677,11 @@ describe('createPoemAction', () => {
 
         expect(axios.post).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'postAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(
-            `${ACTIONS.CREATE_POEM}_rejected`
-        )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe(
-            'some error'
-        )
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.CREATE_POEM}_rejected`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
     })
 
-    test('Should dispatch response when axios returns data correctly', async () => {
+    test('Should dispatch response when axios returns data correctly', async() => {
         // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(
@@ -752,15 +700,9 @@ describe('createPoemAction', () => {
             })(dispatch)
         )
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
-            `${ACTIONS.CREATE_POEM}_request`
-        )
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.CREATE_POEM}_request`)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(
-            `${ACTIONS.CREATE_POEM}_fulfilled`
-        )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual(
-            'poem1'
-        )
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.CREATE_POEM}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
     })
 })

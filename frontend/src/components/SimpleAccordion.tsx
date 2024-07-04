@@ -22,9 +22,7 @@ export default function SimpleAccordion() {
                 onClick={toggleExpanded}
             >
                 <div className='header__dropdown-categories-icon'></div>
-                <p className='header__dropdown-categories'>
-                    {CATEGORIES_TITLE}
-                </p>
+                <p className='header__dropdown-categories'>{CATEGORIES_TITLE}</p>
             </AccordionSummary>
             <div>
                 {CATEGORIES?.sort().map(category => (
@@ -40,11 +38,7 @@ export default function SimpleAccordion() {
                 ))}
             </div>
             <AccordionDetails>
-                <Link
-                    className='header__dropdown-subcategories'
-                    to='/'
-                    onClick={toggleExpanded}
-                >
+                <Link className='header__dropdown-subcategories' to='/' onClick={toggleExpanded}>
                     {ALL}
                 </Link>
             </AccordionDetails>

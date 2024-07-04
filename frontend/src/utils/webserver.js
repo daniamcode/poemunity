@@ -8,9 +8,7 @@ const { createServer } = require('http')
  * @param {number} [options.port=8942] - overwrite the port used to listen for/trigger the live reload
  */
 function esbuildPluginLiveReload({ port = 8942 } = {}) {
-    console.log(
-        'Entering esbuildPluginLiveReload, meaning that if a change is detected, the web will reload...'
-    )
+    console.log('Entering esbuildPluginLiveReload, meaning that if a change is detected, the web will reload...')
     const plugin = {
         name: 'live-reload',
         async setup(build) {
