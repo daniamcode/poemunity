@@ -12,9 +12,9 @@ import {
 } from '../../typescript/interfaces'
 
 interface GetAllPoemsActionProps {
-  params?: object
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
+    params?: object
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
 }
 
 export function getAllPoemsAction({
@@ -35,9 +35,9 @@ export function getAllPoemsAction({
 }
 
 interface GetPoemsListActionProps {
-  params?: object | null
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
+    params?: object | null
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
 }
 
 export function getPoemsListAction({
@@ -58,9 +58,9 @@ export function getPoemsListAction({
 }
 
 interface GetRankingActionProps {
-  params?: object
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
+    params?: object
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
 }
 
 export function getRankingAction({
@@ -81,8 +81,8 @@ export function getRankingAction({
 }
 
 interface UpdatePoemsListCacheAfterLikePoemActionProps {
-  context: Context
-  poemId: string
+    context: Context
+    poemId: string
 }
 
 export function updatePoemsListCacheAfterLikePoemAction({
@@ -102,8 +102,7 @@ export function updatePoemsListCacheAfterLikePoemAction({
                     const index = poem?.likes?.indexOf(context.userId)
                     if (index !== -1) {
                         poem.likes.splice(index, 1)
-                    }
-                    else {
+                    } else {
                         poem.likes.push(context.userId)
                     }
                 }
@@ -123,8 +122,8 @@ export function updatePoemsListCacheAfterLikePoemAction({
 }
 
 interface UpdateRankingCacheAfterLikePoemActionProps {
-  context: Context
-  poemId: string
+    context: Context
+    poemId: string
 }
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterLikePoemAction)
@@ -145,8 +144,7 @@ export function updateRankingCacheAfterLikePoemAction({
                     const index = poem?.likes?.indexOf(context.userId)
                     if (index !== -1) {
                         poem.likes.splice(index, 1)
-                    }
-                    else {
+                    } else {
                         poem.likes.push(context.userId)
                     }
                 }
@@ -166,8 +164,8 @@ export function updateRankingCacheAfterLikePoemAction({
 }
 
 interface UpdateAllPoemsCacheAfterLikePoemActionProps {
-  context: Context
-  poemId: string
+    context: Context
+    poemId: string
 }
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterLikePoemAction)
@@ -188,8 +186,7 @@ export function updateAllPoemsCacheAfterLikePoemAction({
                     const index = poem?.likes?.indexOf(context.userId)
                     if (index !== -1) {
                         poem.likes.splice(index, 1)
-                    }
-                    else {
+                    } else {
                         poem.likes.push(context.userId)
                     }
                 }
@@ -209,10 +206,10 @@ export function updateAllPoemsCacheAfterLikePoemAction({
 }
 
 interface CreatePoemActionProps {
-  poem: Poem
-  callbacks?: ReduxCallbacks
-  context: Context
-  options?: ReduxOptions
+    poem: Poem
+    callbacks?: ReduxCallbacks
+    context: Context
+    options?: ReduxOptions
 }
 
 export function createPoemAction({
@@ -235,7 +232,7 @@ export function createPoemAction({
 }
 
 interface UpdateAllPoemsCacheAfterCreatePoemActionProps {
-  response: Poem
+    response: Poem
 }
 
 export function updateAllPoemsCacheAfterCreatePoemAction({
@@ -258,7 +255,7 @@ export function updateAllPoemsCacheAfterCreatePoemAction({
 }
 
 interface updateAllPoemsCacheAfterDeletePoemActionProps {
-  poemId: string
+    poemId: string
 }
 
 export function updateAllPoemsCacheAfterDeletePoemAction({
@@ -283,7 +280,7 @@ export function updateAllPoemsCacheAfterDeletePoemAction({
 }
 
 interface UpdatePoemsListCacheAfterDeletePoemActionProps {
-  poemId: string
+    poemId: string
 }
 
 export function updatePoemsListCacheAfterDeletePoemAction({
@@ -308,7 +305,7 @@ export function updatePoemsListCacheAfterDeletePoemAction({
 }
 
 interface UpdateRankingCacheAfterDeletePoemActionProps {
-  poemId: string
+    poemId: string
 }
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterDeletePoemAction)
@@ -334,8 +331,8 @@ export function updateRankingCacheAfterDeletePoemAction({
 }
 
 interface updateAllPoemsCacheAfterSavePoemActionProps {
-  poem: Poem
-  poemId: string
+    poem: Poem
+    poemId: string
 }
 
 export function updateAllPoemsCacheAfterSavePoemAction({

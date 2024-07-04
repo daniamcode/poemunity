@@ -26,11 +26,11 @@ function renderRanking(arg) {
 describe('Ranking', () => {
     let RankingTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         RankingTree = renderRanking()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(RankingTree).toMatchSnapshot()
     })
 })

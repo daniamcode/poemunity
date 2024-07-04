@@ -11,10 +11,10 @@ export const CATEGORIES = [
     'Sad'
 ]
 export const ALL = 'All'
-export const PROFILE_TITLE = '\'s Profile'
+export const PROFILE_TITLE = "'s Profile"
 export const PROFILE_SUBTITLE_CREATE = 'Insert a poem:'
 export const PROFILE_SUBTITLE_UPDATE = 'Modify a poem:'
-export const PROFILE_SELECT_TITLE_AUTHOR = 'Author\'s Id: '
+export const PROFILE_SELECT_TITLE_AUTHOR = "Author's Id: "
 export const PROFILE_SELECT_TITLE_TITLE = 'Title: '
 export const PROFILE_SELECT_TITLE = 'Title'
 export const PROFILE_SELECT_LIKES = 'Likes'

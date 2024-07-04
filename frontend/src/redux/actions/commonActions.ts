@@ -90,18 +90,18 @@ export function getTypes(baseType: string | undefined) {
         fulfilledAction: `${baseType}_fulfilled`,
         rejectedAction: `${baseType}_rejected`,
         resetAction: `${baseType}_reset`
-    // updateAction: `${baseType}_update`,
+        // updateAction: `${baseType}_update`,
     }
 }
 
 interface GetActionProps {
-  type: string
-  url: string
-  params?: unknown
-  dispatch: AppDispatch
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
-  extraConfig?: object
+    type: string
+    url: string
+    params?: unknown
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    extraConfig?: object
 }
 
 export function getAction({
@@ -118,8 +118,8 @@ export function getAction({
         fulfilledAction,
         rejectedAction,
         resetAction
-    // updateAction is used with commonListReducers, but with commonReducer is not used for now
-    // updateAction,
+        // updateAction is used with commonListReducers, but with commonReducer is not used for now
+        // updateAction,
     } = getTypes(type)
     options.reset = options.reset !== undefined ? options.reset : false
     options.update = options.update !== undefined ? options.update : false
@@ -139,7 +139,10 @@ export function getAction({
             })
             .then(response => {
                 let responseData = response.data
-                if (transformResponse && typeof transformResponse === 'function') {
+                if (
+                    transformResponse &&
+                    typeof transformResponse === 'function'
+                ) {
                     responseData = transformResponse(responseData)
                 }
                 // if (options.update) {
@@ -187,14 +190,14 @@ export function getAction({
 }
 
 interface PostActionProps {
-  type: string
-  url: string
-  data: object
-  dispatch: AppDispatch
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
-  headers?: object
-  config?: object
+    type: string
+    url: string
+    data: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    headers?: object
+    config?: object
 }
 
 export function postAction({
@@ -212,7 +215,7 @@ export function postAction({
         fulfilledAction,
         rejectedAction,
         resetAction
-    // updateAction,
+        // updateAction,
     } = getTypes(type)
     // default data
     options.reset = options.reset !== undefined ? options.reset : false
@@ -275,13 +278,13 @@ export function postAction({
 }
 
 interface PutActionProps {
-  type: string
-  url: string
-  data?: object
-  dispatch: AppDispatch
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
-  config?: object
+    type: string
+    url: string
+    data?: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    config?: object
 }
 
 export function putAction({
@@ -296,7 +299,7 @@ export function putAction({
 }: PutActionProps) {
     // console.log('listingAction type : ' + type);
     const { requestAction, fulfilledAction, rejectedAction, resetAction } =
-    getTypes(type)
+        getTypes(type)
 
     options.reset = options.reset !== undefined ? options.reset : false
     options.update = options.update !== undefined ? options.update : false
@@ -348,14 +351,14 @@ export function putAction({
 }
 
 interface DeleteActionProps {
-  type: string
-  url: string
-  data?: object
-  dispatch: AppDispatch
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
-  headers?: object
-  config?: object
+    type: string
+    url: string
+    data?: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    headers?: object
+    config?: object
 }
 
 export function deleteAction({
@@ -373,7 +376,7 @@ export function deleteAction({
         fulfilledAction,
         rejectedAction,
         resetAction
-    // updateAction,
+        // updateAction,
     } = getTypes(type)
     // default data
     options.reset = options.reset !== undefined ? options.reset : false
@@ -436,13 +439,13 @@ export function deleteAction({
 }
 
 interface PatchActionProps {
-  type: string
-  url: string
-  data?: object
-  dispatch: AppDispatch
-  options?: ReduxOptions
-  callbacks?: ReduxCallbacks
-  config?: object
+    type: string
+    url: string
+    data?: object
+    dispatch: AppDispatch
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    config?: object
 }
 
 export function patchAction({
@@ -457,7 +460,7 @@ export function patchAction({
 }: PatchActionProps) {
     // console.log('listingAction type : ' + type);
     const { requestAction, fulfilledAction, rejectedAction, resetAction } =
-    getTypes(type)
+        getTypes(type)
 
     options.reset = options.reset !== undefined ? options.reset : false
     options.update = options.update !== undefined ? options.update : false

@@ -5,9 +5,9 @@ import { ReduxOptions, ReduxCallbacks } from '../../typescript/interfaces'
 import { AppDispatch } from '../store'
 
 interface LoginActionProps {
-  data: object
-  options?: ReduxOptions
-  callbacks: ReduxCallbacks
+    data: object
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
 }
 
 export function loginAction({ data, callbacks }: LoginActionProps) {

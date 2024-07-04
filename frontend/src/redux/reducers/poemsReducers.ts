@@ -10,8 +10,8 @@ export const ACTIONS = {
 }
 
 interface Action {
-  type: string
-  payload?: Poem[]
+    type: string
+    payload?: Poem[]
 }
 
 // used for MyFavouritePoems and for MyPoems

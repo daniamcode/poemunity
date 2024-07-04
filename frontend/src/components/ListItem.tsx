@@ -27,9 +27,9 @@ import { manageError, manageSuccess } from '../utils/notifications'
 import { format } from 'date-fns'
 
 interface Props {
-  poem: Poem
-  filter: string
-  context: Context
+    poem: Poem
+    filter: string
+    context: Context
 }
 
 const ListItem = ({ poem, filter, context }: Props) => {
@@ -62,7 +62,9 @@ const ListItem = ({ poem, filter, context }: Props) => {
                         manageSuccess('Poem deleted')
                     },
                     error: () => {
-                        manageError('Sorry. There was an error deleting the poem')
+                        manageError(
+                            'Sorry. There was an error deleting the poem'
+                        )
                     }
                 }
             })
@@ -137,13 +139,18 @@ const ListItem = ({ poem, filter, context }: Props) => {
                             <p className='poem__author'>{poem.author}</p>
                         </div>
                         <div className='poem__date'>
-                            {format(new Date(poem.date), 'MM/dd/yyyy HH:mm\'h\'')}
+                            {format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}
                         </div>
                     </section>
                     <section>
-                        <div className='poem__content poems__content'>{poem.poem}</div>
+                        <div className='poem__content poems__content'>
+                            {poem.poem}
+                        </div>
                         <div className='poems__read-more'>
-                            <Link to={`/detail/${poem.id}`} className='poems__read-more'>
+                            <Link
+                                to={`/detail/${poem.id}`}
+                                className='poems__read-more'
+                            >
                                 {READ_MORE}
                             </Link>
                         </div>
@@ -161,44 +168,47 @@ const ListItem = ({ poem, filter, context }: Props) => {
                         )}
                         <div className='separator' />
                         {context.user &&
-              poem.userId !== context.userId &&
-              poem.likes.some(id => id === context.userId) && (
-                            <Link
-                                className='poem__likes-icon'
-                                onClick={event => onLike(event, poem.id)}
-                                to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                            />
-                        )}
+                            poem.userId !== context.userId &&
+                            poem.likes.some(id => id === context.userId) && (
+                                <Link
+                                    className='poem__likes-icon'
+                                    onClick={event => onLike(event, poem.id)}
+                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                />
+                            )}
                         {context.user &&
-              poem.userId !== context.userId &&
-              !poem.likes.some(id => id === context.userId) && (
-                            <Link
-                                className='poem__unlikes-icon'
-                                onClick={event => onLike(event, poem.id)}
-                                to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                            />
-                        )}
+                            poem.userId !== context.userId &&
+                            !poem.likes.some(id => id === context.userId) && (
+                                <Link
+                                    className='poem__unlikes-icon'
+                                    onClick={event => onLike(event, poem.id)}
+                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                />
+                            )}
                         {context.user &&
-              (poem.userId === context.userId ||
-                context.userId === context.adminId) && (
-                            <EditIcon
-                                className='poem__edit-icon'
-                                onClick={event => editPoem(poem.id)}
-                            />
-                        )}
+                            (poem.userId === context.userId ||
+                                context.userId === context.adminId) && (
+                                <EditIcon
+                                    className='poem__edit-icon'
+                                    onClick={event => editPoem(poem.id)}
+                                />
+                            )}
                         {context.user &&
-              (poem.userId === context.userId ||
-                context.userId === context.adminId) && (
-                            <HighlightOffSharpIcon
-                                className='poem__delete-icon'
-                                style={{
-                                    fill: 'red'
-                                }}
-                                data-testid='delete-poem'
-                                onClick={event => onDelete(event, poem.id)}
-                            />
-                        )}
-                        <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
+                            (poem.userId === context.userId ||
+                                context.userId === context.adminId) && (
+                                <HighlightOffSharpIcon
+                                    className='poem__delete-icon'
+                                    style={{
+                                        fill: 'red'
+                                    }}
+                                    data-testid='delete-poem'
+                                    onClick={event => onDelete(event, poem.id)}
+                                />
+                            )}
+                        <Link
+                            to={`/detail/${poem.id}`}
+                            className='poem__comments-icon'
+                        >
                             <SubjectSharpIcon
                                 style={{
                                     fill: '#000'

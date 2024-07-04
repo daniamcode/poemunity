@@ -41,8 +41,8 @@ describe('getAllPoemsAction', () => {
         dispatch = jest.fn()
     })
     afterEach(() => {
-    // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-    // tests could fail
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         ;(dispatch as jest.Mock).mockClear()
     })
 
@@ -100,7 +100,7 @@ describe('getAllPoemsAction', () => {
         )
     })
 
-    test('Should dispatch error when axios throws a generic error', async() => {
+    test('Should dispatch error when axios throws a generic error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -135,7 +135,7 @@ describe('getAllPoemsAction', () => {
     })
 
     // a network error is diferent beacause we don't get an error as an object with a reponse property
-    test('Should dispatch error when axios throws a network error', async() => {
+    test('Should dispatch error when axios throws a network error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
             Promise.reject('Network error')
@@ -167,8 +167,8 @@ describe('getAllPoemsAction', () => {
         )
     })
 
-    test('Should dispatch response when axios returns data correctly', async() => {
-    // this is beacuse we use Axios.create
+    test('Should dispatch response when axios returns data correctly', async () => {
+        // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
             Promise.resolve({
@@ -191,7 +191,9 @@ describe('getAllPoemsAction', () => {
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(
             `${ACTIONS.ALL_POEMS}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual(
+            'poem1'
+        )
     })
 })
 
@@ -201,8 +203,8 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         dispatch = jest.fn()
     })
     afterEach(() => {
-    // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-    // tests could fail
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         ;(dispatch as jest.Mock).mockClear()
     })
 
@@ -239,7 +241,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
                 item: initialState
             }
@@ -253,7 +255,9 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.POEMS_LIST}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -288,7 +292,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
                 item: initialState
             }
@@ -302,7 +306,9 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.POEMS_LIST}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
     test('Should do nothing when liking a poem that does not exist', () => {
         const context = {
@@ -337,7 +343,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
                 item: initialState
             }
@@ -351,7 +357,9 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.POEMS_LIST}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
 })
 
@@ -361,8 +369,8 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
         dispatch = jest.fn()
     })
     afterEach(() => {
-    // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-    // tests could fail
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         ;(dispatch as jest.Mock).mockClear()
     })
 
@@ -399,7 +407,7 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             rankingQuery: {
                 item: initialState
             }
@@ -413,7 +421,9 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.RANKING}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -448,7 +458,7 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             rankingQuery: {
                 item: initialState
             }
@@ -462,7 +472,9 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.RANKING}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
 })
 
@@ -472,8 +484,8 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
         dispatch = jest.fn()
     })
     afterEach(() => {
-    // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-    // tests could fail
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         ;(dispatch as jest.Mock).mockClear()
     })
 
@@ -510,7 +522,7 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             allPoemsQuery: {
                 item: initialState
             }
@@ -524,7 +536,9 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.ALL_POEMS}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -559,7 +573,7 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             }
         ]
 
-    ;(store.getState as jest.Mock).mockReturnValueOnce({
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
             allPoemsQuery: {
                 item: initialState
             }
@@ -573,7 +587,9 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(
             `${ACTIONS.ALL_POEMS}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(
+            finalState
+        )
     })
 })
 
@@ -623,8 +639,8 @@ describe('createPoemAction', () => {
         dispatch = jest.fn()
     })
     afterEach(() => {
-    // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-    // tests could fail
+        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
+        // tests could fail
         ;(dispatch as jest.Mock).mockClear()
     })
 
@@ -687,7 +703,7 @@ describe('createPoemAction', () => {
         )
     })
 
-    test('Should dispatch error when axios throws a generic error', async() => {
+    test('Should dispatch error when axios throws a generic error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -717,8 +733,8 @@ describe('createPoemAction', () => {
         )
     })
 
-    test('Should dispatch response when axios returns data correctly', async() => {
-    // this is beacuse we use Axios.create
+    test('Should dispatch response when axios returns data correctly', async () => {
+        // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(
             Promise.resolve({
@@ -743,6 +759,8 @@ describe('createPoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(
             `${ACTIONS.CREATE_POEM}_fulfilled`
         )
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual(
+            'poem1'
+        )
     })
 })

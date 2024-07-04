@@ -8,7 +8,9 @@ export function parseQuery(url: string = window.location.search) {
     return Array.from(urlParams.keys()).reduce((acc, key) => {
         if (key !== '__proto__') {
             // we use non-null assertion operator by now to bypass typescript's error
-            acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null
+            acc[key] = urlParams.has(key)
+                ? JSON.parse(urlParams.get(key)!)
+                : null
         }
         return acc
     }, {})
@@ -38,8 +40,8 @@ export function urlTail(url = '') {
  */
 
 interface addQueryParamProps {
-  id: string
-  value: string
+    id: string
+    value: string
 }
 
 export function addQueryParam({ id, value }: addQueryParamProps) {
@@ -51,8 +53,7 @@ export function addQueryParam({ id, value }: addQueryParamProps) {
             search: urlParams.toString(),
             pathname: history.location.pathname
         })
-    }
-    catch (error: any) {
+    } catch (error: any) {
         console.error(error.stack)
     }
 }
@@ -82,8 +83,7 @@ export function addQueryParams(
                 pathname: history.location.pathname
             })
         }
-    }
-    catch (error: any) {
+    } catch (error: any) {
         console.error(error.stack)
     }
 }

@@ -17,7 +17,7 @@ const Login = (): JSX.Element => {
     const dispatch = useAppDispatch()
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-    // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
+        // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
         event.preventDefault()
         dispatch(
             loginAction({
@@ -27,7 +27,10 @@ const Login = (): JSX.Element => {
                 },
                 callbacks: {
                     success: data => {
-                        window.localStorage.setItem('loggedUser', JSON.stringify(data))
+                        window.localStorage.setItem(
+                            'loggedUser',
+                            JSON.stringify(data)
+                        )
                         history.push('profile')
                     },
                     error: () => {
@@ -48,8 +51,8 @@ const Login = (): JSX.Element => {
     return (
         <form className='login' onSubmit={handleLogin} data-testid='login'>
             <label>
-        Introduce your login credentials or click "Register" if you don't have
-        them
+                Introduce your login credentials or click "Register" if you
+                don't have them
             </label>
             <div className='login__username'>
                 <input

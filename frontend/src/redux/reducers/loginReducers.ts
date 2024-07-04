@@ -7,8 +7,8 @@ export const ACTIONS = {
 }
 
 interface Action {
-  type: string
-  payload?: object[]
+    type: string
+    payload?: object[]
 }
 
 export function loginQuery(

@@ -26,11 +26,11 @@ function renderLogout(arg) {
 describe('Logout', () => {
     let LogoutTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         LogoutTree = renderLogout()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(LogoutTree).toMatchSnapshot()
     })
 })

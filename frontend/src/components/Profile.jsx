@@ -170,7 +170,9 @@ export default function Profile(props) {
             setPoemLikes(
                 context?.elementToEdit ? poemQuery?.item?.likes?.toString() : []
             )
-            setPoemCategory(context?.elementToEdit ? poemQuery?.item?.genre : '')
+            setPoemCategory(
+                context?.elementToEdit ? poemQuery?.item?.genre : ''
+            )
             setPoemOrigin(context?.elementToEdit ? poemQuery?.item?.origin : '')
         }
     }, [JSON.stringify([context?.elementToEdit, poemQuery?.item])])
@@ -193,17 +195,17 @@ export default function Profile(props) {
 
         const currentDatetime = new Date()
         const formattedDate =
-      currentDatetime.getFullYear() +
-      '-' +
-      (currentDatetime.getMonth() + 1) +
-      '-' +
-      currentDatetime.getDate() +
-      ' ' +
-      currentDatetime.getHours() +
-      ':' +
-      currentDatetime.getMinutes() +
-      ':' +
-      currentDatetime.getSeconds()
+            currentDatetime.getFullYear() +
+            '-' +
+            (currentDatetime.getMonth() + 1) +
+            '-' +
+            currentDatetime.getDate() +
+            ' ' +
+            currentDatetime.getHours() +
+            ':' +
+            currentDatetime.getMinutes() +
+            ':' +
+            currentDatetime.getSeconds()
 
         if (!context?.elementToEdit) {
             if (context?.userId === context.adminId) {
@@ -212,7 +214,10 @@ export default function Profile(props) {
                     poem: poemContent,
                     title: poemTitle,
                     genre: poemCategory,
-                    likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+                    likes:
+                        poemLikes.length !== 0
+                            ? [...poemLikes?.split(',')]
+                            : [],
                     date: formattedDate,
                     origin: poemOrigin
                 }
@@ -229,13 +234,14 @@ export default function Profile(props) {
                                 )
                             },
                             error: () => {
-                                console.log('something went wrong creating a poem!')
+                                console.log(
+                                    'something went wrong creating a poem!'
+                                )
                             }
                         }
                     })
                 )
-            }
-            else {
+            } else {
                 const poem = {
                     poem: poemContent,
                     title: poemTitle,
@@ -257,7 +263,9 @@ export default function Profile(props) {
                                 )
                             },
                             error: error => {
-                                console.log('something went wrong creating a poem!')
+                                console.log(
+                                    'something went wrong creating a poem!'
+                                )
                             }
                         }
                     })
@@ -267,8 +275,7 @@ export default function Profile(props) {
             setPoemTitle('')
             setPoemOrigin('')
             setPoemCategory('')
-        }
-        else {
+        } else {
             if (context?.userId === context.adminId) {
                 onSave({
                     event,
@@ -277,14 +284,16 @@ export default function Profile(props) {
                         poem: poemContent,
                         title: poemTitle,
                         genre: poemCategory,
-                        likes: poemLikes.length !== 0 ? [...poemLikes?.split(',')] : [],
+                        likes:
+                            poemLikes.length !== 0
+                                ? [...poemLikes?.split(',')]
+                                : [],
                         date: formattedDate,
                         origin: poemOrigin
                     },
                     poemId: poemQuery.item.id
                 })
-            }
-            else {
+            } else {
                 onSave({
                     event,
                     poem: {
@@ -342,33 +351,52 @@ export default function Profile(props) {
                                 <br />
                                 <form className='profile__insert-poem-form'>
                                     <div className='profile__insert-poem-inputs'>
-                                        {context?.userId === context.adminId && (
+                                        {context?.userId ===
+                                            context.adminId && (
                                             <>
                                                 <label className='profile__insert-poem-input'>
-                          Origin
+                                                    Origin
                                                     <select
                                                         className='profile__insert-poem-input'
                                                         name='origin'
                                                         required
                                                         value={poemOrigin}
                                                         onChange={event =>
-                                                            onFieldChange(event.target.value, setPoemOrigin)
+                                                            onFieldChange(
+                                                                event.target
+                                                                    .value,
+                                                                setPoemOrigin
+                                                            )
                                                         }
                                                     >
-                                                        <option value=''>{PROFILE_SELECT_CATEGORY}</option>
-                                                        <option value='famous'>Famous</option>
-                                                        <option value='user'>User</option>
+                                                        <option value=''>
+                                                            {
+                                                                PROFILE_SELECT_CATEGORY
+                                                            }
+                                                        </option>
+                                                        <option value='famous'>
+                                                            Famous
+                                                        </option>
+                                                        <option value='user'>
+                                                            User
+                                                        </option>
                                                     </select>
                                                 </label>
                                                 <label className='profile__insert-poem-input'>
-                                                    {PROFILE_SELECT_TITLE_AUTHOR}
+                                                    {
+                                                        PROFILE_SELECT_TITLE_AUTHOR
+                                                    }
                                                     <input
                                                         className='profile__insert-poem-input'
                                                         name='author'
                                                         required
                                                         value={poemFakeId}
                                                         onChange={event =>
-                                                            onFieldChange(event.target.value, setPoemFakeId)
+                                                            onFieldChange(
+                                                                event.target
+                                                                    .value,
+                                                                setPoemFakeId
+                                                            )
                                                         }
                                                     />
                                                 </label>
@@ -379,7 +407,11 @@ export default function Profile(props) {
                                                         name='likes'
                                                         value={poemLikes}
                                                         onChange={event =>
-                                                            onFieldChange(event.target.value, setPoemLikes)
+                                                            onFieldChange(
+                                                                event.target
+                                                                    .value,
+                                                                setPoemLikes
+                                                            )
                                                         }
                                                     />
                                                 </label>
@@ -389,12 +421,17 @@ export default function Profile(props) {
                                             {PROFILE_SELECT_TITLE_TITLE}
                                             <input
                                                 className='profile__insert-poem-input'
-                                                placeholder={PROFILE_SELECT_TITLE}
+                                                placeholder={
+                                                    PROFILE_SELECT_TITLE
+                                                }
                                                 name='title'
                                                 required
                                                 value={poemTitle}
                                                 onChange={event =>
-                                                    onFieldChange(event.target.value, setPoemTitle)
+                                                    onFieldChange(
+                                                        event.target.value,
+                                                        setPoemTitle
+                                                    )
                                                 }
                                             />
                                         </label>
@@ -407,15 +444,22 @@ export default function Profile(props) {
                                                 required
                                                 value={poemCategory}
                                                 onChange={event => {
-                                                    onFieldChange(event.target.value, setPoemCategory)
+                                                    onFieldChange(
+                                                        event.target.value,
+                                                        setPoemCategory
+                                                    )
                                                 }}
                                             >
-                                                <option value=''>{PROFILE_SELECT_CATEGORY}</option>
+                                                <option value=''>
+                                                    {PROFILE_SELECT_CATEGORY}
+                                                </option>
                                                 {CATEGORIES?.map(category => (
                                                     <option
                                                         value={category.toLowerCase()}
                                                         selected={
-                                                            poemQuery?.item?.genre === category.toLowerCase()
+                                                            poemQuery?.item
+                                                                ?.genre ===
+                                                            category.toLowerCase()
                                                         }
                                                     >
                                                         {category}
@@ -430,10 +474,15 @@ export default function Profile(props) {
                                             id='poem'
                                             name='poem'
                                             required
-                                            placeholder={PROFILE_POEM_PLACEHOLDER}
+                                            placeholder={
+                                                PROFILE_POEM_PLACEHOLDER
+                                            }
                                             value={poemContent}
                                             onChange={event =>
-                                                onFieldChange(event.target.value, setPoemContent)
+                                                onFieldChange(
+                                                    event.target.value,
+                                                    setPoemContent
+                                                )
                                             }
                                         />
                                     </div>
@@ -451,9 +500,11 @@ export default function Profile(props) {
                                         onClick={handleSend}
                                         disabled={
                                             !poemTitle ||
-                      !poemCategory ||
-                      !poemContent ||
-                      (context?.userId === context.adminId && !poemOrigin)
+                                            !poemCategory ||
+                                            !poemContent ||
+                                            (context?.userId ===
+                                                context.adminId &&
+                                                !poemOrigin)
                                         }
                                     >
                                         {PROFILE_SEND_POEM}
@@ -473,12 +524,22 @@ export default function Profile(props) {
                                     variant='fullWidth'
                                     aria-label='full width tabs example'
                                 >
-                                    <Tab label={PROFILE_POEMS} {...a11yProps(0)} />
-                                    <Tab label={PROFILE_FAVOURITE_POEMS} {...a11yProps(1)} />
+                                    <Tab
+                                        label={PROFILE_POEMS}
+                                        {...a11yProps(0)}
+                                    />
+                                    <Tab
+                                        label={PROFILE_FAVOURITE_POEMS}
+                                        {...a11yProps(1)}
+                                    />
                                 </Tabs>
                             </AppBar>
                             <SwipeableViews
-                                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                                axis={
+                                    theme.direction === 'rtl'
+                                        ? 'x-reverse'
+                                        : 'x'
+                                }
                                 index={value}
                                 onChangeIndex={handleChangeIndex}
                             >

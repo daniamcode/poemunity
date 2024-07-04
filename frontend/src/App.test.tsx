@@ -7,8 +7,8 @@ import '@testing-library/jest-dom'
 
 describe('App', () => {
     test('renders some text', () => {
-    // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-    // const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
+        // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+        // const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
 
         render(
             <Provider store={store}>

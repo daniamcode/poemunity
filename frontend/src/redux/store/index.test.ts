@@ -32,8 +32,8 @@ describe('ConfigureStore', () => {
     // });
 
     test('Should create a store in test', () => {
-    // the environment variable is set to test with the afterEach hook (default value)
-    // const store = configureStore();
+        // the environment variable is set to test with the afterEach hook (default value)
+        // const store = configureStore();
 
         expect(process.env.NODE_ENV).toBe('test')
         expect(store).toBeDefined()

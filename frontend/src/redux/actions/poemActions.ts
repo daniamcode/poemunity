@@ -18,10 +18,10 @@ import {
 import { AppDispatch } from '../store'
 
 interface getPoemActionProps {
-  params?: {
-    poemId: string
-  }
-  options?: ReduxOptions
+    params?: {
+        poemId: string
+    }
+    options?: ReduxOptions
 }
 
 export function getPoemAction({ params, options }: getPoemActionProps) {
@@ -36,12 +36,12 @@ export function getPoemAction({ params, options }: getPoemActionProps) {
 }
 
 interface likePoemActionProps {
-  params: {
-    poemId: string
-  }
-  context: Context
-  options?: ReduxOptions
-  callbacks: ReduxCallbacks
+    params: {
+        poemId: string
+    }
+    context: Context
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
 }
 
 export function likePoemAction({
@@ -64,7 +64,7 @@ export function likePoemAction({
 }
 
 interface updatePoemCacheAfterLikePoemActionProps {
-  context: Context
+    context: Context
 }
 
 export function updatePoemCacheAfterLikePoemAction({
@@ -79,8 +79,7 @@ export function updatePoemCacheAfterLikePoemAction({
         const index = newPoemQuery?.likes?.indexOf(context.userId)
         if (index !== -1) {
             newPoemQuery?.likes.splice(index, 1)
-        }
-        else {
+        } else {
             newPoemQuery?.likes.push(context.userId)
         }
 
@@ -93,12 +92,12 @@ export function updatePoemCacheAfterLikePoemAction({
 }
 
 interface deletePoemActionProps {
-  params: {
-    poemId: string
-  }
-  context: Context
-  options?: ReduxOptions
-  callbacks: ReduxCallbacks
+    params: {
+        poemId: string
+    }
+    context: Context
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
 }
 
 export function deletePoemAction({
@@ -121,13 +120,13 @@ export function deletePoemAction({
 }
 
 interface savePoemActionProps {
-  params: {
-    poemId: string
-  }
-  data: Poem
-  context: Context
-  options?: ReduxOptions
-  callbacks: ReduxCallbacks
+    params: {
+        poemId: string
+    }
+    data: Poem
+    context: Context
+    options?: ReduxOptions
+    callbacks: ReduxCallbacks
 }
 
 export function savePoemAction({

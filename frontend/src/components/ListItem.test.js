@@ -50,13 +50,13 @@ describe('ListItem component', () => {
     }
 
     afterEach(() => {
-    // very important, restoreAllMocks works, but clearAllMocks doesn't
+        // very important, restoreAllMocks works, but clearAllMocks doesn't
         jest.restoreAllMocks()
         wrapper = null
     })
 
     test('Check PropTypes', () => {
-    // we can validate that the test fails just by changing for instance, expectedProps.filter into a number
+        // we can validate that the test fails just by changing for instance, expectedProps.filter into a number
         const expectedProps = {
             poem: {},
             filter: '',
@@ -70,7 +70,7 @@ describe('ListItem component', () => {
         )
         expect(propsErr).toBeUndefined()
     })
-    test('Should call manageSuccess when deleting poem', async() => {
+    test('Should call manageSuccess when deleting poem', async () => {
         wrapper = wrapperFactory()
 
         const spy = jest.spyOn(commonActions, 'deleteAction')
@@ -96,7 +96,7 @@ describe('ListItem component', () => {
         expect(manageSuccess).toHaveBeenCalledTimes(1)
         expect(manageSuccess).toHaveBeenCalledWith('Poem deleted')
     })
-    test('Should call manageError when failing in deleting poem', async() => {
+    test('Should call manageError when failing in deleting poem', async () => {
         wrapper = wrapperFactory()
 
         const spy = jest.spyOn(commonActions, 'deleteAction')

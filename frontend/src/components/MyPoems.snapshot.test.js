@@ -26,11 +26,11 @@ function renderMyPoems(arg) {
 describe('MyPoems', () => {
     let MyPoemsTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         MyPoemsTree = renderMyPoems()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(MyPoemsTree).toMatchSnapshot()
     })
 })
