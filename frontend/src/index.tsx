@@ -13,14 +13,14 @@ console.log(`Environment is: ${process.env.NODE_ENV}`)
 const root = document.getElementById('root')
 
 if (root) {
-  ReactDOM.render(
-    <React.StrictMode>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </React.StrictMode>,
-    root
-  )
+    ReactDOM.render(
+        <React.StrictMode>
+            <Provider store={store}>
+                <App />
+            </Provider>
+        </React.StrictMode>,
+        root
+    )
 }
 
 // If you want your app to work offline and load faster, you can change

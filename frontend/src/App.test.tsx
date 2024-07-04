@@ -6,20 +6,20 @@ import store from './redux/store'
 import '@testing-library/jest-dom'
 
 describe('App', () => {
-  test('renders some text', () => {
+    test('renders some text', () => {
     // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
     // const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
 
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    )
+        render(
+            <Provider store={store}>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </Provider>
+        )
 
-    const textElement = screen.getByText(/Your poem community!/)
+        const textElement = screen.getByText(/Your poem community!/)
 
-    expect(textElement).toBeInTheDocument()
-  })
+        expect(textElement).toBeInTheDocument()
+    })
 })

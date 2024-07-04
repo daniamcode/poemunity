@@ -1,19 +1,19 @@
 import store from '../store'
 import {
-  getAction,
-  getTypes,
-  putAction,
-  patchAction,
-  deleteAction
+    getAction,
+    getTypes,
+    putAction,
+    patchAction,
+    deleteAction
 } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import cloneDeep from 'lodash.clonedeep'
 import { ACTIONS } from '../reducers/poemReducers'
 import {
-  ReduxOptions,
-  ReduxCallbacks,
-  Context,
-  Poem
+    ReduxOptions,
+    ReduxCallbacks,
+    Context,
+    Poem
 } from '../../typescript/interfaces'
 import { AppDispatch } from '../store'
 
@@ -25,14 +25,14 @@ interface getPoemActionProps {
 }
 
 export function getPoemAction({ params, options }: getPoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return getAction({
-      type: ACTIONS.POEM,
-      url: `${API_ENDPOINTS.POEMS}/${params?.poemId}`,
-      dispatch,
-      options
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.POEM,
+            url: `${API_ENDPOINTS.POEMS}/${params?.poemId}`,
+            dispatch,
+            options
+        })
+    }
 }
 
 interface likePoemActionProps {
@@ -45,22 +45,22 @@ interface likePoemActionProps {
 }
 
 export function likePoemAction({
-  params,
-  context,
-  options,
-  callbacks
+    params,
+    context,
+    options,
+    callbacks
 }: likePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return putAction({
-      type: ACTIONS.LIKE_POEM,
-      url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
-      // context.config is basically the jwt token
-      config: context.config,
-      dispatch,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return putAction({
+            type: ACTIONS.LIKE_POEM,
+            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            // context.config is basically the jwt token
+            config: context.config,
+            dispatch,
+            options,
+            callbacks
+        })
+    }
 }
 
 interface updatePoemCacheAfterLikePoemActionProps {
@@ -68,27 +68,28 @@ interface updatePoemCacheAfterLikePoemActionProps {
 }
 
 export function updatePoemCacheAfterLikePoemAction({
-  context
+    context
 }: updatePoemCacheAfterLikePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      poemQuery: { item: poemQuery }
-    } = store.getState()
-    const newPoemQuery = cloneDeep(poemQuery as Poem)
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            poemQuery: { item: poemQuery }
+        } = store.getState()
+        const newPoemQuery = cloneDeep(poemQuery as Poem)
 
-    const index = newPoemQuery?.likes?.indexOf(context.userId)
-    if (index !== -1) {
-      newPoemQuery?.likes.splice(index, 1)
-    } else {
-      newPoemQuery?.likes.push(context.userId)
+        const index = newPoemQuery?.likes?.indexOf(context.userId)
+        if (index !== -1) {
+            newPoemQuery?.likes.splice(index, 1)
+        }
+        else {
+            newPoemQuery?.likes.push(context.userId)
+        }
+
+        const { fulfilledAction } = getTypes(ACTIONS.POEM)
+        dispatch({
+            type: fulfilledAction,
+            payload: newPoemQuery
+        })
     }
-
-    const { fulfilledAction } = getTypes(ACTIONS.POEM)
-    dispatch({
-      type: fulfilledAction,
-      payload: newPoemQuery
-    })
-  }
 }
 
 interface deletePoemActionProps {
@@ -101,22 +102,22 @@ interface deletePoemActionProps {
 }
 
 export function deletePoemAction({
-  params,
-  context,
-  options,
-  callbacks
+    params,
+    context,
+    options,
+    callbacks
 }: deletePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return deleteAction({
-      type: ACTIONS.DELETE_POEM,
-      url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
-      // context.config is basically the jwt token
-      config: context.config,
-      dispatch,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return deleteAction({
+            type: ACTIONS.DELETE_POEM,
+            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            // context.config is basically the jwt token
+            config: context.config,
+            dispatch,
+            options,
+            callbacks
+        })
+    }
 }
 
 interface savePoemActionProps {
@@ -130,22 +131,22 @@ interface savePoemActionProps {
 }
 
 export function savePoemAction({
-  params,
-  context,
-  data,
-  options,
-  callbacks
+    params,
+    context,
+    data,
+    options,
+    callbacks
 }: savePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return patchAction({
-      type: ACTIONS.SAVE_POEM,
-      url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
-      // context.config is basically the jwt token
-      config: context.config,
-      data,
-      dispatch,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return patchAction({
+            type: ACTIONS.SAVE_POEM,
+            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            // context.config is basically the jwt token
+            config: context.config,
+            data,
+            dispatch,
+            options,
+            callbacks
+        })
+    }
 }

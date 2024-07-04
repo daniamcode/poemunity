@@ -6,31 +6,31 @@ import { Provider } from 'react-redux'
 import store from '../redux/store'
 
 function renderLogin(arg) {
-  const defaultProps = {
-    match: {
-      params: {}
+    const defaultProps = {
+        match: {
+            params: {}
+        }
     }
-  }
 
-  const props = { ...defaultProps, ...arg }
+    const props = { ...defaultProps, ...arg }
 
-  return render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <Login {...props} />
-      </BrowserRouter>
-    </Provider>
-  )
+    return render(
+        <Provider store={store}>
+            <BrowserRouter>
+                <Login {...props} />
+            </BrowserRouter>
+        </Provider>
+    )
 }
 
 describe('Login', () => {
-  let LoginTree
+    let LoginTree
 
-  beforeEach(async () => {
-    LoginTree = renderLogin()
-  })
+    beforeEach(async() => {
+        LoginTree = renderLogin()
+    })
 
-  test('should match without id', async () => {
-    expect(LoginTree).toMatchSnapshot()
-  })
+    test('should match without id', async() => {
+        expect(LoginTree).toMatchSnapshot()
+    })
 })

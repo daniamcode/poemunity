@@ -6,31 +6,31 @@ import { Provider } from 'react-redux'
 import store from '../redux/store'
 
 function renderMyPoems(arg) {
-  const defaultProps = {
-    match: {
-      params: {}
+    const defaultProps = {
+        match: {
+            params: {}
+        }
     }
-  }
 
-  const props = { ...defaultProps, ...arg }
+    const props = { ...defaultProps, ...arg }
 
-  return render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <MyPoems {...props} />
-      </BrowserRouter>
-    </Provider>
-  )
+    return render(
+        <Provider store={store}>
+            <BrowserRouter>
+                <MyPoems {...props} />
+            </BrowserRouter>
+        </Provider>
+    )
 }
 
 describe('MyPoems', () => {
-  let MyPoemsTree
+    let MyPoemsTree
 
-  beforeEach(async () => {
-    MyPoemsTree = renderMyPoems()
-  })
+    beforeEach(async() => {
+        MyPoemsTree = renderMyPoems()
+    })
 
-  test('should match without id', async () => {
-    expect(MyPoemsTree).toMatchSnapshot()
-  })
+    test('should match without id', async() => {
+        expect(MyPoemsTree).toMatchSnapshot()
+    })
 })

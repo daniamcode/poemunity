@@ -11,56 +11,56 @@ import PageNotFound from './components/PageNotFound'
 import { Context } from './typescript/interfaces'
 
 export const AppContext = React.createContext<Context>({
-  elementToEdit: '',
-  user: '',
-  userId: '',
-  username: '',
-  picture: '',
-  config: {},
-  adminId: '',
-  setState: () => {}
-})
-
-function App() {
-  const [contextState, setContextState] = useState({
     elementToEdit: '',
     user: '',
     userId: '',
     username: '',
     picture: '',
     config: {},
-    adminId: process.env.REACT_APP_ADMIN ?? '',
-    setState(data: Context) {
-      const { setState, ...res } = data
-      const newState = {
-        ...contextState,
-        ...res
-      }
-      setContextState(newState)
-    }
-  })
+    adminId: '',
+    setState: () => {}
+})
 
-  return (
-    <AppContext.Provider value={contextState}>
-      <Router>
-        <div className='container'>
-          <Header />
+function App() {
+    const [contextState, setContextState] = useState({
+        elementToEdit: '',
+        user: '',
+        userId: '',
+        username: '',
+        picture: '',
+        config: {},
+        adminId: process.env.REACT_APP_ADMIN ?? '',
+        setState(data: Context) {
+            const { setState, ...res } = data
+            const newState = {
+                ...contextState,
+                ...res
+            }
+            setContextState(newState)
+        }
+    })
 
-          <div className='margin-body'>
-            <Switch>
-              <Route path='/' exact component={Dashboard} />
-              <Route path='/profile' component={Profile} />
-              <Route path='/login' component={Login} />
-              <Route path='/register' component={Register} />
-              <Route path='/:genre' exact component={Dashboard} />
-              <Route path='/detail/:poemId' exact component={Detail} />
-              <Route component={PageNotFound} />
-            </Switch>
-          </div>
-        </div>
-      </Router>
-    </AppContext.Provider>
-  )
+    return (
+        <AppContext.Provider value={contextState}>
+            <Router>
+                <div className='container'>
+                    <Header />
+
+                    <div className='margin-body'>
+                        <Switch>
+                            <Route path='/' exact component={Dashboard} />
+                            <Route path='/profile' component={Profile} />
+                            <Route path='/login' component={Login} />
+                            <Route path='/register' component={Register} />
+                            <Route path='/:genre' exact component={Dashboard} />
+                            <Route path='/detail/:poemId' exact component={Detail} />
+                            <Route component={PageNotFound} />
+                        </Switch>
+                    </div>
+                </div>
+            </Router>
+        </AppContext.Provider>
+    )
 }
 
 export default App

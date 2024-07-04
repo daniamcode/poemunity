@@ -8,6 +8,6 @@ import Enzime from 'enzyme'
 import EnzimeAdapter from '@wojtekmaj/enzyme-adapter-react-17'
 
 Enzime.configure({
-  adapter: new EnzimeAdapter(),
-  disableLifecycleMethods: true
+    adapter: new EnzimeAdapter(),
+    disableLifecycleMethods: true
 })

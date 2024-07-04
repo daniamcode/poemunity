@@ -11,25 +11,25 @@ interface LoginActionProps {
 }
 
 export function loginAction({ data, callbacks }: LoginActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return postAction({
-      type: ACTIONS.LOGIN,
-      url: `${API_ENDPOINTS.LOGIN}`,
-      dispatch,
-      data,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return postAction({
+            type: ACTIONS.LOGIN,
+            url: `${API_ENDPOINTS.LOGIN}`,
+            dispatch,
+            data,
+            callbacks
+        })
+    }
 }
 
 export function registerAction({ data, callbacks }: LoginActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return postAction({
-      type: ACTIONS.REGISTER,
-      url: `${API_ENDPOINTS.REGISTER}`,
-      dispatch,
-      data,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return postAction({
+            type: ACTIONS.REGISTER,
+            url: `${API_ENDPOINTS.REGISTER}`,
+            dispatch,
+            data,
+            callbacks
+        })
+    }
 }

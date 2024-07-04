@@ -9,9 +9,9 @@ const { ACTIONS: poemsReducersActions, ...restOfPoemsReducers } = poemsReducers
 const { ACTIONS: loginReducersActions, ...restOfLoginReducers } = loginReducers
 
 const rootReducer = combineReducers({
-  ...restOfPoemReducers,
-  ...restOfPoemsReducers,
-  ...restOfLoginReducers
+    ...restOfPoemReducers,
+    ...restOfPoemsReducers,
+    ...restOfLoginReducers
 })
 
 export { rootReducer }

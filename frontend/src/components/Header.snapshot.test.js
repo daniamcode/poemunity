@@ -6,31 +6,31 @@ import { Provider } from 'react-redux'
 import store from '../redux/store'
 
 function renderHeader(arg) {
-  const defaultProps = {
-    match: {
-      params: {}
+    const defaultProps = {
+        match: {
+            params: {}
+        }
     }
-  }
 
-  const props = { ...defaultProps, ...arg }
+    const props = { ...defaultProps, ...arg }
 
-  return render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <Header {...props} />
-      </BrowserRouter>
-    </Provider>
-  )
+    return render(
+        <Provider store={store}>
+            <BrowserRouter>
+                <Header {...props} />
+            </BrowserRouter>
+        </Provider>
+    )
 }
 
 describe('Header', () => {
-  let HeaderTree
+    let HeaderTree
 
-  beforeEach(async () => {
-    HeaderTree = renderHeader()
-  })
+    beforeEach(async() => {
+        HeaderTree = renderHeader()
+    })
 
-  test('should match without id', async () => {
-    expect(HeaderTree).toMatchSnapshot()
-  })
+    test('should match without id', async() => {
+        expect(HeaderTree).toMatchSnapshot()
+    })
 })

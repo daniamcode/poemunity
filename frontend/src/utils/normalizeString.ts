@@ -6,17 +6,17 @@ import { normalizeSwaps } from '../data/normalizeSwaps'
  * @returns {string}
  */
 const normalizeString = (input: string = '') => {
-  let str = String(input)
-  str = str.replace(/^\s+|\s+$/g, '') // trim
-  str = str.toLowerCase()
+    let str = String(input)
+    str = str.replace(/^\s+|\s+$/g, '') // trim
+    str = str.toLowerCase()
 
-  // remove accents, swap ñ for n, etc
-  Object.keys(normalizeSwaps).forEach(swap => {
-    normalizeSwaps[swap].forEach(s => {
-      str = str.replace(new RegExp(s, 'g'), swap)
+    // remove accents, swap ñ for n, etc
+    Object.keys(normalizeSwaps).forEach(swap => {
+        normalizeSwaps[swap].forEach(s => {
+            str = str.replace(new RegExp(s, 'g'), swap)
+        })
     })
-  })
-  return str
+    return str
 }
 
 export default normalizeString

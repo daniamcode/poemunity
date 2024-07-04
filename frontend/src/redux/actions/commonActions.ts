@@ -85,13 +85,13 @@ import { AppDispatch } from '../store'
 // }
 
 export function getTypes(baseType: string | undefined) {
-  return {
-    requestAction: `${baseType}_request`,
-    fulfilledAction: `${baseType}_fulfilled`,
-    rejectedAction: `${baseType}_rejected`,
-    resetAction: `${baseType}_reset`
+    return {
+        requestAction: `${baseType}_request`,
+        fulfilledAction: `${baseType}_fulfilled`,
+        rejectedAction: `${baseType}_rejected`,
+        resetAction: `${baseType}_reset`
     // updateAction: `${baseType}_update`,
-  }
+    }
 }
 
 interface GetActionProps {
@@ -105,85 +105,85 @@ interface GetActionProps {
 }
 
 export function getAction({
-  type,
-  url,
-  params,
-  dispatch,
-  options = { reset: false, update: false, fetch: true },
-  callbacks,
-  extraConfig = {}
+    type,
+    url,
+    params,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    extraConfig = {}
 }: GetActionProps) {
-  const {
-    requestAction,
-    fulfilledAction,
-    rejectedAction,
-    resetAction
+    const {
+        requestAction,
+        fulfilledAction,
+        rejectedAction,
+        resetAction
     // updateAction is used with commonListReducers, but with commonReducer is not used for now
     // updateAction,
-  } = getTypes(type)
-  options.reset = options.reset !== undefined ? options.reset : false
-  options.update = options.update !== undefined ? options.update : false
-  options.fetch = options.fetch !== undefined ? options.fetch : true
-  const { transformResponse } = options
-  if (options.reset) {
-    dispatch({ type: resetAction })
-    if (callbacks?.reset) {
-      callbacks.reset()
+    } = getTypes(type)
+    options.reset = options.reset !== undefined ? options.reset : false
+    options.update = options.update !== undefined ? options.update : false
+    options.fetch = options.fetch !== undefined ? options.fetch : true
+    const { transformResponse } = options
+    if (options.reset) {
+        dispatch({ type: resetAction })
+        if (callbacks?.reset) {
+            callbacks.reset()
+        }
     }
-  }
-  if (options.fetch) {
-    dispatch({ type: requestAction })
-    API({}, extraConfig)
-      .get(url, {
-        params
-      })
-      .then(response => {
-        let responseData = response.data
-        if (transformResponse && typeof transformResponse === 'function') {
-          responseData = transformResponse(responseData)
-        }
-        // if (options.update) {
-        //     dispatch({
-        //         type: updateAction,
-        //         payload: responseData,
-        //     });
-        // } else {
-        dispatch({
-          type: fulfilledAction,
-          payload: responseData
-        })
-        // }
-        if (callbacks?.success) {
-          callbacks.success(responseData)
-        }
-      })
-      .catch(error => {
-        dispatch({
-          type: rejectedAction,
-          // if there's a network error, for example, we don't get a response in error
-          payload: error?.response?.data || error
-        })
-        manageError(error)
-        if (callbacks?.error) {
-          callbacks.error(error?.response?.data || error)
-        }
-        // manageError(error, () => {
-        //     if (callbacks.error) {
-        //         callbacks.error(error?.response?.data || error);
-        //     }
-        // });
-        // actionTrackError({
-        //     logLevel: LogLevels.INFO,
-        //     extraData: {
-        //         type,
-        //         url,
-        //         params,
-        //         options,
-        //     },
-        //     error,
-        // });
-      })
-  }
+    if (options.fetch) {
+        dispatch({ type: requestAction })
+        API({}, extraConfig)
+            .get(url, {
+                params
+            })
+            .then(response => {
+                let responseData = response.data
+                if (transformResponse && typeof transformResponse === 'function') {
+                    responseData = transformResponse(responseData)
+                }
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: responseData,
+                //     });
+                // } else {
+                dispatch({
+                    type: fulfilledAction,
+                    payload: responseData
+                })
+                // }
+                if (callbacks?.success) {
+                    callbacks.success(responseData)
+                }
+            })
+            .catch(error => {
+                dispatch({
+                    type: rejectedAction,
+                    // if there's a network error, for example, we don't get a response in error
+                    payload: error?.response?.data || error
+                })
+                manageError(error)
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error)
+                }
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         params,
+                //         options,
+                //     },
+                //     error,
+                // });
+            })
+    }
 }
 
 interface PostActionProps {
@@ -198,80 +198,80 @@ interface PostActionProps {
 }
 
 export function postAction({
-  type,
-  url,
-  data,
-  dispatch,
-  options = { reset: false, update: false, fetch: true },
-  callbacks,
-  headers = {},
-  config
+    type,
+    url,
+    data,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    headers = {},
+    config
 }: PostActionProps) {
-  const {
-    requestAction,
-    fulfilledAction,
-    rejectedAction,
-    resetAction
+    const {
+        requestAction,
+        fulfilledAction,
+        rejectedAction,
+        resetAction
     // updateAction,
-  } = getTypes(type)
-  // default data
-  options.reset = options.reset !== undefined ? options.reset : false
-  options.update = options.update !== undefined ? options.update : false
-  options.fetch = options.fetch !== undefined ? options.fetch : true
+    } = getTypes(type)
+    // default data
+    options.reset = options.reset !== undefined ? options.reset : false
+    options.update = options.update !== undefined ? options.update : false
+    options.fetch = options.fetch !== undefined ? options.fetch : true
 
-  // initialize logic
-  if (options.reset) {
-    dispatch({ type: resetAction })
-    if (callbacks?.reset) {
-      callbacks.reset()
+    // initialize logic
+    if (options.reset) {
+        dispatch({ type: resetAction })
+        if (callbacks?.reset) {
+            callbacks.reset()
+        }
     }
-  }
-  if (options.fetch) {
-    dispatch({ type: requestAction })
-    API(headers, config)
-      .post(url, data)
-      .then(response => {
-        // if (options.update) {
-        //     dispatch({
-        //         type: updateAction,
-        //         payload: response.data,
-        //     });
-        // } else {
-        dispatch({
-          type: fulfilledAction,
-          payload: response.data
-        })
-        // }
-        if (callbacks?.success) {
-          callbacks.success(response.data)
-        }
-      })
-      .catch(error => {
-        dispatch({
-          type: rejectedAction,
-          payload: error?.response?.data || error
-        })
-        manageError(error)
-        if (callbacks?.error) {
-          callbacks.error(error?.response?.data || error)
-        }
-        // manageError(error, () => {
-        //     if (callbacks.error) {
-        //         callbacks.error(error?.response?.data || error);
-        //     }
-        // });
-        // actionTrackError({
-        //     logLevel: LogLevels.INFO,
-        //     extraData: {
-        //         type,
-        //         url,
-        //         data,
-        //         options,
-        //     },
-        //     error,
-        // });
-      })
-  }
+    if (options.fetch) {
+        dispatch({ type: requestAction })
+        API(headers, config)
+            .post(url, data)
+            .then(response => {
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: response.data,
+                //     });
+                // } else {
+                dispatch({
+                    type: fulfilledAction,
+                    payload: response.data
+                })
+                // }
+                if (callbacks?.success) {
+                    callbacks.success(response.data)
+                }
+            })
+            .catch(error => {
+                dispatch({
+                    type: rejectedAction,
+                    payload: error?.response?.data || error
+                })
+                manageError(error)
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error)
+                }
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         data,
+                //         options,
+                //     },
+                //     error,
+                // });
+            })
+    }
 }
 
 interface PutActionProps {
@@ -285,66 +285,66 @@ interface PutActionProps {
 }
 
 export function putAction({
-  type,
-  url,
-  data,
-  dispatch,
-  options = { reset: false, update: false, fetch: true },
-  callbacks,
-  // in config we pass the jwt
-  config
+    type,
+    url,
+    data,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    // in config we pass the jwt
+    config
 }: PutActionProps) {
-  // console.log('listingAction type : ' + type);
-  const { requestAction, fulfilledAction, rejectedAction, resetAction } =
+    // console.log('listingAction type : ' + type);
+    const { requestAction, fulfilledAction, rejectedAction, resetAction } =
     getTypes(type)
 
-  options.reset = options.reset !== undefined ? options.reset : false
-  options.update = options.update !== undefined ? options.update : false
-  options.fetch = options.fetch !== undefined ? options.fetch : true
-  if (options.reset) {
-    dispatch({ type: resetAction })
-    if (callbacks?.reset) {
-      callbacks.reset()
+    options.reset = options.reset !== undefined ? options.reset : false
+    options.update = options.update !== undefined ? options.update : false
+    options.fetch = options.fetch !== undefined ? options.fetch : true
+    if (options.reset) {
+        dispatch({ type: resetAction })
+        if (callbacks?.reset) {
+            callbacks.reset()
+        }
     }
-  }
-  dispatch({ type: requestAction })
-  API()
-    .put(url, data, config)
-    .then(response => {
-      dispatch({
-        type: fulfilledAction,
-        payload: response.data
-      })
+    dispatch({ type: requestAction })
+    API()
+        .put(url, data, config)
+        .then(response => {
+            dispatch({
+                type: fulfilledAction,
+                payload: response.data
+            })
 
-      if (callbacks?.success) {
-        callbacks.success(response.data)
-      }
-    })
-    .catch(error => {
-      dispatch({
-        type: rejectedAction,
-        payload: error?.response?.data || error
-      })
-      manageError(error)
-      if (callbacks?.error) {
-        callbacks.error(error?.response?.data || error)
-      }
-      // manageError(error, () => {
-      //     if (callbacks.error) {
-      //         callbacks.error(error?.response?.data || error);
-      //     }
-      // });
-      // actionTrackError({
-      //     logLevel: LogLevels.INFO,
-      //     extraData: {
-      //         type,
-      //         url,
-      //         data,
-      //         options,
-      //     },
-      //     error,
-      // });
-    })
+            if (callbacks?.success) {
+                callbacks.success(response.data)
+            }
+        })
+        .catch(error => {
+            dispatch({
+                type: rejectedAction,
+                payload: error?.response?.data || error
+            })
+            manageError(error)
+            if (callbacks?.error) {
+                callbacks.error(error?.response?.data || error)
+            }
+            // manageError(error, () => {
+            //     if (callbacks.error) {
+            //         callbacks.error(error?.response?.data || error);
+            //     }
+            // });
+            // actionTrackError({
+            //     logLevel: LogLevels.INFO,
+            //     extraData: {
+            //         type,
+            //         url,
+            //         data,
+            //         options,
+            //     },
+            //     error,
+            // });
+        })
 }
 
 interface DeleteActionProps {
@@ -359,80 +359,80 @@ interface DeleteActionProps {
 }
 
 export function deleteAction({
-  type,
-  url,
-  data,
-  dispatch,
-  options = { reset: false, update: false, fetch: true },
-  callbacks,
-  headers,
-  config
+    type,
+    url,
+    data,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    headers,
+    config
 }: DeleteActionProps) {
-  const {
-    requestAction,
-    fulfilledAction,
-    rejectedAction,
-    resetAction
+    const {
+        requestAction,
+        fulfilledAction,
+        rejectedAction,
+        resetAction
     // updateAction,
-  } = getTypes(type)
-  // default data
-  options.reset = options.reset !== undefined ? options.reset : false
-  options.update = options.update !== undefined ? options.update : false
-  options.fetch = options.fetch !== undefined ? options.fetch : true
+    } = getTypes(type)
+    // default data
+    options.reset = options.reset !== undefined ? options.reset : false
+    options.update = options.update !== undefined ? options.update : false
+    options.fetch = options.fetch !== undefined ? options.fetch : true
 
-  // initialize logic
-  if (options.reset) {
-    dispatch({ type: resetAction })
-    if (callbacks?.reset) {
-      callbacks.reset()
+    // initialize logic
+    if (options.reset) {
+        dispatch({ type: resetAction })
+        if (callbacks?.reset) {
+            callbacks.reset()
+        }
     }
-  }
-  if (options.fetch) {
-    dispatch({ type: requestAction })
-    API(headers, config)
-      .delete(url, data)
-      .then(response => {
-        // if (options.update) {
-        //     dispatch({
-        //         type: updateAction,
-        //         payload: response.data,
-        //     });
-        // } else {
-        dispatch({
-          type: fulfilledAction,
-          payload: response.data
-        })
-        // }
-        if (callbacks?.success) {
-          callbacks.success(response.data)
-        }
-      })
-      .catch(error => {
-        dispatch({
-          type: rejectedAction,
-          payload: error?.response?.data || error
-        })
-        manageError(error)
-        if (callbacks?.error) {
-          callbacks.error(error?.response?.data || error)
-        }
-        // manageError(error, () => {
-        //     if (callbacks.error) {
-        //         callbacks.error(error?.response?.data || error);
-        //     }
-        // });
-        // actionTrackError({
-        //     logLevel: LogLevels.INFO,
-        //     extraData: {
-        //         type,
-        //         url,
-        //         data,
-        //         options,
-        //     },
-        //     error,
-        // });
-      })
-  }
+    if (options.fetch) {
+        dispatch({ type: requestAction })
+        API(headers, config)
+            .delete(url, data)
+            .then(response => {
+                // if (options.update) {
+                //     dispatch({
+                //         type: updateAction,
+                //         payload: response.data,
+                //     });
+                // } else {
+                dispatch({
+                    type: fulfilledAction,
+                    payload: response.data
+                })
+                // }
+                if (callbacks?.success) {
+                    callbacks.success(response.data)
+                }
+            })
+            .catch(error => {
+                dispatch({
+                    type: rejectedAction,
+                    payload: error?.response?.data || error
+                })
+                manageError(error)
+                if (callbacks?.error) {
+                    callbacks.error(error?.response?.data || error)
+                }
+                // manageError(error, () => {
+                //     if (callbacks.error) {
+                //         callbacks.error(error?.response?.data || error);
+                //     }
+                // });
+                // actionTrackError({
+                //     logLevel: LogLevels.INFO,
+                //     extraData: {
+                //         type,
+                //         url,
+                //         data,
+                //         options,
+                //     },
+                //     error,
+                // });
+            })
+    }
 }
 
 interface PatchActionProps {
@@ -446,64 +446,64 @@ interface PatchActionProps {
 }
 
 export function patchAction({
-  type,
-  url,
-  data,
-  dispatch,
-  options = { reset: false, update: false, fetch: true },
-  callbacks,
-  // in config we pass the jwt
-  config
+    type,
+    url,
+    data,
+    dispatch,
+    options = { reset: false, update: false, fetch: true },
+    callbacks,
+    // in config we pass the jwt
+    config
 }: PatchActionProps) {
-  // console.log('listingAction type : ' + type);
-  const { requestAction, fulfilledAction, rejectedAction, resetAction } =
+    // console.log('listingAction type : ' + type);
+    const { requestAction, fulfilledAction, rejectedAction, resetAction } =
     getTypes(type)
 
-  options.reset = options.reset !== undefined ? options.reset : false
-  options.update = options.update !== undefined ? options.update : false
-  options.fetch = options.fetch !== undefined ? options.fetch : true
-  if (options.reset) {
-    dispatch({ type: resetAction })
-    if (callbacks?.reset) {
-      callbacks.reset()
+    options.reset = options.reset !== undefined ? options.reset : false
+    options.update = options.update !== undefined ? options.update : false
+    options.fetch = options.fetch !== undefined ? options.fetch : true
+    if (options.reset) {
+        dispatch({ type: resetAction })
+        if (callbacks?.reset) {
+            callbacks.reset()
+        }
     }
-  }
-  dispatch({ type: requestAction })
-  API()
-    .patch(url, data, config)
-    .then(response => {
-      dispatch({
-        type: fulfilledAction,
-        payload: response.data
-      })
+    dispatch({ type: requestAction })
+    API()
+        .patch(url, data, config)
+        .then(response => {
+            dispatch({
+                type: fulfilledAction,
+                payload: response.data
+            })
 
-      if (callbacks?.success) {
-        callbacks.success(response.data)
-      }
-    })
-    .catch(error => {
-      dispatch({
-        type: rejectedAction,
-        payload: error?.response?.data || error
-      })
-      manageError(error)
-      if (callbacks?.error) {
-        callbacks.error(error?.response?.data || error)
-      }
-      // manageError(error, () => {
-      //     if (callbacks.error) {
-      //         callbacks.error(error?.response?.data || error);
-      //     }
-      // });
-      // actionTrackError({
-      //     logLevel: LogLevels.INFO,
-      //     extraData: {
-      //         type,
-      //         url,
-      //         data,
-      //         options,
-      //     },
-      //     error,
-      // });
-    })
+            if (callbacks?.success) {
+                callbacks.success(response.data)
+            }
+        })
+        .catch(error => {
+            dispatch({
+                type: rejectedAction,
+                payload: error?.response?.data || error
+            })
+            manageError(error)
+            if (callbacks?.error) {
+                callbacks.error(error?.response?.data || error)
+            }
+            // manageError(error, () => {
+            //     if (callbacks.error) {
+            //         callbacks.error(error?.response?.data || error);
+            //     }
+            // });
+            // actionTrackError({
+            //     logLevel: LogLevels.INFO,
+            //     extraData: {
+            //         type,
+            //         url,
+            //         data,
+            //         options,
+            //     },
+            //     error,
+            // });
+        })
 }

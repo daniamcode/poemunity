@@ -4,13 +4,13 @@ import { Provider } from 'react-redux'
 import store from './redux/store'
 
 describe('App snapshot', () => {
-  const tree = render(
-    <Provider store={store}>
-      <App />
-    </Provider>
-  )
+    const tree = render(
+        <Provider store={store}>
+            <App />
+        </Provider>
+    )
 
-  test('should match', () => {
-    expect(tree.asFragment()).toMatchSnapshot()
-  })
+    test('should match', () => {
+        expect(tree.asFragment()).toMatchSnapshot()
+    })
 })

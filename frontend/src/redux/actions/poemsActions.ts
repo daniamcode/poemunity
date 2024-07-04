@@ -5,10 +5,10 @@ import cloneDeep from 'lodash/cloneDeep'
 import { ACTIONS } from '../reducers/poemsReducers'
 import { AppDispatch } from '../store'
 import {
-  ReduxOptions,
-  ReduxCallbacks,
-  Context,
-  Poem
+    ReduxOptions,
+    ReduxCallbacks,
+    Context,
+    Poem
 } from '../../typescript/interfaces'
 
 interface GetAllPoemsActionProps {
@@ -18,20 +18,20 @@ interface GetAllPoemsActionProps {
 }
 
 export function getAllPoemsAction({
-  params,
-  options,
-  callbacks
+    params,
+    options,
+    callbacks
 }: GetAllPoemsActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return getAction({
-      type: ACTIONS.ALL_POEMS,
-      url: API_ENDPOINTS.POEMS,
-      dispatch,
-      params,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.ALL_POEMS,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks
+        })
+    }
 }
 
 interface GetPoemsListActionProps {
@@ -41,20 +41,20 @@ interface GetPoemsListActionProps {
 }
 
 export function getPoemsListAction({
-  params,
-  options,
-  callbacks
+    params,
+    options,
+    callbacks
 }: GetPoemsListActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return getAction({
-      type: ACTIONS.POEMS_LIST,
-      url: API_ENDPOINTS.POEMS,
-      dispatch,
-      params,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.POEMS_LIST,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks
+        })
+    }
 }
 
 interface GetRankingActionProps {
@@ -64,20 +64,20 @@ interface GetRankingActionProps {
 }
 
 export function getRankingAction({
-  params,
-  options,
-  callbacks
+    params,
+    options,
+    callbacks
 }: GetRankingActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return getAction({
-      type: ACTIONS.RANKING,
-      url: API_ENDPOINTS.POEMS,
-      dispatch,
-      params,
-      options,
-      callbacks
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.RANKING,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks
+        })
+    }
 }
 
 interface UpdatePoemsListCacheAfterLikePoemActionProps {
@@ -86,39 +86,40 @@ interface UpdatePoemsListCacheAfterLikePoemActionProps {
 }
 
 export function updatePoemsListCacheAfterLikePoemAction({
-  poemId,
-  context
+    poemId,
+    context
 }: UpdatePoemsListCacheAfterLikePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      poemsListQuery: { item: poemsListQuery }
-    } = store.getState()
-    const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            poemsListQuery: { item: poemsListQuery }
+        } = store.getState()
+        const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[])
 
-    const poemsListQueryUpdated = newPoemsListQuery?.reduce(
-      (acc: Poem[], poem: Poem) => {
-        const coincidence = poem.id === poemId
-        if (coincidence) {
-          const index = poem?.likes?.indexOf(context.userId)
-          if (index !== -1) {
-            poem.likes.splice(index, 1)
-          } else {
-            poem.likes.push(context.userId)
-          }
-        }
-        acc.push(poem)
+        const poemsListQueryUpdated = newPoemsListQuery?.reduce(
+            (acc: Poem[], poem: Poem) => {
+                const coincidence = poem.id === poemId
+                if (coincidence) {
+                    const index = poem?.likes?.indexOf(context.userId)
+                    if (index !== -1) {
+                        poem.likes.splice(index, 1)
+                    }
+                    else {
+                        poem.likes.push(context.userId)
+                    }
+                }
+                acc.push(poem)
 
-        return acc
-      },
-      []
-    )
+                return acc
+            },
+            []
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
-    dispatch({
-      type: fulfilledAction,
-      payload: poemsListQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
+        dispatch({
+            type: fulfilledAction,
+            payload: poemsListQueryUpdated
+        })
+    }
 }
 
 interface UpdateRankingCacheAfterLikePoemActionProps {
@@ -128,39 +129,40 @@ interface UpdateRankingCacheAfterLikePoemActionProps {
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterLikePoemAction)
 export function updateRankingCacheAfterLikePoemAction({
-  poemId,
-  context
+    poemId,
+    context
 }: UpdateRankingCacheAfterLikePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      rankingQuery: { item: rankingQuery }
-    } = store.getState()
-    const newRankingQuery = cloneDeep(rankingQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            rankingQuery: { item: rankingQuery }
+        } = store.getState()
+        const newRankingQuery = cloneDeep(rankingQuery as Poem[])
 
-    const rankingQueryUpdated = newRankingQuery?.reduce(
-      (acc: Poem[], poem: Poem) => {
-        const coincidence = poem.id === poemId
-        if (coincidence) {
-          const index = poem?.likes?.indexOf(context.userId)
-          if (index !== -1) {
-            poem.likes.splice(index, 1)
-          } else {
-            poem.likes.push(context.userId)
-          }
-        }
-        acc.push(poem)
+        const rankingQueryUpdated = newRankingQuery?.reduce(
+            (acc: Poem[], poem: Poem) => {
+                const coincidence = poem.id === poemId
+                if (coincidence) {
+                    const index = poem?.likes?.indexOf(context.userId)
+                    if (index !== -1) {
+                        poem.likes.splice(index, 1)
+                    }
+                    else {
+                        poem.likes.push(context.userId)
+                    }
+                }
+                acc.push(poem)
 
-        return acc
-      },
-      []
-    )
+                return acc
+            },
+            []
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.RANKING)
-    dispatch({
-      type: fulfilledAction,
-      payload: rankingQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING)
+        dispatch({
+            type: fulfilledAction,
+            payload: rankingQueryUpdated
+        })
+    }
 }
 
 interface UpdateAllPoemsCacheAfterLikePoemActionProps {
@@ -170,39 +172,40 @@ interface UpdateAllPoemsCacheAfterLikePoemActionProps {
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterLikePoemAction)
 export function updateAllPoemsCacheAfterLikePoemAction({
-  poemId,
-  context
+    poemId,
+    context
 }: UpdateAllPoemsCacheAfterLikePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      allPoemsQuery: { item: allPoemsQuery }
-    } = store.getState()
-    const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            allPoemsQuery: { item: allPoemsQuery }
+        } = store.getState()
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
-    const allPoemsQueryUpdated = newAllPoemsQuery?.reduce(
-      (acc: Poem[], poem: Poem) => {
-        const coincidence = poem.id === poemId
-        if (coincidence) {
-          const index = poem?.likes?.indexOf(context.userId)
-          if (index !== -1) {
-            poem.likes.splice(index, 1)
-          } else {
-            poem.likes.push(context.userId)
-          }
-        }
-        acc.push(poem)
+        const allPoemsQueryUpdated = newAllPoemsQuery?.reduce(
+            (acc: Poem[], poem: Poem) => {
+                const coincidence = poem.id === poemId
+                if (coincidence) {
+                    const index = poem?.likes?.indexOf(context.userId)
+                    if (index !== -1) {
+                        poem.likes.splice(index, 1)
+                    }
+                    else {
+                        poem.likes.push(context.userId)
+                    }
+                }
+                acc.push(poem)
 
-        return acc
-      },
-      []
-    )
+                return acc
+            },
+            []
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
-    dispatch({
-      type: fulfilledAction,
-      payload: allPoemsQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: allPoemsQueryUpdated
+        })
+    }
 }
 
 interface CreatePoemActionProps {
@@ -213,22 +216,22 @@ interface CreatePoemActionProps {
 }
 
 export function createPoemAction({
-  poem,
-  context,
-  callbacks,
-  options = {}
+    poem,
+    context,
+    callbacks,
+    options = {}
 }: CreatePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    return postAction({
-      type: ACTIONS.CREATE_POEM,
-      url: `${API_ENDPOINTS.POEMS}`,
-      dispatch,
-      data: poem,
-      callbacks,
-      config: context.config,
-      options
-    })
-  }
+    return function dispatcher(dispatch: AppDispatch) {
+        return postAction({
+            type: ACTIONS.CREATE_POEM,
+            url: `${API_ENDPOINTS.POEMS}`,
+            dispatch,
+            data: poem,
+            callbacks,
+            config: context.config,
+            options
+        })
+    }
 }
 
 interface UpdateAllPoemsCacheAfterCreatePoemActionProps {
@@ -236,22 +239,22 @@ interface UpdateAllPoemsCacheAfterCreatePoemActionProps {
 }
 
 export function updateAllPoemsCacheAfterCreatePoemAction({
-  response
+    response
 }: UpdateAllPoemsCacheAfterCreatePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      allPoemsQuery: { item: allPoemsQuery }
-    } = store.getState()
-    const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            allPoemsQuery: { item: allPoemsQuery }
+        } = store.getState()
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
-    newAllPoemsQuery.push(response)
+        newAllPoemsQuery.push(response)
 
-    const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
-    dispatch({
-      type: fulfilledAction,
-      payload: newAllPoemsQuery
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: newAllPoemsQuery
+        })
+    }
 }
 
 interface updateAllPoemsCacheAfterDeletePoemActionProps {
@@ -259,24 +262,24 @@ interface updateAllPoemsCacheAfterDeletePoemActionProps {
 }
 
 export function updateAllPoemsCacheAfterDeletePoemAction({
-  poemId
+    poemId
 }: updateAllPoemsCacheAfterDeletePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      allPoemsQuery: { item: allPoemsQuery }
-    } = store.getState()
-    const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            allPoemsQuery: { item: allPoemsQuery }
+        } = store.getState()
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
-    const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
-      poem => poem.id !== poemId
-    )
+        const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
+            poem => poem.id !== poemId
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
-    dispatch({
-      type: fulfilledAction,
-      payload: allPoemsQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: allPoemsQueryUpdated
+        })
+    }
 }
 
 interface UpdatePoemsListCacheAfterDeletePoemActionProps {
@@ -284,24 +287,24 @@ interface UpdatePoemsListCacheAfterDeletePoemActionProps {
 }
 
 export function updatePoemsListCacheAfterDeletePoemAction({
-  poemId
+    poemId
 }: UpdatePoemsListCacheAfterDeletePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      poemsListQuery: { item: poemsListQuery }
-    } = store.getState()
-    const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            poemsListQuery: { item: poemsListQuery }
+        } = store.getState()
+        const newPoemsListQuery = cloneDeep(poemsListQuery as Poem[])
 
-    const poemsListQueryUpdated = newPoemsListQuery?.filter(
-      poem => poem.id !== poemId
-    )
+        const poemsListQueryUpdated = newPoemsListQuery?.filter(
+            poem => poem.id !== poemId
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
-    dispatch({
-      type: fulfilledAction,
-      payload: poemsListQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
+        dispatch({
+            type: fulfilledAction,
+            payload: poemsListQueryUpdated
+        })
+    }
 }
 
 interface UpdateRankingCacheAfterDeletePoemActionProps {
@@ -310,24 +313,24 @@ interface UpdateRankingCacheAfterDeletePoemActionProps {
 
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterDeletePoemAction)
 export function updateRankingCacheAfterDeletePoemAction({
-  poemId
+    poemId
 }: UpdateRankingCacheAfterDeletePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      rankingQuery: { item: rankingQuery }
-    } = store.getState()
-    const newRankingQuery = cloneDeep(rankingQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            rankingQuery: { item: rankingQuery }
+        } = store.getState()
+        const newRankingQuery = cloneDeep(rankingQuery as Poem[])
 
-    const rankingQueryUpdated = newRankingQuery?.filter(
-      poem => poem.id !== poemId
-    )
+        const rankingQueryUpdated = newRankingQuery?.filter(
+            poem => poem.id !== poemId
+        )
 
-    const { fulfilledAction } = getTypes(ACTIONS.RANKING)
-    dispatch({
-      type: fulfilledAction,
-      payload: rankingQueryUpdated
-    })
-  }
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING)
+        dispatch({
+            type: fulfilledAction,
+            payload: rankingQueryUpdated
+        })
+    }
 }
 
 interface updateAllPoemsCacheAfterSavePoemActionProps {
@@ -336,30 +339,30 @@ interface updateAllPoemsCacheAfterSavePoemActionProps {
 }
 
 export function updateAllPoemsCacheAfterSavePoemAction({
-  poem,
-  poemId
+    poem,
+    poemId
 }: updateAllPoemsCacheAfterSavePoemActionProps) {
-  return function dispatcher(dispatch: AppDispatch) {
-    const {
-      allPoemsQuery: { item: allPoemsQuery }
-    } = store.getState()
-    const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            allPoemsQuery: { item: allPoemsQuery }
+        } = store.getState()
+        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
-    // todo: refactor with a reduce
-    const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
-      poem => poem.id !== poemId
-    )
-    const poemToUpdate = newAllPoemsQuery?.find(poem => poem.id === poemId)
-    const poemUpdated = {
-      ...poemToUpdate,
-      ...poem
+        // todo: refactor with a reduce
+        const allPoemsQueryUpdated = newAllPoemsQuery?.filter(
+            poem => poem.id !== poemId
+        )
+        const poemToUpdate = newAllPoemsQuery?.find(poem => poem.id === poemId)
+        const poemUpdated = {
+            ...poemToUpdate,
+            ...poem
+        }
+        allPoemsQueryUpdated.push(poemUpdated)
+
+        const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: allPoemsQueryUpdated
+        })
     }
-    allPoemsQueryUpdated.push(poemUpdated)
-
-    const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
-    dispatch({
-      type: fulfilledAction,
-      payload: allPoemsQueryUpdated
-    })
-  }
 }
