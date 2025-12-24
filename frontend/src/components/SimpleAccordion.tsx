@@ -3,6 +3,7 @@ import Accordion from '@material-ui/core/Accordion'
 import AccordionSummary from '@material-ui/core/AccordionSummary'
 import AccordionDetails from '@material-ui/core/AccordionDetails'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import cx from 'classnames'
 import './Header/Header'
 import { Link } from 'react-router-dom'
 import { CATEGORIES_TITLE, CATEGORIES, ALL } from '../data/constants'
@@ -43,9 +44,9 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                 {CATEGORIES?.sort().map(category => (
                     <AccordionDetails key={category}>
                         <Link
-                            className={`header__dropdown-subcategories ${
-                                isActiveCategory(category) ? 'active' : ''
-                            }`}
+                            className={cx('header__dropdown-subcategories', {
+                                active: isActiveCategory(category)
+                            })}
                             to={`/${category.toLowerCase()}`}
                         >
                             {category}
@@ -54,7 +55,12 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                 ))}
             </div>
             <AccordionDetails>
-                <Link className={`header__dropdown-subcategories ${!genre ? 'active' : ''}`} to='/'>
+                <Link
+                    className={cx('header__dropdown-subcategories', {
+                        active: !genre
+                    })}
+                    to='/'
+                >
                     {ALL}
                 </Link>
             </AccordionDetails>

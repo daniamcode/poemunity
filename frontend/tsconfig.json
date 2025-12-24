@@ -26,7 +26,6 @@
     "noImplicitThis": true,
     "importHelpers": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
   "exclude": [

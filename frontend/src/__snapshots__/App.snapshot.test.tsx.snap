@@ -160,7 +160,7 @@ exports[`App snapshot should match 1`] = `
                     class="MuiAccordionDetails-root"
                   >
                     <a
-                      class="header__dropdown-subcategories"
+                      class="header__dropdown-subcategories active"
                       href="/"
                     >
                       All
@@ -195,7 +195,7 @@ exports[`App snapshot should match 1`] = `
       <p
         class="list__presentation"
       >
-        Your poem community!!
+        Your poem community!
       </p>
       <div
         class="separator"
@@ -362,7 +362,7 @@ exports[`App snapshot should match 1`] = `
                       class="MuiAccordionDetails-root"
                     >
                       <a
-                        class="header__dropdown-subcategories"
+                        class="header__dropdown-subcategories active"
                         href="/"
                       >
                         All

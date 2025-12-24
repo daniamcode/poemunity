@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Ranking should match without id 1`] = `
-Object {
+exports[`Detail should match without id 1`] = `
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
       <div
-        class="makeStyles-root-2"
+        class="makeStyles-root-1"
       >
         <div
           class="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"
@@ -32,7 +32,7 @@ Object {
   </body>,
   "container": <div>
     <div
-      class="makeStyles-root-2"
+      class="makeStyles-root-1"
     >
       <div
         class="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"

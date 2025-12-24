@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import Detail from './Detail'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import store from '../redux/store'
+import store from '../../redux/store'
 
 function renderDetail(arg?: object) {
     const defaultProps = {

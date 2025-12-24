@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MyFavouritePoems should match without id 1`] = `
-Object {
+exports[`MyPoems should match without id 1`] = `
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -33,7 +33,7 @@ Object {
               data-shrink="false"
               style="color: rgb(85, 26, 139);"
             >
-              Buscar autor
+              Search author
             </label>
             <div
               class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
@@ -80,7 +80,7 @@ Object {
             data-shrink="false"
             style="color: rgb(85, 26, 139);"
           >
-            Buscar autor
+            Search author
           </label>
           <div
             class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"

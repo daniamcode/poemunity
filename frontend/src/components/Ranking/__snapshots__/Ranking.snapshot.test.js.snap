@@ -1,61 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PageNotFound should match without id 1`] = `
-Object {
+exports[`Ranking should match without id 1`] = `
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <main
-        class="page-not-found__container"
+      <div
+        class="makeStyles-root-2"
       >
-        <section
-          class="page-not-found__message"
+        <div
+          class="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"
+          role="progressbar"
+          style="width: 40px; height: 40px;"
         >
-          <h1
-            class="page-not-found__title"
+          <svg
+            class="MuiCircularProgress-svg"
+            viewBox="22 22 44 44"
           >
-            Error - 404
-          </h1>
-          <p
-            class="page-not-found__text"
-          >
-            Nothing to see here
-          </p>
-          <a
-            class="page-not-found__link"
-            href="/"
-          >
-            Back to Dashboard
-          </a>
-        </section>
-      </main>
+            <circle
+              class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate"
+              cx="44"
+              cy="44"
+              fill="none"
+              r="20.2"
+              stroke-width="3.6"
+            />
+          </svg>
+        </div>
+      </div>
     </div>
   </body>,
   "container": <div>
-    <main
-      class="page-not-found__container"
+    <div
+      class="makeStyles-root-2"
     >
-      <section
-        class="page-not-found__message"
+      <div
+        class="MuiCircularProgress-root MuiCircularProgress-colorSecondary MuiCircularProgress-indeterminate"
+        role="progressbar"
+        style="width: 40px; height: 40px;"
       >
-        <h1
-          class="page-not-found__title"
+        <svg
+          class="MuiCircularProgress-svg"
+          viewBox="22 22 44 44"
         >
-          Error - 404
-        </h1>
-        <p
-          class="page-not-found__text"
-        >
-          Nothing to see here
-        </p>
-        <a
-          class="page-not-found__link"
-          href="/"
-        >
-          Back to Dashboard
-        </a>
-      </section>
-    </main>
+          <circle
+            class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate"
+            cx="44"
+            cy="44"
+            fill="none"
+            r="20.2"
+            stroke-width="3.6"
+          />
+        </svg>
+      </div>
+    </div>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

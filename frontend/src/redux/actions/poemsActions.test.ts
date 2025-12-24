@@ -40,11 +40,13 @@ describe('getAllPoemsAction', () => {
 
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
     })
     afterEach(() => {
         // doing this in an afterAll could lead to not reset dispatch calls number so the latter
         // tests could fail
         ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
     })
 
     test('should call getAction - no fetch', () => {
@@ -188,11 +190,13 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
     let dispatch: AppDispatch
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
     })
     afterEach(() => {
         // doing this in an afterAll could lead to not reset dispatch calls number so the latter
         // tests could fail
         ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
     })
 
     test('Should update cache when disliking a poem', () => {
@@ -342,11 +346,13 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
     let dispatch: AppDispatch
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
     })
     afterEach(() => {
         // doing this in an afterAll could lead to not reset dispatch calls number so the latter
         // tests could fail
         ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
     })
 
     test('Should update cache when disliking a poem', () => {
@@ -449,11 +455,13 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
     let dispatch: AppDispatch
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
     })
     afterEach(() => {
         // doing this in an afterAll could lead to not reset dispatch calls number so the latter
         // tests could fail
         ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
     })
 
     test('Should update cache when disliking a poem', () => {
@@ -596,11 +604,13 @@ describe('createPoemAction', () => {
 
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
     })
     afterEach(() => {
         // doing this in an afterAll could lead to not reset dispatch calls number so the latter
         // tests could fail
         ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
     })
 
     test('should call postAction - no fetch', () => {

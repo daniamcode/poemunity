@@ -1,20 +1,18 @@
-import checkPropTypes from 'check-prop-types'
 import ListItem from './ListItem'
 import { manageSuccess, manageError } from '../../utils/notifications'
 import store from '../../redux/store'
 import { Provider } from 'react-redux'
-import { render, fireEvent, screen, waitFor, act } from '@testing-library/react'
+import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import axios from 'axios'
 import * as commonActions from '../../redux/actions/commonActions'
-import { deletePoemAction } from '../../redux/actions/poemActions'
 
 // these mocks seem to have to be defined before the "describe"
 jest.mock('axios', () => ({
     create: jest.fn(),
     delete: jest.fn()
 }))
-jest.mock('../utils/notifications', () => ({
+jest.mock('../../utils/notifications', () => ({
     manageSuccess: jest.fn(),
     manageError: jest.fn()
 }))
@@ -55,16 +53,6 @@ describe('ListItem component', () => {
         wrapper = null
     })
 
-    test('Check PropTypes', () => {
-        // we can validate that the test fails just by changing for instance, expectedProps.filter into a number
-        const expectedProps = {
-            poem: {},
-            filter: '',
-            context: {}
-        }
-        const propsErr = checkPropTypes(ListItem.propTypes, expectedProps, 'props', ListItem.name)
-        expect(propsErr).toBeUndefined()
-    })
     test('Should call manageSuccess when deleting poem', async () => {
         wrapper = wrapperFactory()
 

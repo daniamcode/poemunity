@@ -1,85 +1,101 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Login should match without id 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <form
-        class="login"
-        data-testid="login"
+      <div
+        class="login-container"
       >
-        <label>
-          Introduce your login credentials or click "Register" if you don't have them
-        </label>
         <div
-          class="login__username"
+          class="login-card"
         >
-          <input
-            name="Username"
-            placeholder="Username"
-            type="text"
-            value=""
-          />
+          <form
+            class="login"
+            data-testid="login"
+          >
+            <label>
+              Introduce your login credentials or click "Register" if you don't have them
+            </label>
+            <div
+              class="login__username"
+            >
+              <input
+                name="Username"
+                placeholder="Username"
+                type="text"
+                value=""
+              />
+            </div>
+            <div
+              class="login__password"
+            >
+              <input
+                name="Password"
+                placeholder="Password"
+                type="password"
+                value=""
+              />
+            </div>
+            <button>
+              Login
+            </button>
+            <a
+              href="/register"
+            >
+              Register
+            </a>
+          </form>
         </div>
-        <div
-          class="login__password"
-        >
-          <input
-            name="Password"
-            placeholder="Password"
-            type="password"
-            value=""
-          />
-        </div>
-        <button>
-          Login
-        </button>
-        <a
-          href="/register"
-        >
-          Register
-        </a>
-      </form>
+      </div>
     </div>
   </body>,
   "container": <div>
-    <form
-      class="login"
-      data-testid="login"
+    <div
+      class="login-container"
     >
-      <label>
-        Introduce your login credentials or click "Register" if you don't have them
-      </label>
       <div
-        class="login__username"
+        class="login-card"
       >
-        <input
-          name="Username"
-          placeholder="Username"
-          type="text"
-          value=""
-        />
+        <form
+          class="login"
+          data-testid="login"
+        >
+          <label>
+            Introduce your login credentials or click "Register" if you don't have them
+          </label>
+          <div
+            class="login__username"
+          >
+            <input
+              name="Username"
+              placeholder="Username"
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="login__password"
+          >
+            <input
+              name="Password"
+              placeholder="Password"
+              type="password"
+              value=""
+            />
+          </div>
+          <button>
+            Login
+          </button>
+          <a
+            href="/register"
+          >
+            Register
+          </a>
+        </form>
       </div>
-      <div
-        class="login__password"
-      >
-        <input
-          name="Password"
-          placeholder="Password"
-          type="password"
-          value=""
-        />
-      </div>
-      <button>
-        Login
-      </button>
-      <a
-        href="/register"
-      >
-        Register
-      </a>
-    </form>
+    </div>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Header should match without id 1`] = `
-Object {
+{
   "asFragment": [Function],
   "baseElement": <body>
     <div>
@@ -160,7 +160,7 @@ Object {
                       class="MuiAccordionDetails-root"
                     >
                       <a
-                        class="header__dropdown-subcategories"
+                        class="header__dropdown-subcategories active"
                         href="/"
                       >
                         All
@@ -195,7 +195,7 @@ Object {
         <p
           class="list__presentation"
         >
-          Your poem community!!
+          Your poem community!
         </p>
         <div
           class="separator"
@@ -362,7 +362,7 @@ Object {
                     class="MuiAccordionDetails-root"
                   >
                     <a
-                      class="header__dropdown-subcategories"
+                      class="header__dropdown-subcategories active"
                       href="/"
                     >
                       All
@@ -397,7 +397,7 @@ Object {
       <p
         class="list__presentation"
       >
-        Your poem community!!
+        Your poem community!
       </p>
       <div
         class="separator"
