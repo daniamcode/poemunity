@@ -80,6 +80,11 @@
     color: #000;
     font-size: 0.9rem;
     text-decoration: none;
+
+    &.active {
+        color: red;
+        font-weight: bold;
+    }
 }
 
 .header__logo {
@@ -144,14 +149,19 @@
 
     .header__dropdown-subcategories {
         font-size: 1.1rem;
-    }
 
-    .header__dropdown-subcategories:hover {
-        color: red;
-    }
+        &:hover {
+            color: red;
+        }
 
-    .header__dropdown-subcategories:focus {
-        color: red;
+        &:focus {
+            color: red;
+        }
+
+        &.active {
+            color: red;
+            font-weight: bold;
+        }
     }
 
     .header__logo {

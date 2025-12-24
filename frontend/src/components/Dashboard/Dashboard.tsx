@@ -5,15 +5,20 @@ import '../Dashboard/Dashboard.scss'
 import Accordion from '../SimpleAccordion'
 import Ranking from '../Ranking/Ranking'
 import List from '../List/List'
+import { RouteComponentProps } from 'react-router-dom'
 
-function Dashboard() {
+interface MatchParams {
+    genre?: string
+}
+
+function Dashboard(props: RouteComponentProps<MatchParams>) {
     return (
         <main className='dashboard'>
             <div className='dashboard__accordion'>
-                <Accordion />
+                <Accordion genre={props.match.params.genre} />
             </div>
             <div className='dashboard__list'>
-                <List />
+                <List {...props} />
             </div>
             <div className='dashboard__ranking'>
                 <Ranking />
