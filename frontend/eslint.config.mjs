@@ -3,6 +3,7 @@ import pluginJs from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js'
 import { fixupConfigRules } from '@eslint/compat'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
     {
@@ -13,6 +14,18 @@ export default [
     },
     {
         languageOptions: { globals: globals.browser }
+    },
+    {
+        files: ['**/*.test.{js,ts,jsx,tsx}', '**/*.spec.{js,ts,jsx,tsx}'],
+        languageOptions: { globals: globals.jest }
+    },
+    {
+        files: ['**/build*.js'],
+        languageOptions: { globals: { ...globals.node } },
+        rules: {
+            '@typescript-eslint/no-require-imports': 'off',
+            'no-console': 'off'
+        }
     },
     pluginJs.configs.recommended,
     ...tseslint.configs.recommended,
@@ -25,9 +38,9 @@ export default [
             'arrow-spacing': [
                 2,
                 {
-                // enforce consistent spacing before and after the arrow in arrow functions
-                    'after': true,
-                    'before': true
+                    // enforce consistent spacing before and after the arrow in arrow functions
+                    after: true,
+                    before: true
                 }
             ],
             'block-spacing': [2, 'always'], // enforce consistent spacing inside single-line blocks
@@ -36,40 +49,40 @@ export default [
             'comma-spacing': [
                 2,
                 {
-                    'after': true,
-                    'before': false
+                    after: true,
+                    before: false
                 }
             ], // enforce consistent spacing before and after commas
             'comma-style': [2, 'last'], // enforce consistent comma style
             'constructor-super': 2, // require super() calls in constructors
-            'curly': [2, 'all'], // enforce consistent brace style for all control statements
+            curly: [2, 'all'], // enforce consistent brace style for all control statements
             'dot-location': [2, 'property'], // enforce consistent newlines before and after dots
             'eol-last': 2, // enforce at least one newline at the end of files
-            'eqeqeq': [2, 'allow-null'], // require the use of === and !==
+            eqeqeq: [2, 'allow-null'], // require the use of === and !==
             'func-call-spacing': 2, // disallow spacing between function identifiers and their applications
             'generator-star-spacing': [
                 2,
                 {
-                // enforce consistent spacing around * operators in generator functions
-                    'after': true,
-                    'before': true
+                    // enforce consistent spacing around * operators in generator functions
+                    after: true,
+                    before: true
                 }
             ],
-            'indent': [2, 4], // enforce consistent indentation
+            indent: [2, 4], // enforce consistent indentation
             'key-spacing': [
                 2,
                 {
-                // enforce consistent spacing between keys and values in object literal properties
-                    'afterColon': true,
-                    'beforeColon': false
+                    // enforce consistent spacing between keys and values in object literal properties
+                    afterColon: true,
+                    beforeColon: false
                 }
             ],
             'keyword-spacing': [
                 2,
                 {
-                // enforce consistent spacing before and after keywords
-                    'after': true,
-                    'before': true
+                    // enforce consistent spacing before and after keywords
+                    after: true,
+                    before: true
                 }
             ],
 
@@ -77,32 +90,32 @@ export default [
             'max-len': [
                 2,
                 {
-                // Max. line length 120 characters
-                    'code': 120,
-                    'ignorePattern': '^import.*',
-                    'ignoreUrls': true,
-                    'tabWidth': 4
+                    // Max. line length 120 characters
+                    code: 120,
+                    ignorePattern: '^import.*',
+                    ignoreUrls: true,
+                    tabWidth: 4
                 }
             ],
             'max-lines': [
                 2,
                 {
-                // enforce max file length
-                    'max': 300,
-                    'skipBlankLines': true,
-                    'skipComments': true
+                    // enforce max file length
+                    max: 300,
+                    skipBlankLines: true,
+                    skipComments: true
                 }
             ],
             'max-nested-callbacks': [1, 5], // set Maximum Depth of Nested Callbacks
             'max-params': [1, 5], // set Maximum number for parameters in a function
-            'max-statements-per-line': [1, { 'max': 1 }], // enforce 1 statement per line
+            'max-statements-per-line': [1, { max: 1 }], // enforce 1 statement per line
             'multiline-ternary': [2, 'always-multiline'], // enforce or disallow newlines between operands of ternary expressions
             'new-cap': [
                 2,
                 {
-                // require constructor function names to begin with a capital letter
-                    'capIsNew': false,
-                    'newIsCap': true
+                    // require constructor function names to begin with a capital letter
+                    capIsNew: false,
+                    newIsCap: true
                 }
             ],
             'new-parens': 2, // require parentheses when invoking a constructor with no arguments
@@ -113,8 +126,8 @@ export default [
             'no-console': [
                 2,
                 {
-                // disallow the use of console
-                    'allow': ['error', 'warn', 'info']
+                    // disallow the use of console
+                    allow: ['error', 'warn', 'info']
                 }
             ],
             'no-const-assign': 2, // disallow reassigning const variables
@@ -145,7 +158,7 @@ export default [
             'no-mixed-spaces-and-tabs': 2, // disallow mixed spaces and tabs for indentation
             'no-multi-spaces': 2, // disallow multiple spaces
             'no-multi-str': 2, // disallow multiline strings
-            'no-multiple-empty-lines': [2, { 'max': 1 }], // disallow multiple empty lines
+            'no-multiple-empty-lines': [2, { max: 1 }], // disallow multiple empty lines
             'no-nested-ternary': 2, // Disallow nested ternaries
             'no-new': 2, // disallow new operators outside of assignments or comparisons
             'no-new-func': 2, // disallow new operators with the Function object
@@ -170,14 +183,14 @@ export default [
             'no-undef': 2, // disallow the use of undeclared variables unless mentioned in /*global */ comments
             'no-undef-init': 2, // disallow initializing variables to undefined
             'no-unexpected-multiline': 2, // disallow confusing multiline expressions
-            'no-unneeded-ternary': [2, { 'defaultAssignment': false }], // disallow ternary operators when simpler alternatives exist
+            'no-unneeded-ternary': [2, { defaultAssignment: false }], // disallow ternary operators when simpler alternatives exist
             'no-unreachable': 2, // disallow unreachable code after return, throw, continue, and break statements
             'no-unused-vars': [
                 2,
                 {
-                // disallow unused variables
-                    'args': 'none',
-                    'vars': 'all'
+                    // disallow unused variables
+                    args: 'none',
+                    vars: 'all'
                 }
             ],
             'no-use-before-define': ['error', 'nofunc'], // enforce variables to be defined before using them
@@ -186,13 +199,13 @@ export default [
             'no-var': 2, // disallow use of var
             'no-with': 2, // disallow with statements
             'object-curly-spacing': [2, 'always'], // enforce spaces at the start and end of each object
-            'one-var': [2, { 'initialized': 'never' }], // enforce variables to be declared either together or separately in functions
+            'one-var': [2, { initialized: 'never' }], // enforce variables to be declared either together or separately in functions
             'operator-linebreak': [
                 2,
                 'after',
                 {
-                // enforce consistent linebreak style for operators
-                    'overrides': {
+                    // enforce consistent linebreak style for operators
+                    overrides: {
                         ':': 'before',
                         '?': 'before'
                     }
@@ -200,34 +213,41 @@ export default [
             ],
             'padded-blocks': [2, 'never'], // require or disallow padding within blocks
             'prefer-const': [2], // enforce use of const
-            'quotes': [2, 'single', { 'allowTemplateLiterals': true, 'avoidEscape': false }], // enforce the consistent use of either backticks, double, or single quotes - aligned with Prettier ESLint plugin config
-            'semi': [2, 'never'], // require or disallow semicolons instead of ASI
+            quotes: [2, 'single', { allowTemplateLiterals: true, avoidEscape: false }], // enforce the consistent use of either backticks, double, or single quotes - aligned with Prettier ESLint plugin config
+            semi: [2, 'never'], // require or disallow semicolons instead of ASI
             'semi-spacing': [
                 2,
                 {
-                // enforce consistent spacing before and after semicolons
-                    'after': true,
-                    'before': false
+                    // enforce consistent spacing before and after semicolons
+                    after: true,
+                    before: false
                 }
             ],
             'space-before-blocks': [2, 'always'], // enforce consistent spacing before blocks
-            'space-before-function-paren': [2, 'never'], // disallow a space before function parenthesis to be in sync with Prettier
+            'space-before-function-paren': [
+                2,
+                {
+                    anonymous: 'never',
+                    named: 'never',
+                    asyncArrow: 'always'
+                }
+            ], // disallow a space before function parenthesis except for async arrows (Prettier adds them)
             'space-in-parens': [2, 'never'], // enforce consistent spacing inside parentheses
             'space-infix-ops': 2, // require spacing around operators
             'space-unary-ops': [
                 2,
                 {
-                // enforce consistent spacing before or after unary operators
-                    'nonwords': false,
-                    'words': true
+                    // enforce consistent spacing before or after unary operators
+                    nonwords: false,
+                    words: true
                 }
             ],
             'spaced-comment': [
                 2,
                 'always',
                 {
-                // enforce consistent spacing after the // or /* in a comment
-                    'markers': ['eslint', 'eslint-disable', 'global', 'globals', '*package', '!', ',']
+                    // enforce consistent spacing after the // or /* in a comment
+                    markers: ['eslint', 'eslint-disable', 'global', 'globals', '*package', '!', ',']
                 }
             ],
             'template-curly-spacing': [2, 'never'], // require or disallow spacing around embedded expressions of template strings
@@ -235,13 +255,31 @@ export default [
             'valid-typeof': 2, // enforce comparing typeof expressions against valid strings
             'wrap-iife': [2, 'any'], // require parentheses around immediate function invocations
             'yield-star-spacing': [2, 'both'], // require or disallow spacing around the * in yield* expressions
-            'yoda': [2, 'never'], // require or disallow “Yoda” conditions
+            yoda: [2, 'never'], // require or disallow “Yoda” conditions
 
             // React
             'react/react-in-jsx-scope': 0, // After React 17 importing react is not needed
 
             // Typescript
             '@typescript-eslint/no-explicit-any': 'off' // Maybe in the future I can remove this
+        }
+    },
+    eslintConfigPrettier, // Disables ESLint rules that conflict with Prettier
+    {
+        rules: {
+            // Re-enable max-len but make it compatible with Prettier
+            'max-len': [
+                'error',
+                {
+                    code: 120,
+                    tabWidth: 4,
+                    ignoreUrls: true,
+                    ignoreStrings: false,
+                    ignoreTemplateLiterals: false,
+                    ignoreRegExpLiterals: true,
+                    ignorePattern: '^import.*|^export.*'
+                }
+            ]
         }
     }
 ]

@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import Login from './Login'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderLogin(arg) {
 describe('Login', () => {
     let LoginTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         LoginTree = renderLogin()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(LoginTree).toMatchSnapshot()
     })
 })

@@ -44,8 +44,7 @@ export function register(config) {
                             'worker. To learn more, visit https://bit.ly/CRA-PWA'
                     )
                 })
-            }
-            else {
+            } else {
                 // Is not localhost. Just register service worker
                 registerValidSW(swUrl, config)
             }
@@ -77,8 +76,7 @@ function registerValidSW(swUrl, config) {
                             if (config && config.onUpdate) {
                                 config.onUpdate(registration)
                             }
-                        }
-                        else {
+                        } else {
                             // At this point, everything has been precached.
                             // It's the perfect time to display a
                             // "Content is cached for offline use." message.
@@ -113,8 +111,7 @@ function checkValidServiceWorker(swUrl, config) {
                         window.location.reload()
                     })
                 })
-            }
-            else {
+            } else {
                 // Service worker found. Proceed as normal.
                 registerValidSW(swUrl, config)
             }

@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import Profile from './Profile'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderProfile(arg) {
 describe('Profile', () => {
     let ProfileTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         ProfileTree = renderProfile()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(ProfileTree).toMatchSnapshot()
     })
 })

@@ -76,7 +76,9 @@ const Register = () => {
                             onChange={({ target }) => setPassword(target.value)}
                         />
                     </div>
-                    <button disabled={username.length === 0 || email.length === 0 || password.length === 0}>Register</button>
+                    <button disabled={username.length === 0 || email.length === 0 || password.length === 0}>
+                        Register
+                    </button>
                     {/* <Notification message={errorMessage}/> */}
                     <NavLink to='/login'>Login</NavLink>
                 </form>

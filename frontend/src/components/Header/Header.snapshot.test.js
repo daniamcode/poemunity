@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import Header from './Header'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderHeader(arg) {
 describe('Header', () => {
     let HeaderTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         HeaderTree = renderHeader()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(HeaderTree).toMatchSnapshot()
     })
 })

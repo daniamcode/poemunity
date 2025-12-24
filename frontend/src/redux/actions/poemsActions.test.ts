@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import axios from 'axios'
 import {
     createPoemAction,
@@ -98,7 +99,7 @@ describe('getAllPoemsAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.ALL_POEMS}_reset`)
     })
 
-    test('Should dispatch error when axios throws a generic error', async() => {
+    test('Should dispatch error when axios throws a generic error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -122,14 +123,16 @@ describe('getAllPoemsAction', () => {
         //     }, 300);
         // })
 
-        expect(axios.get).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
+        // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')"
+        // and then "expect(spy).toHaveBeenCalledTimes(1)"
+        expect(axios.get).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
     })
 
-    // a network error is diferent beacause we don't get an error as an object with a reponse property
-    test('Should dispatch error when axios throws a network error', async() => {
+    // a network error is diferent because we don't get an error as an object with a response property
+    test('Should dispatch error when axios throws a network error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(Promise.reject('Network error'))
 
@@ -149,13 +152,15 @@ describe('getAllPoemsAction', () => {
         //     }, 300);
         // })
 
-        expect(axios.get).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
+        // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')"
+        // and then "expect(spy).toHaveBeenCalledTimes(1)"
+        expect(axios.get).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe('Network error')
     })
 
-    test('Should dispatch response when axios returns data correctly', async() => {
+    test('Should dispatch response when axios returns data correctly', async () => {
         // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.get as jest.Mock).mockReturnValueOnce(
@@ -655,7 +660,7 @@ describe('createPoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.CREATE_POEM}_reset`)
     })
 
-    test('Should dispatch error when axios throws a generic error', async() => {
+    test('Should dispatch error when axios throws a generic error', async () => {
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(
             Promise.reject({
@@ -681,7 +686,7 @@ describe('createPoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
     })
 
-    test('Should dispatch response when axios returns data correctly', async() => {
+    test('Should dispatch response when axios returns data correctly', async () => {
         // this is beacuse we use Axios.create
         ;(axios.create as jest.Mock).mockReturnThis()
         ;(axios.post as jest.Mock).mockReturnValueOnce(

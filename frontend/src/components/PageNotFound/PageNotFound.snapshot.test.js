@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import PageNotFound from './PageNotFound'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderPageNotFound(arg) {
 describe('PageNotFound', () => {
     let PageNotFoundTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         PageNotFoundTree = renderPageNotFound()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(PageNotFoundTree).toMatchSnapshot()
     })
 })

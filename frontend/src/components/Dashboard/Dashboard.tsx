@@ -1,4 +1,3 @@
-
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'

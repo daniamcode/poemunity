@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import List from './List'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderList(arg) {
 describe('List', () => {
     let ListTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         ListTree = renderList()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(ListTree).toMatchSnapshot()
     })
 })

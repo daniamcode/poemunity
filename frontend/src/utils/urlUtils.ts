@@ -51,8 +51,7 @@ export function addQueryParam({ id, value }: addQueryParamProps) {
             search: urlParams.toString(),
             pathname: history.location.pathname
         })
-    }
-    catch (error: any) {
+    } catch (error: any) {
         console.error(error.stack)
     }
 }
@@ -79,8 +78,7 @@ export function addQueryParams(data: { key: string; value: string }[], keysToDel
                 pathname: history.location.pathname
             })
         }
-    }
-    catch (error: any) {
+    } catch (error: any) {
         console.error(error.stack)
     }
 }

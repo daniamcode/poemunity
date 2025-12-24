@@ -23,11 +23,10 @@ function openBrowser(url) {
             break
     }
 
-    exec(command, (err) => {
+    exec(command, err => {
         if (err) {
             console.log('ℹ Could not auto-launch browser')
-        }
-        else {
+        } else {
             console.log('✓ Browser launched automatically')
         }
     })
@@ -112,10 +111,7 @@ async function startServer() {
         (() => new EventSource('http://localhost:${RELOAD_PORT}/live').addEventListener('message', e => location.reload()))();
       `
         },
-        plugins: [
-            ...(esbuildConfigBase.plugins || []),
-            esbuildPluginLiveReload({ port: RELOAD_PORT })
-        ]
+        plugins: [...(esbuildConfigBase.plugins || []), esbuildPluginLiveReload({ port: RELOAD_PORT })]
     }
 
     const esbuildConfig = isReloadMode ? esbuildConfigReload : esbuildConfigBase
@@ -144,18 +140,20 @@ async function startServer() {
                     headers: req.headers
                 }
 
-                const proxyReq = http.request(options, (proxyRes) => {
+                const proxyReq = http.request(options, proxyRes => {
                     res.writeHead(proxyRes.statusCode, proxyRes.headers)
                     proxyRes.pipe(res, { end: true })
                 })
 
-                proxyReq.on('error', (err) => {
+                proxyReq.on('error', err => {
                     console.error('Backend proxy error:', err.message)
                     res.writeHead(502, { 'Content-Type': 'application/json' })
-                    res.end(JSON.stringify({
-                        error: 'Backend server not available',
-                        message: `Make sure backend is running on port ${BACKEND_PORT}`
-                    }))
+                    res.end(
+                        JSON.stringify({
+                            error: 'Backend server not available',
+                            message: `Make sure backend is running on port ${BACKEND_PORT}`
+                        })
+                    )
                 })
 
                 req.pipe(proxyReq, { end: true })
@@ -171,7 +169,7 @@ async function startServer() {
                 headers: req.headers
             }
 
-            const proxyReq = http.request(options, (proxyRes) => {
+            const proxyReq = http.request(options, proxyRes => {
                 // If esbuild returns "not found", serve index.html for client-side routing
                 if (proxyRes.statusCode === 404) {
                     const indexPath = path.join(__dirname, 'build', 'index.html')
@@ -194,7 +192,7 @@ async function startServer() {
                 proxyRes.pipe(res, { end: true })
             })
 
-            proxyReq.on('error', (err) => {
+            proxyReq.on('error', err => {
                 console.error('esbuild proxy error:', err)
                 res.writeHead(500, { 'Content-Type': 'text/html' })
                 res.end('<h1>Internal Server Error</h1>')
@@ -210,21 +208,19 @@ async function startServer() {
             // Auto-launch browser
             openBrowser('http://localhost:3000')
         })
-    }
-    else {
+    } else {
         console.log('Building...')
         try {
             await build(esbuildConfig)
             console.log('✓ Build completed successfully')
-        }
-        catch (err) {
+        } catch (err) {
             console.error('✗ Error during build:', err)
             process.exit(1)
         }
     }
 }
 
-startServer().catch((err) => {
+startServer().catch(err => {
     console.error('✗ Error starting server:', err)
     process.exit(1)
 })

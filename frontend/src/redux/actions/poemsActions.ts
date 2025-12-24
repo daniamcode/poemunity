@@ -84,8 +84,7 @@ export function updatePoemsListCacheAfterLikePoemAction({
                 const index = poem?.likes?.indexOf(context.userId)
                 if (index !== -1) {
                     poem.likes.splice(index, 1)
-                }
-                else {
+                } else {
                     poem.likes.push(context.userId)
                 }
             }
@@ -121,8 +120,7 @@ export function updateRankingCacheAfterLikePoemAction({ poemId, context }: Updat
                 const index = poem?.likes?.indexOf(context.userId)
                 if (index !== -1) {
                     poem.likes.splice(index, 1)
-                }
-                else {
+                } else {
                     poem.likes.push(context.userId)
                 }
             }
@@ -161,8 +159,7 @@ export function updateAllPoemsCacheAfterLikePoemAction({
                 const index = poem?.likes?.indexOf(context.userId)
                 if (index !== -1) {
                     poem.likes.splice(index, 1)
-                }
-                else {
+                } else {
                     poem.likes.push(context.userId)
                 }
             }

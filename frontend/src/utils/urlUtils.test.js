@@ -1,6 +1,5 @@
 import { useFiltersFromQuery } from './urlUtils'
 import { renderHook } from '@testing-library/react-hooks'
-import { act } from '@testing-library/react'
 
 // this is how custom hooks are tested. Watch https://www.youtube.com/watch?v=qRw3qKRBW4M&list=LL
 describe('useFiltersFromQuery', () => {

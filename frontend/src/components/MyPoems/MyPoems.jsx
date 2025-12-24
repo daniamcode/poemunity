@@ -125,7 +125,7 @@ function MyPoems(props) {
                                     {poem.title}
                                 </Link>
                                 <p className='poem__author'>{poem?.author}</p>
-                                <div className='poem__date'>{format(new Date(poem.date), 'MM/dd/yyyy HH:mm\'h\'')}</div>
+                                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
                             </section>
                             <section>
                                 <div className='poem__content poems__content'>{poem.poem}</div>
@@ -149,8 +149,8 @@ function MyPoems(props) {
                                 <div className='separator' />
                                 {context.user &&
                                     (poem.author === context?.username || context.userId === context.adminId) && (
-                                    <EditIcon className='poem__edit-icon' onClick={event => editPoem(poem.id)} />
-                                )}
+                                        <EditIcon className='poem__edit-icon' onClick={event => editPoem(poem.id)} />
+                                    )}
                                 {context.user && poem.author === context?.username && (
                                     <HighlightOffSharpIcon
                                         className='poem__delete-icon'

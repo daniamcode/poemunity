@@ -61,8 +61,7 @@ export function updatePoemCacheAfterLikePoemAction({ context }: updatePoemCacheA
         const index = newPoemQuery?.likes?.indexOf(context.userId)
         if (index !== -1) {
             newPoemQuery?.likes.splice(index, 1)
-        }
-        else {
+        } else {
             newPoemQuery?.likes.push(context.userId)
         }
 

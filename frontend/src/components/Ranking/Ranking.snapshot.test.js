@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import Ranking from './Ranking'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderRanking(arg) {
 describe('Ranking', () => {
     let RankingTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         RankingTree = renderRanking()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(RankingTree).toMatchSnapshot()
     })
 })

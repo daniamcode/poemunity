@@ -65,7 +65,7 @@ describe('ListItem component', () => {
         const propsErr = checkPropTypes(ListItem.propTypes, expectedProps, 'props', ListItem.name)
         expect(propsErr).toBeUndefined()
     })
-    test('Should call manageSuccess when deleting poem', async() => {
+    test('Should call manageSuccess when deleting poem', async () => {
         wrapper = wrapperFactory()
 
         const spy = jest.spyOn(commonActions, 'deleteAction')
@@ -91,7 +91,7 @@ describe('ListItem component', () => {
         expect(manageSuccess).toHaveBeenCalledTimes(1)
         expect(manageSuccess).toHaveBeenCalledWith('Poem deleted')
     })
-    test('Should call manageError when failing in deleting poem', async() => {
+    test('Should call manageError when failing in deleting poem', async () => {
         wrapper = wrapperFactory()
 
         const spy = jest.spyOn(commonActions, 'deleteAction')

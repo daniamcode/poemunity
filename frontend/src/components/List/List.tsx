@@ -80,8 +80,8 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                         params:
                             paramsData.origin !== 'all'
                                 ? {
-                                    origin: paramsData.origin
-                                }
+                                      origin: paramsData.origin
+                                  }
                                 : null,
                         options: queryOptions
                     })
@@ -100,8 +100,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                 const poemsFiltered = newData.filter(poems => poems.genre === genre)
                 const poemsSorted = sortPoems(paramsData.orderBy, poemsFiltered)
                 setPoems(poemsSorted)
-            }
-            else {
+            } else {
                 const poemsSorted = sortPoems(paramsData.orderBy, newData)
                 setPoems(poemsSorted)
             }

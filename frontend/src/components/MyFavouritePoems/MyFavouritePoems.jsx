@@ -166,7 +166,7 @@ function MyFavouritePoems(props) {
                                     <img className='poem__picture' src={poem.picture} />
                                     <p className='poem__author'>{poem.author}</p>
                                 </div>
-                                <div className='poem__date'>{format(new Date(poem.date), 'MM/dd/yyyy HH:mm\'h\'')}</div>
+                                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
                             </section>
                             <section>
                                 <div className='poem__content poems__content'>{poem.poem}</div>
@@ -191,20 +191,20 @@ function MyFavouritePoems(props) {
                                 {context?.user &&
                                     poem.userId !== context?.userId &&
                                     poem.likes.some(id => id === context?.userId) && (
-                                    <Link
-                                        className='poem__likes-icon'
-                                        onClick={event => onLike(event, poem.id)}
-                                        to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                    />
-                                )}
+                                        <Link
+                                            className='poem__likes-icon'
+                                            onClick={event => onLike(event, poem.id)}
+                                            to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                        />
+                                    )}
                                 {context?.user &&
                                     poem.userId !== context?.userId &&
                                     !poem.likes.some(id => id === context?.userId) && (
-                                    <Link
-                                        className='poem__unlikes-icon'
-                                        onClick={event => onLike(event, poem.id)}
-                                    />
-                                )}
+                                        <Link
+                                            className='poem__unlikes-icon'
+                                            onClick={event => onLike(event, poem.id)}
+                                        />
+                                    )}
                                 {context?.user && poem.author === context?.username && (
                                     <HighlightOffSharpIcon
                                         className='poem__delete-icon'

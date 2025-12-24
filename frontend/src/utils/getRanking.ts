@@ -15,7 +15,7 @@ export const SortObjectOfObjects = (data: object, attribute: string) => {
         }
     }
 
-    array.sort(function(a: any, b: any) {
+    array.sort(function (a: any, b: any) {
         const at = a.tempSortName
         const bt = b.tempSortName
         return at > bt ? -1 : at < bt ? 1 : 0
@@ -40,7 +40,7 @@ export const SortObjectOfObjects = (data: object, attribute: string) => {
 export const getRanking = (poems: Poem[], poemPoints: number, likePoints: number): object => {
     let rank = {}
     if (poems && poems.length > 0) {
-        rank = poems.reduce(function(accumulator, item) {
+        rank = poems.reduce(function (accumulator, item) {
             const points = (accumulator[item.userId]?.points || 0) + poemPoints + likePoints * item.likes.length
 
             accumulator[item.userId] = {

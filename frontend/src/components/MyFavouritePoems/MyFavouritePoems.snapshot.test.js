@@ -1,4 +1,3 @@
-
 import { render } from '@testing-library/react'
 import MyFavouritePoems from './MyFavouritePoems'
 import { BrowserRouter } from 'react-router-dom'
@@ -26,11 +25,11 @@ function renderMyFavouritePoems(arg) {
 describe('MyFavouritePoems', () => {
     let MyFavouritePoemsTree
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         MyFavouritePoemsTree = renderMyFavouritePoems()
     })
 
-    test('should match without id', async() => {
+    test('should match without id', async () => {
         expect(MyFavouritePoemsTree).toMatchSnapshot()
     })
 })

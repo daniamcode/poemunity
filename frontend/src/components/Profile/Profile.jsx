@@ -224,8 +224,7 @@ export default function Profile(props) {
                         }
                     })
                 )
-            }
-            else {
+            } else {
                 const poem = {
                     poem: poemContent,
                     title: poemTitle,
@@ -257,8 +256,7 @@ export default function Profile(props) {
             setPoemTitle('')
             setPoemOrigin('')
             setPoemCategory('')
-        }
-        else {
+        } else {
             if (context?.userId === context.adminId) {
                 onSave({
                     event,
@@ -273,8 +271,7 @@ export default function Profile(props) {
                     },
                     poemId: poemQuery.item.id
                 })
-            }
-            else {
+            } else {
                 onSave({
                     event,
                     poem: {
