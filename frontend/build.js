@@ -2,9 +2,36 @@
 const http = require('node:http')
 const fs = require('node:fs')
 const path = require('node:path')
+const { exec } = require('node:child_process')
 const { context, build } = require('esbuild')
 const { sassPlugin } = require('esbuild-sass-plugin')
 const { esbuildPluginLiveReload } = require('./src/utils/webserver')
+
+function openBrowser(url) {
+    const platform = process.platform
+    let command
+
+    switch (platform) {
+        case 'darwin': // macOS
+            command = `open ${url}`
+            break
+        case 'win32': // Windows
+            command = `start ${url}`
+            break
+        default: // Linux and others
+            command = `xdg-open ${url}`
+            break
+    }
+
+    exec(command, (err) => {
+        if (err) {
+            console.log('ℹ Could not auto-launch browser')
+        }
+        else {
+            console.log('✓ Browser launched automatically')
+        }
+    })
+}
 
 function copyPublicAssets() {
     const publicDir = path.join(__dirname, 'public')
@@ -179,6 +206,9 @@ async function startServer() {
             console.log('✓ Proxy server running at http://localhost:3000')
             console.log(`✓ API requests proxied to http://localhost:${BACKEND_PORT}`)
             console.log('✓ Live reload enabled')
+
+            // Auto-launch browser
+            openBrowser('http://localhost:3000')
         })
     }
     else {
