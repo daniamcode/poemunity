@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Register.scss'
 import { registerAction } from '../../redux/actions/loginActions'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { useAppDispatch } from '../../redux/store'
 
 const Register = () => {

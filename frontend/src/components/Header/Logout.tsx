@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../App'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import './Header.scss'
 
 const Logout = () => {

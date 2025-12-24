@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './Login.scss'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { NavLink } from 'react-router-dom'
 // import { FormElement } from '../typescript/types'
 // import { manageSuccess } from '../utils/notifications'

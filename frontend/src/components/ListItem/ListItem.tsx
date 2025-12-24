@@ -8,7 +8,6 @@ import EditIcon from '@material-ui/icons/Edit'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import { LIKE, LIKES, READ_MORE } from '../../data/constants'
 import normalizeString from '../../utils/normalizeString'
-// import PropTypes from 'prop-types'
 import { useAppDispatch } from '../../redux/store'
 import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../../redux/actions/poemActions'
 import {
@@ -195,12 +194,5 @@ const ListItem = ({ poem, filter, context }: Props) => {
         </main>
     )
 }
-
-// PropTypes no longer needed when working with Typescript
-// ListItem.propTypes = {
-//   poem: PropTypes.object.isRequired,
-//   filter: PropTypes.string.isRequired,
-//   context: PropTypes.object.isRequired,
-// }
 
 export default ListItem
