@@ -18,20 +18,29 @@ function Header() {
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
         if (loggedUserJSON) {
+            const parsedUser = JSON.parse(loggedUserJSON)
+            const jwtData = parseJWT(parsedUser)
             context.setState({
-                ...context,
-                user: JSON.parse(loggedUserJSON),
-                userId: parseJWT(JSON.parse(loggedUserJSON))?.id,
-                username: parseJWT(JSON.parse(loggedUserJSON))?.username,
-                picture: parseJWT(JSON.parse(loggedUserJSON))?.picture,
+                user: parsedUser,
+                userId: jwtData?.id,
+                username: jwtData?.username,
+                picture: jwtData?.picture,
                 config: {
                     headers: {
-                        Authorization: `Bearer ${JSON.parse(loggedUserJSON)}`
+                        Authorization: `Bearer ${parsedUser}`
                     }
                 }
             })
         }
     }, [JSON.stringify(location)])
+
+    // Dynamic subtitle based on route
+    const getSubtitle = () => {
+        if (location.pathname === '/profile') {
+            return `${context?.username}'s Profile`
+        }
+        return WEB_SUBTITLE
+    }
 
     // if (isLoading) {
     //   return <CircularProgress />
@@ -50,7 +59,7 @@ function Header() {
                     emunity
                 </Link>
             </div>
-            <p className='list__presentation'>{WEB_SUBTITLE}</p>
+            <p className='list__presentation'>{getSubtitle()}</p>
             <div className='separator' />
             {context?.user ? <Link to='/profile' className='header__profile' /> : <></>}
             {context?.user ? <LogoutButton /> : <LoginButton />}

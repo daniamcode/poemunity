@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import API from './axiosInstance'
 // import { LogLevels, trackError }   from 'utils/errorUtils';
 // import { isProduction, isStaging } from 'constants/environments';
@@ -247,9 +248,16 @@ export function postAction({
                 }
             })
             .catch(error => {
+                // todo: understand why this is needed, and also in other places
+                // Serialize error to avoid Redux non-serializable value warning
+                const serializedError = error?.response?.data || {
+                    message: error?.message || 'An error occurred',
+                    status: error?.response?.status,
+                    statusText: error?.response?.statusText
+                }
                 dispatch({
                     type: rejectedAction,
-                    payload: error?.response?.data || error
+                    payload: serializedError
                 })
                 manageError(error)
                 if (callbacks?.error) {
@@ -320,9 +328,15 @@ export function putAction({
             }
         })
         .catch(error => {
+            // Serialize error to avoid Redux non-serializable value warning
+            const serializedError = error?.response?.data || {
+                message: error?.message || 'An error occurred',
+                status: error?.response?.status,
+                statusText: error?.response?.statusText
+            }
             dispatch({
                 type: rejectedAction,
-                payload: error?.response?.data || error
+                payload: serializedError
             })
             manageError(error)
             if (callbacks?.error) {
@@ -407,9 +421,15 @@ export function deleteAction({
                 }
             })
             .catch(error => {
+                // Serialize error to avoid Redux non-serializable value warning
+                const serializedError = error?.response?.data || {
+                    message: error?.message || 'An error occurred',
+                    status: error?.response?.status,
+                    statusText: error?.response?.statusText
+                }
                 dispatch({
                     type: rejectedAction,
-                    payload: error?.response?.data || error
+                    payload: serializedError
                 })
                 manageError(error)
                 if (callbacks?.error) {
@@ -480,9 +500,15 @@ export function patchAction({
             }
         })
         .catch(error => {
+            // Serialize error to avoid Redux non-serializable value warning
+            const serializedError = error?.response?.data || {
+                message: error?.message || 'An error occurred',
+                status: error?.response?.status,
+                statusText: error?.response?.statusText
+            }
             dispatch({
                 type: rejectedAction,
-                payload: error?.response?.data || error
+                payload: serializedError
             })
             manageError(error)
             if (callbacks?.error) {

@@ -49,6 +49,9 @@ exports[`MyFavouritePoems should match without id 1`] = `
           </div>
         </div>
       </div>
+      <div
+        style="height: 20px;"
+      />
     </div>
   </body>,
   "container": <div>
@@ -96,6 +99,9 @@ exports[`MyFavouritePoems should match without id 1`] = `
         </div>
       </div>
     </div>
+    <div
+      style="height: 20px;"
+    />
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

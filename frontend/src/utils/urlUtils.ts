@@ -3,15 +3,18 @@ import { createBrowserHistory } from 'history'
 
 const history = createBrowserHistory()
 
-export function parseQuery(url: string = window.location.search) {
+export function parseQuery(url: string = window.location.search): Record<string, any> {
     const urlParams = new URLSearchParams(url)
-    return Array.from(urlParams.keys()).reduce((acc, key) => {
-        if (key !== '__proto__') {
-            // we use non-null assertion operator by now to bypass typescript's error
-            acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null
-        }
-        return acc
-    }, {})
+    return Array.from(urlParams.keys()).reduce(
+        (acc: Record<string, any>, key) => {
+            if (key !== '__proto__') {
+                // we use non-null assertion operator by now to bypass typescript's error
+                acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null
+            }
+            return acc
+        },
+        {} as Record<string, any>
+    )
 }
 
 export function urlParse(url = '') {
@@ -65,10 +68,8 @@ export function addQueryParams(data: { key: string; value: string }[], keysToDel
     try {
         const urlParams = new URLSearchParams(window.location.search)
         keysToDelete.forEach(key => urlParams.delete(key))
-        console.log(keysToDelete)
         data.forEach(({ key, value }) => {
             const parsedValue = JSON.stringify(value)
-            console.log(`Adding key ${key} with value ${parsedValue}`)
             urlParams.set(key, parsedValue)
         })
         const newQuery = urlParams.toString()
@@ -105,7 +106,7 @@ export function useFiltersFromQuery(defaultValue: any) {
     const [data, setData] = useState(defaultValue)
     useEffect(() => {
         const keys = Object.keys(defaultValue)
-        const accumulatedQuery = {}
+        const accumulatedQuery: Record<string, any> = {}
         keys.forEach(key => {
             const value = getQueryParam(key)
             if (value !== undefined) {

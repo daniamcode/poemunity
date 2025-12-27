@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 export const normalizeSwaps: { [key: string]: string[] } = {
     0: ['°', '₀', '۰', '０'],
     1: ['¹', '₁', '۱', '１'],

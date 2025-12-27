@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { AppContext } from '../../App'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
@@ -18,7 +16,8 @@ import {
     ORDER_BY_LIKES,
     ORDER_BY_RANDOM,
     ORDER_BY_TITLE,
-    CATEGORIES_TITLE_LABEL
+    CATEGORIES_TITLE_LABEL,
+    PAGINATION_LIMIT
 } from '../../data/constants'
 import normalizeString from '../../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../../utils/urlUtils'
@@ -28,10 +27,11 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../../redux/store'
 import { getPoemsListAction } from '../../redux/actions/poemsActions'
 import { Poem } from '../../typescript/interfaces'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 
 interface MatchParams {
-    genre: string
+    genre?: string
 }
 
 function List(props: Partial<RouteComponentProps<MatchParams>>) {
@@ -77,24 +77,22 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                 }
                 dispatch(
                     getPoemsListAction({
-                        params:
-                            paramsData.origin !== 'all'
-                                ? {
-                                      origin: paramsData.origin
-                                  }
-                                : null,
+                        params: {
+                            page: 1,
+                            limit: PAGINATION_LIMIT,
+                            ...(paramsData.origin !== 'all' && { origin: paramsData.origin })
+                        },
                         options: queryOptions
                     })
                 )
             }
         }
         handleLoadPoems()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify(paramsData.origin), dispatch])
 
     useEffect(() => {
-        if (poemsListQuery && poemsListQuery?.item && poemsListQuery?.item?.length > 0) {
-            const newData = [...poemsListQuery?.item]
+        if (poemsListQuery && poemsListQuery.item && poemsListQuery.item.length > 0) {
+            const newData = [...poemsListQuery.item]
 
             if (genre) {
                 const poemsFiltered = newData.filter(poems => poems.genre === genre)
@@ -105,8 +103,32 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                 setPoems(poemsSorted)
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify([poemsListQuery, genre, paramsData])])
+
+    const handleLoadMore = () => {
+        if (!poemsListQuery.isFetching && poemsListQuery.hasMore) {
+            const nextPage = (poemsListQuery.page || 0) + 1
+            dispatch(
+                getPoemsListAction({
+                    params: {
+                        page: nextPage,
+                        limit: PAGINATION_LIMIT,
+                        ...(paramsData.origin !== 'all' && { origin: paramsData.origin })
+                    },
+                    options: {
+                        fetch: true,
+                        reset: false
+                    }
+                })
+            )
+        }
+    }
+
+    const sentinelRef = useInfiniteScroll({
+        onLoadMore: handleLoadMore,
+        hasMore: poemsListQuery.hasMore || false,
+        isLoading: poemsListQuery.isFetching
+    })
 
     const handleOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         addQueryParam({
@@ -134,11 +156,8 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
         setFilter(normalizeString(event.target.value))
     }
 
-    if (poemsListQuery?.isFetching) {
-        // console.log('test my first npm package!')
-        // console.log(strings.isLowercase('Qwerty'))
-        // console.log(strings.isLowercase('qwerty'))
-        // console.log(strings.isLowercase('ABC'))
+    // Show full page loader only on initial load (no poems yet)
+    if (poemsListQuery?.isFetching && (!poemsListQuery?.item || poemsListQuery?.item?.length === 0)) {
         return <CircularProgress />
     }
 
@@ -234,6 +253,14 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                 {poems.map(poem => (
                     <ListItem key={poem?.id} poem={poem} filter={filter} context={context} />
                 ))}
+
+                {poemsListQuery?.isFetching && poemsListQuery?.item && poemsListQuery?.item?.length > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                        <CircularProgress />
+                    </div>
+                )}
+
+                <div ref={sentinelRef} style={{ height: '20px' }} />
             </div>
         </>
     )

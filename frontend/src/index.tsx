@@ -8,11 +8,13 @@ import store from './redux/store'
 
 // export const store = configureStore();
 
+// eslint-disable-next-line no-console, no-undef
 console.log(`Environment is: ${process.env.NODE_ENV}`)
 
 const root = document.getElementById('root')
 
 if (root) {
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <React.StrictMode>
             <Provider store={store}>

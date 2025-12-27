@@ -1,7 +1,6 @@
 import store from '../store'
 import { getAction, getTypes, putAction, patchAction, deleteAction } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
-import cloneDeep from 'lodash.clonedeep'
 import { ACTIONS } from '../reducers/poemReducers'
 import { ReduxOptions, ReduxCallbacks, Context, Poem } from '../../typescript/interfaces'
 import { AppDispatch } from '../store'
@@ -56,7 +55,7 @@ export function updatePoemCacheAfterLikePoemAction({ context }: updatePoemCacheA
         const {
             poemQuery: { item: poemQuery }
         } = store.getState()
-        const newPoemQuery = cloneDeep(poemQuery as Poem)
+        const newPoemQuery = structuredClone(poemQuery as Poem)
 
         const index = newPoemQuery?.likes?.indexOf(context.userId)
         if (index !== -1) {

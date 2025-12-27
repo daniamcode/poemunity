@@ -5,22 +5,82 @@ const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 
 poemsRouter.get('/', async (req, res) => {
-  if (req.query.origin) {
-    Poem.find({ origin: req.query.origin }, (error, poems) => {
-      if (error) {
-        res.send(error)
-      } else {
-        res.json(poems)
+  try {
+    // Build filter
+    const filter = {}
+
+    // Add origin filter if provided
+    if (req.query.origin) {
+      filter.origin = req.query.origin
+    }
+
+    // Add userId filter if provided (for MyPoems - filter by poem author)
+    if (req.query.userId) {
+      filter.userId = req.query.userId
+    }
+
+    // Add likedBy filter if provided (for MyFavouritePoems - filter by user who liked)
+    if (req.query.likedBy) {
+      filter.likes = req.query.likedBy
+    }
+
+    // Check if pagination is requested (if page or limit params are present)
+    const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
+
+    if (isPaginationRequested) {
+      // Parse pagination parameters first (without applying defaults)
+      const pageParam = req.query.page !== undefined ? parseInt(req.query.page) : null
+      const limitParam = req.query.limit !== undefined ? parseInt(req.query.limit) : null
+
+      // Validate parameters if they were provided
+      if (pageParam !== null && (isNaN(pageParam) || pageParam < 1)) {
+        return res.status(400).json({ error: 'Page must be greater than 0' })
       }
-    })
-  } else {
-    Poem.find((error, poems) => {
-      if (error) {
-        res.send(error)
-      } else {
-        res.json(poems)
+      if (limitParam !== null && (isNaN(limitParam) || limitParam < 1)) {
+        return res.status(400).json({ error: 'Limit must be greater than 0' })
       }
-    })
+
+      // Apply defaults after validation
+      const page = pageParam || 1
+      const limit = limitParam || 10
+      const maxLimit = 100
+
+      // Enforce maximum limit
+      const effectiveLimit = Math.min(limit, maxLimit)
+
+      // Calculate skip value for pagination
+      const skip = (page - 1) * effectiveLimit
+
+      // Get total count for pagination metadata
+      const total = await Poem.countDocuments(filter)
+
+      // Fetch paginated poems, sorted by date descending (newest first)
+      const poems = await Poem.find(filter)
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(effectiveLimit)
+
+      // Calculate pagination metadata
+      const totalPages = Math.ceil(total / effectiveLimit)
+      const hasMore = page < totalPages
+
+      // Return paginated response
+      res.json({
+        poems,
+        total,
+        page,
+        limit: effectiveLimit,
+        totalPages,
+        hasMore
+      })
+    } else {
+      // No pagination requested - return all poems as simple array (used for ranking calculation)
+      // TODO: In the future, move ranking calculation to backend to avoid fetching all poems
+      const poems = await Poem.find(filter).sort({ date: -1 })
+      res.json(poems)
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 

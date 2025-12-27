@@ -10,7 +10,7 @@
       "DOM",
       "dom.iterable"
     ],
-    "types": ["jest"],
+    "types": ["jest", "node"],
     "downlevelIteration": true,
     "moduleResolution": "node",
     "noEmit": true,

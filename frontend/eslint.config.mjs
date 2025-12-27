@@ -31,6 +31,11 @@ export default [
     ...tseslint.configs.recommended,
     ...fixupConfigRules(pluginReactConfig),
     {
+        settings: {
+            react: {
+                version: 'detect'
+            }
+        },
         rules: {
             // Common rules
             'accessor-pairs': 2, // enforce getter and setter pairs in objects
@@ -259,6 +264,7 @@ export default [
 
             // React
             'react/react-in-jsx-scope': 0, // After React 17 importing react is not needed
+            'react/prop-types': 0, // Disable prop-types validation (using TypeScript instead)
 
             // Typescript
             '@typescript-eslint/no-explicit-any': 'off' // Maybe in the future I can remove this

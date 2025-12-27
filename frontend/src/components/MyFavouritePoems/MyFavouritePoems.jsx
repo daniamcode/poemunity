@@ -9,22 +9,16 @@ import SearchIcon from '@material-ui/icons/Search'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from '../CircularIndeterminate'
-import getFavouritePoemsByUser from '../../utils/getFavouritePoemsByUser'
-import parseJWT from '../../utils/parseJWT'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
-import {
-    getAllPoemsAction,
-    updateAllPoemsCacheAfterDeletePoemAction,
-    updateAllPoemsCacheAfterLikePoemAction,
-    updatePoemsListCacheAfterLikePoemAction,
-    updateRankingCacheAfterLikePoemAction
-} from '../../redux/actions/poemsActions'
-import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../../redux/actions/poemActions'
+import { getMyFavouritePoemsAction } from '../../redux/actions/poemsActions'
+import { deletePoemAction, likePoemAction } from '../../redux/actions/poemActions'
 import { manageError, manageSuccess } from '../../utils/notifications'
 import { format } from 'date-fns'
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
+import { PAGINATION_LIMIT } from '../../data/constants'
 
-function MyFavouritePoems(props) {
+function MyFavouritePoems() {
     const context = useContext(AppContext)
 
     const [poems, setPoems] = useState([])
@@ -33,18 +27,60 @@ function MyFavouritePoems(props) {
     // Redux
     const dispatch = useAppDispatch()
 
-    const { allPoemsQuery } = useSelector(state => state)
+    const myFavouritePoemsQuery = useSelector(state => state.myFavouritePoemsQuery)
 
+    // Initial load
     useEffect(() => {
-        dispatch(getAllPoemsAction({}))
-    }, [])
-
-    useEffect(() => {
-        if (allPoemsQuery.item) {
-            const poemsFiltered = getFavouritePoemsByUser(allPoemsQuery.item, context?.userId)
-            setPoems(poemsFiltered)
+        if (context?.userId) {
+            const queryOptions = {
+                reset: true,
+                fetch: true
+            }
+            dispatch(
+                getMyFavouritePoemsAction({
+                    params: {
+                        likedBy: context.userId,
+                        page: 1,
+                        limit: PAGINATION_LIMIT
+                    },
+                    options: queryOptions
+                })
+            )
         }
-    }, [JSON.stringify([allPoemsQuery.item, context?.username])])
+    }, [context?.userId, dispatch])
+
+    // Update local state when data changes
+    useEffect(() => {
+        if (myFavouritePoemsQuery?.item) {
+            setPoems(myFavouritePoemsQuery.item)
+        }
+    }, [JSON.stringify(myFavouritePoemsQuery?.item)])
+
+    // Infinite scroll handler
+    const handleLoadMore = () => {
+        if (!myFavouritePoemsQuery.isFetching && myFavouritePoemsQuery.hasMore && context?.userId) {
+            const nextPage = (myFavouritePoemsQuery.page || 0) + 1
+            dispatch(
+                getMyFavouritePoemsAction({
+                    params: {
+                        likedBy: context.userId,
+                        page: nextPage,
+                        limit: PAGINATION_LIMIT
+                    },
+                    options: {
+                        fetch: true,
+                        reset: false
+                    }
+                })
+            )
+        }
+    }
+
+    const sentinelRef = useInfiniteScroll({
+        onLoadMore: handleLoadMore,
+        isLoading: myFavouritePoemsQuery.isFetching,
+        hasMore: myFavouritePoemsQuery.hasMore
+    })
 
     function onDelete(event, poemId) {
         event.preventDefault()
@@ -56,9 +92,20 @@ function MyFavouritePoems(props) {
                 context,
                 callbacks: {
                     success: () => {
+                        // Refresh the list by fetching page 1 again
+                        // todo: check if old used updateAllPoemsCacheAfterDeletePoemAction is needed
+                        // instead of getMyFavouritePoemsAction
                         dispatch(
-                            updateAllPoemsCacheAfterDeletePoemAction({
-                                poemId
+                            getMyFavouritePoemsAction({
+                                params: {
+                                    likedBy: context.userId,
+                                    page: 1,
+                                    limit: PAGINATION_LIMIT
+                                },
+                                options: {
+                                    reset: true,
+                                    fetch: true
+                                }
                             })
                         )
                         // if I delete a poem that's being edited, I need to reset the state
@@ -86,27 +133,45 @@ function MyFavouritePoems(props) {
                 context,
                 callbacks: {
                     success: () => {
+                        // Refresh the list since unliking will remove from favorites
+                        // todo: understand why i had
+                        //     success: () => {
+                        //     dispatch(
+                        //         updatePoemsListCacheAfterLikePoemAction({
+                        //             poemId,
+                        //             context
+                        //         })
+                        //     )
+                        //     dispatch(
+                        //         updateRankingCacheAfterLikePoemAction({
+                        //             poemId,
+                        //             context
+                        //         })
+                        //     )
+                        //     dispatch(
+                        //         updateAllPoemsCacheAfterLikePoemAction({
+                        //             poemId,
+                        //             context
+                        //         })
+                        //     )
+                        //     dispatch(
+                        //         updatePoemCacheAfterLikePoemAction({
+                        //             context
+                        //         })
+                        //     )
+                        // }
+                        // and now is enough with just getMyFavouritePoemsAction
                         dispatch(
-                            updatePoemsListCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateRankingCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateAllPoemsCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updatePoemCacheAfterLikePoemAction({
-                                context
+                            getMyFavouritePoemsAction({
+                                params: {
+                                    likedBy: context.userId,
+                                    page: 1,
+                                    limit: PAGINATION_LIMIT
+                                },
+                                options: {
+                                    reset: true,
+                                    fetch: true
+                                }
                             })
                         )
                     }
@@ -123,9 +188,9 @@ function MyFavouritePoems(props) {
         setFilter(event.target.value)
     }
 
-    // if (isLoading) {
-    //   return <CircularProgress />
-    // }
+    if (myFavouritePoemsQuery.isFetching && !poems.length) {
+        return <CircularProgress />
+    }
 
     return (
         <>
@@ -226,6 +291,9 @@ function MyFavouritePoems(props) {
                     )}
                 </main>
             ))}
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} style={{ height: '20px' }} />
+            {myFavouritePoemsQuery.isFetching && poems.length > 0 && <CircularProgress />}
         </>
     )
 }

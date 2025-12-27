@@ -1,12 +1,25 @@
 import { Poem } from '../typescript/interfaces'
 
-export const SortObjectOfObjects = (data: object, attribute: string) => {
-    const array = []
+interface RankItem {
+    author: string
+    picture: string
+    points: number
+}
+
+interface RankAccumulator {
+    [userId: string]: RankItem
+}
+
+interface SortableObject {
+    tempSortName?: string
+    [key: string]: any
+}
+
+export const SortObjectOfObjects = (data: Record<string, any>, attribute: string): RankItem[] => {
+    const array: SortableObject[] = []
     for (const prop in data) {
-        if (data.hasOwnProperty(prop)) {
-            const object: {
-                tempSortName?: string
-            } = {
+        if (Object.prototype.hasOwnProperty.call(data, prop)) {
+            const object: SortableObject = {
                 tempSortName: ''
             }
             object[prop] = data[prop]
@@ -15,19 +28,21 @@ export const SortObjectOfObjects = (data: object, attribute: string) => {
         }
     }
 
-    array.sort(function (a: any, b: any) {
-        const at = a.tempSortName
-        const bt = b.tempSortName
-        return at > bt ? -1 : at < bt ? 1 : 0
+    array.sort(function (a: SortableObject, b: SortableObject) {
+        const at = a.tempSortName || ''
+        const bt = b.tempSortName || ''
+        if (at > bt) return -1
+        if (at < bt) return 1
+        return 0
     })
 
-    const result = []
+    const result: RankItem[] = []
     let id = ''
     for (let i = 0, l = array.length; i < l; i++) {
         const object = array[i]
         delete object.tempSortName
         for (const prop in object) {
-            if (object.hasOwnProperty(prop)) {
+            if (Object.prototype.hasOwnProperty.call(object, prop)) {
                 id = prop
             }
         }
@@ -37,10 +52,10 @@ export const SortObjectOfObjects = (data: object, attribute: string) => {
     return result
 }
 
-export const getRanking = (poems: Poem[], poemPoints: number, likePoints: number): object => {
-    let rank = {}
+export const getRanking = (poems: Poem[], poemPoints: number, likePoints: number): RankItem[] => {
+    let rank: RankItem[] = []
     if (poems && poems.length > 0) {
-        rank = poems.reduce(function (accumulator, item) {
+        const rankAccumulator = poems.reduce(function (accumulator: RankAccumulator, item) {
             const points = (accumulator[item.userId]?.points || 0) + poemPoints + likePoints * item.likes.length
 
             accumulator[item.userId] = {
@@ -50,9 +65,9 @@ export const getRanking = (poems: Poem[], poemPoints: number, likePoints: number
             }
 
             return accumulator
-        }, {})
+        }, {} as RankAccumulator)
 
-        rank = SortObjectOfObjects(rank, 'points')
+        rank = SortObjectOfObjects(rankAccumulator, 'points')
     }
 
     return rank

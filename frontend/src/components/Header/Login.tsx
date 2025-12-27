@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import './Login.scss'
 import { useHistory } from 'react-router-dom'
 import { NavLink } from 'react-router-dom'
@@ -7,7 +7,7 @@ import { NavLink } from 'react-router-dom'
 import { useAppDispatch } from '../../redux/store'
 import { loginAction } from '../../redux/actions/loginActions'
 
-const Login = (): JSX.Element => {
+const Login = (): React.JSX.Element => {
     const history = useHistory()
 
     const [username, setUsername] = useState('')
@@ -49,7 +49,9 @@ const Login = (): JSX.Element => {
         <div className='login-container'>
             <div className='login-card'>
                 <form className='login' onSubmit={handleLogin} data-testid='login'>
-                    <label>Introduce your login credentials or click "Register" if you don't have them</label>
+                    <label>
+                        Introduce your login credentials or click &quot;Register&quot; if you don&apos;t have them
+                    </label>
                     <div className='login__username'>
                         <input
                             type='text'

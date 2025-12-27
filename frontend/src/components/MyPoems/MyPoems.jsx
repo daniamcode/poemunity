@@ -10,15 +10,16 @@ import EditIcon from '@material-ui/icons/Edit'
 import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
 import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
 import CircularProgress from '../CircularIndeterminate'
-import getPoemsByUser from '../../utils/getPoemsByUser'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
-import { getAllPoemsAction, updateAllPoemsCacheAfterDeletePoemAction } from '../../redux/actions/poemsActions'
+import { getMyPoemsAction } from '../../redux/actions/poemsActions'
 import { deletePoemAction } from '../../redux/actions/poemActions'
 import { manageError, manageSuccess } from '../../utils/notifications'
 import { format } from 'date-fns'
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
+import { PAGINATION_LIMIT } from '../../data/constants'
 
-function MyPoems(props) {
+function MyPoems() {
     const [poems, setPoems] = useState([])
     const [filter, setFilter] = useState('')
 
@@ -27,18 +28,61 @@ function MyPoems(props) {
     // Redux
     const dispatch = useAppDispatch()
 
-    const { allPoemsQuery } = useSelector(state => state)
+    const myPoemsQuery = useSelector(state => state.myPoemsQuery)
 
+    // Initial load
+    // todo: check if i have to dispatch getAllPoemsAction as i used to do, or if this ia approach is correct
     useEffect(() => {
-        dispatch(getAllPoemsAction({}))
-    }, [])
-
-    useEffect(() => {
-        if (allPoemsQuery.item) {
-            const poemsFiltered = getPoemsByUser(allPoemsQuery.item, context?.username)
-            setPoems(poemsFiltered)
+        if (context?.userId) {
+            const queryOptions = {
+                reset: true,
+                fetch: true
+            }
+            dispatch(
+                getMyPoemsAction({
+                    params: {
+                        userId: context.userId,
+                        page: 1,
+                        limit: PAGINATION_LIMIT
+                    },
+                    options: queryOptions
+                })
+            )
         }
-    }, [JSON.stringify([allPoemsQuery, context?.username])])
+    }, [context?.userId, dispatch])
+
+    // Update local state when data changes
+    useEffect(() => {
+        if (myPoemsQuery?.item) {
+            setPoems(myPoemsQuery.item)
+        }
+    }, [JSON.stringify(myPoemsQuery?.item)])
+
+    // Infinite scroll handler
+    const handleLoadMore = () => {
+        if (!myPoemsQuery.isFetching && myPoemsQuery.hasMore && context?.userId) {
+            const nextPage = (myPoemsQuery.page || 0) + 1
+            dispatch(
+                getMyPoemsAction({
+                    params: {
+                        userId: context.userId,
+                        page: nextPage,
+                        limit: PAGINATION_LIMIT
+                    },
+                    options: {
+                        fetch: true,
+                        reset: false
+                    }
+                })
+            )
+        }
+    }
+
+    const sentinelRef = useInfiniteScroll({
+        onLoadMore: handleLoadMore,
+        isLoading: myPoemsQuery.isFetching,
+        hasMore: myPoemsQuery.hasMore
+    })
 
     const editPoem = poemId => {
         context.setState({
@@ -57,9 +101,19 @@ function MyPoems(props) {
                 context,
                 callbacks: {
                     success: () => {
+                        // Refresh the list by fetching page 1 again
+                        // todo: check if we should use updateAllPoemsCacheAfterDeletePoemAction here
                         dispatch(
-                            updateAllPoemsCacheAfterDeletePoemAction({
-                                poemId
+                            getMyPoemsAction({
+                                params: {
+                                    userId: context.userId,
+                                    page: 1,
+                                    limit: PAGINATION_LIMIT
+                                },
+                                options: {
+                                    reset: true,
+                                    fetch: true
+                                }
                             })
                         )
                         // if I delete a poem that's being edited, I need to reset the state
@@ -85,9 +139,9 @@ function MyPoems(props) {
         setFilter(event.target.value)
     }
 
-    // if (isLoading) {
-    //   return <CircularProgress />
-    // }
+    if (myPoemsQuery.isFetching && !poems.length) {
+        return <CircularProgress />
+    }
 
     return (
         <>
@@ -149,7 +203,7 @@ function MyPoems(props) {
                                 <div className='separator' />
                                 {context.user &&
                                     (poem.author === context?.username || context.userId === context.adminId) && (
-                                        <EditIcon className='poem__edit-icon' onClick={event => editPoem(poem.id)} />
+                                        <EditIcon className='poem__edit-icon' onClick={() => editPoem(poem.id)} />
                                     )}
                                 {context.user && poem.author === context?.username && (
                                     <HighlightOffSharpIcon
@@ -172,6 +226,9 @@ function MyPoems(props) {
                     )}
                 </main>
             ))}
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} style={{ height: '20px' }} />
+            {myPoemsQuery.isFetching && poems.length > 0 && <CircularProgress />}
         </>
     )
 }

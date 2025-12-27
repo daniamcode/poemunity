@@ -14,14 +14,40 @@ import { waitFor } from '@testing-library/react'
 import { AppDispatch } from '../store'
 import store from '../store/index'
 
-jest.mock('axios', () => ({
-    create: jest.fn(),
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn()
-}))
+jest.mock('axios', () => {
+    const mockGetFn = jest.fn()
+    const mockPostFn = jest.fn()
+    const mockPutFn = jest.fn()
+    const mockDeleteFn = jest.fn()
+    const mockPatchFn = jest.fn()
+
+    const mockAxiosInstance = {
+        get: mockGetFn,
+        post: mockPostFn,
+        put: mockPutFn,
+        delete: mockDeleteFn,
+        patch: mockPatchFn
+    }
+
+    const mockCreateFn = jest.fn(() => mockAxiosInstance)
+
+    return {
+        __esModule: true,
+        default: {
+            create: mockCreateFn,
+            __mockGet: mockGetFn,
+            __mockPost: mockPostFn,
+            __mockPut: mockPutFn,
+            __mockDelete: mockDeleteFn,
+            __mockPatch: mockPatchFn
+        }
+    }
+})
 jest.mock('../store/index')
+
+// Get references to the mock functions - these are used throughout the tests
+const mockGet = (axios as any).__mockGet
+const mockPost = (axios as any).__mockPost
 
 describe('getAllPoemsAction', () => {
     let dispatch: AppDispatch
@@ -102,12 +128,9 @@ describe('getAllPoemsAction', () => {
     })
 
     test('Should dispatch error when axios throws a generic error', async () => {
-        ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.get as jest.Mock).mockReturnValueOnce(
-            Promise.reject({
-                response: 'some error'
-            })
-        )
+        mockGet.mockRejectedValueOnce({
+            response: 'some error'
+        })
 
         const options = { fetch: true }
 
@@ -127,7 +150,7 @@ describe('getAllPoemsAction', () => {
 
         // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')"
         // and then "expect(spy).toHaveBeenCalledTimes(1)"
-        expect(axios.get).toHaveBeenCalledTimes(1)
+        expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
@@ -135,8 +158,7 @@ describe('getAllPoemsAction', () => {
 
     // a network error is diferent because we don't get an error as an object with a response property
     test('Should dispatch error when axios throws a network error', async () => {
-        ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.get as jest.Mock).mockReturnValueOnce(Promise.reject('Network error'))
+        mockGet.mockRejectedValueOnce('Network error')
 
         const options = { fetch: true }
 
@@ -156,7 +178,7 @@ describe('getAllPoemsAction', () => {
 
         // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')"
         // and then "expect(spy).toHaveBeenCalledTimes(1)"
-        expect(axios.get).toHaveBeenCalledTimes(1)
+        expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe('Network error')
@@ -164,12 +186,13 @@ describe('getAllPoemsAction', () => {
 
     test('Should dispatch response when axios returns data correctly', async () => {
         // this is beacuse we use Axios.create
-        ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.get as jest.Mock).mockReturnValueOnce(
-            Promise.resolve({
-                data: 'poem1'
-            })
-        )
+        mockGet.mockResolvedValueOnce({
+            data: 'poem1',
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
 
         const options = { fetch: true }
         await waitFor(() =>
@@ -221,7 +244,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
                 likes: ['12', '14']
             }
         ]
-        const finalState = [
+        const finalPoems = [
             {
                 id: '1',
                 likes: ['4']
@@ -234,7 +257,11 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
 
         ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
-                item: initialState
+                item: initialState,
+                page: 2,
+                hasMore: true,
+                total: 25,
+                totalPages: 3
             }
         })
 
@@ -244,7 +271,13 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         })(dispatch)
 
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
+            poems: finalPoems,
+            page: 2,
+            hasMore: true,
+            total: 25,
+            totalPages: 3
+        })
     })
     test('Should update cache when liking a poem', () => {
         const context = {
@@ -268,7 +301,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
                 likes: ['12', '14']
             }
         ]
-        const finalState = [
+        const finalPoems = [
             {
                 id: '1',
                 likes: ['1', '2']
@@ -281,7 +314,11 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
 
         ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
-                item: initialState
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 2,
+                totalPages: 1
             }
         })
 
@@ -291,7 +328,13 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         })(dispatch)
 
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
+            poems: finalPoems,
+            page: 1,
+            hasMore: false,
+            total: 2,
+            totalPages: 1
+        })
     })
     test('Should do nothing when liking a poem that does not exist', () => {
         const context = {
@@ -315,7 +358,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
                 likes: ['12', '14']
             }
         ]
-        const finalState = [
+        const finalPoems = [
             {
                 id: '1',
                 likes: ['1']
@@ -328,7 +371,11 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
 
         ;(store.getState as jest.Mock).mockReturnValueOnce({
             poemsListQuery: {
-                item: initialState
+                item: initialState,
+                page: 1,
+                hasMore: true,
+                total: 15,
+                totalPages: 2
             }
         })
 
@@ -338,7 +385,13 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
         })(dispatch)
 
         expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
+            poems: finalPoems,
+            page: 1,
+            hasMore: true,
+            total: 15,
+            totalPages: 2
+        })
     })
 })
 
@@ -671,12 +724,14 @@ describe('createPoemAction', () => {
     })
 
     test('Should dispatch error when axios throws a generic error', async () => {
-        ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.post as jest.Mock).mockReturnValueOnce(
-            Promise.reject({
-                response: 'some error'
-            })
-        )
+        const mockPost = (axios as any).__mockPost
+        mockPost.mockRejectedValueOnce({
+            message: 'some error',
+            response: {
+                status: 400,
+                statusText: 'Bad Request'
+            }
+        })
 
         const options = { fetch: true }
 
@@ -690,20 +745,28 @@ describe('createPoemAction', () => {
             })(dispatch)
         )
 
-        expect(axios.post).toHaveBeenCalledTimes(1) // probably is better to use "const spy = jest.spyOn(commonActions, 'postAction')" and then "expect(spy).toHaveBeenCalledTimes(1)"
+        // probably is better to use "const spy = jest.spyOn(commonActions, 'postAction')"
+        // and then "expect(spy).toHaveBeenCalledTimes(1)"
+        expect(mockPost).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.CREATE_POEM}_rejected`)
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
+        // After error serialization fix, we expect the serialized error format
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual({
+            message: 'some error',
+            status: 400,
+            statusText: 'Bad Request'
+        })
     })
 
     test('Should dispatch response when axios returns data correctly', async () => {
         // this is beacuse we use Axios.create
-        ;(axios.create as jest.Mock).mockReturnThis()
-        ;(axios.post as jest.Mock).mockReturnValueOnce(
-            Promise.resolve({
-                data: 'poem1'
-            })
-        )
+        mockPost.mockResolvedValueOnce({
+            data: 'poem1',
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
 
         const options = { fetch: true }
         await waitFor(() =>
@@ -719,5 +782,907 @@ describe('createPoemAction', () => {
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.CREATE_POEM}_fulfilled`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
+    })
+})
+
+describe('getPoemsListAction - Pagination', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
+    })
+
+    test('should include pagination params in request', async () => {
+        const spy = jest.spyOn(commonActions, 'getAction')
+        // Mock the axios call to prevent actual API call
+        mockGet.mockResolvedValueOnce({
+            data: { poems: [], total: 0, page: 2, limit: 20, totalPages: 0, hasMore: false },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const params = { page: 2, limit: 20 }
+        const options = { fetch: true }
+
+        const { getPoemsListAction } = await import('./poemsActions')
+
+        await waitFor(() => {
+            getPoemsListAction({
+                params,
+                options
+            })(dispatch)
+        })
+
+        expect(spy).toHaveBeenCalledWith({
+            type: ACTIONS.POEMS_LIST,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks: undefined
+        })
+
+        spy.mockRestore()
+    })
+
+    test('should handle paginated response with hasMore true', async () => {
+        const mockResponse = {
+            poems: [
+                { id: '1', title: 'Poem 1' },
+                { id: '2', title: 'Poem 2' }
+            ],
+            total: 50,
+            page: 1,
+            limit: 20,
+            totalPages: 3,
+            hasMore: true
+        }
+
+        const mockGet = (axios as any).__mockGet
+        mockGet.mockResolvedValueOnce({
+            data: mockResponse,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true }
+
+        const { getPoemsListAction } = await import('./poemsActions')
+
+        await waitFor(() => {
+            getPoemsListAction({
+                params: { page: 1, limit: 20 },
+                options
+            })(dispatch)
+        })
+
+        expect(mockGet).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_fulfilled`)
+    })
+
+    test('should handle paginated response with hasMore false', async () => {
+        const mockResponse = {
+            poems: [{ id: '21', title: 'Poem 21' }],
+            total: 21,
+            page: 2,
+            limit: 20,
+            totalPages: 2,
+            hasMore: false
+        }
+
+        const mockGet = (axios as any).__mockGet
+        mockGet.mockResolvedValueOnce({
+            data: mockResponse,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true }
+
+        const { getPoemsListAction } = await import('./poemsActions')
+
+        await waitFor(() => {
+            getPoemsListAction({
+                params: { page: 2, limit: 20 },
+                options
+            })(dispatch)
+        })
+
+        expect(mockGet).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_fulfilled`)
+    })
+
+    test('should handle pagination with origin filter', async () => {
+        const spy = jest.spyOn(commonActions, 'getAction')
+
+        // Mock getAction to do nothing (it returns void)
+        spy.mockImplementation(() => {})
+
+        const params = { page: 1, limit: 20, origin: 'classic' }
+        const options = { fetch: true }
+
+        const { getPoemsListAction } = await import('./poemsActions')
+
+        // Call the thunk with mocked dispatch
+        await getPoemsListAction({ params, options })(dispatch)
+
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                params: expect.objectContaining({
+                    origin: 'classic',
+                    page: 1,
+                    limit: 20
+                }),
+                options
+            })
+        )
+
+        spy.mockRestore()
+    })
+
+    test('should reset to page 1 when reset option is true', () => {
+        const options = {
+            fetch: false,
+            reset: true
+        }
+
+        import('./poemsActions').then(({ getPoemsListAction }) => {
+            getPoemsListAction({
+                params: {},
+                options
+            })(dispatch)
+
+            expect(dispatch).toHaveBeenCalled()
+            expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.POEMS_LIST}_reset`)
+        })
+    })
+
+    test('should handle empty results on last page', async () => {
+        const mockResponse = {
+            poems: [],
+            total: 20,
+            page: 3,
+            limit: 20,
+            totalPages: 1,
+            hasMore: false
+        }
+
+        const mockGet = (axios as any).__mockGet
+        mockGet.mockResolvedValueOnce({
+            data: mockResponse,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true }
+
+        await waitFor(async () => {
+            const { getPoemsListAction } = await import('./poemsActions')
+            await getPoemsListAction({
+                params: { page: 3, limit: 20 },
+                options
+            })(dispatch)
+        })
+
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_fulfilled`)
+    })
+})
+
+describe('getMyPoemsAction', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
+    })
+
+    test('should call getAction with MY_POEMS type and userId param', async () => {
+        const spy = jest.spyOn(commonActions, 'getAction')
+        mockGet.mockResolvedValueOnce({
+            data: { poems: [], total: 0, page: 1, limit: 10, totalPages: 0, hasMore: false },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true, reset: true }
+        const params = { userId: 'user-123', page: 1, limit: 10 }
+
+        const { getMyPoemsAction } = await import('./poemsActions')
+
+        await waitFor(() => {
+            getMyPoemsAction({
+                params,
+                options
+            })(dispatch)
+        })
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy).toBeCalledTimes(1)
+        expect(spy).toHaveBeenCalledWith({
+            type: ACTIONS.MY_POEMS,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks: undefined
+        })
+        spy.mockRestore()
+    })
+
+    test('should handle paginated response', async () => {
+        const mockResponse = {
+            poems: [
+                { id: '1', title: 'My Poem 1', userId: 'user-123' },
+                { id: '2', title: 'My Poem 2', userId: 'user-123' }
+            ],
+            total: 2,
+            page: 1,
+            limit: 10,
+            totalPages: 1,
+            hasMore: false
+        }
+
+        const mockGet = (axios as any).__mockGet
+        mockGet.mockResolvedValueOnce({
+            data: mockResponse,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true }
+        const params = { userId: 'user-123', page: 1, limit: 10 }
+
+        await waitFor(async () => {
+            const { getMyPoemsAction } = await import('./poemsActions')
+            await getMyPoemsAction({
+                params,
+                options
+            })(dispatch)
+        })
+
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.MY_POEMS}_fulfilled`)
+    })
+})
+
+describe('getMyFavouritePoemsAction', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        jest.clearAllMocks()
+    })
+
+    test('should call getAction with MY_FAVOURITE_POEMS type and likedBy param', async () => {
+        const spy = jest.spyOn(commonActions, 'getAction')
+        mockGet.mockResolvedValueOnce({
+            data: { poems: [], total: 0, page: 1, limit: 10, totalPages: 0, hasMore: false },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true, reset: true }
+        const params = { likedBy: 'user-123', page: 1, limit: 10 }
+
+        const { getMyFavouritePoemsAction } = await import('./poemsActions')
+
+        await waitFor(() => {
+            getMyFavouritePoemsAction({
+                params,
+                options
+            })(dispatch)
+        })
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy).toBeCalledTimes(1)
+        expect(spy).toHaveBeenCalledWith({
+            type: ACTIONS.MY_FAVOURITE_POEMS,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks: undefined
+        })
+        spy.mockRestore()
+    })
+
+    test('should handle paginated response with liked poems', async () => {
+        const mockResponse = {
+            poems: [
+                { id: '1', title: 'Favorite Poem', likes: ['user-123'] },
+                { id: '2', title: 'Another Favorite', likes: ['user-123', 'user-456'] }
+            ],
+            total: 2,
+            page: 1,
+            limit: 10,
+            totalPages: 1,
+            hasMore: false
+        }
+
+        const mockGet = (axios as any).__mockGet
+        mockGet.mockResolvedValueOnce({
+            data: mockResponse,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: {}
+        })
+
+        const options = { fetch: true }
+        const params = { likedBy: 'user-123', page: 1, limit: 10 }
+
+        await waitFor(async () => {
+            const { getMyFavouritePoemsAction } = await import('./poemsActions')
+            await getMyFavouritePoemsAction({
+                params,
+                options
+            })(dispatch)
+        })
+
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.MY_FAVOURITE_POEMS}_fulfilled`)
+    })
+})
+
+describe('updateAllPoemsCacheAfterSavePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should update poem in cache when allPoemsQuery exists', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Original Title',
+                author: 'Author 1',
+                poem: 'Original poem text',
+                likes: ['1']
+            },
+            {
+                id: '2',
+                title: 'Poem 2',
+                author: 'Author 2',
+                poem: 'Poem 2 text',
+                likes: ['2']
+            }
+        ]
+
+        const updatedPoemData = {
+            title: 'Updated Title',
+            poem: 'Updated poem text'
+        }
+
+        const expectedState = [
+            {
+                id: '2',
+                title: 'Poem 2',
+                author: 'Author 2',
+                poem: 'Poem 2 text',
+                likes: ['2']
+            },
+            {
+                id: '1',
+                title: 'Updated Title',
+                author: 'Author 1',
+                poem: 'Updated poem text',
+                likes: ['1']
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: initialState
+            }
+        })
+
+        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterSavePoemAction({
+            poem: updatedPoemData,
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(expectedState)
+    })
+
+    test('Should not crash when allPoemsQuery is undefined (cache not loaded)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: undefined
+            }
+        })
+
+        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Title' },
+            poemId: '1'
+        })(dispatch)
+
+        // Should not dispatch anything
+        expect(dispatch).not.toHaveBeenCalled()
+        // Should log a message
+        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for save poem')
+    })
+
+    test('Should not crash when allPoemsQuery is null', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: null
+            }
+        })
+
+        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Title' },
+            poemId: '1'
+        })(dispatch)
+
+        // Should not dispatch anything
+        expect(dispatch).not.toHaveBeenCalled()
+        // Should log a message
+        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for save poem')
+    })
+
+    test('Should preserve all other poems when updating one poem', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                author: 'Author 1',
+                likes: ['1']
+            },
+            {
+                id: '2',
+                title: 'Poem 2',
+                author: 'Author 2',
+                likes: ['2', '3']
+            },
+            {
+                id: '3',
+                title: 'Poem 3',
+                author: 'Author 3',
+                likes: []
+            }
+        ]
+
+        const updatedPoemData = {
+            title: 'Updated Poem 2 Title'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: initialState
+            }
+        })
+
+        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterSavePoemAction({
+            poem: updatedPoemData,
+            poemId: '2'
+        })(dispatch)
+
+        const dispatchedPayload = (dispatch as jest.Mock).mock.calls[0][0].payload
+
+        // Should have all 3 poems
+        expect(dispatchedPayload).toHaveLength(3)
+        // Should have updated poem 2
+        const updatedPoem = dispatchedPayload.find((p: any) => p.id === '2')
+        expect(updatedPoem.title).toBe('Updated Poem 2 Title')
+        expect(updatedPoem.author).toBe('Author 2')
+        expect(updatedPoem.likes).toEqual(['2', '3'])
+        // Should preserve other poems
+        expect(dispatchedPayload.find((p: any) => p.id === '1')).toBeDefined()
+        expect(dispatchedPayload.find((p: any) => p.id === '3')).toBeDefined()
+    })
+
+    test('Should handle updating a poem that does not exist in cache', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                author: 'Author 1'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: initialState
+            }
+        })
+
+        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Title' },
+            poemId: '999'
+        })(dispatch)
+
+        const dispatchedPayload = (dispatch as jest.Mock).mock.calls[0][0].payload
+
+        // Current behavior: adds a partial poem object when poem doesn't exist
+        // Note: This is not ideal behavior but tests the actual implementation
+        expect(dispatchedPayload).toHaveLength(2)
+        expect(dispatchedPayload[0].id).toBe('1')
+        // Second item will be the "updated" poem with undefined merged with update data
+        expect(dispatchedPayload[1].title).toBe('Updated Title')
+    })
+})
+
+describe('updateMyPoemsCacheAfterSavePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should update poem in myPoems cache when cache exists', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'My Original Poem',
+                author: 'Author 1',
+                poem: 'Original content',
+                userId: 'user-123',
+                likes: []
+            },
+            {
+                id: '2',
+                title: 'Another Poem',
+                author: 'Author 1',
+                poem: 'Another content',
+                userId: 'user-123',
+                likes: ['user-456']
+            }
+        ]
+
+        const updatedPoemData = {
+            title: 'My Updated Poem',
+            poem: 'Updated content'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 2,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterSavePoemAction({
+            poem: updatedPoemData,
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.MY_POEMS}_fulfilled`)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.poems).toHaveLength(2)
+        expect(payload.poems[0].id).toBe('1')
+        expect(payload.poems[0].title).toBe('My Updated Poem')
+        expect(payload.poems[0].poem).toBe('Updated content')
+        expect(payload.poems[0].author).toBe('Author 1')
+        expect(payload.poems[1].id).toBe('2')
+        expect(payload.page).toBe(1)
+        expect(payload.total).toBe(2)
+    })
+
+    test('Should not crash when myPoemsQuery is undefined (cache not loaded)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: undefined
+            }
+        })
+
+        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Title' },
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+        expect(consoleLogSpy).toHaveBeenCalledWith('My poems cache not loaded, skipping cache update for save poem')
+    })
+
+    test('Should preserve pagination metadata when updating', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                userId: 'user-123'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 2,
+                hasMore: true,
+                total: 15,
+                totalPages: 2
+            }
+        })
+
+        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Poem 1' },
+            poemId: '1'
+        })(dispatch)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.page).toBe(2)
+        expect(payload.hasMore).toBe(true)
+        expect(payload.total).toBe(15)
+        expect(payload.totalPages).toBe(2)
+    })
+
+    test('Should only update the specific poem, not others', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                likes: ['user-1']
+            },
+            {
+                id: '2',
+                title: 'Poem 2',
+                likes: ['user-2', 'user-3']
+            },
+            {
+                id: '3',
+                title: 'Poem 3',
+                likes: []
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 3,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterSavePoemAction({
+            poem: { title: 'Updated Poem 2' },
+            poemId: '2'
+        })(dispatch)
+
+        const poems = (dispatch as jest.Mock).mock.calls[0][0].payload.poems
+        expect(poems[0].title).toBe('Poem 1')
+        expect(poems[1].title).toBe('Updated Poem 2')
+        expect(poems[1].likes).toEqual(['user-2', 'user-3'])
+        expect(poems[2].title).toBe('Poem 3')
+    })
+})
+
+describe('updatePoemsListCacheAfterSavePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should update poem in poemsList cache when cache exists', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'List Poem 1',
+                author: 'Author 1',
+                poem: 'Content 1',
+                likes: []
+            },
+            {
+                id: '2',
+                title: 'List Poem 2',
+                author: 'Author 2',
+                poem: 'Content 2',
+                likes: ['user-1']
+            }
+        ]
+
+        const updatedPoemData = {
+            title: 'Updated List Poem 1',
+            poem: 'Updated content 1'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: true,
+                total: 50,
+                totalPages: 3
+            }
+        })
+
+        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterSavePoemAction({
+            poem: updatedPoemData,
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.poems).toHaveLength(2)
+        expect(payload.poems[0].id).toBe('1')
+        expect(payload.poems[0].title).toBe('Updated List Poem 1')
+        expect(payload.poems[0].poem).toBe('Updated content 1')
+        expect(payload.poems[1].id).toBe('2')
+        expect(payload.page).toBe(1)
+        expect(payload.hasMore).toBe(true)
+        expect(payload.total).toBe(50)
+    })
+
+    test('Should not crash when poemsListQuery is undefined (cache not loaded)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: undefined
+            }
+        })
+
+        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterSavePoemAction({
+            poem: { title: 'Updated Title' },
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+        expect(consoleLogSpy).toHaveBeenCalledWith('Poems list cache not loaded, skipping cache update for save poem')
+    })
+
+    test('Should preserve pagination metadata when updating', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: initialState,
+                page: 3,
+                hasMore: false,
+                total: 45,
+                totalPages: 3
+            }
+        })
+
+        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterSavePoemAction({
+            poem: { title: 'Updated Poem 1' },
+            poemId: '1'
+        })(dispatch)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.page).toBe(3)
+        expect(payload.hasMore).toBe(false)
+        expect(payload.total).toBe(45)
+        expect(payload.totalPages).toBe(3)
+    })
+
+    test('Should handle updating poem across multiple pages', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Page 1 Poem 1'
+            },
+            {
+                id: '2',
+                title: 'Page 1 Poem 2'
+            },
+            {
+                id: '21',
+                title: 'Page 2 Poem 1'
+            },
+            {
+                id: '22',
+                title: 'Page 2 Poem 2'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: initialState,
+                page: 2,
+                hasMore: false,
+                total: 4,
+                totalPages: 2
+            }
+        })
+
+        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterSavePoemAction({
+            poem: { title: 'Updated Page 2 Poem 1' },
+            poemId: '21'
+        })(dispatch)
+
+        const poems = (dispatch as jest.Mock).mock.calls[0][0].payload.poems
+        expect(poems).toHaveLength(4)
+        expect(poems[2].id).toBe('21')
+        expect(poems[2].title).toBe('Updated Page 2 Poem 1')
+        expect(poems[0].title).toBe('Page 1 Poem 1')
+        expect(poems[1].title).toBe('Page 1 Poem 2')
     })
 })

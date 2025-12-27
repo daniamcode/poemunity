@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
@@ -43,7 +44,8 @@ const ListItem = ({ poem, filter, context }: Props) => {
                     success: () => {
                         // todo: when I update this cache, it has effects on many queries.
                         // Maybe I need some optimisation, in the frontend or in the backend
-                        // for now I update the cache needed for this page, but I need to update the cache for the other pages too if I don't query the backend when navigating
+                        // for now I update the cache needed for this page, but I need to update the cache for
+                        // the other pages too if I don't query the backend when navigating
                         dispatch(
                             updatePoemsListCacheAfterDeletePoemAction({
                                 poemId
@@ -108,11 +110,19 @@ const ListItem = ({ poem, filter, context }: Props) => {
     }
 
     const editPoem = (poemId: string) => {
-        const newPath = '/profile'
-        history.push(newPath)
+        // Set the poem to edit in context
+        // Only pass the property we want to update, not the entire context
         context.setState({
-            ...context,
             elementToEdit: poemId
+        })
+        // Navigate to profile and pass the ENTIRE poem data in location state
+        // This eliminates flicker by allowing Profile to initialize immediately
+        history.push({
+            pathname: '/profile',
+            state: {
+                elementToEdit: poemId,
+                poemData: poem // Pass the full poem object to avoid fetching
+            }
         })
     }
 
@@ -157,6 +167,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
                                     className='poem__likes-icon'
                                     onClick={event => onLike(event, poem.id)}
                                     to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                    data-testid='like-icon'
                                 />
                             )}
                         {context.user &&
@@ -166,10 +177,15 @@ const ListItem = ({ poem, filter, context }: Props) => {
                                     className='poem__unlikes-icon'
                                     onClick={event => onLike(event, poem.id)}
                                     to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
+                                    data-testid='unlike-icon'
                                 />
                             )}
                         {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
-                            <EditIcon className='poem__edit-icon' onClick={event => editPoem(poem.id)} />
+                            <EditIcon
+                                className='poem__edit-icon'
+                                onClick={() => editPoem(poem.id)}
+                                data-testid='edit-poem'
+                            />
                         )}
                         {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
                             <HighlightOffSharpIcon

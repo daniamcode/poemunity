@@ -35,6 +35,7 @@ describe('ConfigureStore', () => {
         // the environment variable is set to test with the afterEach hook (default value)
         // const store = configureStore();
 
+        // eslint-disable-next-line no-undef
         expect(process.env.NODE_ENV).toBe('test')
         expect(store).toBeDefined()
     })

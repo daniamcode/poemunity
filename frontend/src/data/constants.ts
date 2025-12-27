@@ -2,15 +2,12 @@ export const WEB_SUBTITLE = 'Your poem community!'
 export const CATEGORIES_TITLE = 'Categories'
 export const CATEGORIES = ['Anniversary', 'Friendship', 'Funny', 'Haikus', 'Hope', 'Life', 'Love', 'Sad']
 export const ALL = 'All'
-export const PROFILE_TITLE = "'s Profile"
 export const PROFILE_SUBTITLE_CREATE = 'Insert a poem:'
 export const PROFILE_SUBTITLE_UPDATE = 'Modify a poem:'
 export const PROFILE_SELECT_TITLE_AUTHOR = "Author's Id: "
-export const PROFILE_SELECT_TITLE_TITLE = 'Title: '
 export const PROFILE_SELECT_TITLE = 'Title'
 export const PROFILE_SELECT_LIKES = 'Likes'
-export const PROFILE_SELECT_CATEGORY_TITLE = 'Category: '
-export const PROFILE_SELECT_CATEGORY = 'Select'
+export const PROFILE_SELECT_CATEGORY = 'Select a category'
 export const PROFILE_POEM_PLACEHOLDER = 'Insert your poem here'
 export const PROFILE_SEND_POEM = 'Send'
 export const PROFILE_RESET_POEM = 'Reset'
@@ -32,3 +29,6 @@ export const RANKING_POETS_TITLE = 'Poets'
 export const RANKING_POINTS_TITLE = 'Points'
 export const POEM_POINTS = 3
 export const LIKE_POINTS = 1
+
+// Pagination
+export const PAGINATION_LIMIT = 10

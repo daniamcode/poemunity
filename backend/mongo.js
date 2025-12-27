@@ -1,22 +1,33 @@
 const mongoose = require('mongoose')
 
-const { MONGODB, MONGODB_PRE, NODE_ENV } = process.env
+// Suppress strictQuery warning (will be false by default in Mongoose 7)
+mongoose.set('strictQuery', false)
 
-const connectionString = NODE_ENV === 'development'
-  ? MONGODB_PRE
-  : MONGODB
+const { MONGODB, MONGODB_PRE, MONGODB_TEST, NODE_ENV } = process.env
 
-mongoose.connect(connectionString, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('Database connected')
-  }).catch(err => {
-    console.error(err)
+// Don't auto-connect in test environment (jest.setup.js will handle it)
+if (NODE_ENV !== 'test') {
+  let connectionString
+  if (NODE_ENV === 'development') {
+    connectionString = MONGODB_PRE
+  } else {
+    connectionString = MONGODB
+  }
+
+  mongoose.connect(connectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
+    .then(() => {
+      console.log('Database connected')
+    }).catch(err => {
+      console.error(err)
+    })
 
-process.on('uncaughtException', error => {
-  console.error(error)
-  mongoose.disconnect()
-})
+  process.on('uncaughtException', error => {
+    console.error(error)
+    mongoose.disconnect()
+  })
+}
+
+module.exports = mongoose

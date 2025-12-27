@@ -29,16 +29,22 @@ const useStyles = makeStyles({
     }
 })
 
+interface RankItem {
+    author: string
+    picture: string
+    points: number
+}
+
 export default function Ranking() {
     interface RankingStates {
         poems: Poem[]
-        rank: object
+        rank: RankItem[]
     }
     const classes = useStyles()
 
     const [poems, setPoems] = useState<RankingStates['poems']>([])
 
-    const [rank, setRank] = useState<RankingStates['rank']>({})
+    const [rank, setRank] = useState<RankingStates['rank']>([])
 
     // Redux
     const dispatch = useAppDispatch()
@@ -46,10 +52,13 @@ export default function Ranking() {
     const { rankingQuery } = useSelector((state: RootState) => state)
 
     useEffect(() => {
+        // Fetch all user poems for ranking calculation (no pagination params)
+        // TODO: In the future, move ranking calculation to backend to avoid fetching all poems
         dispatch(
             getRankingAction({
                 params: {
                     origin: 'user'
+                    // No page/limit - fetches all poems for accurate ranking
                 }
             })
         )
@@ -59,14 +68,12 @@ export default function Ranking() {
         if (rankingQuery?.item) {
             setPoems(rankingQuery?.item)
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify(rankingQuery?.item)])
 
     useEffect(() => {
         if (poems) {
             setRank(getRanking(poems, POEM_POINTS, LIKE_POINTS))
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify([poems, POEM_POINTS, LIKE_POINTS])])
 
     if (rankingQuery.isFetching) {
@@ -86,7 +93,7 @@ export default function Ranking() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.keys(rank).map((element, index) => (
+                        {rank.slice(0, 10).map((item, index) => (
                             <TableRow key={index}>
                                 <TableCell
                                     className='ranking__picture-container'
@@ -95,12 +102,12 @@ export default function Ranking() {
                                     scope='row'
                                 >
                                     <div className='ranking__picture-wrap'>
-                                        <img className='ranking__picture' src={rank[element]?.picture} />
-                                        <p className='ranking__picture-description'>{rank[element]?.author}</p>
+                                        <img className='ranking__picture' src={item?.picture} />
+                                        <p className='ranking__picture-description'>{item?.author}</p>
                                     </div>
                                 </TableCell>
                                 <TableCell className='ranking__number' align='center'>
-                                    {rank[element]?.points}
+                                    {item?.points}
                                 </TableCell>
                             </TableRow>
                         ))}

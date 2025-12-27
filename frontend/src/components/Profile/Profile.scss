@@ -1,145 +1,159 @@
+// Main container
 .profile__main {
-    height: 550px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
-.profile__title {
-    display: flex;
-    justify-content: center;
-    font-size: 24px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #eee;
-    width: 80%;
-    margin: auto;
-}
-
+// Intro section - very compact version
 .profile__intro {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 1600px;
-    margin-top: 10px;
-    margin-left: 0px;
+    padding: 15px 10px;
+    background-color: #fff;
+    z-index: 50;
 }
 
 .profile__image {
-    display: inline-block;
-    // background-image: url(../../icons/profile.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    width: 35%;
-    margin: 35px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
 }
 
 .profile__personal-data {
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-}
-
-.profile__insert-poem {
-    height: 70%;
+    width: 100%;
+    max-width: 600px;
 }
 
 .profile__insert-poem-title {
     font-size: 20px;
+    margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .profile__insert-poem-inputs {
-    margin-bottom: 20px;
-    margin-right: 10px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    width: 90%;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .profile__insert-poem-input {
-    padding: 0.15rem;
-    font-size: 1.2rem;
+    padding: 8px;
+    font-size: 16px;
+    width: 100%;
 }
 
 .profile__text-area {
-    width: 70%;
-    height: 230px;
-    font-size: 24px;
-    margin-left: 40px;
-    z-index: 150;
+    width: 100%;
+    height: 120px;
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 10px;
+    resize: none;
 }
 
 .profile__send-poem {
-    font-size: 22px;
-    margin-top: 12px;
-    margin-left: 40px;
-    margin-bottom: 30px;
-    padding: 6px;
-    width: 15rem;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
     background-color: red;
     color: white;
+    border: none;
     cursor: pointer;
+
     &[disabled] {
-        background-color: #eee;
-        color: black;
+        background-color: #ccc;
+        color: #666;
         cursor: not-allowed;
+    }
+
+    &:hover:not([disabled]) {
+        background-color: green;
     }
 }
 
-.profile__send-poem:hover {
-    background-color: green;
-    color: white;
-    &[disabled] {
-        background-color: #eee;
-        color: black;
-        cursor: not-allowed;
-    }
+// Tabs section
+.profile__tabs-header {
+    background-color: #fff;
+    z-index: 40;
+    margin-top: 20px;
+}
+
+.profile__tabs-content {
+    margin-top: 0;
 }
 
 .profile__myPoems {
-    margin-top: -125px;
+    margin-top: 0;
 }
 
-.profile__tabs {
-    z-index: -100;
-}
-
+// Tablet and up
 @media screen and (min-width: 700px) {
-    .profile__title {
-        font-size: 28px;
-    }
-
-    .profile__myPoems {
-        margin-top: -72px;
-    }
-}
-
-@media screen and (min-width: 900px) {
-    .profile__title {
-        font-size: 32px;
-    }
-
     .profile__intro {
-        display: flex;
         flex-direction: row;
-        height: 450px;
-        margin-left: 10vw;
+        gap: 20px;
+        padding: 15px 20px;
+        top: 130px;
     }
 
     .profile__image {
-        height: 50%;
-        width: auto;
+        width: 100px;
+        height: 100px;
+        margin-bottom: 0;
+    }
+
+    .profile__personal-data {
+        flex: 1;
+        max-width: 700px;
+    }
+
+    .profile__insert-poem-inputs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .profile__insert-poem-input {
+        flex: 1;
+        min-width: 180px;
     }
 
     .profile__text-area {
-        margin-left: 80px;
+        font-size: 16px;
     }
 
-    .profile__send-poem {
-        margin-left: 80px;
+    .profile__tabs-header {
+        top: 420px;
+    }
+}
+
+// Desktop
+@media screen and (min-width: 900px) {
+    .profile__intro {
+        position: sticky;
+        top: 120px;
+        padding: 20px 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        top: 65px;
+    }
+
+    .profile__image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile__text-area {
+        font-size: 16px;
+    }
+
+    .profile__tabs-header {
+        position: sticky;
+        top: 370px;
     }
 }

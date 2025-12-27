@@ -20,6 +20,9 @@
 
     .dashboard__accordion {
         display: block;
+        position: sticky;
+        top: 100px;
+        align-self: flex-start;
         width: 15%;
         margin-left: 3%;
         margin-right: 3%;
@@ -32,6 +35,9 @@
 
     .dashboard__ranking {
         display: block;
+        position: sticky;
+        top: 100px;
+        align-self: flex-start;
         width: 16%;
         margin-right: 4%;
     }

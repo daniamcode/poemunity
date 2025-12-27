@@ -14,11 +14,13 @@ const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
 
 app.use(express.json())
-app.use(cors({
-  origin: 'http://localhost:3000', // or the origin of your frontend
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-}))
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // or the origin of your frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true
+  })
+)
 
 console.log(process.env.NODE_ENV)
 console.log(process.env)
@@ -33,7 +35,8 @@ app.use('/api/users', usersRouter)
 app.use('/api/poems', poemsRouter)
 app.use('/api/poems', poemRouter)
 
-const server = app.listen(port, () => debug(`running on port ${port}`))
+// Only start server if not in test mode
+const server = process.env.NODE_ENV !== 'test' ? app.listen(port, () => debug(`running on port ${port}`)) : null
 
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {

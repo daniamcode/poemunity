@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires, no-undef, no-console, max-len */
 // http is node native, not a npm library
 const { createServer } = require('http')
 

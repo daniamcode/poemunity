@@ -29,14 +29,16 @@ function App() {
         username: '',
         picture: '',
         config: {},
+        // eslint-disable-next-line no-undef
         adminId: process.env.REACT_APP_ADMIN ?? '',
         setState(data: Context) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
             const { setState, ...res } = data
-            const newState = {
-                ...contextState,
+            // Use functional setState to avoid stale closure issues
+            setContextState(prevState => ({
+                ...prevState,
                 ...res
-            }
-            setContextState(newState)
+            }))
         }
     })
 
@@ -52,8 +54,8 @@ function App() {
                             <Route path='/profile' component={Profile} />
                             <Route path='/login' component={Login} />
                             <Route path='/register' component={Register} />
-                            <Route path='/:genre' exact component={Dashboard} />
                             <Route path='/detail/:poemId' exact component={Detail} />
+                            <Route path='/:genre' exact component={Dashboard} />
                             <Route component={PageNotFound} />
                         </Switch>
                     </div>

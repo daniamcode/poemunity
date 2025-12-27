@@ -50,11 +50,13 @@ describe('MyFavouritePoems component', () => {
 describe('Login component', () => {
     let wrapper = null
     const wrapperFactory = () => {
-        return ({ children }) => (
+        const TestWrapper = ({ children }) => (
             <Provider store={store}>
                 <Router>{children}</Router>
             </Provider>
         )
+        TestWrapper.displayName = 'TestWrapper'
+        return TestWrapper
     }
 
     afterEach(() => {
@@ -90,7 +92,9 @@ describe('Profile component', () => {
     test('renders', () => {
         const { container } = render(
             <Provider store={store}>
-                <Profile />
+                <Router>
+                    <Profile />
+                </Router>
             </Provider>
         )
         expect(container).not.toBeNull()
