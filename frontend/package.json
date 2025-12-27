@@ -2,7 +2,9 @@
     "name": "frontend",
     "version": "1.0.0",
     "scripts": {
+        "build": "NODE_ENV=production node build.js",
         "clean:build": "rimraf ./build",
+        "copy:backend": "rimraf ../backend/public && cp -r ./build ../backend/public",
         "coverage": "jest --coverage",
         "cypress": "cypress open",
         "cypress:run": "cypress run",
@@ -12,7 +14,7 @@
         "lint": "node --no-deprecation ./node_modules/eslint/bin/eslint.js --max-warnings=0 --no-error-on-unmatched-pattern ./src",
         "lint:fix": "pnpm lint --fix",
         "prettier": "npx prettier ./src --write",
-        "prod": "NODE_ENV=production node build.js",
+        "prod": "pnpm build && pnpm copy:backend",
         "test": "jest",
         "test:all": "pnpm test && pnpm cypress:run",
         "test:changed": "jest --onlyChanged",

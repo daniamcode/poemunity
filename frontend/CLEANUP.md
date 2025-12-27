@@ -1405,4 +1405,6 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Ask IA to add component tests from Cypress, not just e2e, and see if it's useful
 -   Add to the pipeline that all tests have to pass, including cypress ones
 -   Fix sticky header in Profile, as when scrolling, the search is bypassing the header view
--   Cypress inserts shouldn't go inoto real database
+-   Cypress inserts shouldn't go into real database
+-   Check "copy:backend" in package.json, as that's something that should also do the pipeline, to avoid manual
+    copy/paste, see if it already does it or not

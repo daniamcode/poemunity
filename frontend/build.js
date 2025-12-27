@@ -104,17 +104,18 @@ async function startServer() {
         ...specificConfig
     }
 
-    const esbuildConfigReload = {
-        ...esbuildConfigBase,
-        banner: {
-            js: `
+    // Only create reload config if actually in reload mode
+    const esbuildConfig = isReloadMode
+        ? {
+              ...esbuildConfigBase,
+              banner: {
+                  js: `
         (() => new EventSource('http://localhost:${RELOAD_PORT}/live').addEventListener('message', e => location.reload()))();
       `
-        },
-        plugins: [...(esbuildConfigBase.plugins || []), esbuildPluginLiveReload({ port: RELOAD_PORT })]
-    }
-
-    const esbuildConfig = isReloadMode ? esbuildConfigReload : esbuildConfigBase
+              },
+              plugins: [...(esbuildConfigBase.plugins || []), esbuildPluginLiveReload({ port: RELOAD_PORT })]
+          }
+        : esbuildConfigBase
 
     // Copy public assets (index.html) to build directory
     copyPublicAssets()
