@@ -1,9 +1,11 @@
+/* eslint-disable max-lines */
 import { renderHook, act } from '@testing-library/react-hooks'
 import { Provider } from 'react-redux'
 import { useProfileForm } from './useProfileForm'
 import store from '../../../redux/store'
 import * as poemActions from '../../../redux/actions/poemActions'
 import * as poemsActions from '../../../redux/actions/poemsActions'
+import { manageSuccess, manageError } from '../../../utils/notifications'
 import React from 'react'
 
 // Mock the notification utils
@@ -449,5 +451,440 @@ describe('useProfileForm', () => {
         expect(poemsActions.updateAllPoemsCacheAfterSavePoemAction).not.toHaveBeenCalled()
         expect(poemsActions.updateMyPoemsCacheAfterSavePoemAction).not.toHaveBeenCalled()
         expect(poemsActions.updatePoemsListCacheAfterSavePoemAction).not.toHaveBeenCalled()
+    })
+
+    test('should initialize from location state poemData when provided', () => {
+        const locationState = {
+            elementToEdit: 'poem-456',
+            poemData: {
+                id: 'poem-456',
+                title: 'Location State Poem',
+                poem: 'Content from location state',
+                userId: 'user-789',
+                genre: 'epic',
+                origin: 'classic',
+                likes: ['user1', 'user2', 'user3']
+            }
+        }
+
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-456'
+        }
+
+        const { result } = renderHook(
+            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, locationState),
+            { wrapper }
+        )
+
+        expect(result.current.poem).toEqual({
+            title: 'Location State Poem',
+            content: 'Content from location state',
+            fakeId: 'user-789',
+            category: 'epic',
+            origin: 'classic',
+            likes: 'user1,user2,user3'
+        })
+    })
+
+    test('should initialize from poemsListQuery cache when poemQuery is empty', () => {
+        const mockPoemsListQueryWithData = {
+            item: [
+                {
+                    id: 'poem-111',
+                    title: 'Poem from List',
+                    poem: 'Content from list cache',
+                    userId: 'user-222',
+                    genre: 'romance',
+                    origin: 'user',
+                    likes: ['user5']
+                },
+                {
+                    id: 'poem-222',
+                    title: 'Another Poem',
+                    poem: 'More content',
+                    userId: 'user-333',
+                    genre: 'nature',
+                    origin: 'user',
+                    likes: []
+                }
+            ]
+        }
+
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-111'
+        }
+
+        const { result } = renderHook(
+            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQueryWithData, undefined),
+            { wrapper }
+        )
+
+        expect(result.current.poem).toEqual({
+            title: 'Poem from List',
+            content: 'Content from list cache',
+            fakeId: 'user-222',
+            category: 'romance',
+            origin: 'user',
+            likes: 'user5'
+        })
+    })
+
+    test('should sync elementToEdit from location state to context', () => {
+        const locationState = {
+            elementToEdit: 'poem-sync-test',
+            poemData: {
+                id: 'poem-sync-test',
+                title: 'Test',
+                poem: 'Content',
+                userId: 'user-123',
+                genre: 'test',
+                origin: 'user',
+                likes: []
+            }
+        }
+
+        const contextWithDifferentEdit = {
+            ...mockContext,
+            elementToEdit: 'different-poem-id'
+        }
+
+        renderHook(() => useProfileForm(contextWithDifferentEdit, mockPoemQuery, mockPoemsListQuery, locationState), {
+            wrapper
+        })
+
+        expect(mockContext.setState).toHaveBeenCalledWith({ elementToEdit: 'poem-sync-test' })
+    })
+
+    test('should dispatch getPoemAction with reset when not editing', () => {
+        renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), { wrapper })
+
+        expect(poemActions.getPoemAction).toHaveBeenCalledWith({
+            options: { reset: true, fetch: false }
+        })
+    })
+
+    test('should dispatch getPoemAction to fetch poem when editing and not in cache', () => {
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-not-in-cache'
+        }
+
+        renderHook(() => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, undefined), { wrapper })
+
+        expect(poemActions.getPoemAction).toHaveBeenCalledWith({
+            params: { poemId: 'poem-not-in-cache' },
+            options: { reset: false, fetch: true }
+        })
+    })
+
+    test('should NOT fetch poem when initialized from location state cache', () => {
+        const locationState = {
+            elementToEdit: 'poem-cached',
+            poemData: {
+                id: 'poem-cached',
+                title: 'Cached Poem',
+                poem: 'Cached content',
+                userId: 'user-123',
+                genre: 'test',
+                origin: 'user',
+                likes: []
+            }
+        }
+
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-cached'
+        }
+
+        ;(poemActions.getPoemAction as jest.Mock).mockClear()
+
+        renderHook(() => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, locationState), { wrapper })
+
+        // Should not call getPoemAction with fetch: true because data is from location state
+        expect(poemActions.getPoemAction).not.toHaveBeenCalledWith(
+            expect.objectContaining({
+                params: { poemId: 'poem-cached' },
+                options: { reset: false, fetch: true }
+            })
+        )
+    })
+
+    test('should create a new poem when handleSend is called and not editing', () => {
+        ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.success) {
+                    callbacks.success({ id: 'new-poem-123' })
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        act(() => {
+            result.current.updatePoemField('title', 'New Poem')
+            result.current.updatePoemField('content', 'New poem content')
+            result.current.updatePoemField('category', 'love')
+        })
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(poemsActions.createPoemAction).toHaveBeenCalledWith(
+            expect.objectContaining({
+                poem: expect.objectContaining({
+                    title: 'New Poem',
+                    poem: 'New poem content'
+                }),
+                context: mockContext
+            })
+        )
+    })
+
+    test('should update cache after creating a poem successfully', () => {
+        const mockResponse = { id: 'new-poem-456', title: 'Created Poem' }
+
+        ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.success) {
+                    callbacks.success(mockResponse)
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        act(() => {
+            result.current.updatePoemField('title', 'Test Create')
+            result.current.updatePoemField('content', 'Test content')
+        })
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(poemsActions.updateAllPoemsCacheAfterCreatePoemAction).toHaveBeenCalledWith({
+            response: mockResponse
+        })
+    })
+
+    test('should reset form after creating a poem', () => {
+        ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.success) {
+                    callbacks.success({ id: 'new-poem' })
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        act(() => {
+            result.current.updatePoemField('title', 'Will be reset')
+            result.current.updatePoemField('content', 'Will be reset too')
+        })
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        // Form should be reset to initial state
+        expect(result.current.poem).toEqual({
+            content: '',
+            fakeId: '',
+            title: '',
+            origin: '',
+            category: '',
+            likes: []
+        })
+    })
+
+    test('should call manageError when create poem fails', () => {
+        ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.error) {
+                    callbacks.error()
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        act(() => {
+            result.current.updatePoemField('title', 'Failed Poem')
+        })
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(manageError).toHaveBeenCalledWith('Sorry. There was an error creating the poem')
+    })
+
+    test('should call preventDefault on handleSend', () => {
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        const mockEvent = {
+            preventDefault: jest.fn()
+        } as unknown as React.MouseEvent<HTMLButtonElement>
+
+        act(() => {
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(mockEvent.preventDefault).toHaveBeenCalled()
+    })
+
+    test('should call preventDefault on handleReset', () => {
+        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
+            wrapper
+        })
+
+        const mockEvent = {
+            preventDefault: jest.fn()
+        } as unknown as React.MouseEvent<HTMLButtonElement>
+
+        act(() => {
+            result.current.handleReset(mockEvent)
+        })
+
+        expect(mockEvent.preventDefault).toHaveBeenCalled()
+    })
+
+    test('should clear elementToEdit when handleReset is called', () => {
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-to-clear'
+        }
+
+        const { result } = renderHook(
+            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, undefined),
+            { wrapper }
+        )
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleReset(mockEvent)
+        })
+
+        expect(mockContext.setState).toHaveBeenCalledWith({ elementToEdit: '' })
+    })
+
+    test('should call manageSuccess when save poem succeeds', () => {
+        const mockPoemQueryWithItem = {
+            item: {
+                id: 'poem-123',
+                title: 'Test',
+                poem: 'Content',
+                userId: 'user-123',
+                genre: 'test',
+                origin: 'user',
+                likes: []
+            }
+        }
+
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-123'
+        }
+
+        ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.success) {
+                    callbacks.success()
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(
+            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            { wrapper }
+        )
+
+        act(() => {
+            result.current.updatePoemField('title', 'Updated')
+        })
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(manageSuccess).toHaveBeenCalledWith('Poem saved')
+    })
+
+    test('should call manageError when save poem fails', () => {
+        const mockPoemQueryWithItem = {
+            item: {
+                id: 'poem-123',
+                title: 'Test',
+                poem: 'Content',
+                userId: 'user-123',
+                genre: 'test',
+                origin: 'user',
+                likes: []
+            }
+        }
+
+        const contextWithEdit = {
+            ...mockContext,
+            elementToEdit: 'poem-123'
+        }
+
+        ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
+            return () => {
+                if (callbacks && callbacks.error) {
+                    callbacks.error()
+                }
+                return Promise.resolve()
+            }
+        })
+
+        const { result } = renderHook(
+            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            { wrapper }
+        )
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleSend(mockEvent)
+        })
+
+        expect(manageError).toHaveBeenCalledWith('Sorry. There was an error saving the poem')
     })
 })

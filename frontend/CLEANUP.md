@@ -105,11 +105,13 @@ This document outlines potential code cleanups and improvements for the Poemunit
 -   [ ] Test wrapper types not properly defined in `useProfileForm.test.tsx`
 -   [ ] Snapshot tests may be outdated or missing
 -   [ ] **Inconsistent test selectors**: Replace `getByRole`, `getByText`, etc. with `getByTestId` for more stable tests
+
     -   Current: Mix of semantic queries (`getByRole('progressbar')`) and text queries (`getByText('Title')`)
     -   Target: Consistent use of `data-testid` attributes for all test selections
     -   Benefits: More stable tests, less brittle to UI text changes, explicit test hooks
     -   Files affected: All `.test.tsx`, `.test.jsx` files
     -   Example:
+
         ```typescript
         // Before
         expect(screen.getByRole('progressbar')).toBeInTheDocument()
@@ -258,10 +260,10 @@ This document outlines potential code cleanups and improvements for the Poemunit
     -   Check why the same endpoint is called multiple times during route changes
     -   **Root cause**: Frontend is fetching all data then filtering client-side (by category, genre, etc.)
     -   **Proposed solution**: Move filtering logic to backend
-        - Create dedicated endpoints for filtered data (e.g., `/api/poems/category/:category`)
-        - Use query parameters for filtering (e.g., `/api/poems?category=love&genre=classic`)
-        - Reduce data transfer and improve performance
-        - Prevent unnecessary re-fetches
+        -   Create dedicated endpoints for filtered data (e.g., `/api/poems/category/:category`)
+        -   Use query parameters for filtering (e.g., `/api/poems?category=love&genre=classic`)
+        -   Reduce data transfer and improve performance
+        -   Prevent unnecessary re-fetches
     -   **Impact**: Significant performance improvement, especially on mobile/slow connections
     -   **Files to audit**: All components that fetch poems and filter client-side
 
@@ -580,6 +582,7 @@ This document outlines potential code cleanups and improvements for the Poemunit
     - **Tests**: Coverage > 80%
 
 3. **Improve Existing Tests**
+
     - [ ] Refactor tests to use test factories
     - [ ] Replace implementation-focused tests with behavior tests
     - [ ] Add edge case coverage
@@ -590,6 +593,7 @@ This document outlines potential code cleanups and improvements for the Poemunit
     - **Tests**: All tests pass and are maintainable
 
 4. **Integration Testing with Cypress**
+
     - [ ] Install and configure Cypress
     - [ ] Set up TypeScript support for Cypress
     - [ ] Create integration test suites for component interactions
@@ -941,6 +945,7 @@ This document outlines potential code cleanups and improvements for the Poemunit
 #### 13.1 Pagination Constants ✅ **COMPLETED**
 
 **What Changed:**
+
 -   [x] Created `PAGINATION_LIMIT = 10` constant in `/frontend/src/data/constants.ts`
 -   [x] Updated all paginated components to use this shared constant:
     -   `List.tsx` (main feed, infinite scroll)
@@ -948,11 +953,13 @@ This document outlines potential code cleanups and improvements for the Poemunit
     -   `MyFavouritePoems.jsx` (user's liked poems, infinite scroll)
 
 **Why:**
+
 -   Centralizes pagination configuration
 -   Easy to adjust limit across all components from one place
 -   Prevents inconsistencies between components
 
 **Tests:**
+
 -   ✅ All components import and use `PAGINATION_LIMIT` correctly
 -   ✅ No hardcoded `const PAGINATION_LIMIT = 10` remains in component files
 
@@ -961,35 +968,40 @@ This document outlines potential code cleanups and improvements for the Poemunit
 #### 13.2 Backend API Enhancements ✅ **COMPLETED**
 
 **What Changed:**
+
 -   [x] Enhanced `GET /api/poems` endpoint with new filters:
     -   `?userId=xxx` - Filter poems by author (for MyPoems component)
     -   `?likedBy=xxx` - Filter poems liked by user (for MyFavouritePoems component)
     -   `?origin=xxx` - Filter by origin (existing, still works)
 -   [x] Restored dual-mode API behavior:
-    -   **With pagination params (`?page=x&limit=y`)**: Returns paginated response `{ poems, total, page, limit, totalPages, hasMore }`
+    -   **With pagination params (`?page=x&limit=y`)**: Returns paginated response
+        `{ poems, total, page, limit, totalPages, hasMore }`
     -   **Without pagination params**: Returns simple array `[poem1, poem2, ...]` (for ranking calculation)
 
 **Backend Code** (`backend/src/controllers/poems.js`):
+
 ```javascript
 // Check if pagination is requested
 const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
 
 if (isPaginationRequested) {
-  // ... paginated response
+    // ... paginated response
 } else {
-  // No pagination - return all poems (used for ranking)
-  // TODO: In the future, move ranking calculation to backend
-  const poems = await Poem.find(filter).sort({ date: -1 })
-  res.json(poems)
+    // No pagination - return all poems (used for ranking)
+    // TODO: In the future, move ranking calculation to backend
+    const poems = await Poem.find(filter).sort({ date: -1 })
+    res.json(poems)
 }
 ```
 
 **Why:**
+
 -   MyPoems/MyFavouritePoems need server-side filtering for efficiency
 -   Ranking needs ALL poems for accurate point calculation
 -   Flexible API supports both use cases without breaking changes
 
 **Tests:**
+
 -   ✅ Backend tests verify both paginated and non-paginated responses
 -   ✅ Tests verify `userId` and `likedBy` filters work correctly
 -   ✅ Tests verify filters can be combined (e.g., `userId` + `origin`)
@@ -999,12 +1011,14 @@ if (isPaginationRequested) {
 #### 13.3 Ranking Component Optimization ⚠️ **TEMPORARY SOLUTION**
 
 **Current Implementation:**
+
 -   [x] Ranking component fetches **ALL** user poems (no pagination params)
 -   [x] Frontend calculates ranking using `getRanking()` utility
 -   [x] Displays **top 10 authors** using `.slice(0, 10)`
 -   [x] Accurate point calculation: `(poems × 3) + (likes × 1)`
 
 **Component Code** (`frontend/src/components/Ranking/Ranking.tsx`):
+
 ```typescript
 useEffect(() => {
   // Fetch all user poems for ranking calculation (no pagination params)
@@ -1026,11 +1040,13 @@ useEffect(() => {
 ```
 
 **Why This Approach:**
+
 -   ✅ **Accurate**: Calculates ranking from ALL poems, not just a sample
 -   ✅ **Simple**: Reuses existing frontend calculation logic
 -   ⚠️ **Performance**: Fetches all poems (could be hundreds/thousands)
 
 **Future Optimization (TODO):**
+
 ```javascript
 // TODO: backend/src/controllers/poems.js
 // Add new endpoint: GET /api/poems/ranking
@@ -1046,6 +1062,7 @@ useEffect(() => {
 ```
 
 **Tests:**
+
 -   ✅ Frontend tests verify top 10 slice works
 -   ✅ Tests verify ranking with large datasets (100+ poems)
 -   ✅ Backend tests verify non-paginated response returns full array
@@ -1055,22 +1072,26 @@ useEffect(() => {
 #### 13.4 Component Pagination Implementation ✅ **COMPLETED**
 
 **MyPoems Component:**
+
 -   [x] Uses `getMyPoemsAction({ params: { userId, page, limit } })`
 -   [x] Infinite scroll with `useInfiniteScroll` hook
 -   [x] Fetches user's own poems only (server-side filter)
 -   [x] Refreshes on delete
 
 **MyFavouritePoems Component:**
+
 -   [x] Uses `getMyFavouritePoemsAction({ params: { likedBy, page, limit } })`
 -   [x] Infinite scroll with `useInfiniteScroll` hook
 -   [x] Fetches poems user has liked (server-side filter)
 -   [x] Refreshes on like/unlike (removes from list when unliked)
 
 **List Component:**
+
 -   [x] Already had pagination (no changes needed)
 -   [x] Now uses `PAGINATION_LIMIT` constant
 
 **Tests:**
+
 -   ✅ Component tests verify loading states
 -   ✅ Component tests verify infinite scroll behavior
 -   ✅ Component tests verify correct actions dispatched
@@ -1080,17 +1101,21 @@ useEffect(() => {
 #### 13.5 Redux State Management ✅ **COMPLETED**
 
 **New Actions:**
+
 -   [x] `getMyPoemsAction` - Fetches user's poems with pagination
 -   [x] `getMyFavouritePoemsAction` - Fetches liked poems with pagination
 
 **New Reducers:**
+
 -   [x] `myPoemsQuery` - Handles pagination for user's poems
 -   [x] `myFavouritePoemsQuery` - Handles pagination for liked poems
 
 **Updated Reducer:**
+
 -   [x] `rankingQuery` - Reverted to handle plain array (non-paginated)
 
 **Reducer Logic:**
+
 ```typescript
 // Paginated reducers (myPoemsQuery, myFavouritePoemsQuery)
 const { poems, page, hasMore, total } = action.payload
@@ -1104,6 +1129,7 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 ```
 
 **Tests:**
+
 -   ✅ Reducer tests verify pagination append/replace logic
 -   ✅ Reducer tests verify reset behavior
 -   ✅ Action tests verify correct API calls
@@ -1113,19 +1139,21 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 
 ### Implementation Summary
 
-| Component | Method | Page Size | Filter | Total Tests |
-|-----------|--------|-----------|--------|-------------|
-| **List** | Infinite scroll | 10 | origin | Existing |
-| **MyPoems** | Infinite scroll | 10 | userId | 3 new |
-| **MyFavouritePoems** | Infinite scroll | 10 | likedBy | 3 new |
-| **Ranking** | Fetch all, show top 10 | N/A | origin | 2 new |
+| Component            | Method                 | Page Size | Filter  | Total Tests |
+| -------------------- | ---------------------- | --------- | ------- | ----------- |
+| **List**             | Infinite scroll        | 10        | origin  | Existing    |
+| **MyPoems**          | Infinite scroll        | 10        | userId  | 3 new       |
+| **MyFavouritePoems** | Infinite scroll        | 10        | likedBy | 3 new       |
+| **Ranking**          | Fetch all, show top 10 | N/A       | origin  | 2 new       |
 
 **Backend:**
+
 -   2 new filter parameters added
 -   2 new test cases (non-paginated mode)
 -   Dual-mode API (paginated vs full array)
 
 **Frontend:**
+
 -   1 shared constant (`PAGINATION_LIMIT`)
 -   2 new Redux actions
 -   2 new Redux reducers (paginated)
@@ -1137,6 +1165,7 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 ### Performance Considerations
 
 **Current Performance:**
+
 -   ✅ MyPoems/MyFavouritePoems: Only fetches 10 poems per page
 -   ✅ List: Only fetches 10 poems per page
 -   ⚠️ Ranking: Fetches ALL poems (could be 1000+)
@@ -1144,44 +1173,49 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 **Future Optimizations:**
 
 1. **Ranking Backend Calculation** (High Priority)
-   ```
-   TODO: Create GET /api/poems/ranking endpoint
-   - Calculate top 10 on backend using MongoDB aggregation
-   - Return only top 10 users (not all poems)
-   - Reduces data transfer by 90%+
-   ```
+
+    ```
+    TODO: Create GET /api/poems/ranking endpoint
+    - Calculate top 10 on backend using MongoDB aggregation
+    - Return only top 10 users (not all poems)
+    - Reduces data transfer by 90%+
+    ```
 
 2. **Implement Caching** (Medium Priority)
-   ```
-   TODO: Add Redis caching for ranking
-   - Cache ranking for 5 minutes
-   - Invalidate on new poem/like
-   - Reduces database load
-   ```
+
+    ```
+    TODO: Add Redis caching for ranking
+    - Cache ranking for 5 minutes
+    - Invalidate on new poem/like
+    - Reduces database load
+    ```
 
 3. **Database Indexing** (Medium Priority)
-   ```
-   TODO: Add indexes to Poem collection
-   - Index on userId (for MyPoems filter)
-   - Index on likes array (for MyFavouritePoems filter)
-   - Index on origin + date (for ranking)
-   ```
+    ```
+    TODO: Add indexes to Poem collection
+    - Index on userId (for MyPoems filter)
+    - Index on likes array (for MyFavouritePoems filter)
+    - Index on origin + date (for ranking)
+    ```
 
 ---
 
 ### Migration Notes
 
 **Breaking Changes:**
+
 -   None - All changes are backward compatible
 -   Components using old `getAllPoemsAction()` still work
 
 **Deprecated Patterns:**
+
 -   ❌ **Don't**: Fetch all poems then filter client-side
 -   ✅ **Do**: Use server-side filters (`userId`, `likedBy`)
 -   ❌ **Don't**: Use hardcoded `const PAGINATION_LIMIT = 10` in components
 -   ✅ **Do**: Import from `data/constants.ts`
 
 **Future Cleanup:**
+
 -   [ ] Consider removing `getAllPoemsAction` if no longer used
 -   [ ] Consider removing `allPoemsQuery` reducer if no longer used
 -   [ ] Migrate old client-side filtering to server-side
@@ -1191,19 +1225,23 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 ### Related Files Modified
 
 **Backend:**
+
 -   `backend/src/controllers/poems.js` - Enhanced with filters and dual-mode
 -   `backend/src/__tests__/poems.pagination.test.js` - 8 new tests
 
 **Frontend Constants:**
+
 -   `frontend/src/data/constants.ts` - Added `PAGINATION_LIMIT`
 
 **Frontend Redux:**
+
 -   `frontend/src/redux/reducers/poemsReducers.ts` - New reducers
 -   `frontend/src/redux/reducers/poemsReducers.pagination.test.ts` - 14 new tests
 -   `frontend/src/redux/actions/poemsActions.ts` - New actions
 -   `frontend/src/redux/actions/poemsActions.test.ts` - 4 new tests
 
 **Frontend Components:**
+
 -   `frontend/src/components/List/List.tsx` - Uses constant
 -   `frontend/src/components/MyPoems/MyPoems.jsx` - Pagination added
 -   `frontend/src/components/MyPoems/MyPoems.test.jsx` - 3 new tests
@@ -1217,19 +1255,21 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 ### Next Steps
 
 1. **Monitor Performance** (Week 15)
-   - [ ] Track ranking API response times
-   - [ ] Monitor frontend bundle size
-   - [ ] Set up performance budgets
+
+    - [ ] Track ranking API response times
+    - [ ] Monitor frontend bundle size
+    - [ ] Set up performance budgets
 
 2. **Optimize Ranking** (Week 16)
-   - [ ] Implement backend ranking calculation
-   - [ ] Add database indexes
-   - [ ] Add caching layer
+
+    - [ ] Implement backend ranking calculation
+    - [ ] Add database indexes
+    - [ ] Add caching layer
 
 3. **Cleanup** (Week 17)
-   - [ ] Remove unused `getAllPoemsAction` if applicable
-   - [ ] Document new API endpoints
-   - [ ] Update API documentation
+    - [ ] Remove unused `getAllPoemsAction` if applicable
+    - [ ] Document new API endpoints
+    - [ ] Update API documentation
 
 ---
 
@@ -1240,14 +1280,18 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 #### 14.1 Route Ordering Bug ✅ **FIXED**
 
 **Issue:**
+
 -   Clicking on poem comments icon (`poem__comments-icon`) caused error: `Uncaught SyntaxError: Unexpected token '<'`
--   React Router was matching `/detail/:poemId` against the `/:genre` route instead of the specific `/detail/:poemId` route
+-   React Router was matching `/detail/:poemId` against the `/:genre` route instead of the specific `/detail/:poemId`
+    route
 
 **Root Cause:**
+
 -   Generic route `/:genre` was defined BEFORE specific route `/detail/:poemId` in `App.tsx`
 -   React Router matches routes in order, so `/detail/123` was being caught by `/:genre` with "detail" as the genre
 
 **Fix Applied:**
+
 ```tsx
 // Before (WRONG - caused bug)
 <Route path='/:genre' exact component={Dashboard} />
@@ -1259,20 +1303,23 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 ```
 
 **Files Modified:**
+
 -   `frontend/src/App.tsx` - Reordered routes (line 57-58)
 
 **Tests Added:**
+
 -   `frontend/src/App.test.tsx` - Comprehensive routing tests including:
-    - Route matching for all paths
-    - Route ordering verification (detail route takes precedence)
-    - Multiple poem ID formats tested
-    - Genre routes still work correctly
+    -   Route matching for all paths
+    -   Route ordering verification (detail route takes precedence)
+    -   Multiple poem ID formats tested
+    -   Genre routes still work correctly
 
 ---
 
 #### 14.2 Asset Loading Bug ✅ **FIXED** (Root Cause)
 
 **Issue:**
+
 -   When navigating to `/detail/:poemId`, browser tried to load assets from wrong paths
 -   `index.js` loaded as `/detail/index.js` instead of `/index.js`
 -   `index.css` loaded as `/detail/index.css` instead of `/index.css`
@@ -1280,53 +1327,65 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Browser received HTML (`<`) when expecting JavaScript → `Unexpected token '<'`
 
 **Root Cause:**
+
 -   `public/index.html` used **relative paths** for assets:
     ```html
-    <link rel="stylesheet" href="index.css">   <!-- WRONG -->
-    <script src="index.js"></script>           <!-- WRONG -->
+    <link rel="stylesheet" href="index.css" />
+    <!-- WRONG -->
+    <script src="index.js"></script>
+    <!-- WRONG -->
     ```
 -   On nested routes like `/detail/123`, relative paths resolve incorrectly
 
 **Fix Applied:**
+
 -   Changed to **absolute paths** with leading slash:
     ```html
-    <link rel="stylesheet" href="/index.css">  <!-- CORRECT -->
-    <script src="/index.js"></script>          <!-- CORRECT -->
+    <link rel="stylesheet" href="/index.css" />
+    <!-- CORRECT -->
+    <script src="/index.js"></script>
+    <!-- CORRECT -->
     ```
 
 **Why This Works:**
+
 -   Absolute paths always resolve from root, regardless of current route depth
 -   `/index.js` works from `/`, `/detail/123`, `/profile`, etc.
 -   Relative `index.js` would try to load from `/detail/index.js` on detail pages
 
 **Files Modified:**
+
 -   `frontend/public/index.html` - Changed to absolute paths (line 8, 12)
 -   `frontend/build/index.html` - Updated build output
 
 **Tests Added:**
+
 -   `frontend/src/index.html.test.ts` - Validates HTML structure:
-    - Script tags use absolute paths (`/index.js`)
-    - Stylesheet links use absolute paths (`/index.css`)
-    - No relative paths that would break on nested routes
-    - Prevents regression of this bug
+    -   Script tags use absolute paths (`/index.js`)
+    -   Stylesheet links use absolute paths (`/index.css`)
+    -   No relative paths that would break on nested routes
+    -   Prevents regression of this bug
 
 ---
 
 #### 14.3 Lessons Learned
 
 **Best Practices:**
+
 1. **Route Ordering**: Always define specific routes before generic catch-all routes
 2. **Asset Paths**: Use absolute paths for assets in SPAs with client-side routing
 3. **Testing**: Add routing tests to catch route ordering issues
 4. **Testing**: Add HTML validation tests to ensure asset paths are correct
 
 **Deprecated Patterns:**
+
 -   ❌ **Don't**: Define generic routes before specific ones
 -   ✅ **Do**: Order routes from most specific to least specific
 -   ❌ **Don't**: Use relative paths for assets in `index.html`
 -   ✅ **Do**: Use absolute paths (leading `/`) for all assets
 
 **Future Prevention:**
+
 -   Unit tests verify route ordering in `App.test.tsx`
 -   Unit tests verify asset paths in `index.html.test.ts`
 -   Integration tests with Cypress will test navigation (planned)
@@ -1342,3 +1401,4 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Periodic accessibility audits
 -   Performance monitoring dashboards
 -   Code review checklist based on these standards
+-   Search for unused code and remove it

@@ -15,7 +15,7 @@ export function useInfiniteScroll({ onLoadMore, hasMore, isLoading, threshold = 
         (entries: IntersectionObserverEntry[]) => {
             const [entry] = entries
 
-            if (entry.isIntersecting && hasMore && !isLoading) {
+            if (entry && entry.isIntersecting && hasMore && !isLoading) {
                 onLoadMore()
             }
         },
