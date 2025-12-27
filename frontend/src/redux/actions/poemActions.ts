@@ -16,7 +16,7 @@ export function getPoemAction({ params, options }: getPoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.POEM,
-            url: `${API_ENDPOINTS.POEMS}/${params?.poemId}`,
+            url: `${API_ENDPOINTS.POEM}/${params?.poemId}`,
             dispatch,
             options
         })
@@ -36,7 +36,7 @@ export function likePoemAction({ params, context, options, callbacks }: likePoem
     return function dispatcher(dispatch: AppDispatch) {
         return putAction({
             type: ACTIONS.LIKE_POEM,
-            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
             // context.config is basically the jwt token
             config: context.config,
             dispatch,
@@ -85,7 +85,7 @@ export function deletePoemAction({ params, context, options, callbacks }: delete
     return function dispatcher(dispatch: AppDispatch) {
         return deleteAction({
             type: ACTIONS.DELETE_POEM,
-            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
             // context.config is basically the jwt token
             config: context.config,
             dispatch,
@@ -109,7 +109,7 @@ export function savePoemAction({ params, context, data, options, callbacks }: sa
     return function dispatcher(dispatch: AppDispatch) {
         return patchAction({
             type: ACTIONS.SAVE_POEM,
-            url: `${API_ENDPOINTS.POEMS}/${params.poemId}`,
+            url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
             // context.config is basically the jwt token
             config: context.config,
             data,

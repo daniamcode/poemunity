@@ -33,7 +33,7 @@ app.use('/api/login', loginRouter)
 app.use('/api/register', registerRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/poems', poemsRouter)
-app.use('/api/poems', poemRouter)
+app.use('/api/poem', poemRouter)
 
 // Only start server if not in test mode
 const server = process.env.NODE_ENV !== 'test' ? app.listen(port, () => debug(`running on port ${port}`)) : null

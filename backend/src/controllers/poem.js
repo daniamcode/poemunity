@@ -5,15 +5,19 @@ const findPoemById = require('../middleware/findPoemById')
 const userExtractor = require('../middleware/userExtractor')
 
 poemRouter.get('/:poemId', async (req, res) => {
-  Poem.findById(req.params.poemId, (error, poem) => {
-    if (error) {
+  try {
+    const poem = await Poem.findById(req.params.poemId)
+    if (!poem) {
       return res.status(404).json({
         error: 'poem not found'
-    })}
-    if (poem) {
-      return res.json(poem)
+      })
     }
-  })
+    return res.json(poem)
+  } catch (error) {
+    return res.status(404).json({
+      error: 'poem not found'
+    })
+  }
 })
 
 //like poem
@@ -53,14 +57,21 @@ poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
 
 poemRouter.delete('/:poemId', userExtractor, async (req, res) => {
   const { poemId } = req.params
-  
-  const response = await Poem.findByIdAndDelete(poemId)
-  if (response === null) {
-    return res.status(404).json({
-    error: 'poem not found or not deleted'
-  })}
 
-  res.status(204).end()
+  try {
+    const response = await Poem.findByIdAndDelete(poemId)
+    if (response === null) {
+      return res.status(404).json({
+        error: 'poem not found or not deleted'
+      })
+    }
+
+    res.status(204).end()
+  } catch (error) {
+    return res.status(404).json({
+      error: 'poem not found or not deleted'
+    })
+  }
 })
 
 module.exports = poemRouter 

@@ -3,6 +3,9 @@ const mongoose = require('mongoose')
 
 let mongoServer
 
+// Set environment variable for JWT secret, this is just for test
+process.env.SECRET = '1234'
+
 // Suppress strictQuery warning
 mongoose.set('strictQuery', false)
 

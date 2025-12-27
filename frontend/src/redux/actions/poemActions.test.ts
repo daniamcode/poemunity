@@ -60,7 +60,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith({
                 type: ACTIONS.POEM,
-                url: `${API_ENDPOINTS.POEMS}/${poemId}`,
+                url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 dispatch,
                 options: undefined
             })
@@ -81,7 +81,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith({
                 type: ACTIONS.POEM,
-                url: `${API_ENDPOINTS.POEMS}/${poemId}`,
+                url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 dispatch,
                 options
             })
@@ -107,7 +107,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    url: `${API_ENDPOINTS.POEMS}/${poemId}`
+                    url: `${API_ENDPOINTS.POEM}/${poemId}`
                 })
             )
 
@@ -128,7 +128,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith({
                 type: ACTIONS.LIKE_POEM,
-                url: `${API_ENDPOINTS.POEMS}/${poemId}`,
+                url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 config: mockContext.config,
                 dispatch,
                 options: undefined,
@@ -308,7 +308,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith({
                 type: ACTIONS.DELETE_POEM,
-                url: `${API_ENDPOINTS.POEMS}/${poemId}`,
+                url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 config: mockContext.config,
                 dispatch,
                 options: undefined,
@@ -396,7 +396,7 @@ describe('poemActions', () => {
 
             expect(spy).toHaveBeenCalledWith({
                 type: ACTIONS.SAVE_POEM,
-                url: `${API_ENDPOINTS.POEMS}/${poemId}`,
+                url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 config: mockContext.config,
                 data: mockPoemData,
                 dispatch,

@@ -131,7 +131,7 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
 poemsRouter.patch('/', async (req, res) => {
   const newProperty = req.body
 
-  const response = await Poem.updateMany({ $set: newProperty });
+  const response = await Poem.updateMany({}, { $set: newProperty });
 
   if (response === null) {
     return res.status(404).json({

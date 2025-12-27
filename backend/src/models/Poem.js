@@ -10,7 +10,7 @@ const poemSchema = new Schema({
   date: Date,
   userId: String,
   origin: String
-})
+}, { strict: false })
 
 poemSchema.set('toJSON', {
   transform: (document, returnedObject) => {
