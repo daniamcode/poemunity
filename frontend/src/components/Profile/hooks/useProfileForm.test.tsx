@@ -44,7 +44,13 @@ describe('useProfileForm', () => {
         ;(poemActions.savePoemAction as jest.Mock).mockReturnValue({ type: 'SAVE_POEM' })
         ;(poemsActions.createPoemAction as jest.Mock).mockReturnValue({ type: 'CREATE_POEM' })
         ;(poemsActions.updateAllPoemsCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_CACHE'
+            type: 'UPDATE_ALL_POEMS_CACHE_AFTER_CREATE'
+        })
+        ;(poemsActions.updateMyPoemsCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_MY_POEMS_CACHE_AFTER_CREATE'
+        })
+        ;(poemsActions.updatePoemsListCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_POEMS_LIST_CACHE_AFTER_CREATE'
         })
         ;(poemsActions.updateAllPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_ALL_POEMS_CACHE'

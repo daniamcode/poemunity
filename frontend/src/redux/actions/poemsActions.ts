@@ -113,6 +113,12 @@ export function updatePoemsListCacheAfterLikePoemAction({
 }: UpdatePoemsListCacheAfterLikePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { poemsListQuery } = store.getState()
+
+        if (!poemsListQuery.item) {
+            console.log('Poems list cache not loaded, skipping cache update for like poem')
+            return
+        }
+
         const newPoemsListQuery = cloneDeep(poemsListQuery.item as Poem[])
 
         const poemsListQueryUpdated = newPoemsListQuery?.reduce((acc: Poem[], poem: Poem) => {
@@ -155,6 +161,12 @@ export function updateRankingCacheAfterLikePoemAction({ poemId, context }: Updat
         const {
             rankingQuery: { item: rankingQuery }
         } = store.getState()
+
+        if (!rankingQuery) {
+            console.log('Ranking cache not loaded, skipping cache update for like poem')
+            return
+        }
+
         const newRankingQuery = cloneDeep(rankingQuery as Poem[])
 
         const rankingQueryUpdated = newRankingQuery?.reduce((acc: Poem[], poem: Poem) => {
@@ -194,6 +206,12 @@ export function updateAllPoemsCacheAfterLikePoemAction({
         const {
             allPoemsQuery: { item: allPoemsQuery }
         } = store.getState()
+
+        if (!allPoemsQuery) {
+            console.log('All poems cache not loaded, skipping cache update for like poem')
+            return
+        }
+
         const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
         const allPoemsQueryUpdated = newAllPoemsQuery?.reduce((acc: Poem[], poem: Poem) => {
@@ -249,6 +267,12 @@ export function updateAllPoemsCacheAfterCreatePoemAction({ response }: UpdateAll
         const {
             allPoemsQuery: { item: allPoemsQuery }
         } = store.getState()
+
+        if (!allPoemsQuery) {
+            console.log('All poems cache not loaded, skipping cache update for create poem')
+            return
+        }
+
         const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
         newAllPoemsQuery.push(response)
@@ -257,6 +281,73 @@ export function updateAllPoemsCacheAfterCreatePoemAction({ response }: UpdateAll
         dispatch({
             type: fulfilledAction,
             payload: newAllPoemsQuery
+        })
+    }
+}
+
+interface UpdateMyPoemsCacheAfterCreatePoemActionProps {
+    response: Poem
+}
+
+export function updateMyPoemsCacheAfterCreatePoemAction({ response }: UpdateMyPoemsCacheAfterCreatePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { myPoemsQuery } = store.getState()
+        const myPoemsQueryItem = myPoemsQuery.item
+
+        if (!myPoemsQueryItem) {
+            console.log('My poems cache not loaded, skipping cache update for create poem')
+            return
+        }
+
+        const newMyPoemsQuery = cloneDeep(myPoemsQueryItem as Poem[])
+
+        // Add new poem to the beginning of the list (most recent first)
+        newMyPoemsQuery.unshift(response)
+
+        const { fulfilledAction } = getTypes(ACTIONS.MY_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: newMyPoemsQuery,
+                page: myPoemsQuery.page,
+                hasMore: myPoemsQuery.hasMore,
+                total: (myPoemsQuery.total || 0) + 1, // Increment total count
+                totalPages: myPoemsQuery.totalPages
+            }
+        })
+    }
+}
+
+interface UpdatePoemsListCacheAfterCreatePoemActionProps {
+    response: Poem
+}
+
+export function updatePoemsListCacheAfterCreatePoemAction({ response }: UpdatePoemsListCacheAfterCreatePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { poemsListQuery } = store.getState()
+
+        if (!poemsListQuery.item) {
+            console.log('Poems list cache not loaded, skipping cache update for create poem')
+            return
+        }
+
+        const newPoemsListQuery = cloneDeep(poemsListQuery.item as Poem[])
+
+        // Add new poem to the beginning of the list (most recent first)
+        newPoemsListQuery.unshift(response)
+
+        console.log(`Poem created: ${response.id}. Updating cache with ${newPoemsListQuery.length} poems.`)
+
+        const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: newPoemsListQuery,
+                page: poemsListQuery.page,
+                hasMore: poemsListQuery.hasMore,
+                total: (poemsListQuery.total || 0) + 1, // Increment total count
+                totalPages: poemsListQuery.totalPages
+            }
         })
     }
 }
@@ -270,6 +361,12 @@ export function updateAllPoemsCacheAfterDeletePoemAction({ poemId }: updateAllPo
         const {
             allPoemsQuery: { item: allPoemsQuery }
         } = store.getState()
+
+        if (!allPoemsQuery) {
+            console.log('All poems cache not loaded, skipping cache update for delete poem')
+            return
+        }
+
         const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
 
         const allPoemsQueryUpdated = newAllPoemsQuery?.filter((poem: Poem) => poem.id !== poemId)
@@ -289,6 +386,12 @@ interface UpdatePoemsListCacheAfterDeletePoemActionProps {
 export function updatePoemsListCacheAfterDeletePoemAction({ poemId }: UpdatePoemsListCacheAfterDeletePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { poemsListQuery } = store.getState()
+
+        if (!poemsListQuery.item) {
+            console.log('Poems list cache not loaded, skipping cache update for delete poem')
+            return
+        }
+
         const newPoemsListQuery = cloneDeep(poemsListQuery.item as Poem[])
 
         const poemsListQueryUpdated = newPoemsListQuery?.filter((poem: Poem) => poem.id !== poemId)
@@ -321,6 +424,12 @@ export function updateRankingCacheAfterDeletePoemAction({ poemId }: UpdateRankin
         const {
             rankingQuery: { item: rankingQuery }
         } = store.getState()
+
+        if (!rankingQuery) {
+            console.log('Ranking cache not loaded, skipping cache update for delete poem')
+            return
+        }
+
         const newRankingQuery = cloneDeep(rankingQuery as Poem[])
 
         const rankingQueryUpdated = newRankingQuery?.filter((poem: Poem) => poem.id !== poemId)

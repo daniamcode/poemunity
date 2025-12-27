@@ -4,6 +4,8 @@ import { getPoemAction, savePoemAction } from '../../../redux/actions/poemAction
 import {
     createPoemAction,
     updateAllPoemsCacheAfterCreatePoemAction,
+    updateMyPoemsCacheAfterCreatePoemAction,
+    updatePoemsListCacheAfterCreatePoemAction,
     updateAllPoemsCacheAfterSavePoemAction,
     updateMyPoemsCacheAfterSavePoemAction,
     updatePoemsListCacheAfterSavePoemAction
@@ -167,9 +169,15 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 context,
                 callbacks: {
                     success: response => {
+                        console.log('Poem created successfully:', response)
+                        // Update all relevant caches after creating
                         dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
+                        dispatch(updateMyPoemsCacheAfterCreatePoemAction({ response }))
+                        dispatch(updatePoemsListCacheAfterCreatePoemAction({ response }))
+                        manageSuccess('Poem created successfully')
                     },
-                    error: () => {
+                    error: error => {
+                        console.error('Error creating poem:', error)
                         manageError('Sorry. There was an error creating the poem')
                     }
                 }
@@ -186,6 +194,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 data: poemData,
                 callbacks: {
                     success: () => {
+                        console.log('Poem saved successfully:', poemQuery.item.id)
                         const updatePayload = { poem: poemData, poemId: poemQuery.item.id }
                         // Update all relevant caches after saving
                         dispatch(updateAllPoemsCacheAfterSavePoemAction(updatePayload))
@@ -193,7 +202,8 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         dispatch(updatePoemsListCacheAfterSavePoemAction(updatePayload))
                         manageSuccess('Poem saved')
                     },
-                    error: () => {
+                    error: error => {
+                        console.error('Error saving poem:', error)
                         manageError('Sorry. There was an error saving the poem')
                     }
                 }

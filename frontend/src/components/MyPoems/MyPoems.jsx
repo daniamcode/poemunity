@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'
-import { TextField } from '@material-ui/core'
-import SearchIcon from '@material-ui/icons/Search'
-import EditIcon from '@material-ui/icons/Edit'
-import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
-import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
+import { TextField } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import EditIcon from '@mui/icons-material/Edit'
+import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
+import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
 import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
@@ -145,9 +145,9 @@ function MyPoems() {
 
     return (
         <>
-            <div className='search__container'>
+            <div className='list__intro'>
                 <div className='separator' />
-                <div className='list__intro'>
+                <div className='list__search'>
                     <SearchIcon
                         style={{
                             fontSize: 40,
@@ -155,6 +155,7 @@ function MyPoems() {
                         }}
                     />
                     <TextField
+                        variant="standard"
                         label='Search author'
                         InputLabelProps={{
                             style: {

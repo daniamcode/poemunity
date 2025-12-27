@@ -3,8 +3,8 @@ import { AppContext } from '../../App'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'
-import { TextField } from '@material-ui/core'
-import SearchIcon from '@material-ui/icons/Search'
+import { TextField } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
 import CircularProgress from '../CircularIndeterminate'
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter'
 import sortPoems from '../../utils/sortPoems'
@@ -183,6 +183,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                             }}
                         />
                         <TextField
+                            variant="standard"
                             label={SEARCH_PLACEHOLDER}
                             InputLabelProps={{
                                 style: {

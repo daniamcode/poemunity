@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Paper from '@mui/material/Paper'
 import './Ranking.scss'
 import { getRanking } from '../../utils/getRanking'
 import CircularProgress from '../CircularIndeterminate'
@@ -23,12 +22,6 @@ import { useAppDispatch, RootState } from '../../redux/store'
 import { getRankingAction } from '../../redux/actions/poemsActions'
 import { Poem } from '../../typescript/interfaces'
 
-const useStyles = makeStyles({
-    table: {
-        minWidth: 50
-    }
-})
-
 interface RankItem {
     author: string
     picture: string
@@ -40,7 +33,6 @@ export default function Ranking() {
         poems: Poem[]
         rank: RankItem[]
     }
-    const classes = useStyles()
 
     const [poems, setPoems] = useState<RankingStates['poems']>([])
 
@@ -85,7 +77,7 @@ export default function Ranking() {
             <h3 className='ranking__title'>{RANKING_TITLE}</h3>
             <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
             <TableContainer className='ranking__body' component={Paper}>
-                <Table className={classes.table} aria-label='simple table'>
+                <Table sx={{ minWidth: 50 }} aria-label='simple table'>
                     <TableHead>
                         <TableRow>
                             <TableCell align='center'>{RANKING_POETS_TITLE}</TableCell>

@@ -1402,3 +1402,7 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Performance monitoring dashboards
 -   Code review checklist based on these standards
 -   Search for unused code and remove it
+-   Ask IA to add component tests from Cypress, not just e2e, and see if it's useful
+-   Add to the pipeline that all tests have to pass, including cypress ones
+-   Fix sticky header in Profile, as when scrolling, the search is bypassing the header view
+-   Cypress inserts shouldn't go inoto real database

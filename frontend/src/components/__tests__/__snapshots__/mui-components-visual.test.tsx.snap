@@ -1,0 +1,570 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MUI Components Visual Regression Tests CircularIndeterminate should render loading spinner correctly 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests List should render List component correctly with genre 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests List should render List component correctly without genre 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests ListItem should render list item correctly 1`] = `
+<main
+  class="poem__detail"
+/>
+`;
+
+exports[`MUI Components Visual Regression Tests ListItem should render list item with likes correctly 1`] = `
+<main
+  class="poem__detail"
+/>
+`;
+
+exports[`MUI Components Visual Regression Tests MyFavouritePoems should render MyFavouritePoems component correctly 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests MyPoems should render MyPoems component correctly 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests PoemFooter should render poem footer correctly 1`] = `
+<section
+  class="poem__footer"
+>
+  <div
+    class="poem__likes"
+  >
+    0
+     
+    Likes
+  </div>
+  <div
+    class="separator"
+  />
+  <svg
+    aria-hidden="true"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__edit-icon css-1umw9bq-MuiSvgIcon-root"
+    data-testid="edit-icon"
+    focusable="false"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"
+    />
+  </svg>
+  <svg
+    aria-hidden="true"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__delete-icon css-1umw9bq-MuiSvgIcon-root"
+    data-testid="delete-icon"
+    focusable="false"
+    style="fill: red;"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
+    />
+  </svg>
+  <a
+    class="poem__comments-icon"
+    href="/detail/test-poem-id"
+  >
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+      data-testid="SubjectSharpIcon"
+      focusable="false"
+      style="fill: #000;"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+      />
+    </svg>
+  </a>
+</section>
+`;
+
+exports[`MUI Components Visual Regression Tests ProfileTabs should render profile tabs correctly 1`] = `
+<section
+  class="profile__outro"
+>
+  <div
+    class="profile__tabs-header"
+  >
+    <header
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorDefault MuiAppBar-positionStatic css-12ysj7f-MuiPaper-root-MuiAppBar-root"
+      style="--Paper-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);"
+    >
+      <div
+        class="MuiTabs-root css-jhczcq-MuiTabs-root"
+      >
+        <div
+          class="MuiTabs-scroller MuiTabs-fixed css-s2t35c-MuiTabs-scroller"
+          style="overflow: hidden; margin-bottom: 0px;"
+        >
+          <div
+            aria-label="full width tabs example"
+            class="MuiTabs-list MuiTabs-flexContainer css-hzcega-MuiTabs-list"
+            role="tablist"
+          >
+            <button
+              aria-controls="full-width-tabpanel-0"
+              aria-selected="true"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-fullWidth Mui-selected css-hmk518-MuiButtonBase-root-MuiTab-root"
+              id="full-width-tab-0"
+              role="tab"
+              tabindex="0"
+              type="button"
+            >
+              My poems
+            </button>
+            <button
+              aria-controls="full-width-tabpanel-1"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-fullWidth css-hmk518-MuiButtonBase-root-MuiTab-root"
+              id="full-width-tab-1"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              My favourite poems
+            </button>
+          </div>
+          <span
+            class="MuiTabs-indicator css-1qltlow-MuiTabs-indicator"
+            style="left: 0px; width: 0px;"
+          />
+        </div>
+      </div>
+    </header>
+  </div>
+  <div
+    class="profile__tabs-content"
+  >
+    <div
+      style="overflow-x: hidden;"
+    >
+      <div
+        class="react-swipeable-view-container"
+        style="flex-direction: row; transition: all 0s ease 0s; direction: ltr; display: flex; will-change: transform;"
+      >
+        <div
+          aria-hidden="false"
+          data-swipeable="true"
+          style="width: 100%; flex-shrink: 0; overflow: auto;"
+        >
+          <div
+            aria-labelledby="full-width-tab-0"
+            class="profile__myPoems"
+            dir="ltr"
+            id="full-width-tabpanel-0"
+            role="tabpanel"
+          >
+            <div
+              class="MuiBox-root css-19kzrtu"
+            >
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
+              >
+                <div
+                  class="search__container"
+                >
+                  <div
+                    class="separator"
+                  />
+                  <div
+                    class="list__intro"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+                      data-testid="SearchIcon"
+                      focusable="false"
+                      style="font-size: 40px; fill: #551A8B;"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+                      />
+                    </svg>
+                    <div
+                      class="MuiFormControl-root MuiTextField-root css-1xp5r68-MuiFormControl-root-MuiTextField-root"
+                    >
+                      <label
+                        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-19qnlrw-MuiFormLabel-root-MuiInputLabel-root"
+                        data-shrink="false"
+                        for="mui-1"
+                        id="mui-1-label"
+                        style="color: rgb(85, 26, 139);"
+                      >
+                        Search author
+                      </label>
+                      <div
+                        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root"
+                        style="color: rgb(85, 26, 139);"
+                      >
+                        <input
+                          aria-invalid="false"
+                          class="MuiInputBase-input MuiOutlinedInput-input css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input"
+                          id="mui-1"
+                          type="text"
+                          value=""
+                        />
+                        <fieldset
+                          aria-hidden="true"
+                          class="MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+                        >
+                          <legend
+                            class="css-1n64csd-MuiNotchedOutlined-root"
+                          >
+                            <span>
+                              Search author
+                            </span>
+                          </legend>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="height: 20px;"
+                />
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+
+exports[`MUI Components Visual Regression Tests Ranking should render ranking table correctly 1`] = `
+<div
+  class="MuiBox-root css-2l3c9v"
+>
+  <span
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    role="progressbar"
+    style="width: 40px; height: 40px;"
+  >
+    <svg
+      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+      viewBox="22 22 44 44"
+    >
+      <circle
+        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+        cx="44"
+        cy="44"
+        fill="none"
+        r="20.2"
+        stroke-width="3.6"
+      />
+    </svg>
+  </span>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests SimpleAccordion should render accordion correctly 1`] = `
+<div
+  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded MuiAccordion-gutters accordion css-1808mag-MuiPaper-root-MuiAccordion-root"
+  style="--Paper-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);"
+>
+  <h3
+    class="MuiAccordion-heading css-cy7rkm-MuiAccordion-heading"
+  >
+    <button
+      aria-controls="panel1a-content"
+      aria-expanded="false"
+      class="MuiButtonBase-root MuiAccordionSummary-root MuiAccordionSummary-gutters css-1f1pi2l-MuiButtonBase-root-MuiAccordionSummary-root"
+      id="panel1a-header"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiAccordionSummary-content MuiAccordionSummary-contentGutters css-yfrx4k-MuiAccordionSummary-content"
+      >
+        <div
+          class="header__dropdown-categories-icon"
+        />
+        <p
+          class="header__dropdown-categories"
+        >
+          Categories
+        </p>
+      </span>
+      <span
+        class="MuiAccordionSummary-expandIconWrapper css-1wqf3nl-MuiAccordionSummary-expandIconWrapper"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </span>
+    </button>
+  </h3>
+  <div
+    class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-cwrbtg-MuiCollapse-root"
+    style="min-height: 0px;"
+  >
+    <div
+      class="MuiCollapse-wrapper MuiCollapse-vertical css-1x6hinx-MuiCollapse-wrapper"
+    >
+      <div
+        class="MuiCollapse-wrapperInner MuiCollapse-vertical css-1i4ywhz-MuiCollapse-wrapperInner"
+      >
+        <div
+          aria-labelledby="panel1a-header"
+          class="MuiAccordion-region css-at4ued-MuiAccordion-region"
+          id="panel1a-content"
+          role="region"
+        >
+          <div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/anniversary"
+              >
+                Anniversary
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/friendship"
+              >
+                Friendship
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/funny"
+              >
+                Funny
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/haikus"
+              >
+                Haikus
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/hope"
+              >
+                Hope
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/life"
+              >
+                Life
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/love"
+              >
+                Love
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/sad"
+              >
+                Sad
+              </a>
+            </div>
+          </div>
+          <div
+            class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+          >
+            <a
+              class="header__dropdown-subcategories active"
+              href="/"
+            >
+              All
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`MUI Components Visual Regression Tests TabPanel should not render tab panel when not selected 1`] = `
+<div
+  aria-labelledby="full-width-tab-1"
+  hidden=""
+  id="full-width-tabpanel-1"
+  role="tabpanel"
+/>
+`;
+
+exports[`MUI Components Visual Regression Tests TabPanel should render tab panel when selected 1`] = `
+<div
+  aria-labelledby="full-width-tab-0"
+  id="full-width-tabpanel-0"
+  role="tabpanel"
+>
+  <div
+    class="MuiBox-root css-19kzrtu"
+  >
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
+    >
+      <div>
+        Test Content
+      </div>
+    </p>
+  </div>
+</div>
+`;

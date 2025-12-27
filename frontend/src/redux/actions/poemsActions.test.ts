@@ -1521,6 +1521,319 @@ describe('updateMyPoemsCacheAfterSavePoemAction', () => {
     })
 })
 
+describe('updateAllPoemsCacheAfterCreatePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should add new poem to cache when allPoemsQuery exists', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Existing Poem',
+                author: 'Author 1',
+                likes: []
+            }
+        ]
+
+        const newPoem = {
+            id: '2',
+            title: 'New Poem',
+            author: 'Author 2',
+            poem: 'New poem content',
+            userId: 'user-123',
+            likes: [],
+            genre: 'love',
+            picture: 'pic.jpg',
+            date: '2024-01-01'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: initialState
+            }
+        })
+
+        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterCreatePoemAction({
+            response: newPoem
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toHaveLength(2)
+        expect((dispatch as jest.Mock).mock.calls[0][0].payload[1]).toEqual(newPoem)
+    })
+
+    test('Should not crash when allPoemsQuery is null (CRITICAL BUG FIX)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: null
+            }
+        })
+
+        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        const newPoem = {
+            id: '1',
+            title: 'New Poem',
+            author: 'Author 1'
+        }
+
+        // This used to crash with "Cannot read properties of undefined reading push"
+        updateAllPoemsCacheAfterCreatePoemAction({
+            response: newPoem
+        })(dispatch)
+
+        // Should not dispatch anything
+        expect(dispatch).not.toHaveBeenCalled()
+        // Should log a message
+        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for create poem')
+    })
+
+    test('Should not crash when allPoemsQuery is undefined', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            allPoemsQuery: {
+                item: undefined
+            }
+        })
+
+        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updateAllPoemsCacheAfterCreatePoemAction({
+            response: { id: '1', title: 'New Poem' }
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for create poem')
+    })
+})
+
+describe('updateMyPoemsCacheAfterCreatePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should add new poem to beginning of myPoems cache (CRITICAL BUG FIX)', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Older Poem',
+                author: 'Author 1',
+                userId: 'user-123',
+                likes: []
+            }
+        ]
+
+        const newPoem = {
+            id: '2',
+            title: 'Brand New Poem',
+            author: 'Author 1',
+            poem: 'New content',
+            userId: 'user-123',
+            likes: [],
+            genre: 'love',
+            picture: 'pic.jpg',
+            date: '2024-01-02'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 1,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterCreatePoemAction({
+            response: newPoem
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+
+        expect(payload.poems).toHaveLength(2)
+        // New poem should be at the beginning (most recent first)
+        expect(payload.poems[0]).toEqual(newPoem)
+        expect(payload.poems[1].id).toBe('1')
+        // Total should be incremented
+        expect(payload.total).toBe(2)
+    })
+
+    test('Should not crash when myPoemsQuery is null (CRITICAL BUG FIX)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: null
+            }
+        })
+
+        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterCreatePoemAction({
+            response: { id: '1', title: 'New Poem' }
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+        expect(consoleLogSpy).toHaveBeenCalledWith('My poems cache not loaded, skipping cache update for create poem')
+    })
+
+    test('Should increment total count correctly', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: [],
+                page: 1,
+                hasMore: false,
+                total: 0,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterCreatePoemAction({
+            response: { id: '1', title: 'First Poem' }
+        })(dispatch)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.total).toBe(1)
+    })
+})
+
+describe('updatePoemsListCacheAfterCreatePoemAction', () => {
+    let dispatch: AppDispatch
+    let consoleLogSpy: jest.SpyInstance
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        ;(dispatch as jest.Mock).mockClear()
+        consoleLogSpy.mockRestore()
+        jest.clearAllMocks()
+    })
+
+    test('Should add new poem to beginning of poemsList cache', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Existing Poem',
+                author: 'Author 1',
+                likes: []
+            }
+        ]
+
+        const newPoem = {
+            id: '2',
+            title: 'New Poem',
+            author: 'Author 2',
+            poem: 'Content',
+            userId: 'user-456',
+            likes: [],
+            genre: 'nature',
+            picture: 'pic2.jpg',
+            date: '2024-01-02'
+        }
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 1,
+                totalPages: 1
+            }
+        })
+
+        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterCreatePoemAction({
+            response: newPoem
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+
+        expect(payload.poems).toHaveLength(2)
+        // New poem should be at the beginning
+        expect(payload.poems[0]).toEqual(newPoem)
+        expect(payload.poems[1].id).toBe('1')
+        // Total should be incremented
+        expect(payload.total).toBe(2)
+        expect(consoleLogSpy).toHaveBeenCalledWith('Poem created: 2. Updating cache with 2 poems.')
+    })
+
+    test('Should not crash when poemsListQuery is null', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: null
+            }
+        })
+
+        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterCreatePoemAction({
+            response: { id: '1', title: 'New Poem' }
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+        expect(consoleLogSpy).toHaveBeenCalledWith('Poems list cache not loaded, skipping cache update for create poem')
+    })
+
+    test('Should preserve pagination metadata', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            poemsListQuery: {
+                item: [],
+                page: 2,
+                hasMore: true,
+                total: 20,
+                totalPages: 3
+            }
+        })
+
+        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
+
+        updatePoemsListCacheAfterCreatePoemAction({
+            response: { id: '21', title: 'New Poem' }
+        })(dispatch)
+
+        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
+        expect(payload.page).toBe(2)
+        expect(payload.hasMore).toBe(true)
+        expect(payload.total).toBe(21) // Incremented
+        expect(payload.totalPages).toBe(3)
+    })
+})
+
 describe('updatePoemsListCacheAfterSavePoemAction', () => {
     let dispatch: AppDispatch
     let consoleLogSpy: jest.SpyInstance

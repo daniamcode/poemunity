@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import HighlightOffSharpIcon from '@material-ui/icons/HighlightOffSharp'
-import EditIcon from '@material-ui/icons/Edit'
-import SubjectSharpIcon from '@material-ui/icons/SubjectSharp'
+import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
+import EditIcon from '@mui/icons-material/Edit'
+import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
 import { LIKE, LIKES } from '../../../data/constants'
 import { Poem, Context } from '../../../typescript/interfaces'
 
