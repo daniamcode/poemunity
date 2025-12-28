@@ -200,6 +200,70 @@ interface UpdateAllPoemsCacheAfterLikePoemActionProps {
     poemId: string
 }
 
+interface UpdateMyFavouritePoemsCacheAfterLikePoemActionProps {
+    context: Context
+    poemId: string
+}
+
+/**
+ * Updates MyFavouritePoems cache after liking/unliking a poem.
+ * IMPORTANT: When unliking a poem from MyFavouritePoems, it should be REMOVED from the cache
+ * because MyFavouritePoems only shows poems the user has liked.
+ */
+export function updateMyFavouritePoemsCacheAfterLikePoemAction({
+    poemId,
+    context
+}: UpdateMyFavouritePoemsCacheAfterLikePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { myFavouritePoemsQuery } = store.getState()
+
+        if (!myFavouritePoemsQuery.item) {
+            return
+        }
+
+        // Check if the user is unliking (poem exists and user's ID is in likes)
+        const targetPoem = myFavouritePoemsQuery.item.find((poem: Poem) => poem.id === poemId)
+        const isUnliking = targetPoem && targetPoem.likes?.includes(context.userId)
+
+        let myFavouritePoemsQueryUpdated
+
+        if (isUnliking) {
+            // Remove the poem from MyFavouritePoems when unliking
+            myFavouritePoemsQueryUpdated = myFavouritePoemsQuery.item.filter((poem: Poem) => poem.id !== poemId)
+        }
+        else {
+            // Update likes count (for the rare case of liking from this view)
+            myFavouritePoemsQueryUpdated = myFavouritePoemsQuery.item.map((poem: Poem) => {
+                if (poem.id !== poemId) {
+                    return poem
+                }
+
+                const isLiked = poem.likes?.includes(context.userId)
+                const newLikes = isLiked
+                    ? poem.likes.filter((id: string) => id !== context.userId)
+                    : [...(poem.likes || []), context.userId]
+
+                return {
+                    ...poem,
+                    likes: newLikes
+                }
+            })
+        }
+
+        const { fulfilledAction } = getTypes(ACTIONS.MY_FAVOURITE_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: myFavouritePoemsQueryUpdated,
+                page: myFavouritePoemsQuery.page,
+                hasMore: myFavouritePoemsQuery.hasMore,
+                total: isUnliking ? Math.max(0, (myFavouritePoemsQuery.total || 0) - 1) : myFavouritePoemsQuery.total,
+                totalPages: myFavouritePoemsQuery.totalPages
+            }
+        })
+    }
+}
+
 // todo: refactor (this function is very similar to updatePoemsListCacheAfterLikePoemAction)
 export function updateAllPoemsCacheAfterLikePoemAction({
     poemId,

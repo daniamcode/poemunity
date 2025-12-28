@@ -70,6 +70,9 @@ describe('usePoemActions', () => {
         ;(poemsActions.updateAllPoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_ALL_POEMS_LIKE'
         })
+        ;(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_MY_FAVOURITE_POEMS_LIKE'
+        })
         ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_POEM_LIKE'
         })
@@ -189,6 +192,10 @@ describe('usePoemActions', () => {
             context: mockContext
         })
         expect(poemsActions.updateAllPoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
+            poemId: 'poem-123',
+            context: mockContext
+        })
+        expect(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
             poemId: 'poem-123',
             context: mockContext
         })
