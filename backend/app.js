@@ -35,8 +35,11 @@ app.use('/api/users', usersRouter)
 app.use('/api/poems', poemsRouter)
 app.use('/api/poem', poemRouter)
 
-// Only start server if not in test mode
-const server = process.env.NODE_ENV !== 'test' ? app.listen(port, () => debug(`running on port ${port}`)) : null
+// Start server unless running Jest unit tests
+// - For Cypress E2E tests: server SHOULD start (JEST_WORKER_ID is undefined)
+// - For Jest unit tests: server should NOT start (JEST_WORKER_ID is defined)
+const isJestTest = process.env.JEST_WORKER_ID !== undefined
+const server = !isJestTest ? app.listen(port, () => debug(`running on port ${port}`)) : null
 
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {

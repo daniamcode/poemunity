@@ -61,21 +61,23 @@ Added comprehensive unit tests for cache update actions:
 
 Before running E2E tests, you need:
 
-1. **Backend running** on `http://localhost:4200`
-   ```bash
-   cd ../backend
-   pnpm dev
-   ```
-
-2. **Frontend running** on `http://localhost:3000`
+1. **Frontend running** on `http://localhost:3000`
    ```bash
    cd frontend
    pnpm dev
    ```
 
-3. **Test user**: The tests use the existing test user with credentials:
+2. **Test user**: The tests use the test user with credentials:
    - Username: `test`
    - Password: `1234`
+
+   The test user is created automatically in the in-memory database when you run the tests
+
+**Note**: The backend is automatically managed by Cypress:
+- ✅ When you run Cypress, it automatically starts the backend in TEST mode **on port 4201**
+- ✅ **Your dev backend on port 4200 is unaffected** - you can run both simultaneously!
+- ✅ When you close Cypress, it automatically stops the test backend
+- ✅ The backend uses an **in-memory MongoDB database** (no database pollution!)
 
 ## Running Tests
 
@@ -223,17 +225,17 @@ export default defineConfig({
 ## Troubleshooting
 
 ### Tests fail with "Cannot find user"
-Make sure the test user exists in your database. The tests use:
+The tests use credentials:
 - Username: `test`
 - Password: `1234`
 
-If you need to create it:
-```bash
-# Via API
-curl -X POST http://localhost:4200/api/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test","password":"1234","picture":"default.jpg"}'
-```
+The test user is automatically created in the **in-memory database** when the backend starts in test mode. If tests fail:
+
+1. Check that the backend started successfully (look for "✅ Connected to in-memory MongoDB" in logs)
+2. The first test run creates the test user - subsequent tests reuse it
+3. Each test run starts with a fresh in-memory database
+
+**Note**: The in-memory database is destroyed when Cypress closes, so no cleanup needed!
 
 ### Tests timeout
 - Check backend is running on port 4200

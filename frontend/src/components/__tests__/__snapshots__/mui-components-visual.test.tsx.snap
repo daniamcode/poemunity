@@ -282,13 +282,13 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
                 class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
               >
                 <div
-                  class="search__container"
+                  class="list__intro"
                 >
                   <div
                     class="separator"
                   />
                   <div
-                    class="list__intro"
+                    class="list__search"
                   >
                     <svg
                       aria-hidden="true"
@@ -306,7 +306,7 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
                       class="MuiFormControl-root MuiTextField-root css-1xp5r68-MuiFormControl-root-MuiTextField-root"
                     >
                       <label
-                        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-19qnlrw-MuiFormLabel-root-MuiInputLabel-root"
+                        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard css-2hy7sk-MuiFormLabel-root-MuiInputLabel-root"
                         data-shrink="false"
                         for="mui-1"
                         id="mui-1-label"
@@ -315,28 +315,16 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
                         Search author
                       </label>
                       <div
-                        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root"
+                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-5h82ro-MuiInputBase-root-MuiInput-root"
                         style="color: rgb(85, 26, 139);"
                       >
                         <input
                           aria-invalid="false"
-                          class="MuiInputBase-input MuiOutlinedInput-input css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input"
+                          class="MuiInputBase-input MuiInput-input css-1yrc8ca-MuiInputBase-input-MuiInput-input"
                           id="mui-1"
                           type="text"
                           value=""
                         />
-                        <fieldset
-                          aria-hidden="true"
-                          class="MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-                        >
-                          <legend
-                            class="css-1n64csd-MuiNotchedOutlined-root"
-                          >
-                            <span>
-                              Search author
-                            </span>
-                          </legend>
-                        </fieldset>
                       </div>
                     </div>
                   </div>

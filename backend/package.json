@@ -6,8 +6,9 @@
   "scripts": {
     "test": "NODE_ENV=test jest",
     "test:watch": "NODE_ENV=test jest --watch",
+    "test:cypress": "NODE_ENV=test PORT=4201 DEBUG=app,app:* nodemon -r ./cypress.setup.js index.js",
     "coverage": "NODE_ENV=test jest --coverage",
-    "dev": "NODE_ENV=development DEBUG=app,app:* nodemon index.js",
+    "dev": "NODE_ENV=development PORT=4200 DEBUG=app,app:* nodemon index.js",
     "stg": "NODE_ENV=development PORT=4200 forever start index.js",
     "prod": "NODE_ENV=production forever start index.js",
     "lint": "npx standard --fix",
@@ -72,9 +73,6 @@
     "ignore": [
       "node_modules/**/node_modules"
     ],
-    "delay": "3000",
-    "env": {
-      "PORT": 4200
-    }
+    "delay": "3000"
   }
 }
