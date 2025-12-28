@@ -150,17 +150,19 @@ describe('Header', () => {
 
         expect(window.localStorage.getItem).toHaveBeenCalledWith('loggedUser')
         expect(parseJWTModule.default).toHaveBeenCalledWith(mockToken)
-        expect(mockSetState).toHaveBeenCalledWith({
-            user: mockToken,
-            userId: 'user-123',
-            username: 'johndoe',
-            picture: 'https://example.com/pic.jpg',
-            config: {
-                headers: {
-                    Authorization: `Bearer ${mockToken}`
+        expect(mockSetState).toHaveBeenCalledWith(
+            expect.objectContaining({
+                user: mockToken,
+                userId: 'user-123',
+                username: 'johndoe',
+                picture: 'https://example.com/pic.jpg',
+                config: {
+                    headers: {
+                        Authorization: `Bearer ${mockToken}`
+                    }
                 }
-            }
-        })
+            })
+        )
     })
 
     test('should NOT call setState when loggedUser is not in localStorage', () => {

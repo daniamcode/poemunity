@@ -81,13 +81,221 @@ exports[`MUI Components Visual Regression Tests List should render List componen
 exports[`MUI Components Visual Regression Tests ListItem should render list item correctly 1`] = `
 <main
   class="poem__detail"
-/>
+>
+  <section
+    class="poem__block"
+    id="poem__block"
+  >
+    <section>
+      <a
+        class="poem__title"
+        href="/detail/test-poem-id"
+      >
+        Test Poem
+      </a>
+      <div
+        class="poem__author-container"
+      >
+        <img
+          alt="testuser"
+          class="poem__picture"
+          src="test-pic.jpg"
+        />
+        <p
+          class="poem__author"
+        >
+          testuser
+        </p>
+      </div>
+      <div
+        class="poem__date"
+      >
+        01/01/2024 01:00h
+      </div>
+    </section>
+    <section>
+      <div
+        class="poem__content poems__content"
+      >
+        Test poem content
+      </div>
+      <div
+        class="poems__read-more"
+      >
+        <a
+          class="poems__read-more"
+          href="/detail/test-poem-id"
+        >
+          Read more
+        </a>
+      </div>
+    </section>
+    <section
+      class="poem__footer"
+    >
+      <div
+        class="poem__likes"
+      >
+        0
+         
+        Likes
+      </div>
+      <div
+        class="separator"
+      />
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__edit-icon css-1umw9bq-MuiSvgIcon-root"
+        data-testid="edit-poem"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"
+        />
+      </svg>
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__delete-icon css-1umw9bq-MuiSvgIcon-root"
+        data-testid="delete-poem"
+        focusable="false"
+        style="fill: red;"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
+        />
+      </svg>
+      <a
+        class="poem__comments-icon"
+        href="/detail/test-poem-id"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+          data-testid="SubjectSharpIcon"
+          focusable="false"
+          style="fill: #000;"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+          />
+        </svg>
+      </a>
+    </section>
+  </section>
+</main>
 `;
 
 exports[`MUI Components Visual Regression Tests ListItem should render list item with likes correctly 1`] = `
 <main
   class="poem__detail"
-/>
+>
+  <section
+    class="poem__block"
+    id="poem__block"
+  >
+    <section>
+      <a
+        class="poem__title"
+        href="/detail/test-poem-id"
+      >
+        Test Poem
+      </a>
+      <div
+        class="poem__author-container"
+      >
+        <img
+          alt="testuser"
+          class="poem__picture"
+          src="test-pic.jpg"
+        />
+        <p
+          class="poem__author"
+        >
+          testuser
+        </p>
+      </div>
+      <div
+        class="poem__date"
+      >
+        01/01/2024 01:00h
+      </div>
+    </section>
+    <section>
+      <div
+        class="poem__content poems__content"
+      >
+        Test poem content
+      </div>
+      <div
+        class="poems__read-more"
+      >
+        <a
+          class="poems__read-more"
+          href="/detail/test-poem-id"
+        >
+          Read more
+        </a>
+      </div>
+    </section>
+    <section
+      class="poem__footer"
+    >
+      <div
+        class="poem__likes"
+      >
+        3
+         
+        Likes
+      </div>
+      <div
+        class="separator"
+      />
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__edit-icon css-1umw9bq-MuiSvgIcon-root"
+        data-testid="edit-poem"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"
+        />
+      </svg>
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium poem__delete-icon css-1umw9bq-MuiSvgIcon-root"
+        data-testid="delete-poem"
+        focusable="false"
+        style="fill: red;"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
+        />
+      </svg>
+      <a
+        class="poem__comments-icon"
+        href="/detail/test-poem-id"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+          data-testid="SubjectSharpIcon"
+          focusable="false"
+          style="fill: #000;"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+          />
+        </svg>
+      </a>
+    </section>
+  </section>
+</main>
 `;
 
 exports[`MUI Components Visual Regression Tests MyFavouritePoems should render MyFavouritePoems component correctly 1`] = `

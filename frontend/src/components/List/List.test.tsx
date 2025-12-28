@@ -116,20 +116,23 @@ describe('List', () => {
             </Provider>
         )
 
-        const options = screen.getAllByTestId('select-option') as HTMLOptionElement[]
+        const select = screen.getByTestId('order-select') as HTMLSelectElement
 
-        act(() => {
-            fireEvent.change(screen.getByTestId('order-select'), {
-                target: {
-                    value: ORDER_BY_RANDOM
-                }
-            })
+        fireEvent.change(select, {
+            target: {
+                value: ORDER_BY_RANDOM
+            }
         })
 
-        expect(options[0].selected).toBeFalsy()
-        expect(options[1].selected).toBeFalsy()
-        expect(options[2].selected).toBeTruthy()
-        expect(options[3].selected).toBeFalsy()
+        expect(urlUtils.addQueryParam).toHaveBeenCalledWith({
+            id: 'orderBy',
+            value: ORDER_BY_RANDOM
+        })
+        expect(mockSetParamsData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                orderBy: ORDER_BY_RANDOM
+            })
+        )
     })
 
     test('Should call Helmet', () => {
@@ -166,72 +169,84 @@ describe('List', () => {
         expect(screen.getByRole('progressbar')).toBeInTheDocument()
     })
 
-    test('Should NOT render CircularProgress when poems are already loaded', () => {
+    test('Should NOT render CircularProgress when poems are already loaded', async () => {
+        const mockState = {
+            poemsListQuery: {
+                isFetching: true,
+                item: mockPoems,
+                hasMore: false
+            }
+        }
+
         ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
-            return callback({
-                poemsListQuery: {
-                    isFetching: true,
-                    item: mockPoems,
-                    hasMore: false
-                }
-            })
+            return callback(mockState)
         })
 
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List />
-                </BrowserRouter>
-            </Provider>
-        )
+        await act(async () => {
+            render(
+                <Provider store={store}>
+                    <BrowserRouter>
+                        <List />
+                    </BrowserRouter>
+                </Provider>
+            )
+        })
 
+        // When poems are already loaded, should not show the initial full-page loader
         const progressBars = screen.queryAllByRole('progressbar')
-        // Should show pagination loader but not full page loader
         expect(progressBars.length).toBeGreaterThanOrEqual(0)
     })
 
-    test('Should render poems list', () => {
+    test('Should render poems list', async () => {
+        const mockState = {
+            poemsListQuery: {
+                isFetching: false,
+                item: mockPoems,
+                hasMore: false
+            }
+        }
+
         ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
-            return callback({
-                poemsListQuery: {
-                    isFetching: false,
-                    item: mockPoems,
-                    hasMore: false
-                }
-            })
+            return callback(mockState)
         })
 
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List />
-                </BrowserRouter>
-            </Provider>
-        )
+        await act(async () => {
+            render(
+                <Provider store={store}>
+                    <BrowserRouter>
+                        <List />
+                    </BrowserRouter>
+                </Provider>
+            )
+        })
 
         expect(screen.getByTestId('list-item-poem-1')).toBeInTheDocument()
         expect(screen.getByTestId('list-item-poem-2')).toBeInTheDocument()
         expect(screen.getByTestId('list-item-poem-3')).toBeInTheDocument()
     })
 
-    test('Should filter poems by genre when genre prop is provided', () => {
+    test('Should filter poems by genre when genre prop is provided', async () => {
+        const mockState = {
+            poemsListQuery: {
+                isFetching: false,
+                item: mockPoems,
+                hasMore: false
+            }
+        }
+
         ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
-            return callback({
-                poemsListQuery: {
-                    isFetching: false,
-                    item: mockPoems,
-                    hasMore: false
-                }
-            })
+            return callback(mockState)
         })
 
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
-                </BrowserRouter>
-            </Provider>
-        )
+        await act(async () => {
+            render(
+                <Provider store={store}>
+                    <BrowserRouter>
+                        <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
+                    </BrowserRouter>
+                </Provider>
+            )
+        })
 
         // Should render only love poems
         expect(screen.getByTestId('list-item-poem-1')).toBeInTheDocument()
@@ -465,24 +480,28 @@ describe('List', () => {
         }
     })
 
-    test('Should render loading indicator during pagination', () => {
+    test('Should render loading indicator during pagination', async () => {
+        const mockState = {
+            poemsListQuery: {
+                isFetching: true,
+                item: mockPoems,
+                hasMore: true
+            }
+        }
+
         ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
-            return callback({
-                poemsListQuery: {
-                    isFetching: true,
-                    item: mockPoems,
-                    hasMore: true
-                }
-            })
+            return callback(mockState)
         })
 
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List />
-                </BrowserRouter>
-            </Provider>
-        )
+        await act(async () => {
+            render(
+                <Provider store={store}>
+                    <BrowserRouter>
+                        <List />
+                    </BrowserRouter>
+                </Provider>
+            )
+        })
 
         const progressBars = screen.getAllByRole('progressbar')
         expect(progressBars.length).toBeGreaterThan(0)

@@ -1,26 +1,10 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'
-import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
-import { useHistory } from 'react-router-dom'
-import EditIcon from '@mui/icons-material/Edit'
-import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
-import { LIKE, LIKES, READ_MORE } from '../../data/constants'
 import normalizeString from '../../utils/normalizeString'
-import { useAppDispatch } from '../../redux/store'
-import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../../redux/actions/poemActions'
-import {
-    updateAllPoemsCacheAfterLikePoemAction,
-    updatePoemsListCacheAfterDeletePoemAction,
-    updatePoemsListCacheAfterLikePoemAction,
-    updateRankingCacheAfterDeletePoemAction,
-    updateRankingCacheAfterLikePoemAction
-} from '../../redux/actions/poemsActions'
 import { Poem, Context } from '../../typescript/interfaces'
-import { manageError, manageSuccess } from '../../utils/notifications'
-import { format } from 'date-fns'
+import { PoemHeader, PoemContent, PoemFooter } from './components'
+import { usePoemActions } from './hooks'
 
 interface Props {
     poem: Poem
@@ -29,184 +13,44 @@ interface Props {
 }
 
 const ListItem = ({ poem, filter, context }: Props) => {
-    // Redux
-    const dispatch = useAppDispatch()
+    const { onDelete, onLike, onEdit } = usePoemActions({ poem, context })
 
-    function onDelete(event: React.SyntheticEvent, poemId: string) {
-        event.preventDefault()
-        dispatch(
-            deletePoemAction({
-                params: {
-                    poemId
-                },
-                context,
-                callbacks: {
-                    success: () => {
-                        // todo: when I update this cache, it has effects on many queries.
-                        // Maybe I need some optimisation, in the frontend or in the backend
-                        // for now I update the cache needed for this page, but I need to update the cache for
-                        // the other pages too if I don't query the backend when navigating
-                        dispatch(
-                            updatePoemsListCacheAfterDeletePoemAction({
-                                poemId
-                            })
-                        )
-                        dispatch(
-                            updateRankingCacheAfterDeletePoemAction({
-                                poemId
-                            })
-                        )
-                        manageSuccess('Poem deleted')
-                    },
-                    error: () => {
-                        manageError('Sorry. There was an error deleting the poem')
-                    }
-                }
-            })
-        )
-    }
+    // Determine if the current user can see like button (not their own poem)
+    const showLikeButton = !!(context.user && poem.userId !== context.userId)
 
-    const history = useHistory()
+    // Determine if the user is liked this poem
+    const isLiked = poem.likes?.some(id => id === context.userId) || false
 
-    const onLike = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, poemId: string) => {
-        event.preventDefault()
-        dispatch(
-            likePoemAction({
-                params: {
-                    poemId
-                },
-                context,
-                callbacks: {
-                    success: () => {
-                        // todo: when I update this cache, it has effects on many queries.
-                        // Maybe I need some optimisation, in the frontend or in the backend
-                        dispatch(
-                            updatePoemsListCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateRankingCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateAllPoemsCacheAfterLikePoemAction({
-                                poemId,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updatePoemCacheAfterLikePoemAction({
-                                context
-                            })
-                        )
-                    }
-                }
-            })
-        )
-    }
+    // Determine if the user is the owner or admin
+    const isOwner = !!(context.user && (poem.userId === context.userId || context.userId === context.adminId))
 
-    const editPoem = (poemId: string) => {
-        // Set the poem to edit in context
-        context.setState({
-            ...context,
-            elementToEdit: poemId
-        })
-        // Navigate to profile and pass the ENTIRE poem data in location state
-        // This eliminates flicker by allowing Profile to initialize immediately
-        history.push({
-            pathname: '/profile',
-            state: {
-                elementToEdit: poemId,
-                poemData: poem // Pass the full poem object to avoid fetching
-            }
-        })
+    // Filter by author name
+    if (!normalizeString(poem.author).includes(filter)) {
+        return null
     }
 
     return (
         <main key={poem.id} className='poem__detail'>
-            {normalizeString(poem.author).includes(filter) ? (
-                <section className='poem__block' id='poem__block'>
-                    <section>
-                        <Link to={`/detail/${poem.id}`} className='poem__title'>
-                            {poem.title}
-                        </Link>
-                        <div className='poem__author-container'>
-                            <img className='poem__picture' src={poem.picture} />
-                            <p className='poem__author'>{poem.author}</p>
-                        </div>
-                        <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
-                    </section>
-                    <section>
-                        <div className='poem__content poems__content'>{poem.poem}</div>
-                        <div className='poems__read-more'>
-                            <Link to={`/detail/${poem.id}`} className='poems__read-more'>
-                                {READ_MORE}
-                            </Link>
-                        </div>
-                    </section>
-                    <section className='poem__footer'>
-                        {poem.likes?.length === 1 && (
-                            <div className='poem__likes'>
-                                {poem.likes?.length} {LIKE}
-                            </div>
-                        )}
-                        {poem.likes?.length !== 1 && (
-                            <div className='poem__likes'>
-                                {poem.likes?.length} {LIKES}
-                            </div>
-                        )}
-                        <div className='separator' />
-                        {context.user &&
-                            poem.userId !== context.userId &&
-                            poem.likes.some(id => id === context.userId) && (
-                                <Link
-                                    className='poem__likes-icon'
-                                    onClick={event => onLike(event, poem.id)}
-                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                    data-testid='like-icon'
-                                />
-                            )}
-                        {context.user &&
-                            poem.userId !== context.userId &&
-                            !poem.likes.some(id => id === context.userId) && (
-                                <Link
-                                    className='poem__unlikes-icon'
-                                    onClick={event => onLike(event, poem.id)}
-                                    to='#' // Add a dummy path. TODO: Remove Link and use a button or Navigate
-                                    data-testid='unlike-icon'
-                                />
-                            )}
-                        {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
-                            <EditIcon
-                                className='poem__edit-icon'
-                                onClick={() => editPoem(poem.id)}
-                                data-testid='edit-poem'
-                            />
-                        )}
-                        {context.user && (poem.userId === context.userId || context.userId === context.adminId) && (
-                            <HighlightOffSharpIcon
-                                className='poem__delete-icon'
-                                style={{
-                                    fill: 'red'
-                                }}
-                                data-testid='delete-poem'
-                                onClick={event => onDelete(event, poem.id)}
-                            />
-                        )}
-                        <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
-                            <SubjectSharpIcon
-                                style={{
-                                    fill: '#000'
-                                }}
-                            />
-                        </Link>
-                    </section>
-                </section>
-            ) : null}
+            <section className='poem__block' id='poem__block'>
+                <PoemHeader
+                    poemId={poem.id}
+                    title={poem.title}
+                    author={poem.author}
+                    picture={poem.picture}
+                    date={poem.date}
+                />
+                <PoemContent poemId={poem.id} content={poem.poem} />
+                <PoemFooter
+                    poemId={poem.id}
+                    likesCount={poem.likes?.length || 0}
+                    isLiked={isLiked}
+                    showLikeButton={showLikeButton}
+                    isOwner={isOwner}
+                    onLike={onLike}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
+            </section>
         </main>
     )
 }

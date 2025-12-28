@@ -116,26 +116,27 @@ export function updatePoemsListCacheAfterLikePoemAction({
         const { poemsListQuery } = store.getState()
 
         if (!poemsListQuery.item) {
-            console.log('Poems list cache not loaded, skipping cache update for like poem')
             return
         }
 
-        const newPoemsListQuery = cloneDeep(poemsListQuery.item as Poem[])
-
-        const poemsListQueryUpdated = newPoemsListQuery?.reduce((acc: Poem[], poem: Poem) => {
-            const coincidence = poem.id === poemId
-            if (coincidence) {
-                const index = poem?.likes?.indexOf(context.userId)
-                if (index !== -1) {
-                    poem.likes.splice(index, 1)
-                } else {
-                    poem.likes.push(context.userId)
-                }
+        // Create new array with updated poem - immutable approach
+        const poemsListQueryUpdated = poemsListQuery.item.map((poem: Poem) => {
+            if (poem.id !== poemId) {
+                return poem
             }
-            acc.push(poem)
 
-            return acc
-        }, [])
+            // Found the poem to update - create new poem object with updated likes array
+            const isLiked = poem.likes?.includes(context.userId)
+            const newLikes = isLiked
+                ? poem.likes.filter((id: string) => id !== context.userId) // Remove userId
+                : [...(poem.likes || []), context.userId] // Add userId
+
+            // Return new poem object with new likes array
+            return {
+                ...poem,
+                likes: newLikes
+            }
+        })
 
         const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
         dispatch({
@@ -164,26 +165,27 @@ export function updateRankingCacheAfterLikePoemAction({ poemId, context }: Updat
         } = store.getState()
 
         if (!rankingQuery) {
-            console.log('Ranking cache not loaded, skipping cache update for like poem')
             return
         }
 
-        const newRankingQuery = cloneDeep(rankingQuery as Poem[])
-
-        const rankingQueryUpdated = newRankingQuery?.reduce((acc: Poem[], poem: Poem) => {
-            const coincidence = poem.id === poemId
-            if (coincidence) {
-                const index = poem?.likes?.indexOf(context.userId)
-                if (index !== -1) {
-                    poem.likes.splice(index, 1)
-                } else {
-                    poem.likes.push(context.userId)
-                }
+        // Create new array with updated poem - immutable approach
+        const rankingQueryUpdated = rankingQuery.map((poem: Poem) => {
+            if (poem.id !== poemId) {
+                return poem
             }
-            acc.push(poem)
 
-            return acc
-        }, [])
+            // Found the poem to update - create new poem object with updated likes array
+            const isLiked = poem.likes?.includes(context.userId)
+            const newLikes = isLiked
+                ? poem.likes.filter((id: string) => id !== context.userId) // Remove userId
+                : [...(poem.likes || []), context.userId] // Add userId
+
+            // Return new poem object with new likes array
+            return {
+                ...poem,
+                likes: newLikes
+            }
+        })
 
         const { fulfilledAction } = getTypes(ACTIONS.RANKING)
         dispatch({
@@ -209,26 +211,27 @@ export function updateAllPoemsCacheAfterLikePoemAction({
         } = store.getState()
 
         if (!allPoemsQuery) {
-            console.log('All poems cache not loaded, skipping cache update for like poem')
             return
         }
 
-        const newAllPoemsQuery = cloneDeep(allPoemsQuery as Poem[])
-
-        const allPoemsQueryUpdated = newAllPoemsQuery?.reduce((acc: Poem[], poem: Poem) => {
-            const coincidence = poem.id === poemId
-            if (coincidence) {
-                const index = poem?.likes?.indexOf(context.userId)
-                if (index !== -1) {
-                    poem.likes.splice(index, 1)
-                } else {
-                    poem.likes.push(context.userId)
-                }
+        // Create new array with updated poem - immutable approach
+        const allPoemsQueryUpdated = allPoemsQuery.map((poem: Poem) => {
+            if (poem.id !== poemId) {
+                return poem
             }
-            acc.push(poem)
 
-            return acc
-        }, [])
+            // Found the poem to update - create new poem object with updated likes array
+            const isLiked = poem.likes?.includes(context.userId)
+            const newLikes = isLiked
+                ? poem.likes.filter((id: string) => id !== context.userId) // Remove userId
+                : [...(poem.likes || []), context.userId] // Add userId
+
+            // Return new poem object with new likes array
+            return {
+                ...poem,
+                likes: newLikes
+            }
+        })
 
         const { fulfilledAction } = getTypes(ACTIONS.ALL_POEMS)
         dispatch({
@@ -270,7 +273,6 @@ export function updateAllPoemsCacheAfterCreatePoemAction({ response }: UpdateAll
         } = store.getState()
 
         if (!allPoemsQuery) {
-            console.log('All poems cache not loaded, skipping cache update for create poem')
             return
         }
 
@@ -296,7 +298,6 @@ export function updateMyPoemsCacheAfterCreatePoemAction({ response }: UpdateMyPo
         const myPoemsQueryItem = myPoemsQuery.item
 
         if (!myPoemsQueryItem) {
-            console.log('My poems cache not loaded, skipping cache update for create poem')
             return
         }
 
@@ -330,7 +331,6 @@ export function updatePoemsListCacheAfterCreatePoemAction({
         const { poemsListQuery } = store.getState()
 
         if (!poemsListQuery.item) {
-            console.log('Poems list cache not loaded, skipping cache update for create poem')
             return
         }
 
@@ -338,8 +338,6 @@ export function updatePoemsListCacheAfterCreatePoemAction({
 
         // Add new poem to the beginning of the list (most recent first)
         newPoemsListQuery.unshift(response)
-
-        console.log(`Poem created: ${response.id}. Updating cache with ${newPoemsListQuery.length} poems.`)
 
         const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
         dispatch({
@@ -366,7 +364,6 @@ export function updateAllPoemsCacheAfterDeletePoemAction({ poemId }: updateAllPo
         } = store.getState()
 
         if (!allPoemsQuery) {
-            console.log('All poems cache not loaded, skipping cache update for delete poem')
             return
         }
 
@@ -391,17 +388,12 @@ export function updatePoemsListCacheAfterDeletePoemAction({ poemId }: UpdatePoem
         const { poemsListQuery } = store.getState()
 
         if (!poemsListQuery.item) {
-            console.log('Poems list cache not loaded, skipping cache update for delete poem')
             return
         }
 
         const newPoemsListQuery = cloneDeep(poemsListQuery.item as Poem[])
 
         const poemsListQueryUpdated = newPoemsListQuery?.filter((poem: Poem) => poem.id !== poemId)
-
-        console.log(
-            `Poem deleted: ${poemId}. Updating cache with ${poemsListQueryUpdated?.length || 0} poems remaining.`
-        )
 
         const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
         dispatch({
@@ -429,7 +421,6 @@ export function updateRankingCacheAfterDeletePoemAction({ poemId }: UpdateRankin
         } = store.getState()
 
         if (!rankingQuery) {
-            console.log('Ranking cache not loaded, skipping cache update for delete poem')
             return
         }
 
@@ -458,7 +449,6 @@ export function updateAllPoemsCacheAfterSavePoemAction({ poem, poemId }: updateA
         } = store.getState()
 
         if (!allPoemsQuery) {
-            console.log('All poems cache not loaded, skipping cache update for save poem')
             return
         }
 
@@ -492,7 +482,6 @@ export function updateMyPoemsCacheAfterSavePoemAction({ poem, poemId }: UpdateMy
         const myPoemsQueryItem = myPoemsQuery.item
 
         if (!myPoemsQueryItem) {
-            console.log('My poems cache not loaded, skipping cache update for save poem')
             return
         }
 
@@ -538,7 +527,6 @@ export function updatePoemsListCacheAfterSavePoemAction({
         const poemsListQueryItem = poemsListQuery.item
 
         if (!poemsListQueryItem) {
-            console.log('Poems list cache not loaded, skipping cache update for save poem')
             return
         }
 

@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import Ranking from './Ranking'
+import * as poemsActions from '../../redux/actions/poemsActions'
+
+jest.mock('../../redux/actions/poemsActions')
 
 const mockStore = configureStore([])
 
@@ -9,6 +12,9 @@ describe('Ranking Component - Top 10', () => {
     let store: ReturnType<typeof mockStore>
 
     beforeEach(() => {
+        jest.clearAllMocks()
+        ;(poemsActions.getRankingAction as jest.Mock).mockReturnValue({ type: 'get_ranking' })
+
         store = mockStore({
             rankingQuery: {
                 isFetching: false,
