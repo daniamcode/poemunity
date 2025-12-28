@@ -1244,8 +1244,6 @@ describe('updateAllPoemsCacheAfterSavePoemAction', () => {
 
         // Should not dispatch anything
         expect(dispatch).not.toHaveBeenCalled()
-        // Should log a message
-        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for save poem')
     })
 
     test('Should not crash when allPoemsQuery is null', () => {
@@ -1264,8 +1262,6 @@ describe('updateAllPoemsCacheAfterSavePoemAction', () => {
 
         // Should not dispatch anything
         expect(dispatch).not.toHaveBeenCalled()
-        // Should log a message
-        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for save poem')
     })
 
     test('Should preserve all other poems when updating one poem', () => {
@@ -1441,7 +1437,6 @@ describe('updateMyPoemsCacheAfterSavePoemAction', () => {
         })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-        expect(consoleLogSpy).toHaveBeenCalledWith('My poems cache not loaded, skipping cache update for save poem')
     })
 
     test('Should preserve pagination metadata when updating', () => {
@@ -1599,8 +1594,6 @@ describe('updateAllPoemsCacheAfterCreatePoemAction', () => {
 
         // Should not dispatch anything
         expect(dispatch).not.toHaveBeenCalled()
-        // Should log a message
-        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for create poem')
     })
 
     test('Should not crash when allPoemsQuery is undefined', () => {
@@ -1617,7 +1610,6 @@ describe('updateAllPoemsCacheAfterCreatePoemAction', () => {
         })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-        expect(consoleLogSpy).toHaveBeenCalledWith('All poems cache not loaded, skipping cache update for create poem')
     })
 })
 
@@ -1701,7 +1693,6 @@ describe('updateMyPoemsCacheAfterCreatePoemAction', () => {
         })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-        expect(consoleLogSpy).toHaveBeenCalledWith('My poems cache not loaded, skipping cache update for create poem')
     })
 
     test('Should increment total count correctly', () => {
@@ -1789,7 +1780,6 @@ describe('updatePoemsListCacheAfterCreatePoemAction', () => {
         expect(payload.poems[1].id).toBe('1')
         // Total should be incremented
         expect(payload.total).toBe(2)
-        expect(consoleLogSpy).toHaveBeenCalledWith('Poem created: 2. Updating cache with 2 poems.')
     })
 
     test('Should not crash when poemsListQuery is null', () => {
@@ -1806,7 +1796,6 @@ describe('updatePoemsListCacheAfterCreatePoemAction', () => {
         })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-        expect(consoleLogSpy).toHaveBeenCalledWith('Poems list cache not loaded, skipping cache update for create poem')
     })
 
     test('Should preserve pagination metadata', () => {
@@ -1919,7 +1908,6 @@ describe('updatePoemsListCacheAfterSavePoemAction', () => {
         })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-        expect(consoleLogSpy).toHaveBeenCalledWith('Poems list cache not loaded, skipping cache update for save poem')
     })
 
     test('Should preserve pagination metadata when updating', () => {

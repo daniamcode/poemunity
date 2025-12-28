@@ -5,12 +5,12 @@ import { BrowserRouter } from 'react-router-dom'
 import Detail from './Detail'
 import store from '../../redux/store'
 import * as useDetailPoemHook from './hooks/useDetailPoem'
-import * as usePoemActionsHook from './hooks/usePoemActions'
+import * as usePoemActionsHook from '../../hooks/usePoemActions'
 import { Poem } from '../../typescript/interfaces'
 
 // Mock the hooks
 jest.mock('./hooks/useDetailPoem')
-jest.mock('./hooks/usePoemActions')
+jest.mock('../../hooks/usePoemActions')
 
 // Mock AppContext - define mockContext first
 jest.mock('../../App', () => {
@@ -123,9 +123,15 @@ describe('Detail', () => {
         expect(useDetailPoemHook.useDetailPoem).toHaveBeenCalledWith('poem-123')
     })
 
-    test('should call usePoemActions with correct poemId and context', () => {
+    test('should call usePoemActions with correct poem, context, and onDeleteSuccess', () => {
         renderWithProviders(<Detail {...mockProps} />)
-        expect(usePoemActionsHook.usePoemActions).toHaveBeenCalledWith('poem-123', expect.any(Object))
+        expect(usePoemActionsHook.usePoemActions).toHaveBeenCalledWith(
+            expect.objectContaining({
+                poem: expect.objectContaining({ id: 'poem-123' }),
+                context: expect.any(Object),
+                onDeleteSuccess: expect.any(Function)
+            })
+        )
     })
 
     test('should render PoemFooter with correct props', () => {

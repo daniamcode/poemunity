@@ -4,7 +4,7 @@ import '../../App.scss'
 import normalizeString from '../../utils/normalizeString'
 import { Poem, Context } from '../../typescript/interfaces'
 import { PoemHeader, PoemContent, PoemFooter } from './components'
-import { usePoemActions } from './hooks'
+import { usePoemActions } from '../../hooks/usePoemActions'
 
 interface Props {
     poem: Poem

@@ -96,9 +96,7 @@ describe('LikeButton', () => {
         })
 
         test('should verify that className changes when isLiked prop changes', () => {
-            const { rerender } = renderWithRouter(
-                <LikeButton isLiked={false} onLike={mockOnLike} show={true} />
-            )
+            const { rerender } = renderWithRouter(<LikeButton isLiked={false} onLike={mockOnLike} show={true} />)
 
             // Initially unliked
             const initialIcon = screen.getByTestId('unlike-icon')

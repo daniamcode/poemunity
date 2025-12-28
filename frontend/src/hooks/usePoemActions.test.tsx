@@ -1,14 +1,16 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { usePoemActions } from './usePoemActions'
-import * as poemActions from '../../../redux/actions/poemActions'
-import * as poemsActions from '../../../redux/actions/poemsActions'
-import * as notifications from '../../../utils/notifications'
-import { Poem, Context } from '../../../typescript/interfaces'
+import * as poemActions from '../redux/actions/poemActions'
+import * as poemsActions from '../redux/actions/poemsActions'
+import * as notifications from '../utils/notifications'
+import { Poem, Context } from '../typescript/interfaces'
 
 // Mock dependencies
-jest.mock('../../../redux/actions/poemActions')
-jest.mock('../../../redux/actions/poemsActions')
-jest.mock('../../../utils/notifications')
+jest.mock('../redux/actions/poemActions')
+jest.mock('../redux/actions/poemsActions')
+jest.mock('../utils/notifications')
+
+const mockHistoryPush = jest.fn()
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
     useHistory: () => ({
@@ -16,10 +18,9 @@ jest.mock('react-router-dom', () => ({
     })
 }))
 
-const mockHistoryPush = jest.fn()
 const mockDispatch = jest.fn()
 
-jest.mock('../../../redux/store', () => ({
+jest.mock('../redux/store', () => ({
     useAppDispatch: () => mockDispatch
 }))
 
@@ -42,6 +43,7 @@ describe('usePoemActions', () => {
         username: 'testuser',
         picture: 'avatar.jpg',
         adminId: 'admin-1',
+        elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }
     }
@@ -117,6 +119,22 @@ describe('usePoemActions', () => {
         expect(notifications.manageSuccess).toHaveBeenCalledWith('Poem deleted')
     })
 
+    test('onDelete success callback with custom onDeleteSuccess should call it', () => {
+        const mockOnDeleteSuccess = jest.fn()
+        const { result } = renderHook(() =>
+            usePoemActions({ poem: mockPoem, context: mockContext, onDeleteSuccess: mockOnDeleteSuccess })
+        )
+
+        const mockEvent = { preventDefault: jest.fn() } as any
+        result.current.onDelete(mockEvent)
+
+        // Get the success callback and call it
+        const deletePoemCall = (poemActions.deletePoemAction as jest.Mock).mock.calls[0][0]
+        deletePoemCall.callbacks.success()
+
+        expect(mockOnDeleteSuccess).toHaveBeenCalled()
+    })
+
     test('onDelete error callback should show error notification', () => {
         const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
 
@@ -179,6 +197,7 @@ describe('usePoemActions', () => {
         result.current.onEdit()
 
         expect(mockContext.setState).toHaveBeenCalledWith({
+            ...mockContext,
             elementToEdit: 'poem-123'
         })
         expect(mockHistoryPush).toHaveBeenCalledWith({

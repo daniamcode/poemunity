@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
-import * as usePoemActionsModule from './hooks/usePoemActions'
+import * as usePoemActionsModule from '../../hooks/usePoemActions'
 
 // Mock child components
 jest.mock('./components', () => ({
@@ -20,7 +20,7 @@ jest.mock('./components', () => ({
 }))
 
 // Mock the hook
-jest.mock('./hooks/usePoemActions')
+jest.mock('../../hooks/usePoemActions')
 
 describe('ListItem (Refactored)', () => {
     const mockOnDelete = jest.fn()
