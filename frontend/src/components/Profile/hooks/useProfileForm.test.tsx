@@ -279,7 +279,7 @@ describe('useProfileForm', () => {
 
         // Mock savePoemAction to call the success callback
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
-            return (dispatch: any) => {
+            return () => {
                 // Simulate success callback
                 if (callbacks && callbacks.success) {
                     callbacks.success()
@@ -417,7 +417,7 @@ describe('useProfileForm', () => {
 
         // Mock savePoemAction to call the error callback
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
-            return (dispatch: any) => {
+            return () => {
                 // Simulate error callback
                 if (callbacks && callbacks.error) {
                     callbacks.error()

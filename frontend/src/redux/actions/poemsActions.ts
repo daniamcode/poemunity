@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable max-lines */
 import store from '../store/index'
 import { getAction, postAction, getTypes } from './commonActions'
@@ -322,7 +323,9 @@ interface UpdatePoemsListCacheAfterCreatePoemActionProps {
     response: Poem
 }
 
-export function updatePoemsListCacheAfterCreatePoemAction({ response }: UpdatePoemsListCacheAfterCreatePoemActionProps) {
+export function updatePoemsListCacheAfterCreatePoemAction({
+    response
+}: UpdatePoemsListCacheAfterCreatePoemActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { poemsListQuery } = store.getState()
 

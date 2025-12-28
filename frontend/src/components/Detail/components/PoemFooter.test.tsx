@@ -24,7 +24,11 @@ describe('PoemFooter', () => {
     const mockContext: Context = {
         user: 'testuser',
         userId: 'user-789',
+        username: 'testuser',
+        picture: 'default.jpg',
+        config: {},
         adminId: 'admin-123',
+        elementToEdit: '',
         setState: jest.fn()
     }
 
@@ -69,7 +73,7 @@ describe('PoemFooter', () => {
     })
 
     test('should NOT show like/unlike icons when user is not logged in', () => {
-        const contextNoUser = { ...mockContext, user: null }
+        const contextNoUser = { ...mockContext, user: '' }
         renderWithRouter(<PoemFooter poem={mockPoem} context={contextNoUser} {...mockHandlers} />)
         expect(screen.queryByTestId('like-icon')).not.toBeInTheDocument()
         expect(screen.queryByTestId('unlike-icon')).not.toBeInTheDocument()
@@ -136,7 +140,7 @@ describe('PoemFooter', () => {
     })
 
     test('should NOT show edit/delete icons when user is not logged in', () => {
-        const contextNoUser = { ...mockContext, user: null }
+        const contextNoUser = { ...mockContext, user: '' }
         renderWithRouter(<PoemFooter poem={mockPoem} context={contextNoUser} {...mockHandlers} />)
         expect(screen.queryByTestId('edit-icon')).not.toBeInTheDocument()
         expect(screen.queryByTestId('delete-icon')).not.toBeInTheDocument()

@@ -111,8 +111,8 @@ const ListItem = ({ poem, filter, context }: Props) => {
 
     const editPoem = (poemId: string) => {
         // Set the poem to edit in context
-        // Only pass the property we want to update, not the entire context
         context.setState({
+            ...context,
             elementToEdit: poemId
         })
         // Navigate to profile and pass the ENTIRE poem data in location state

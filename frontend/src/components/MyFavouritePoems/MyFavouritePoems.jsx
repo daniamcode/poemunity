@@ -204,7 +204,7 @@ function MyFavouritePoems() {
                         }}
                     />
                     <TextField
-                        variant="standard"
+                        variant='standard'
                         label='Search author'
                         InputLabelProps={{
                             style: {

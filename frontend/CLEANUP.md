@@ -1408,3 +1408,6 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Cypress inserts shouldn't go into real database
 -   Check "copy:backend" in package.json, as that's something that should also do the pipeline, to avoid manual
     copy/paste, see if it already does it or not
+-   Avoid the use of "any" for typescript
+-   See what to do with console logs/warnings/errors. Maybe i don't want to pollute the console in prod, maybe i do want
+    to do it on dev. I have a rule on eslint to avoid doing console.logs but in some file i skip it

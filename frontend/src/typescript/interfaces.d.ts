@@ -21,6 +21,7 @@ export interface User {
 export interface StateItem<T> {
     isFetching: boolean
     isError: boolean
+    err?: unknown
     // at least we have 2 cases for the item (Poem and Poem[])
     // we could also say that item is "object | object[]"" but we will keep it wider with
     // unknown, and then we can use the "as" operator to cast it to the correct type

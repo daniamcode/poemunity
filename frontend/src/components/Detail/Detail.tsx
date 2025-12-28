@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { AppContext } from '../../App'
 import './Detail.scss'
 import '../../App.scss'

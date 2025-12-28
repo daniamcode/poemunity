@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import React from 'react'
 import List from './List'
-import { render, act, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, act, screen, fireEvent } from '@testing-library/react'
 import store from '../../redux/store'
 import { Provider } from 'react-redux'
 import * as Redux from 'react-redux'
@@ -228,7 +228,7 @@ describe('List', () => {
         render(
             <Provider store={store}>
                 <BrowserRouter>
-                    <List match={{ params: { genre: 'love' } }} />
+                    <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
                 </BrowserRouter>
             </Provider>
         )
@@ -243,7 +243,7 @@ describe('List', () => {
         render(
             <Provider store={store}>
                 <BrowserRouter>
-                    <List match={{ params: { genre: 'love' } }} />
+                    <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
                 </BrowserRouter>
             </Provider>
         )
@@ -268,7 +268,7 @@ describe('List', () => {
         render(
             <Provider store={store}>
                 <BrowserRouter>
-                    <List match={{ params: { genre: 'sad' } }} />
+                    <List match={{ params: { genre: 'sad' }, isExact: true, path: '/sad', url: '/sad' }} />
                 </BrowserRouter>
             </Provider>
         )

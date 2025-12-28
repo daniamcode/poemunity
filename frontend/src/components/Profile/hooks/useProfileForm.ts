@@ -38,7 +38,12 @@ const initialPoemState: PoemFormData = {
     likes: []
 }
 
-export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any, locationState?: any): UseProfileFormReturn {
+export function useProfileForm(
+    context: any,
+    poemQuery: any,
+    poemsListQuery: any,
+    locationState?: any
+): UseProfileFormReturn {
     const dispatch = useAppDispatch()
     const isAdmin = context?.userId === context?.adminId
 
@@ -119,8 +124,8 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
         if (isEditing) {
             // Check if we already have this poem in cache (either in poemQuery or poemsList)
             const alreadyInPoemQuery = poemQuery?.item?.id === elementToEdit
-            const alreadyInPoemsList = Array.isArray(poemsListQuery?.item) &&
-                poemsListQuery.item.some((p: any) => p.id === elementToEdit)
+            const alreadyInPoemsList =
+                Array.isArray(poemsListQuery?.item) && poemsListQuery.item.some((p: any) => p.id === elementToEdit)
 
             // If we initialized from cache, never fetch
             if (initializedFromCache.current && (alreadyInPoemsList || locationState?.poemData)) {
@@ -169,15 +174,13 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 context,
                 callbacks: {
                     success: response => {
-                        console.log('Poem created successfully:', response)
                         // Update all relevant caches after creating
                         dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
                         dispatch(updateMyPoemsCacheAfterCreatePoemAction({ response }))
                         dispatch(updatePoemsListCacheAfterCreatePoemAction({ response }))
                         manageSuccess('Poem created successfully')
                     },
-                    error: error => {
-                        console.error('Error creating poem:', error)
+                    error: () => {
                         manageError('Sorry. There was an error creating the poem')
                     }
                 }
@@ -194,7 +197,6 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 data: poemData,
                 callbacks: {
                     success: () => {
-                        console.log('Poem saved successfully:', poemQuery.item.id)
                         const updatePayload = { poem: poemData, poemId: poemQuery.item.id }
                         // Update all relevant caches after saving
                         dispatch(updateAllPoemsCacheAfterSavePoemAction(updatePayload))
@@ -202,8 +204,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         dispatch(updatePoemsListCacheAfterSavePoemAction(updatePayload))
                         manageSuccess('Poem saved')
                     },
-                    error: error => {
-                        console.error('Error saving poem:', error)
+                    error: () => {
                         manageError('Sorry. There was an error saving the poem')
                     }
                 }

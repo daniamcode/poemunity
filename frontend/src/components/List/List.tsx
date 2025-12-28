@@ -183,7 +183,7 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
                             }}
                         />
                         <TextField
-                            variant="standard"
+                            variant='standard'
                             label={SEARCH_PLACEHOLDER}
                             InputLabelProps={{
                                 style: {

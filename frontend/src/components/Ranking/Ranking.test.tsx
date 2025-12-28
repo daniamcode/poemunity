@@ -1,15 +1,12 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
 import Ranking from './Ranking'
 
-const middlewares = [thunk]
-const mockStore = configureStore(middlewares)
+const mockStore = configureStore([])
 
 describe('Ranking Component - Top 10', () => {
-    let store
+    let store: ReturnType<typeof mockStore>
 
     beforeEach(() => {
         store = mockStore({

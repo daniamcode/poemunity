@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint'
 import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js'
 import { fixupConfigRules } from '@eslint/compat'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import unusedImports from 'eslint-plugin-unused-imports'
 
 export default [
     {
@@ -16,15 +17,32 @@ export default [
         languageOptions: { globals: globals.browser }
     },
     {
-        files: ['**/*.test.{js,ts,jsx,tsx}', '**/*.spec.{js,ts,jsx,tsx}'],
-        languageOptions: { globals: globals.jest }
-    },
-    {
         files: ['**/build*.js'],
         languageOptions: { globals: { ...globals.node } },
         rules: {
             '@typescript-eslint/no-require-imports': 'off',
             'no-console': 'off'
+        }
+    },
+    {
+        plugins: {
+            'unused-imports': unusedImports
+        },
+        rules: {
+            // Turn off the base rules
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': 'off',
+            // Turn on the unused-imports plugin rules (auto-fixable)
+            'unused-imports/no-unused-imports': 'error',
+            'unused-imports/no-unused-vars': [
+                'error',
+                {
+                    vars: 'all',
+                    varsIgnorePattern: '^_',
+                    args: 'after-used',
+                    argsIgnorePattern: '^_'
+                }
+            ]
         }
     },
     pluginJs.configs.recommended,
@@ -190,14 +208,7 @@ export default [
             'no-unexpected-multiline': 2, // disallow confusing multiline expressions
             'no-unneeded-ternary': [2, { defaultAssignment: false }], // disallow ternary operators when simpler alternatives exist
             'no-unreachable': 2, // disallow unreachable code after return, throw, continue, and break statements
-            'no-unused-vars': [
-                2,
-                {
-                    // disallow unused variables
-                    args: 'none',
-                    vars: 'all'
-                }
-            ],
+            // 'no-unused-vars' is now handled by eslint-plugin-unused-imports (see config above)
             'no-use-before-define': ['error', 'nofunc'], // enforce variables to be defined before using them
             'no-useless-call': 2, // disallow unnecessary calls to .call() and .apply()
             'no-useless-constructor': 2, // disallow unnecessary constructors
@@ -286,6 +297,23 @@ export default [
                     ignorePattern: '^import.*|^export.*'
                 }
             ]
+        }
+    },
+    // Test files: Allow Node.js globals and relax strict rules
+    {
+        files: ['**/*.test.{js,ts,jsx,tsx}', '**/*.spec.{js,ts,jsx,tsx}', '**/__tests__/**/*.{js,ts,jsx,tsx}'],
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+                ...globals.node // Add Node.js globals (process, Buffer, require, etc.)
+            }
+        },
+        rules: {
+            '@typescript-eslint/no-var-requires': 'off', // Allow require() in tests for dynamic imports/mocking
+            '@typescript-eslint/no-require-imports': 'off', // Allow require() in tests
+            'no-undef': 'off', // TypeScript handles this, and Node.js globals are available
+            'no-console': 'off', // Allow console in tests
+            'max-lines': 'off' // Allow longer test files
         }
     }
 ]

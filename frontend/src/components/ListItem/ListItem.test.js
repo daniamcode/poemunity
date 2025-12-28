@@ -396,7 +396,7 @@ describe('ListItem component', () => {
                 })
             }
 
-            const { container } = render(<ListItem poem={ownPoem} filter={filter} context={contextWithUser} />, {
+            render(<ListItem poem={ownPoem} filter={filter} context={contextWithUser} />, {
                 wrapper
             })
 
@@ -470,7 +470,7 @@ describe('ListItem component', () => {
                 userId: 'user-456' // Same as context userId
             }
 
-            const { container } = render(<ListItem poem={poemToEdit} filter={filter} context={contextWithUser} />, {
+            render(<ListItem poem={poemToEdit} filter={filter} context={contextWithUser} />, {
                 wrapper
             })
 

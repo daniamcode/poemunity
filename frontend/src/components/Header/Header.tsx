@@ -21,6 +21,7 @@ function Header() {
             const parsedUser = JSON.parse(loggedUserJSON)
             const jwtData = parseJWT(parsedUser)
             context.setState({
+                ...context,
                 user: parsedUser,
                 userId: jwtData?.id,
                 username: jwtData?.username,

@@ -14,7 +14,7 @@ describe('useInfiniteScroll', () => {
         mockDisconnect = jest.fn()
 
         // Mock IntersectionObserver
-        global.IntersectionObserver = jest.fn((callback) => {
+        global.IntersectionObserver = jest.fn(callback => {
             intersectionObserverCallback = callback
             return {
                 observe: mockObserve,

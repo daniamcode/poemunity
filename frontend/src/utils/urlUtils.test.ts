@@ -1,5 +1,13 @@
 /* eslint-disable max-lines */
-import { parseQuery, urlParse, urlTail, getQueryParam, decodeRedirectQuery, queryMatch, getEncodedUri } from './urlUtils'
+import {
+    parseQuery,
+    urlParse,
+    urlTail,
+    getQueryParam,
+    decodeRedirectQuery,
+    queryMatch,
+    getEncodedUri
+} from './urlUtils'
 
 describe('urlUtils', () => {
     beforeEach(() => {

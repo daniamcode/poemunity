@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Header from './Header'
@@ -8,19 +7,19 @@ import * as parseJWTModule from '../../utils/parseJWT'
 // Mock child components
 jest.mock('../SimpleAccordion', () => {
     return function MockAccordion() {
-        return <div data-testid="mock-accordion">Accordion</div>
+        return <div data-testid='mock-accordion'>Accordion</div>
     }
 })
 
 jest.mock('./LoginButton', () => {
     return function MockLoginButton() {
-        return <button data-testid="login-button">Login</button>
+        return <button data-testid='login-button'>Login</button>
     }
 })
 
 jest.mock('./Logout', () => {
     return function MockLogoutButton() {
-        return <button data-testid="logout-button">Logout</button>
+        return <button data-testid='logout-button'>Logout</button>
     }
 })
 

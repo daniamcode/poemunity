@@ -28,7 +28,7 @@ jest.mock('axios', () => {
 
 const mockContext = {
     elementToEdit: '',
-    user: { id: 'user123' },
+    user: 'user123',
     userId: 'user123',
     username: 'testuser',
     picture: '',
@@ -44,7 +44,7 @@ describe('List component - Duplicate keys bug', () => {
             title: 'First Poem',
             author: 'Author 1',
             poem: 'Content 1',
-            likes: [],
+            likes: [] as string[],
             date: new Date().toISOString(),
             userId: 'otherUser1',
             picture: '',
@@ -56,7 +56,7 @@ describe('List component - Duplicate keys bug', () => {
             title: 'Second Poem',
             author: 'Author 2',
             poem: 'Content 2',
-            likes: [],
+            likes: [] as string[],
             date: new Date().toISOString(),
             userId: 'otherUser2',
             picture: '',
@@ -134,7 +134,7 @@ describe('List component - Duplicate keys bug', () => {
             <Provider store={store}>
                 <AppContext.Provider value={mockContext}>
                     <MemoryRouter>
-                        <List match={{ params: {} }} />
+                        <List match={{ params: {}, isExact: true, path: '/', url: '/' }} />
                     </MemoryRouter>
                 </AppContext.Provider>
             </Provider>

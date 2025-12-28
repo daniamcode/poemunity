@@ -22,7 +22,7 @@ describe('SimpleAccordion', () => {
     })
 
     test('should expand accordion when genre is provided', () => {
-        const { container } = renderWithRouter(<SimpleAccordion genre="love" />)
+        const { container } = renderWithRouter(<SimpleAccordion genre='love' />)
         const accordion = container.querySelector('.accordion')
         expect(accordion).toHaveClass('Mui-expanded')
     })
@@ -97,7 +97,7 @@ describe('SimpleAccordion', () => {
     })
 
     test('should NOT highlight "ALL" link when genre is provided', () => {
-        renderWithRouter(<SimpleAccordion genre="love" />)
+        renderWithRouter(<SimpleAccordion genre='love' />)
 
         const allLink = screen.getByText(ALL).closest('a')
         expect(allLink).not.toHaveClass('active')
@@ -150,7 +150,7 @@ describe('SimpleAccordion', () => {
         // Rerender with genre
         rerender(
             <BrowserRouter>
-                <SimpleAccordion genre="love" />
+                <SimpleAccordion genre='love' />
             </BrowserRouter>
         )
 

@@ -1,10 +1,10 @@
-import { render, screen, cleanup, act } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react'
 import App, { AppContext } from './App'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import store from './redux/store'
 import '@testing-library/jest-dom'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 
 // Mock child components to isolate routing tests
 jest.mock('./components/Dashboard/Dashboard', () => {
@@ -153,10 +153,7 @@ describe('App', () => {
             // rather than setContextState({ ...contextState, ...res })
             // This prevents the bug where rapid setState calls lose previous state
 
-            const AppSource = require('fs').readFileSync(
-                require('path').join(__dirname, 'App.tsx'),
-                'utf8'
-            )
+            const AppSource = require('fs').readFileSync(require('path').join(__dirname, 'App.tsx'), 'utf8')
 
             // Check that functional setState is used (CRITICAL for preventing context loss)
             expect(AppSource).toMatch(/setContextState\s*\(\s*prevState\s*=>/)

@@ -175,8 +175,8 @@ describe('Cypress Backend Cleanup', () => {
             })
 
             const execSyncSpy = jest.spyOn(require('child_process'), 'execSync')
-            execSyncSpy.mockImplementation((cmd: string) => {
-                if (cmd.includes('lsof -ti:4200')) {
+            execSyncSpy.mockImplementation((cmd: unknown) => {
+                if (typeof cmd === 'string' && cmd.includes('lsof -ti:4200')) {
                     // Simulate killing process
                     return Buffer.from('')
                 }
@@ -196,8 +196,8 @@ describe('Cypress Backend Cleanup', () => {
             })
 
             const execSyncSpy = jest.spyOn(require('child_process'), 'execSync')
-            execSyncSpy.mockImplementation((cmd: string) => {
-                if (cmd.includes('netstat -ano')) {
+            execSyncSpy.mockImplementation((cmd: unknown) => {
+                if (typeof cmd === 'string' && cmd.includes('netstat -ano')) {
                     // Simulate killing process
                     return Buffer.from('')
                 }
@@ -274,11 +274,12 @@ describe('Cypress Backend Cleanup', () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
             const mockProcess: Partial<ChildProcess> = {
-                on: jest.fn((event, callback) => {
+                on: jest.fn((event: string, callback: (...args: any[]) => void) => {
                     if (event === 'error') {
                         // Simulate error
-                        ;(callback as (err: Error) => void)(new Error('Spawn failed'))
+                        callback(new Error('Spawn failed'))
                     }
+                    return mockProcess as ChildProcess
                 }),
                 kill: jest.fn(),
                 pid: 12345

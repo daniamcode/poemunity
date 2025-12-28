@@ -15,7 +15,12 @@ export default function Profile() {
     const poemQuery = useSelector(state => state.poemQuery)
     const poemsListQuery = useSelector(state => state.poemsListQuery)
 
-    const { poem, updatePoemField, handleSend, handleReset } = useProfileForm(context, poemQuery, poemsListQuery, location.state)
+    const { poem, updatePoemField, handleSend, handleReset } = useProfileForm(
+        context,
+        poemQuery,
+        poemsListQuery,
+        location.state
+    )
 
     const handleChange = (_event, newValue) => {
         setValue(newValue)
