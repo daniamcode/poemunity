@@ -77,6 +77,20 @@
     }
 }
 
+.profile__cancel-edit {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f57c00;
+    }
+}
+
 // Tabs section
 .profile__tabs-header {
     background-color: #fff;

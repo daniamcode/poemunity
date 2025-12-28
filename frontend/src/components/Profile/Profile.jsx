@@ -15,11 +15,11 @@ export default function Profile() {
     const poemQuery = useSelector(state => state.poemQuery)
     const poemsListQuery = useSelector(state => state.poemsListQuery)
 
-    const { poem, updatePoemField, handleSend, handleReset } = useProfileForm(
+    const { poem, isEditing, updatePoemField, handleSend, handleReset, handleCancel } = useProfileForm(
         context,
         poemQuery,
         poemsListQuery,
-        location.state
+        location
     )
 
     const handleChange = (_event, newValue) => {
@@ -43,10 +43,12 @@ export default function Profile() {
                         <ProfileForm
                             context={context}
                             poem={poem}
+                            isEditing={isEditing}
                             updatePoemField={updatePoemField}
                             poemQuery={poemQuery}
                             handleSend={handleSend}
                             handleReset={handleReset}
+                            handleCancel={handleCancel}
                         />
                     </section>
                     <ProfileTabs value={value} handleChange={handleChange} handleChangeIndex={handleChangeIndex} />

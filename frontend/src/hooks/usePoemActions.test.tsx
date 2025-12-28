@@ -204,19 +204,15 @@ describe('usePoemActions', () => {
         })
     })
 
-    test('onEdit should set context state and navigate to profile', () => {
+    test('onEdit should navigate to profile with edit query param', () => {
         const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
 
         result.current.onEdit()
 
-        expect(mockContext.setState).toHaveBeenCalledWith({
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        })
         expect(mockHistoryPush).toHaveBeenCalledWith({
             pathname: '/profile',
+            search: '?edit=poem-123',
             state: {
-                elementToEdit: 'poem-123',
                 poemData: mockPoem
             }
         })

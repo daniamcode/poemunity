@@ -12,7 +12,7 @@ import * as poemsActions from '../../redux/actions/poemsActions'
 import * as urlUtils from '../../utils/urlUtils'
 import { Poem } from '../../typescript/interfaces'
 
-// we cannot mock the whole react-redux; we need the store, so we require everyting except useSelector
+// we cannot mock the whole react-redux; we need the store, so we require everything except useSelector
 jest.mock('react-redux', () => ({
     ...jest.requireActual('react-redux'),
     useSelector: jest.fn()

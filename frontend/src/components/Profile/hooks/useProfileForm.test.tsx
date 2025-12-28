@@ -18,6 +18,15 @@ jest.mock('../../../utils/notifications', () => ({
 jest.mock('../../../redux/actions/poemActions')
 jest.mock('../../../redux/actions/poemsActions')
 
+// Mock React Router
+const mockPush = jest.fn()
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useHistory: () => ({
+        push: mockPush
+    })
+}))
+
 describe('useProfileForm', () => {
     const mockContext = {
         userId: 'user-123',
@@ -34,12 +43,27 @@ describe('useProfileForm', () => {
         item: null
     }
 
+    const mockLocation = {
+        pathname: '/profile',
+        search: '',
+        state: undefined,
+        hash: ''
+    }
+
+    const createMockLocationWithEdit = (poemId: string, poemData?: any) => ({
+        pathname: '/profile',
+        search: `?edit=${poemId}`,
+        state: poemData ? { poemData } : undefined,
+        hash: ''
+    })
+
     const wrapper: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => (
         <Provider store={store}>{children}</Provider>
     )
 
     beforeEach(() => {
         jest.clearAllMocks()
+        mockPush.mockClear()
         ;(poemActions.getPoemAction as jest.Mock).mockReturnValue({ type: 'GET_POEM' })
         ;(poemActions.savePoemAction as jest.Mock).mockReturnValue({ type: 'SAVE_POEM' })
         ;(poemsActions.createPoemAction as jest.Mock).mockReturnValue({ type: 'CREATE_POEM' })
@@ -64,9 +88,12 @@ describe('useProfileForm', () => {
     })
 
     test('should initialize with empty poem data', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         expect(result.current.poem).toEqual({
             content: '',
@@ -79,9 +106,12 @@ describe('useProfileForm', () => {
     })
 
     test('should update poem field when updatePoemField is called', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'New Poem Title')
@@ -91,9 +121,12 @@ describe('useProfileForm', () => {
     })
 
     test('should update multiple poem fields independently', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'My Poem')
@@ -121,13 +154,10 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             {
                 wrapper
             }
@@ -144,9 +174,12 @@ describe('useProfileForm', () => {
     })
 
     test('should reset poem data when handleReset is called', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         // Set some data first
         act(() => {
@@ -173,9 +206,12 @@ describe('useProfileForm', () => {
     })
 
     test('should update poem field with different types of values', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('likes', 'user1,user2,user3')
@@ -191,9 +227,12 @@ describe('useProfileForm', () => {
     })
 
     test('should maintain other poem fields when updating one field', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'Title')
@@ -225,13 +264,10 @@ describe('useProfileForm', () => {
             }
         }
 
-        let testContext = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        let testLocation = createMockLocationWithEdit('poem-123')
 
         const { result, rerender } = renderHook(
-            () => useProfileForm(testContext, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, testLocation),
             {
                 wrapper
             }
@@ -240,11 +276,8 @@ describe('useProfileForm', () => {
         // Verify it loaded
         expect(result.current.poem.title).toBe('Existing Poem')
 
-        // Remove elementToEdit
-        testContext = {
-            ...mockContext,
-            elementToEdit: ''
-        }
+        // Remove edit param from URL
+        testLocation = mockLocation
 
         rerender()
 
@@ -272,10 +305,7 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         // Mock savePoemAction to call the success callback
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
@@ -300,7 +330,7 @@ describe('useProfileForm', () => {
         })
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             {
                 wrapper
             }
@@ -359,17 +389,14 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(() => {
             return () => Promise.resolve()
         })
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             {
                 wrapper
             }
@@ -389,7 +416,7 @@ describe('useProfileForm', () => {
         expect(poemActions.savePoemAction).toHaveBeenCalledWith(
             expect.objectContaining({
                 params: { poemId: 'poem-123' },
-                context: contextWithEdit,
+                context: mockContext,
                 data: expect.objectContaining({
                     title: 'Updated Title'
                 })
@@ -410,10 +437,7 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         // Mock savePoemAction to call the error callback
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
@@ -436,7 +460,7 @@ describe('useProfileForm', () => {
         })
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             {
                 wrapper
             }
@@ -460,26 +484,25 @@ describe('useProfileForm', () => {
     })
 
     test('should initialize from location state poemData when provided', () => {
-        const locationState = {
-            elementToEdit: 'poem-456',
-            poemData: {
-                id: 'poem-456',
-                title: 'Location State Poem',
-                poem: 'Content from location state',
-                userId: 'user-789',
-                genre: 'epic',
-                origin: 'classic',
-                likes: ['user1', 'user2', 'user3']
-            }
-        }
-
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-456'
+        const locationWithEditAndData = {
+            pathname: '/profile',
+            search: '?edit=poem-456',
+            state: {
+                poemData: {
+                    id: 'poem-456',
+                    title: 'Location State Poem',
+                    poem: 'Content from location state',
+                    userId: 'user-789',
+                    genre: 'epic',
+                    origin: 'classic',
+                    likes: ['user1', 'user2', 'user3']
+                }
+            },
+            hash: ''
         }
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, locationState),
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, locationWithEditAndData),
             { wrapper }
         )
 
@@ -517,13 +540,10 @@ describe('useProfileForm', () => {
             ]
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-111'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-111')
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQueryWithData, undefined),
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQueryWithData, locationWithEdit),
             { wrapper }
         )
 
@@ -537,34 +557,8 @@ describe('useProfileForm', () => {
         })
     })
 
-    test('should sync elementToEdit from location state to context', () => {
-        const locationState = {
-            elementToEdit: 'poem-sync-test',
-            poemData: {
-                id: 'poem-sync-test',
-                title: 'Test',
-                poem: 'Content',
-                userId: 'user-123',
-                genre: 'test',
-                origin: 'user',
-                likes: []
-            }
-        }
-
-        const contextWithDifferentEdit = {
-            ...mockContext,
-            elementToEdit: 'different-poem-id'
-        }
-
-        renderHook(() => useProfileForm(contextWithDifferentEdit, mockPoemQuery, mockPoemsListQuery, locationState), {
-            wrapper
-        })
-
-        expect(mockContext.setState).toHaveBeenCalledWith({ elementToEdit: 'poem-sync-test' })
-    })
-
     test('should dispatch getPoemAction with reset when not editing', () => {
-        renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), { wrapper })
+        renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation), { wrapper })
 
         expect(poemActions.getPoemAction).toHaveBeenCalledWith({
             options: { reset: true, fetch: false }
@@ -572,12 +566,9 @@ describe('useProfileForm', () => {
     })
 
     test('should dispatch getPoemAction to fetch poem when editing and not in cache', () => {
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-not-in-cache'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-not-in-cache')
 
-        renderHook(() => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, undefined), { wrapper })
+        renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, locationWithEdit), { wrapper })
 
         expect(poemActions.getPoemAction).toHaveBeenCalledWith({
             params: { poemId: 'poem-not-in-cache' },
@@ -586,27 +577,21 @@ describe('useProfileForm', () => {
     })
 
     test('should NOT fetch poem when initialized from location state cache', () => {
-        const locationState = {
-            elementToEdit: 'poem-cached',
-            poemData: {
-                id: 'poem-cached',
-                title: 'Cached Poem',
-                poem: 'Cached content',
-                userId: 'user-123',
-                genre: 'test',
-                origin: 'user',
-                likes: []
-            }
-        }
-
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-cached'
-        }
+        const locationWithCachedData = createMockLocationWithEdit('poem-cached', {
+            id: 'poem-cached',
+            title: 'Cached Poem',
+            poem: 'Cached content',
+            userId: 'user-123',
+            genre: 'test',
+            origin: 'user',
+            likes: []
+        })
 
         ;(poemActions.getPoemAction as jest.Mock).mockClear()
 
-        renderHook(() => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, locationState), { wrapper })
+        renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, locationWithCachedData), {
+            wrapper
+        })
 
         // Should not call getPoemAction with fetch: true because data is from location state
         expect(poemActions.getPoemAction).not.toHaveBeenCalledWith(
@@ -627,9 +612,12 @@ describe('useProfileForm', () => {
             }
         })
 
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'New Poem')
@@ -667,9 +655,12 @@ describe('useProfileForm', () => {
             }
         })
 
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'Test Create')
@@ -698,9 +689,12 @@ describe('useProfileForm', () => {
             }
         })
 
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'Will be reset')
@@ -735,9 +729,12 @@ describe('useProfileForm', () => {
             }
         })
 
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         act(() => {
             result.current.updatePoemField('title', 'Failed Poem')
@@ -754,9 +751,12 @@ describe('useProfileForm', () => {
     })
 
     test('should call preventDefault on handleSend', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         const mockEvent = {
             preventDefault: jest.fn()
@@ -770,9 +770,12 @@ describe('useProfileForm', () => {
     })
 
     test('should call preventDefault on handleReset', () => {
-        const { result } = renderHook(() => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, undefined), {
-            wrapper
-        })
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, mockLocation),
+            {
+                wrapper
+            }
+        )
 
         const mockEvent = {
             preventDefault: jest.fn()
@@ -785,17 +788,28 @@ describe('useProfileForm', () => {
         expect(mockEvent.preventDefault).toHaveBeenCalled()
     })
 
-    test('should clear elementToEdit when handleReset is called', () => {
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-to-clear'
-        }
+    test('should clear form fields when handleReset is called', () => {
+        const locationWithEdit = createMockLocationWithEdit('poem-to-clear')
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQuery, mockPoemsListQuery, undefined),
-            { wrapper }
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, locationWithEdit),
+            {
+                wrapper
+            }
         )
 
+        // Set some values first
+        act(() => {
+            result.current.updatePoemField('title', 'Test Title')
+            result.current.updatePoemField('content', 'Test Content')
+            result.current.updatePoemField('category', 'love')
+        })
+
+        // Verify fields are set
+        expect(result.current.poem.title).toBe('Test Title')
+        expect(result.current.poem.content).toBe('Test Content')
+
+        // Reset the form
         act(() => {
             const mockEvent = {
                 preventDefault: jest.fn()
@@ -803,7 +817,34 @@ describe('useProfileForm', () => {
             result.current.handleReset(mockEvent)
         })
 
-        expect(mockContext.setState).toHaveBeenCalledWith({ elementToEdit: '' })
+        // Fields should be cleared
+        expect(result.current.poem.title).toBe('')
+        expect(result.current.poem.content).toBe('')
+        expect(result.current.poem.category).toBe('')
+
+        // Should NOT have navigated (still in edit mode)
+        expect(mockPush).not.toHaveBeenCalled()
+    })
+
+    test('should navigate away when handleCancel is called', () => {
+        const locationWithEdit = createMockLocationWithEdit('poem-to-cancel')
+
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery, locationWithEdit),
+            {
+                wrapper
+            }
+        )
+
+        act(() => {
+            const mockEvent = {
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>
+            result.current.handleCancel(mockEvent)
+        })
+
+        // Should navigate to /profile (clearing edit param)
+        expect(mockPush).toHaveBeenCalledWith('/profile')
     })
 
     test('should call manageSuccess when save poem succeeds', () => {
@@ -819,10 +860,7 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
             return () => {
@@ -834,7 +872,7 @@ describe('useProfileForm', () => {
         })
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             { wrapper }
         )
 
@@ -865,10 +903,7 @@ describe('useProfileForm', () => {
             }
         }
 
-        const contextWithEdit = {
-            ...mockContext,
-            elementToEdit: 'poem-123'
-        }
+        const locationWithEdit = createMockLocationWithEdit('poem-123')
 
         ;(poemActions.savePoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
             return () => {
@@ -880,7 +915,7 @@ describe('useProfileForm', () => {
         })
 
         const { result } = renderHook(
-            () => useProfileForm(contextWithEdit, mockPoemQueryWithItem, mockPoemsListQuery, undefined),
+            () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery, locationWithEdit),
             { wrapper }
         )
 

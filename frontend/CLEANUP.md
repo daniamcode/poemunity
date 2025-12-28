@@ -1405,9 +1405,23 @@ const newPoems = isFirstPage ? poems : [...(state.item || []), ...poems]
 -   Ask IA to add component tests from Cypress, not just e2e, and see if it's useful
 -   Add to the pipeline that all tests have to pass, including cypress ones
 -   Fix sticky header in Profile, as when scrolling, the search is bypassing the header view
--   Cypress inserts shouldn't go into real database
 -   Check "copy:backend" in package.json, as that's something that should also do the pipeline, to avoid manual
     copy/paste, see if it already does it or not
 -   Avoid the use of "any" for typescript
 -   See what to do with console logs/warnings/errors. Maybe i don't want to pollute the console in prod, maybe i do want
     to do it on dev. I have a rule on eslint to avoid doing console.logs but in some file i skip it
+-   In the backend I have "standard" installed, I think is eslint related. Check if i need it, and add format and
+    typescript commands to package.json
+-   Check for deprecated props in MUI such as InputLabelProps
+-   Convert all files to typescript
+-   What's the best practice with barrel exports?
+-   Create a crawler to scrape poems from a good poems source
+-   PoemActions seem overkill. I guess when I refactor the backend this will be simpler, but anyways seems refactorable
+-   Do i really need to use Context (Context persists across reloads)? isn't enough with Redux?
+-   When i click on a poem detail I briefly see a 404, looks weird
+-   I see unit tests, then integration tests done with react-testing library, then i have cypress (check component
+    tests) e2e, so what about Selenium?
+
+## Detected BUGS
+
+-   None

@@ -118,14 +118,12 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
     }
 
     const onEdit = () => {
-        context.setState({
-            ...context,
-            elementToEdit: poem.id
-        })
+        // Navigate to profile with edit query param
+        // Pass poem data in location state for immediate loading
         history.push({
             pathname: '/profile',
+            search: `?edit=${poem.id}`,
             state: {
-                elementToEdit: poem.id,
                 poemData: poem
             }
         })

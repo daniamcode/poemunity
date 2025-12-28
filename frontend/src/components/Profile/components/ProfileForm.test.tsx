@@ -31,6 +31,7 @@ describe('ProfileForm', () => {
     const mockUpdatePoemField = jest.fn()
     const mockHandleSend = jest.fn()
     const mockHandleReset = jest.fn()
+    const mockHandleCancel = jest.fn()
 
     const mockPoem: PoemFormData = {
         content: 'Test content',
@@ -68,10 +69,12 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={regularUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -90,6 +93,7 @@ describe('ProfileForm', () => {
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -101,10 +105,12 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={regularUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -116,10 +122,12 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={regularUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -127,16 +135,16 @@ describe('ProfileForm', () => {
     })
 
     it('should display "Modify" subtitle when editing', () => {
-        const editingContext = { ...regularUserContext, elementToEdit: 'poem123' }
-
         render(
             <ProfileForm
-                context={editingContext}
+                context={regularUserContext}
                 poem={mockPoem}
+                isEditing={true}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -148,10 +156,12 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={regularUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -163,10 +173,12 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={regularUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
                 handleReset={mockHandleReset}
+                handleCancel={mockHandleCancel}
             />
         )
 

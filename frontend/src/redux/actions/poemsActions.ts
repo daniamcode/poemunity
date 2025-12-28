@@ -230,8 +230,7 @@ export function updateMyFavouritePoemsCacheAfterLikePoemAction({
         if (isUnliking) {
             // Remove the poem from MyFavouritePoems when unliking
             myFavouritePoemsQueryUpdated = myFavouritePoemsQuery.item.filter((poem: Poem) => poem.id !== poemId)
-        }
-        else {
+        } else {
             // Update likes count (for the rare case of liking from this view)
             myFavouritePoemsQueryUpdated = myFavouritePoemsQuery.item.map((poem: Poem) => {
                 if (poem.id !== poemId) {

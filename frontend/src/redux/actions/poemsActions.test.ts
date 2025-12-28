@@ -156,7 +156,7 @@ describe('getAllPoemsAction', () => {
         expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
     })
 
-    // a network error is diferent because we don't get an error as an object with a response property
+    // a network error is different because we don't get an error as an object with a response property
     test('Should dispatch error when axios throws a network error', async () => {
         mockGet.mockRejectedValueOnce('Network error')
 
@@ -185,7 +185,7 @@ describe('getAllPoemsAction', () => {
     })
 
     test('Should dispatch response when axios returns data correctly', async () => {
-        // this is beacuse we use Axios.create
+        // this is because we use Axios.create
         mockGet.mockResolvedValueOnce({
             data: 'poem1',
             status: 200,
@@ -759,7 +759,7 @@ describe('createPoemAction', () => {
     })
 
     test('Should dispatch response when axios returns data correctly', async () => {
-        // this is beacuse we use Axios.create
+        // this is because we use Axios.create
         mockPost.mockResolvedValueOnce({
             data: 'poem1',
             status: 200,

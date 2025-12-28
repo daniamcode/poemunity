@@ -6,6 +6,7 @@ import { PoemFormData } from '../../hooks/useProfileForm'
 describe('FormButtons', () => {
     const mockHandleReset = jest.fn()
     const mockHandleSend = jest.fn()
+    const mockHandleCancel = jest.fn()
     const mockContext = {
         userId: 'user123',
         adminId: 'admin456'
@@ -29,8 +30,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={mockPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -44,8 +47,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={mockPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -61,8 +66,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={mockPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -79,8 +86,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={incompletePoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -95,8 +104,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={incompletePoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -111,8 +122,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={incompletePoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -131,8 +144,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={adminContext}
                 poem={poemWithoutOrigin}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -145,8 +160,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={mockPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -165,8 +182,10 @@ describe('FormButtons', () => {
             <FormButtons
                 context={adminContext}
                 poem={adminPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
@@ -188,12 +207,63 @@ describe('FormButtons', () => {
             <FormButtons
                 context={mockContext}
                 poem={emptyPoem}
+                isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
             />
         )
 
         const resetButton = screen.getByRole('button', { name: /reset/i })
         expect(resetButton).not.toBeDisabled()
+    })
+
+    it('should not render cancel button when not editing', () => {
+        render(
+            <FormButtons
+                context={mockContext}
+                poem={mockPoem}
+                isEditing={false}
+                handleReset={mockHandleReset}
+                handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
+            />
+        )
+
+        expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument()
+    })
+
+    it('should render cancel button when editing', () => {
+        render(
+            <FormButtons
+                context={mockContext}
+                poem={mockPoem}
+                isEditing={true}
+                handleReset={mockHandleReset}
+                handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
+            />
+        )
+
+        expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
+    })
+
+    it('should call handleCancel when cancel button is clicked', async () => {
+        const user = userEvent.setup()
+        render(
+            <FormButtons
+                context={mockContext}
+                poem={mockPoem}
+                isEditing={true}
+                handleReset={mockHandleReset}
+                handleSend={mockHandleSend}
+                handleCancel={mockHandleCancel}
+            />
+        )
+
+        const cancelButton = screen.getByRole('button', { name: /cancel/i })
+        await user.click(cancelButton)
+
+        expect(mockHandleCancel).toHaveBeenCalledTimes(1)
     })
 })

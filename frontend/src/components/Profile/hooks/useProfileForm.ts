@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useAppDispatch } from '../../../redux/store'
 import { getPoemAction, savePoemAction } from '../../../redux/actions/poemActions'
 import {
@@ -24,9 +25,11 @@ export interface PoemFormData {
 
 export interface UseProfileFormReturn {
     poem: PoemFormData
+    isEditing: boolean
     updatePoemField: <K extends keyof PoemFormData>(field: K, value: PoemFormData[K]) => void
     handleSend: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleReset: (event: React.MouseEvent<HTMLButtonElement>) => void
+    handleCancel: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 const initialPoemState: PoemFormData = {
@@ -38,24 +41,27 @@ const initialPoemState: PoemFormData = {
     likes: []
 }
 
-export function useProfileForm(
-    context: any,
-    poemQuery: any,
-    poemsListQuery: any,
-    locationState?: any
-): UseProfileFormReturn {
+export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any, location: any): UseProfileFormReturn {
     const dispatch = useAppDispatch()
+    const history = useHistory()
     const isAdmin = context?.userId === context?.adminId
 
-    // Get elementToEdit from location state if available (from navigation), otherwise from context
-    // Location state takes priority because it's set synchronously during navigation
-    const elementToEdit = locationState?.elementToEdit || context?.elementToEdit
+    // Get elementToEdit from URL query params (e.g., /profile?edit=poemId)
+    const searchParams = new URLSearchParams(location.search)
+    const elementToEdit = searchParams.get('edit') || ''
     const isEditing = Boolean(elementToEdit)
+
+    // Get poem data from location state (passed during navigation for immediate loading)
+    const locationState = location.state
 
     // Track if we initialized from cache to avoid unnecessary fetches
     const initializedFromCache = React.useRef(false)
 
+    // Track previous elementToEdit to detect when user switches between poems
+    const prevElementToEdit = React.useRef(elementToEdit)
+
     // Initialize poem state - use lazy initialization to avoid flicker
+    // TODO: This seems crazy, simplify or go for another approach
     const [poem, setPoem] = useState<PoemFormData>(() => {
         // If editing, try to get poem data from cache to avoid flicker
         if (isEditing) {
@@ -105,13 +111,6 @@ export function useProfileForm(
         return initialPoemState
     })
 
-    // Sync elementToEdit from location state to context if needed
-    useEffect(() => {
-        if (locationState?.elementToEdit && locationState.elementToEdit !== context?.elementToEdit) {
-            context.setState({ elementToEdit: locationState.elementToEdit })
-        }
-    }, [locationState?.elementToEdit, context])
-
     // Initialize poem query on mount (only reset when creating, not editing)
     useEffect(() => {
         if (!elementToEdit) {
@@ -143,8 +142,27 @@ export function useProfileForm(
         }
     }, [dispatch, isEditing, elementToEdit, poemQuery?.item?.id, poemsListQuery?.item, locationState?.poemData])
 
-    // Populate form when editing or reset when not editing
-    // Only update if poemQuery has newer/different data than what we already have
+    // Detect when user switches from one poem to another and reset form
+    useEffect(() => {
+        // Only reset if actually switching between two different poems (not from undefined to poem or vice versa)
+        if (
+            elementToEdit &&
+            prevElementToEdit.current &&
+            prevElementToEdit.current !== elementToEdit &&
+            prevElementToEdit.current !== '' // Don't reset if coming from empty state
+        ) {
+            // User switched from editing one poem to another
+            // Reset the form and clear cache flag so new poem data loads
+            setPoem(initialPoemState)
+            initializedFromCache.current = false
+        }
+        // Always update the ref to track current state
+        if (elementToEdit) {
+            prevElementToEdit.current = elementToEdit
+        }
+    }, [elementToEdit])
+
+    // Populate form when editing - only update from poemQuery if form is still empty
     useEffect(() => {
         if (isEditing && poemQuery?.item && poemQuery.item.id === elementToEdit) {
             // Only update if the form is empty (hasn't been initialized yet)
@@ -158,10 +176,13 @@ export function useProfileForm(
                     origin: poemQuery.item.origin || ''
                 })
             }
-        } else if (!isEditing) {
+        } else if (!isEditing && prevElementToEdit.current && prevElementToEdit.current !== '') {
+            // Only reset if transitioning from editing to not editing (intentional clear)
+            // This prevents flickering but allows proper reset after save/cancel
             setPoem(initialPoemState)
+            prevElementToEdit.current = '' // Update ref to prevent repeated resets
         }
-    }, [isEditing, poemQuery?.item, elementToEdit])
+    }, [isEditing, poemQuery?.item, elementToEdit, poem.title])
 
     function updatePoemField<K extends keyof PoemFormData>(field: K, value: PoemFormData[K]) {
         setPoem(prev => ({ ...prev, [field]: value }))
@@ -192,17 +213,20 @@ export function useProfileForm(
     function handleSavePoem(poemData: any) {
         dispatch(
             savePoemAction({
-                params: { poemId: poemQuery.item.id },
+                params: { poemId: elementToEdit },
                 context,
                 data: poemData,
                 callbacks: {
                     success: () => {
-                        const updatePayload = { poem: poemData, poemId: poemQuery.item.id }
+                        const updatePayload = { poem: poemData, poemId: elementToEdit }
                         // Update all relevant caches after saving
                         dispatch(updateAllPoemsCacheAfterSavePoemAction(updatePayload))
                         dispatch(updateMyPoemsCacheAfterSavePoemAction(updatePayload))
                         dispatch(updatePoemsListCacheAfterSavePoemAction(updatePayload))
                         manageSuccess('Poem saved')
+                        // Clear edit state by navigating to profile without query params
+                        history.push('/profile')
+                        setPoem(initialPoemState)
                     },
                     error: () => {
                         manageError('Sorry. There was an error saving the poem')
@@ -210,7 +234,6 @@ export function useProfileForm(
                 }
             })
         )
-        context.setState({ elementToEdit: '' })
     }
 
     function handleSend(event: React.MouseEvent<HTMLButtonElement>) {
@@ -227,14 +250,23 @@ export function useProfileForm(
 
     function handleReset(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault()
-        context.setState({ elementToEdit: '' })
+        // Only clear form fields, stay in edit mode
+        setPoem(initialPoemState)
+    }
+
+    function handleCancel(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault()
+        // Exit edit mode by navigating to profile without query params
+        history.push('/profile')
         setPoem(initialPoemState)
     }
 
     return {
         poem,
+        isEditing,
         updatePoemField,
         handleSend,
-        handleReset
+        handleReset,
+        handleCancel
     }
 }

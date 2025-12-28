@@ -9,20 +9,31 @@ import { PoemFormData } from '../hooks/useProfileForm'
 interface ProfileFormProps {
     context: any
     poem: PoemFormData
+    isEditing: boolean
     updatePoemField: <K extends keyof PoemFormData>(field: K, value: PoemFormData[K]) => void
     poemQuery: any
     handleSend: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleReset: (event: React.MouseEvent<HTMLButtonElement>) => void
+    handleCancel: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
-function ProfileForm({ context, poem, updatePoemField, poemQuery, handleSend, handleReset }: ProfileFormProps) {
+function ProfileForm({
+    context,
+    poem,
+    isEditing,
+    updatePoemField,
+    poemQuery,
+    handleSend,
+    handleReset,
+    handleCancel
+}: ProfileFormProps) {
     const isAdmin = context?.userId === context.adminId
 
     return (
         <div className='profile__personal-data'>
             <div className='profile__insert-poem'>
                 <p className='profile__insert-poem-title'>
-                    {context?.elementToEdit ? PROFILE_SUBTITLE_UPDATE : PROFILE_SUBTITLE_CREATE}
+                    {isEditing ? PROFILE_SUBTITLE_UPDATE : PROFILE_SUBTITLE_CREATE}
                 </p>
                 <form className='profile__insert-poem-form'>
                     <div className='profile__insert-poem-inputs'>
@@ -30,7 +41,14 @@ function ProfileForm({ context, poem, updatePoemField, poemQuery, handleSend, ha
                         <PoemInputFields poem={poem} poemQuery={poemQuery} updatePoemField={updatePoemField} />
                     </div>
                     <PoemTextArea poem={poem} updatePoemField={updatePoemField} />
-                    <FormButtons context={context} poem={poem} handleReset={handleReset} handleSend={handleSend} />
+                    <FormButtons
+                        context={context}
+                        poem={poem}
+                        isEditing={isEditing}
+                        handleReset={handleReset}
+                        handleSend={handleSend}
+                        handleCancel={handleCancel}
+                    />
                 </form>
             </div>
         </div>
