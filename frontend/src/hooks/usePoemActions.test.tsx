@@ -58,6 +58,9 @@ describe('usePoemActions', () => {
         ;(poemsActions.updateRankingCacheAfterDeletePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_RANKING_DELETE'
         })
+        ;(poemsActions.updateMyPoemsCacheAfterDeletePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_MY_POEMS_DELETE'
+        })
         ;(poemsActions.updatePoemsListCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_CACHE_LIKE'
         })
@@ -114,6 +117,9 @@ describe('usePoemActions', () => {
             poemId: 'poem-123'
         })
         expect(poemsActions.updateRankingCacheAfterDeletePoemAction).toHaveBeenCalledWith({
+            poemId: 'poem-123'
+        })
+        expect(poemsActions.updateMyPoemsCacheAfterDeletePoemAction).toHaveBeenCalledWith({
             poemId: 'poem-123'
         })
         expect(notifications.manageSuccess).toHaveBeenCalledWith('Poem deleted')

@@ -436,6 +436,36 @@ export function updateRankingCacheAfterDeletePoemAction({ poemId }: UpdateRankin
     }
 }
 
+interface UpdateMyPoemsCacheAfterDeletePoemActionProps {
+    poemId: string
+}
+
+export function updateMyPoemsCacheAfterDeletePoemAction({ poemId }: UpdateMyPoemsCacheAfterDeletePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { myPoemsQuery } = store.getState()
+
+        if (!myPoemsQuery.item) {
+            return
+        }
+
+        const newMyPoemsQuery = cloneDeep(myPoemsQuery.item as Poem[])
+
+        const myPoemsQueryUpdated = newMyPoemsQuery?.filter((poem: Poem) => poem.id !== poemId)
+
+        const { fulfilledAction } = getTypes(ACTIONS.MY_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: myPoemsQueryUpdated,
+                page: myPoemsQuery.page,
+                hasMore: myPoemsQuery.hasMore,
+                total: Math.max(0, (myPoemsQuery.total || 0) - 1), // Decrease total count
+                totalPages: myPoemsQuery.totalPages
+            }
+        })
+    }
+}
+
 interface updateAllPoemsCacheAfterSavePoemActionProps {
     poem: Poem
     poemId: string

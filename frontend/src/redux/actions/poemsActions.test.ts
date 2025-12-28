@@ -1987,3 +1987,188 @@ describe('updatePoemsListCacheAfterSavePoemAction', () => {
         expect(poems[1].title).toBe('Page 1 Poem 2')
     })
 })
+
+describe('updateMyPoemsCacheAfterDeletePoemAction', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('Should remove poem from myPoems cache', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                userId: 'user-123'
+            },
+            {
+                id: '2',
+                title: 'Poem 2',
+                userId: 'user-123'
+            },
+            {
+                id: '3',
+                title: 'Poem 3',
+                userId: 'user-123'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 3,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '2'
+        })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.type).toBe('my-poems_fulfilled')
+        expect(action.payload.poems).toHaveLength(2)
+        expect(action.payload.poems.find((p: any) => p.id === '2')).toBeUndefined()
+        expect(action.payload.poems[0].id).toBe('1')
+        expect(action.payload.poems[1].id).toBe('3')
+    })
+
+    test('Should decrease total count when deleting poem', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                userId: 'user-123'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 5,
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '1'
+        })(dispatch)
+
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.payload.total).toBe(4) // 5 - 1
+    })
+
+    test('Should not crash when myPoemsQuery is undefined (cache not loaded)', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: undefined
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+    })
+
+    test('Should not crash when myPoemsQuery is null', () => {
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: null
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '1'
+        })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+    })
+
+    test('Should preserve pagination metadata when deleting', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Poem 1',
+                userId: 'user-123'
+            },
+            {
+                id: '2',
+                title: 'Poem 2',
+                userId: 'user-123'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 2,
+                hasMore: true,
+                total: 15,
+                totalPages: 3
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '1'
+        })(dispatch)
+
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.payload.page).toBe(2)
+        expect(action.payload.hasMore).toBe(true)
+        expect(action.payload.total).toBe(14) // Decreased by 1
+        expect(action.payload.totalPages).toBe(3)
+    })
+
+    test('Should handle deleting the last poem (total should not go below 0)', () => {
+        const initialState = [
+            {
+                id: '1',
+                title: 'Last Poem',
+                userId: 'user-123'
+            }
+        ]
+
+        ;(store.getState as jest.Mock).mockReturnValueOnce({
+            myPoemsQuery: {
+                item: initialState,
+                page: 1,
+                hasMore: false,
+                total: 0, // Edge case: total is already 0
+                totalPages: 1
+            }
+        })
+
+        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+
+        updateMyPoemsCacheAfterDeletePoemAction({
+            poemId: '1'
+        })(dispatch)
+
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.payload.total).toBe(0) // Should not be negative
+        expect(action.payload.poems).toHaveLength(0)
+    })
+})
