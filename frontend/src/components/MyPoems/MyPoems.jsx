@@ -3,8 +3,6 @@ import { AppContext } from '../../App'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'
-import { TextField } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
 import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
@@ -12,6 +10,7 @@ import { getMyPoemsAction } from '../../redux/actions/poemsActions'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { PAGINATION_LIMIT } from '../../data/constants'
 import ListItem from '../ListItem/ListItem'
+import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 
 function MyPoems() {
     const [poems, setPoems] = useState([])
@@ -88,32 +87,7 @@ function MyPoems() {
 
     return (
         <>
-            <div className='list__intro'>
-                <div className='separator' />
-                <div className='list__search'>
-                    <SearchIcon
-                        style={{
-                            fontSize: 40,
-                            fill: '#551A8B'
-                        }}
-                    />
-                    <TextField
-                        variant='standard'
-                        label='Search author'
-                        InputLabelProps={{
-                            style: {
-                                color: '#551A8B'
-                            }
-                        }}
-                        InputProps={{
-                            style: {
-                                color: '#551A8B'
-                            }
-                        }}
-                        onChange={handleSearchChange}
-                    />
-                </div>
-            </div>
+            <PoemsListIntro onSearchChange={handleSearchChange} />
             {poems.map(poem => (
                 <ListItem key={poem.id} poem={poem} filter={filter} context={context} />
             ))}
