@@ -34,22 +34,24 @@ export default function Profile() {
         <main className='profile__main'>
             {context?.user ? (
                 <div>
-                    <section className='profile__intro'>
-                        <img
-                            className='profile__image'
-                            src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
-                            alt={context?.username}
-                        />
-                        <ProfileForm
-                            context={context}
-                            poem={poem}
-                            isEditing={isEditing}
-                            updatePoemField={updatePoemField}
-                            poemQuery={poemQuery}
-                            handleSend={handleSend}
-                            handleReset={handleReset}
-                            handleCancel={handleCancel}
-                        />
+                    <section className='profile__intro-wrapper'>
+                        <div className='profile__intro'>
+                            <img
+                                className='profile__image'
+                                src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
+                                alt={context?.username}
+                            />
+                            <ProfileForm
+                                context={context}
+                                poem={poem}
+                                isEditing={isEditing}
+                                updatePoemField={updatePoemField}
+                                poemQuery={poemQuery}
+                                handleSend={handleSend}
+                                handleReset={handleReset}
+                                handleCancel={handleCancel}
+                            />
+                        </div>
                     </section>
                     <ProfileTabs value={value} handleChange={handleChange} handleChangeIndex={handleChangeIndex} />
                 </div>
