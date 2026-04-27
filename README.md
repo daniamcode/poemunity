@@ -41,3 +41,23 @@ Finally, I implemented Redux, because the goal of this project is to learn as mu
 
 ### Own build
 Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
+
+## Deployment (Vercel + MongoDB Atlas)
+
+Migrated from AWS to Vercel (frontend + backend) and MongoDB Atlas M0 (free tier).
+
+The backend uses an Express adapter pattern for Vercel serverless: the existing Express app is wrapped in a single serverless function at `backend/api/index.js`, which Vercel invokes on each request. MongoDB connections are cached across warm invocations to avoid connection pool exhaustion.
+
+The original Express server entry point is preserved in `backend/old/` for reference.
+
+### Env vars required
+
+**Backend (Vercel project):**
+- `MONGODB` — MongoDB Atlas connection string
+- `SECRET` — JWT secret
+- `FRONTEND_URL` — Vercel frontend URL (e.g. `https://poemunity.vercel.app`)
+- `NODE_ENV=production`
+
+**Frontend (Vercel project):**
+- `REACT_APP_API_URL` — Vercel backend URL (e.g. `https://poemunity-api.vercel.app`)
+- `REACT_APP_ADMIN` — admin user ID

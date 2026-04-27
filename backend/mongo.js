@@ -1,37 +1,30 @@
 const mongoose = require('mongoose')
 
-// Suppress strictQuery warning (will be false by default in Mongoose 7)
 mongoose.set('strictQuery', false)
 
-const { MONGODB, MONGODB_PRE, NODE_ENV } = process.env
+let cached = global.mongoose || { conn: null, promise: null }
+global.mongoose = cached
 
-// Don't auto-connect when running tests
-// - Jest tests: jest.setup.js will handle in-memory DB
-// - Cypress tests: cypress.setup.js will handle in-memory DB
-const isTestMode = NODE_ENV === 'test'
+const connectMongo = async () => {
+  if (cached.conn) return cached.conn
 
-if (!isTestMode) {
-  let connectionString
-  if (NODE_ENV === 'development') {
-    connectionString = MONGODB_PRE
-  } else {
-    connectionString = MONGODB
+  const isTestMode = process.env.NODE_ENV === 'test'
+  if (isTestMode) return null
+
+  const uri = process.env.NODE_ENV === 'development'
+    ? process.env.MONGODB_PRE
+    : process.env.MONGODB
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
   }
 
-  mongoose.connect(connectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-    .then(() => {
-      console.log(`Database connected (${NODE_ENV} mode)`)
-    }).catch(err => {
-      console.error(err)
-    })
-
-  process.on('uncaughtException', error => {
-    console.error(error)
-    mongoose.disconnect()
-  })
+  cached.conn = await cached.promise
+  console.log(`Database connected (${process.env.NODE_ENV} mode)`)
+  return cached.conn
 }
 
-module.exports = mongoose
+module.exports = connectMongo
