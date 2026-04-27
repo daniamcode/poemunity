@@ -3,6 +3,7 @@ import '../Detail/Detail.scss'
 import '../../App.scss'
 import '../Dashboard/Dashboard.scss'
 import Accordion from '../SimpleAccordion'
+import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
 import List from '../List/List'
 import { RouteComponentProps } from 'react-router-dom'
@@ -16,6 +17,7 @@ function Dashboard(props: RouteComponentProps<MatchParams>) {
         <main className='dashboard'>
             <div className='dashboard__accordion'>
                 <Accordion genre={props.match.params.genre} />
+                <AuthorsAccordion />
             </div>
             <div className='dashboard__list'>
                 <List {...props} />

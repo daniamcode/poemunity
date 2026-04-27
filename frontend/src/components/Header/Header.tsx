@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import './Header.scss'
 import '../../App.scss'
 import Accordion from '../SimpleAccordion'
+import AuthorsAccordion from '../AuthorsAccordion'
 // import CircularProgress from './CircularIndeterminate'
 import LoginButton from './LoginButton'
 import LogoutButton from './Logout'
@@ -50,6 +51,7 @@ function Header() {
         <section className='header'>
             <div className='header__dropdown'>
                 <Accordion />
+                <AuthorsAccordion />
             </div>
             <div className='header__logo'>
                 <Link to='/' className='header__text-logo-first'>

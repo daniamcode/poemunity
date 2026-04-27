@@ -7,6 +7,7 @@ const registerRouter = require('./src/controllers/register')
 const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
+const authorsRouter = require('./src/controllers/authors')
 
 app.use(express.json())
 app.use(
@@ -22,6 +23,7 @@ app.use('/api/register', registerRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/poems', poemsRouter)
 app.use('/api/poem', poemRouter)
+app.use('/api/authors', authorsRouter)
 
 app.get('/', (req, res) => {
   res.send('Server is ok')

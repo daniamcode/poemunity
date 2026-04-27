@@ -10,6 +10,12 @@ export interface Poem {
     userId: string
 }
 
+export interface Author {
+    name: string
+    count: number
+    slug: string
+}
+
 export interface User {
     id: string
     username: string

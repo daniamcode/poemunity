@@ -304,6 +304,25 @@ export function updateAllPoemsCacheAfterLikePoemAction({
     }
 }
 
+interface GetAuthorPoemsActionProps {
+    params?: object | null
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+}
+
+export function getAuthorPoemsAction({ params, options, callbacks }: GetAuthorPoemsActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.AUTHOR_POEMS,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params,
+            options,
+            callbacks
+        })
+    }
+}
+
 interface CreatePoemActionProps {
     poem: Poem
     callbacks?: ReduxCallbacks

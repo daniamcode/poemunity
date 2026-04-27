@@ -33,3 +33,7 @@ export const LIKE_POINTS = 1
 
 // Pagination
 export const PAGINATION_LIMIT = 10
+
+// Authors
+export const AUTHORS_TITLE = 'Authors'
+export const AUTHORS_BROWSE_ALL = 'Browse all authors →'

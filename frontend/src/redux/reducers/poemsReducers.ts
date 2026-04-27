@@ -9,7 +9,8 @@ export const ACTIONS = {
     MY_POEMS: 'my-poems',
     MY_FAVOURITE_POEMS: 'my-favourite-poems',
     RANKING: 'ranking',
-    CREATE_POEM: 'create-poem'
+    CREATE_POEM: 'create-poem',
+    AUTHOR_POEMS: 'author-poems'
 }
 
 interface Action {
@@ -226,4 +227,52 @@ export function createPoemQuery(state: StateItem<Poem[]> = INITIAL, action: Acti
         action,
         actionType: ACTIONS?.CREATE_POEM
     })
+}
+
+export function authorPoemsQuery(
+    state: PaginatedStateItem<Poem[]> = INITIAL,
+    action: Action
+): PaginatedStateItem<Poem[]> {
+    const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.AUTHOR_POEMS)
+
+    switch (action.type) {
+        case requestAction: {
+            if (state.abortController) {
+                state.abortController.abort()
+            }
+            return Object.assign({}, state, { isFetching: true })
+        }
+        case fulfilledAction: {
+            const { poems, page, hasMore, total, totalPages } = action.payload
+            const isFirstPage = page === 1
+            const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
+            const newPoems = isFirstPage || isCacheUpdate ? poems : [...(state.item || []), ...poems]
+            return Object.assign({}, state, {
+                isFetching: false,
+                isError: false,
+                item: newPoems,
+                page,
+                hasMore,
+                total,
+                totalPages,
+                err: undefined,
+                abortController: undefined
+            })
+        }
+        case rejectedAction:
+            return Object.assign({}, state, {
+                isFetching: false,
+                isError: true,
+                err: action.payload,
+                abortController: undefined
+            })
+        case resetAction: {
+            if (state.abortController) {
+                state.abortController.abort()
+            }
+            return INITIAL
+        }
+        default:
+            return state
+    }
 }

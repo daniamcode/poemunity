@@ -8,6 +8,8 @@ import Profile from './components/Profile/Profile'
 import Login from './components/Header/Login'
 import Register from './components/Register/Register'
 import PageNotFound from './components/PageNotFound/PageNotFound'
+import AuthorsIndex from './components/Authors/AuthorsIndex'
+import AuthorDetail from './components/Authors/AuthorDetail'
 import { Context } from './typescript/interfaces'
 
 export const AppContext = React.createContext<Context>({
@@ -55,6 +57,8 @@ function App() {
                             <Route path='/login' component={Login} />
                             <Route path='/register' component={Register} />
                             <Route path='/detail/:poemId' exact component={Detail} />
+                            <Route path='/authors' exact component={AuthorsIndex} />
+                            <Route path='/authors/:slug' exact component={AuthorDetail} />
                             <Route path='/:genre' exact component={Dashboard} />
                             <Route component={PageNotFound} />
                         </Switch>

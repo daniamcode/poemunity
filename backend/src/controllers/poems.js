@@ -24,6 +24,12 @@ poemsRouter.get('/', async (req, res) => {
       filter.likes = req.query.likedBy
     }
 
+    // Add author filter if provided (slug like "robert-frost" → case-insensitive name match)
+    if (req.query.author) {
+      const nameFromSlug = req.query.author.replace(/-/g, ' ')
+      filter.author = { $regex: `^${nameFromSlug}$`, $options: 'i' }
+    }
+
     // Check if pagination is requested (if page or limit params are present)
     const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
 
