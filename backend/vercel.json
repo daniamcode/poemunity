@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../frontend && pnpm install --prod=false && pnpm build && cp -r build ../backend/public",
+  "buildCommand": "cd ../frontend && pnpm install --prod=false && pnpm build && rm -rf ../backend/public && cp -r build ../backend/public",
   "outputDirectory": "public",
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
