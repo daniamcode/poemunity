@@ -61,3 +61,6 @@ The original Express server entry point is preserved in `backend/old/` for refer
 **Frontend (Vercel project):**
 - `REACT_APP_API_URL` — Vercel backend URL (e.g. `https://poemunity-api.vercel.app`)
 - `REACT_APP_ADMIN` — admin user ID
+
+### TODO
+- `frontend/vercel.json` uses `"installCommand": "pnpm install --prod=false"` to work around pnpm skipping devDependencies when `NODE_ENV=production` is set. Build tools like `esbuild-sass-plugin` should be moved to `dependencies` (or the build pipeline restructured) so the install step is solid and not relying on a flag override.

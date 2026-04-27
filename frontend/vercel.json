@@ -1,4 +1,5 @@
 {
+  "installCommand": "pnpm install --prod=false",
   "buildCommand": "pnpm build",
   "outputDirectory": "build",
   "routes": [
