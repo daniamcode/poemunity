@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
+import profilePlaceholder from '../../../icons/profile.svg'
 
 interface PoemHeaderProps {
     poemId: string
@@ -16,7 +17,12 @@ export function PoemHeader({ poemId, title, author, picture, date }: PoemHeaderP
                 {title}
             </Link>
             <div className='poem__author-container'>
-                <img className='poem__picture' src={picture} alt={author} />
+                <img
+                    className='poem__picture'
+                    src={picture || profilePlaceholder}
+                    alt={author}
+                    onError={e => { (e.target as HTMLImageElement).src = profilePlaceholder }}
+                />
                 <p className='poem__author'>{author}</p>
             </div>
             <div className='poem__date'>{format(new Date(date), "MM/dd/yyyy HH:mm'h'")}</div>

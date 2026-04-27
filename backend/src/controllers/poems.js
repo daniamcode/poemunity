@@ -11,7 +11,9 @@ poemsRouter.get('/', async (req, res) => {
 
     // Add origin filter if provided
     if (req.query.origin) {
-      filter.origin = req.query.origin
+      filter.origin = req.query.origin === 'famous'
+        ? { $in: ['famous', 'Poetry Foundation'] }
+        : req.query.origin
     }
 
     // Add userId filter if provided (for MyPoems - filter by poem author)
