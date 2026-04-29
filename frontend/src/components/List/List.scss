@@ -6,7 +6,9 @@
 
 .list__presentation {
     display: none;
-    margin-top: 15px;
+    margin-right: auto;
+    color: #2c3e50;
+    font-weight: 500;
 }
 
 .poems__content {
@@ -20,65 +22,114 @@
 
 .poems__read-more {
     margin-bottom: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: red;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3498db;
     text-align: center;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #2980b9;
+    }
 }
 
 .list__intro {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     margin-bottom: 35px;
     position: sticky;
     top: 70px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(8px);
     z-index: 50;
-    padding: 10px 0;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 15px;
+}
+
+.search-input__container {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2px 12px;
+    transition: all 0.2s;
+    flex-grow: 1;
+    max-width: 300px;
+
+    &:focus-within {
+        border-color: #3498db;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+}
+
+.search-input__icon {
+    color: #bdc3c7;
+    font-size: 20px !important;
+    margin-right: 8px;
+}
+
+.search-input__field {
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    width: 100%;
+    outline: none;
+
+    &::placeholder {
+        color: #bdc3c7;
+    }
 }
 
 .list__sort {
-    margin-right: 5%;
-    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
 
     label {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.85rem;
-        color: #666;
+        font-size: 0.9rem;
+        color: #7f8c8d;
         white-space: nowrap;
     }
 
     select {
         appearance: none;
         background-color: #fff;
-        border: 1px solid #d0d5dd;
-        border-radius: 6px;
-        padding: 5px 28px 5px 10px;
-        font-size: 0.85rem;
-        color: #333;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 8px 32px 8px 12px;
+        font-size: 0.9rem;
+        color: #2c3e50;
         cursor: pointer;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23bdc3c7'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        background-position: right 9px center;
-        transition: border-color 0.15s;
+        background-position: right 12px center;
+        transition: all 0.2s;
 
-        &:hover,
+        &:hover {
+            border-color: #3498db;
+        }
+
         &:focus {
-            border-color: #4f5d73;
+            border-color: #3498db;
             outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
         }
     }
 }
 
 .list__search {
-    margin-right: 5%;
     display: flex;
-    align-items: flex-end;
-    gap: 10px;
+    align-items: center;
 }
 
 .search__container {
@@ -88,34 +139,17 @@
     margin-bottom: 20px;
 }
 
-.search__container .list__intro {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-@media screen and (min-width: 700px) {
-    .list__container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
+@media screen and (min-width: 900px) {
     .list__intro {
-        display: flex;
         flex-direction: row;
-        align-items: flex-end;
-        justify-content: space-around;
-        position: sticky;
-        top: 70px;
-        background-color: #fff;
-        z-index: 50;
-        padding: 10px 0;
+        align-items: center;
+        gap: 25px;
+        padding: 15px 30px;
     }
 
     .list__presentation {
         display: flex;
         font-size: 20px;
-        margin-left: 5%;
+        margin-top: 0;
     }
 }

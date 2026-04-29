@@ -149,3 +149,12 @@ export function queryMatch(key: string, value: string) {
 export function getEncodedUri(rawUri: string) {
     return encodeURI(rawUri)
 }
+
+export function slugify(text: string) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+}

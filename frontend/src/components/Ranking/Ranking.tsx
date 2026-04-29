@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
+import { Link } from 'react-router-dom'
 import './Ranking.scss'
 import { getRanking } from '../../utils/getRanking'
 import CircularProgress from '../CircularIndeterminate'
 import {
     RANKING_TITLE,
     RANKING_SUBTITLE,
-    RANKING_POETS_TITLE,
-    RANKING_POINTS_TITLE,
     POEM_POINTS,
     LIKE_POINTS
 } from '../../data/constants'
@@ -21,6 +13,8 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../../redux/store'
 import { getRankingAction } from '../../redux/actions/poemsActions'
 import { Poem } from '../../typescript/interfaces'
+import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
+import { slugify } from '../../utils/urlUtils'
 
 interface RankItem {
     author: string
@@ -35,22 +29,16 @@ export default function Ranking() {
     }
 
     const [poems, setPoems] = useState<RankingStates['poems']>([])
-
     const [rank, setRank] = useState<RankingStates['rank']>([])
 
-    // Redux
     const dispatch = useAppDispatch()
-
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
 
     useEffect(() => {
-        // Fetch all user poems for ranking calculation (no pagination params)
-        // TODO: In the future, move ranking calculation to backend to avoid fetching all poems
         dispatch(
             getRankingAction({
                 params: {
                     origin: 'user'
-                    // No page/limit - fetches all poems for accurate ranking
                 }
             })
         )
@@ -76,36 +64,30 @@ export default function Ranking() {
         <main className='ranking'>
             <h3 className='ranking__title'>{RANKING_TITLE}</h3>
             <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
-            <TableContainer className='ranking__body' component={Paper}>
-                <Table sx={{ minWidth: 50 }} aria-label='simple table'>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align='center'>{RANKING_POETS_TITLE}</TableCell>
-                            <TableCell align='center'>{RANKING_POINTS_TITLE}</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rank.slice(0, 10).map((item, index) => (
-                            <TableRow key={index}>
-                                <TableCell
-                                    className='ranking__picture-container'
-                                    align='center'
-                                    component='th'
-                                    scope='row'
-                                >
-                                    <div className='ranking__picture-wrap'>
-                                        <img className='ranking__picture' src={item?.picture} />
-                                        <p className='ranking__picture-description'>{item?.author}</p>
-                                    </div>
-                                </TableCell>
-                                <TableCell className='ranking__number' align='center'>
-                                    {item?.points}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <div className='ranking__list'>
+                {rank.slice(0, 10).map((item, index) => {
+                    const authorSlug = slugify(item.author)
+                    const rankPos = index + 1
+                    return (
+                        <Link 
+                            key={index} 
+                            to={`/authors/${authorSlug}`} 
+                            className='ranking__item'
+                        >
+                            <span className={`ranking__rank-number ranking__rank-number--${rankPos}`}>
+                                {rankPos}
+                            </span>
+                            <div className='ranking__author-info'>
+                                <AuthorAvatar name={item.author} picture={item.picture} />
+                                <span className='ranking__author-name'>{item.author}</span>
+                            </div>
+                            <span className='ranking__points'>
+                                {item.points} pts
+                            </span>
+                        </Link>
+                    )
+                })}
+            </div>
         </main>
     )
 }

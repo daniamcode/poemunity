@@ -1,5 +1,4 @@
 import React from 'react'
-import { TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { SEARCH_PLACEHOLDER } from '../../../data/constants'
 
@@ -9,27 +8,12 @@ interface SearchBarProps {
 
 export function SearchBar({ onChange }: SearchBarProps) {
     return (
-        <div className='list__search'>
-            <div className='separator' />
-            <SearchIcon
-                style={{
-                    fontSize: 40,
-                    fill: '#4F5D73'
-                }}
-            />
-            <TextField
-                variant='standard'
-                label={SEARCH_PLACEHOLDER}
-                InputLabelProps={{
-                    style: {
-                        color: '#4F5D73'
-                    }
-                }}
-                InputProps={{
-                    style: {
-                        color: '#4F5D73'
-                    }
-                }}
+        <div className='search-input__container'>
+            <SearchIcon className='search-input__icon' />
+            <input
+                type='text'
+                className='search-input__field'
+                placeholder={SEARCH_PLACEHOLDER}
                 onChange={onChange}
             />
         </div>

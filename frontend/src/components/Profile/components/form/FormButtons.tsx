@@ -16,8 +16,8 @@ function FormButtons({ context, poem, isEditing, handleReset, handleSend, handle
         !poem.title || !poem.category || !poem.content || (context?.userId === context.adminId && !poem.origin)
 
     return (
-        <>
-            <button className='profile__send-poem' type='submit' onClick={handleReset}>
+        <div className='profile__form-buttons'>
+            <button className='profile__send-poem profile__reset-btn' type='submit' onClick={handleReset}>
                 {PROFILE_RESET_POEM}
             </button>
             {isEditing && (
@@ -28,7 +28,7 @@ function FormButtons({ context, poem, isEditing, handleReset, handleSend, handle
             <button className='profile__send-poem' type='submit' onClick={handleSend} disabled={isDisabled}>
                 {PROFILE_SEND_POEM}
             </button>
-        </>
+        </div>
     )
 }
 

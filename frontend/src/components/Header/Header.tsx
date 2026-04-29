@@ -51,16 +51,18 @@ function Header() {
             <div className='header__dropdown'>
                 <Accordion />
             </div>
-            <div className='header__logo'>
-                <Link to='/' className='header__text-logo-first'>
-                    P
-                </Link>
-                <Link to='/' className='header__logo-icon' />
-                <Link to='/' className='header__text-logo-second'>
-                    emunity
-                </Link>
+            <div className='header__brand'>
+                <div className='header__logo'>
+                    <Link to='/' className='header__text-logo-first'>
+                        P
+                    </Link>
+                    <Link to='/' className='header__logo-icon' />
+                    <Link to='/' className='header__text-logo-second'>
+                        emunity
+                    </Link>
+                </div>
+                <p className='list__presentation'>{getSubtitle()}</p>
             </div>
-            <p className='list__presentation'>{getSubtitle()}</p>
             <div className='separator' />
             {context?.user ? <Link to='/profile' className='header__profile' /> : <></>}
             {context?.user ? <LogoutButton /> : <LoginButton />}

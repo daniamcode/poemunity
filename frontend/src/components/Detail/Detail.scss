@@ -2,37 +2,44 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 20px 0;
 }
 
 .poem__block {
-    width: 80vw;
+    width: 90vw;
+    max-width: 800px;
     margin: 20px;
-    border-bottom: 1px solid gray;
-    padding-bottom: 5px;
+    padding: 40px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
     text-align: left;
 }
 
 .poem__title {
-    font-size: 27px;
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #333;
 }
 
 .poem__author-container {
     display: flex;
-    margin: 10px auto;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
 .poem__picture {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    margin-right: 7px;
+    margin-right: 12px;
 
     &--initials {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-size: 13px;
+        font-size: 16px;
         font-weight: 600;
         flex-shrink: 0;
         user-select: none;
@@ -40,26 +47,27 @@
 }
 
 .poem__author {
-    font-size: 24px;
+    font-size: 20px;
+    color: #555;
 }
 
 .poem__content {
     font-size: 22px;
-    margin-bottom: 5px;
+    line-height: 1.6;
+    margin: 30px 0;
     white-space: pre-line;
+    color: #2c3e50;
 }
 
 .poem__likes {
-    color: black;
-    font-size: 18px;
-    margin-left: 5%;
+    color: #7f8c8d;
+    font-size: 16px;
 }
 
 .poem__date {
     font-size: 14px;
     margin-bottom: 20px;
-    color: red;
-    font-weight: bold;
+    color: #95a5a6;
 }
 
 .poem__likes-icon {
