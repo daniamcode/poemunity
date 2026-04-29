@@ -43,14 +43,18 @@ function Header() {
         return WEB_SUBTITLE
     }
 
+    const isAuthOrProfilePage = ['/login', '/register', '/profile'].includes(location.pathname)
+
     // if (isLoading) {
     //   return <CircularProgress />
     // }
     return (
         <section className='header'>
-            <div className='header__dropdown'>
-                <Accordion />
-            </div>
+            {!isAuthOrProfilePage && (
+                <div className='header__dropdown'>
+                    <Accordion />
+                </div>
+            )}
             <div className='header__brand'>
                 <div className='header__logo'>
                     <Link to='/' className='header__text-logo-first'>

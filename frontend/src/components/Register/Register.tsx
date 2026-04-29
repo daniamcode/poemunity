@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Register.scss'
 import { registerAction } from '../../redux/actions/loginActions'
 import { useHistory } from 'react-router-dom'
 import { useAppDispatch } from '../../redux/store'
 
-const Register = () => {
+const Register: React.FC = () => {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -14,7 +14,7 @@ const Register = () => {
     // Redux
     const dispatch = useAppDispatch()
 
-    const handleRegister = event => {
+    const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         dispatch(
             registerAction({
@@ -28,25 +28,17 @@ const Register = () => {
                         history.push('/login')
                     },
                     error: () => {
-                        // setErrorMessage('Wrong credentials')
-                        // manageError(error.response.data.error)
                         console.error('Something went wrong')
-                        // setTimeout(()=> {
-                        //   setErrorMessage(null)
-                        // }, 3000)
                     }
                 }
             })
         )
-
-        // setUsername('')
-        // setEmail('')
-        // setPassword('')
     }
 
     return (
         <div className='register-container'>
             <div className='register-card'>
+                <h2>Register</h2>
                 <form className='register' onSubmit={handleRegister}>
                     <label>Introduce your new credentials or click &quot;Login&quot; if you already have them</label>
                     <div className='register__username'>
@@ -55,7 +47,7 @@ const Register = () => {
                             value={username}
                             name='Username'
                             placeholder='Username'
-                            onChange={({ target }) => setUsername(target.value)}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
                         />
                     </div>
                     <div className='register__email'>
@@ -64,7 +56,7 @@ const Register = () => {
                             value={email}
                             name='Email'
                             placeholder='Email'
-                            onChange={({ target }) => setEmail(target.value)}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                         />
                     </div>
                     <div className='register__password'>
@@ -73,13 +65,12 @@ const Register = () => {
                             value={password}
                             name='Password'
                             placeholder='Password'
-                            onChange={({ target }) => setPassword(target.value)}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                         />
                     </div>
                     <button disabled={username.length === 0 || email.length === 0 || password.length === 0}>
                         Register
                     </button>
-                    {/* <Notification message={errorMessage}/> */}
                     <NavLink to='/login'>Login</NavLink>
                 </form>
             </div>
