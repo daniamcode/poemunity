@@ -1,4 +1,4 @@
-import { CATEGORIES, PROFILE_SELECT_CATEGORY, PROFILE_SELECT_TITLE } from '../../../../data/constants'
+import { CATEGORIES, PROFILE_SELECT_CATEGORY, PROFILE_SELECT_TITLE, categoryToSlug } from '../../../../data/constants'
 import { PoemFormData } from '../../hooks/useProfileForm'
 
 interface PoemInputFieldsProps {
@@ -33,8 +33,8 @@ function PoemInputFields({ poem, poemQuery, updatePoemField }: PoemInputFieldsPr
                     {CATEGORIES?.map((category, index) => (
                         <option
                             key={index}
-                            value={category.toLowerCase()}
-                            selected={poemQuery?.item?.genre === category.toLowerCase()}
+                            value={categoryToSlug(category)}
+                            selected={poemQuery?.item?.genre === categoryToSlug(category)}
                         >
                             {category}
                         </option>

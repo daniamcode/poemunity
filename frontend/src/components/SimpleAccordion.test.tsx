@@ -2,9 +2,8 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import SimpleAccordion from './SimpleAccordion'
-import { CATEGORIES_TITLE, CATEGORIES, ALL } from '../data/constants'
+import { CATEGORIES_TITLE, CATEGORIES, MUST_HAVE_CATEGORIES, ALL, CATEGORIES_BROWSE_ALL, categoryToSlug } from '../data/constants'
 
-// Wrapper with Router for Link components
 const renderWithRouter = (component: React.ReactElement) => {
     return render(<BrowserRouter>{component}</BrowserRouter>)
 }
@@ -31,33 +30,50 @@ describe('SimpleAccordion', () => {
         const { container } = renderWithRouter(<SimpleAccordion />)
         const accordion = container.querySelector('.accordion')
 
-        // Initially not expanded
         expect(accordion).not.toHaveClass('Mui-expanded')
 
-        // Click to expand
         const summary = screen.getByText(CATEGORIES_TITLE).closest('.MuiAccordionSummary-root')
-        if (summary) {
-            fireEvent.click(summary)
-        }
-
-        // Should now be expanded
+        if (summary) fireEvent.click(summary)
         expect(accordion).toHaveClass('Mui-expanded')
 
-        // Click again to collapse
-        if (summary) {
-            fireEvent.click(summary)
-        }
-
-        // Should be collapsed again
+        if (summary) fireEvent.click(summary)
         expect(accordion).not.toHaveClass('Mui-expanded')
     })
 
-    test('should render all categories from CATEGORIES constant', () => {
+    test('should render only must-have categories by default', () => {
         renderWithRouter(<SimpleAccordion />)
+
+        MUST_HAVE_CATEGORIES.forEach(category => {
+            expect(screen.getByText(category)).toBeInTheDocument()
+        })
+
+        const nonMustHave = CATEGORIES.filter(c => !MUST_HAVE_CATEGORIES.includes(c))
+        nonMustHave.forEach(category => {
+            expect(screen.queryByText(category)).not.toBeInTheDocument()
+        })
+    })
+
+    test('should render "Browse all categories" button when not showing all', () => {
+        renderWithRouter(<SimpleAccordion />)
+        expect(screen.getByText(CATEGORIES_BROWSE_ALL)).toBeInTheDocument()
+    })
+
+    test('should show all categories after clicking "Browse all categories"', () => {
+        renderWithRouter(<SimpleAccordion />)
+
+        fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
 
         CATEGORIES.forEach(category => {
             expect(screen.getByText(category)).toBeInTheDocument()
         })
+        expect(screen.queryByText(CATEGORIES_BROWSE_ALL)).not.toBeInTheDocument()
+    })
+
+    test('should auto-show all categories when active genre is not a must-have category', () => {
+        renderWithRouter(<SimpleAccordion genre='anxiety' />)
+
+        expect(screen.getByText('Anxiety')).toBeInTheDocument()
+        expect(screen.queryByText(CATEGORIES_BROWSE_ALL)).not.toBeInTheDocument()
     })
 
     test('should render "ALL" link', () => {
@@ -66,63 +82,63 @@ describe('SimpleAccordion', () => {
     })
 
     test('should highlight active category when genre matches', () => {
-        const testGenre = 'love'
-        renderWithRouter(<SimpleAccordion genre={testGenre} />)
-
+        renderWithRouter(<SimpleAccordion genre='love' />)
         const loveLink = screen.getByText('Love').closest('a')
         expect(loveLink).toHaveClass('active')
     })
 
-    test('should highlight active category case-insensitively', () => {
-        const testGenre = 'LOVE'
-        renderWithRouter(<SimpleAccordion genre={testGenre} />)
-
+    test('should highlight active category when genre matches slug', () => {
+        renderWithRouter(<SimpleAccordion genre='love' />)
         const loveLink = screen.getByText('Love').closest('a')
         expect(loveLink).toHaveClass('active')
     })
 
     test('should NOT highlight non-matching categories', () => {
-        const testGenre = 'love'
-        renderWithRouter(<SimpleAccordion genre={testGenre} />)
-
-        const sadLink = screen.getByText('Sad').closest('a')
-        expect(sadLink).not.toHaveClass('active')
+        renderWithRouter(<SimpleAccordion genre='love' />)
+        const deathLink = screen.getByText('Death').closest('a')
+        expect(deathLink).not.toHaveClass('active')
     })
 
     test('should highlight "ALL" link when no genre is provided', () => {
         renderWithRouter(<SimpleAccordion />)
-
         const allLink = screen.getByText(ALL).closest('a')
         expect(allLink).toHaveClass('active')
     })
 
     test('should NOT highlight "ALL" link when genre is provided', () => {
         renderWithRouter(<SimpleAccordion genre='love' />)
-
         const allLink = screen.getByText(ALL).closest('a')
         expect(allLink).not.toHaveClass('active')
     })
 
-    test('should render links with correct paths for categories', () => {
+    test('should render links with correct paths for must-have categories', () => {
         renderWithRouter(<SimpleAccordion />)
+
+        MUST_HAVE_CATEGORIES.forEach(category => {
+            const link = screen.getByText(category).closest('a')
+            expect(link).toHaveAttribute('href', `/${categoryToSlug(category)}`)
+        })
+    })
+
+    test('should render links with correct paths for all categories when expanded', () => {
+        renderWithRouter(<SimpleAccordion />)
+        fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
 
         CATEGORIES.forEach(category => {
             const link = screen.getByText(category).closest('a')
-            expect(link).toHaveAttribute('href', `/${category.toLowerCase()}`)
+            expect(link).toHaveAttribute('href', `/${categoryToSlug(category)}`)
         })
     })
 
     test('should render "ALL" link with correct path', () => {
         renderWithRouter(<SimpleAccordion />)
-
         const allLink = screen.getByText(ALL).closest('a')
         expect(allLink).toHaveAttribute('href', '/')
     })
 
     test('should apply correct CSS classes to category links', () => {
         renderWithRouter(<SimpleAccordion />)
-
-        const categoryLink = screen.getByText(CATEGORIES[0]).closest('a')
+        const categoryLink = screen.getByText(MUST_HAVE_CATEGORIES[0]).closest('a')
         expect(categoryLink).toHaveClass('header__dropdown-subcategories')
     })
 
@@ -134,7 +150,6 @@ describe('SimpleAccordion', () => {
 
     test('should have correct aria attributes', () => {
         renderWithRouter(<SimpleAccordion />)
-
         const summary = screen.getByText(CATEGORIES_TITLE).closest('.MuiAccordionSummary-root')
         expect(summary).toHaveAttribute('aria-controls', 'panel1a-content')
         expect(summary).toHaveAttribute('id', 'panel1a-header')
@@ -144,29 +159,26 @@ describe('SimpleAccordion', () => {
         const { container, rerender } = renderWithRouter(<SimpleAccordion />)
         const accordion = container.querySelector('.accordion')
 
-        // Initially collapsed
         expect(accordion).not.toHaveClass('Mui-expanded')
 
-        // Rerender with genre
         rerender(
             <BrowserRouter>
                 <SimpleAccordion genre='love' />
             </BrowserRouter>
         )
 
-        // Should now be expanded
         expect(accordion).toHaveClass('Mui-expanded')
     })
 
-    test('should sort categories alphabetically', () => {
+    test('should sort must-have categories alphabetically by default', () => {
         const { container } = renderWithRouter(<SimpleAccordion />)
 
-        const categoryLinks = container.querySelectorAll('.header__dropdown-subcategories')
+        const categoryLinks = container.querySelectorAll('a.header__dropdown-subcategories')
         const categoryTexts = Array.from(categoryLinks)
-            .slice(0, -1) // Exclude the "ALL" link at the end
+            .slice(0, -1) // exclude the "All" link
             .map(link => link.textContent || '')
 
-        const sortedCategories = [...CATEGORIES].sort()
-        expect(categoryTexts).toEqual(sortedCategories)
+        const sortedMustHave = [...MUST_HAVE_CATEGORIES].sort()
+        expect(categoryTexts).toEqual(sortedMustHave)
     })
 })

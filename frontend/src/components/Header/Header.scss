@@ -73,6 +73,11 @@
     width: 100px;
 }
 
+.accordion__list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
 .header__dropdown-categories {
     font-size: 18px;
     display: none;
@@ -86,6 +91,15 @@
     &.active {
         color: red;
         font-weight: bold;
+    }
+
+    &:is(button) {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: inherit;
+        font-style: normal;
     }
 }
 

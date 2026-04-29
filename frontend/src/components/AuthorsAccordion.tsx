@@ -38,7 +38,7 @@ export default function AuthorsAccordion({ authorSlug }: AuthorsAccordionProps) 
                 <div className='header__dropdown-categories-icon'></div>
                 <p className='header__dropdown-categories'>{AUTHORS_TITLE}</p>
             </AccordionSummary>
-            <div>
+            <div className='accordion__list'>
                 {!isFetching && (authors as Author[])?.map(author => (
                     <AccordionDetails key={author.slug}>
                         <Link
