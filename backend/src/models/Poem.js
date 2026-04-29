@@ -9,7 +9,8 @@ const poemSchema = new Schema({
   likes: [String],
   date: Date,
   userId: String,
-  origin: String
+  origin: String,
+  slug: { type: String, unique: true, sparse: true }
 }, { strict: false })
 
 poemSchema.set('toJSON', {

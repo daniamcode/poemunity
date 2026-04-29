@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 const poemRouter = require('express').Router()
 const Poem = require('../models/Poem')
 const findPoemById = require('../middleware/findPoemById')
@@ -6,17 +7,23 @@ const userExtractor = require('../middleware/userExtractor')
 
 poemRouter.get('/:poemId', async (req, res) => {
   try {
-    const poem = await Poem.findById(req.params.poemId)
+    const { poemId } = req.params
+    let poem
+
+    if (mongoose.Types.ObjectId.isValid(poemId)) {
+      poem = await Poem.findById(poemId)
+    }
+
     if (!poem) {
-      return res.status(404).json({
-        error: 'poem not found'
-      })
+      poem = await Poem.findOne({ slug: poemId })
+    }
+
+    if (!poem) {
+      return res.status(404).json({ error: 'poem not found' })
     }
     return res.json(poem)
   } catch (error) {
-    return res.status(404).json({
-      error: 'poem not found'
-    })
+    return res.status(404).json({ error: 'poem not found' })
   }
 })
 

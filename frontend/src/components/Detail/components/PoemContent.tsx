@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { Poem } from '../../../typescript/interfaces'
+import { AuthorAvatar } from '../../ListItem/components/AuthorAvatar'
 
 interface PoemContentProps {
     poem: Poem
@@ -11,7 +12,7 @@ export function PoemContent({ poem }: PoemContentProps) {
             <section>
                 <h2 className='poem__title'>{poem.title}</h2>
                 <div className='poem__author-container'>
-                    <img className='poem__picture' src={poem.picture} alt={poem.author} />
+                    <AuthorAvatar name={poem.author} picture={poem.picture} />
                     <p className='poem__author'>{poem.author}</p>
                 </div>
                 <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>

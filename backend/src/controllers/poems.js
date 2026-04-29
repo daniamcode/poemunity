@@ -3,6 +3,17 @@ const poemsRouter = require('express').Router()
 const Poem = require('../models/Poem')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
+const { generatePoemSlug } = require('../utils/slugUtils')
+
+async function buildUniqueSlug(title, author) {
+  const base = generatePoemSlug(title, author)
+  let slug = base
+  let counter = 2
+  while (await Poem.exists({ slug })) {
+    slug = `${base}-${counter++}`
+  }
+  return slug
+}
 
 poemsRouter.get('/', async (req, res) => {
   try {
@@ -30,6 +41,11 @@ poemsRouter.get('/', async (req, res) => {
     if (req.query.author) {
       const nameFromSlug = req.query.author.replace(/-/g, ' ')
       filter.author = { $regex: `^${nameFromSlug}$`, $options: 'i' }
+    }
+
+    // Add genre filter if provided (case-insensitive)
+    if (req.query.genre) {
+      filter.genre = { $regex: `^${req.query.genre}$`, $options: 'i' }
     }
 
     // Check if pagination is requested (if page or limit params are present)
@@ -115,11 +131,15 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
 
   const user = await User.findById(userId)
 
+  const finalAuthor = (poem.userId && userId === adminId) ? fakeUser.username : user.username
+  const slug = await buildUniqueSlug(poem.title, finalAuthor)
+
   const newPoem = new Poem({
     ...poem,
     userId: (poem.userId && userId === adminId) ? poem.userId : user._id,
-    author: (poem.userId && userId === adminId) ? fakeUser.username : user.username,
+    author: finalAuthor,
     picture: (poem.userId && userId === adminId) ? fakeUser.picture : user.picture,
+    slug,
   })
   try {
     const savedPoem = await newPoem.save()

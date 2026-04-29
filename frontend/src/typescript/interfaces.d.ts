@@ -8,6 +8,7 @@ export interface Poem {
     poem: string
     title: string
     userId: string
+    slug?: string
 }
 
 export interface Author {

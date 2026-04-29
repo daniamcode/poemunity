@@ -1,6 +1,6 @@
 export const WEB_SUBTITLE = 'Your poem community!'
 export const CATEGORIES_TITLE = 'Categories'
-export const CATEGORIES = ['Anniversary', 'Friendship', 'Funny', 'Haikus', 'Hope', 'Life', 'Love', 'Sad']
+export const CATEGORIES = ['Activities', 'Arts & Sciences', 'Death', 'Family & Ancestors', 'History & Politics', 'Living', 'Love', 'Nature', 'Philosophy', 'Relationships', 'Religion', 'Social Commentaries', 'Sorrow & Grieving', 'War & Conflict']
 export const ALL = 'All'
 export const PROFILE_SUBTITLE_CREATE = 'Insert a poem:'
 export const PROFILE_SUBTITLE_UPDATE = 'Modify a poem:'

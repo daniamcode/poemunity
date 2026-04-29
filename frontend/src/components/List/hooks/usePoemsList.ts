@@ -28,7 +28,7 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
         )
     }, [dispatch])
 
-    // Fetch poems when origin changes
+    // Fetch poems when origin or genre changes
     useEffect(() => {
         function handleLoadPoems() {
             if (origin) {
@@ -41,7 +41,8 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
                         params: {
                             page: 1,
                             limit: PAGINATION_LIMIT,
-                            ...(origin !== 'all' && { origin })
+                            ...(origin !== 'all' && { origin }),
+                            ...(genre && { genre })
                         },
                         options: queryOptions
                     })
@@ -49,7 +50,7 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
             }
         }
         handleLoadPoems()
-    }, [origin, dispatch])
+    }, [origin, genre, dispatch])
 
     // Derive sorted/filtered poems directly from Redux state (no local state)
     const poems = (() => {
@@ -58,11 +59,6 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
         }
 
         const data = [...poemsListQuery.item]
-
-        if (genre) {
-            const poemsFiltered = data.filter(poem => poem.genre === genre)
-            return sortPoems(orderBy, poemsFiltered)
-        }
 
         return sortPoems(orderBy, data)
     })()
@@ -75,7 +71,8 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
                     params: {
                         page: nextPage,
                         limit: PAGINATION_LIMIT,
-                        ...(origin !== 'all' && { origin })
+                        ...(origin !== 'all' && { origin }),
+                        ...(genre && { genre })
                     },
                     options: {
                         fetch: true,

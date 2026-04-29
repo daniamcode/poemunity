@@ -41,7 +41,7 @@ export default function Ranking() {
     // Redux
     const dispatch = useAppDispatch()
 
-    const { rankingQuery } = useSelector((state: RootState) => state)
+    const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
 
     useEffect(() => {
         // Fetch all user poems for ranking calculation (no pagination params)

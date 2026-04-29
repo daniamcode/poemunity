@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react-hooks'
 import { useInfiniteScroll } from './useInfiniteScroll'
 
 describe('useInfiniteScroll', () => {
@@ -32,15 +32,25 @@ describe('useInfiniteScroll', () => {
         jest.clearAllMocks()
     })
 
-    test('should create IntersectionObserver with default threshold', () => {
+    function attachSentinel(callbackRef: (node: HTMLDivElement | null) => void) {
+        const element = document.createElement('div')
+        act(() => {
+            callbackRef(element)
+        })
+        return element
+    }
+
+    test('should create IntersectionObserver with default threshold when sentinel attaches', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
                 isLoading: false
             })
         )
+
+        attachSentinel(result.current)
 
         expect(global.IntersectionObserver).toHaveBeenCalledWith(
             expect.any(Function),
@@ -54,7 +64,7 @@ describe('useInfiniteScroll', () => {
 
     test('should create IntersectionObserver with custom threshold', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -62,6 +72,8 @@ describe('useInfiniteScroll', () => {
                 threshold: 0.5
             })
         )
+
+        attachSentinel(result.current)
 
         expect(global.IntersectionObserver).toHaveBeenCalledWith(
             expect.any(Function),
@@ -71,7 +83,7 @@ describe('useInfiniteScroll', () => {
         )
     })
 
-    test('should return a ref object for the sentinel element', () => {
+    test('should return a callback ref function for the sentinel element', () => {
         const onLoadMore = jest.fn()
         const { result } = renderHook(() =>
             useInfiniteScroll({
@@ -81,10 +93,8 @@ describe('useInfiniteScroll', () => {
             })
         )
 
-        // Verify it returns a ref object
         expect(result.current).toBeDefined()
-        expect(result.current).toHaveProperty('current')
-        expect(result.current.current).toBeNull() // Initially null
+        expect(typeof result.current).toBe('function')
     })
 
     test('should call onLoadMore when sentinel intersects and hasMore is true', () => {
@@ -97,21 +107,22 @@ describe('useInfiniteScroll', () => {
             })
         )
 
-        const sentinelElement = document.createElement('div')
-        result.current.current = sentinelElement
+        attachSentinel(result.current)
 
         // Simulate intersection
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         expect(onLoadMore).toHaveBeenCalledTimes(1)
     })
 
     test('should NOT call onLoadMore when sentinel is not intersecting', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -119,18 +130,22 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // Simulate non-intersection
-        intersectionObserverCallback(
-            [{ isIntersecting: false } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: false } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         expect(onLoadMore).not.toHaveBeenCalled()
     })
 
     test('should NOT call onLoadMore when hasMore is false', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: false,
@@ -138,18 +153,22 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // Simulate intersection
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         expect(onLoadMore).not.toHaveBeenCalled()
     })
 
     test('should NOT call onLoadMore when isLoading is true', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -157,18 +176,22 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // Simulate intersection
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         expect(onLoadMore).not.toHaveBeenCalled()
     })
 
     test('should cleanup IntersectionObserver on unmount', () => {
         const onLoadMore = jest.fn()
-        const { unmount } = renderHook(() =>
+        const { result, unmount } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -176,11 +199,14 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // Verify observer was created
         expect(global.IntersectionObserver).toHaveBeenCalled()
 
         // Unmount should not throw
         expect(() => unmount()).not.toThrow()
+        expect(mockDisconnect).toHaveBeenCalled()
     })
 
     test('should handle IntersectionObserver not being supported', () => {
@@ -198,15 +224,15 @@ describe('useInfiniteScroll', () => {
             })
         )
 
-        // Should still return a ref
+        // Should still return a callback ref function
         expect(result.current).toBeDefined()
-        expect(result.current.current).toBeNull()
+        expect(typeof result.current).toBe('function')
 
         // Restore
         global.IntersectionObserver = originalIntersectionObserver
     })
 
-    test('should not observe when sentinel is null', () => {
+    test('should not observe when sentinel is null (not attached)', () => {
         const onLoadMore = jest.fn()
         renderHook(() =>
             useInfiniteScroll({
@@ -216,13 +242,14 @@ describe('useInfiniteScroll', () => {
             })
         )
 
-        // Sentinel ref is null by default, should not call observe
+        // Sentinel not attached, observer should not be created
+        expect(global.IntersectionObserver).not.toHaveBeenCalled()
         expect(mockObserve).not.toHaveBeenCalled()
     })
 
-    test('should update observer when dependencies change', () => {
+    test('should use latest isLoading via stateRef when intersection fires', () => {
         const onLoadMore = jest.fn()
-        const { rerender } = renderHook(
+        const { result, rerender } = renderHook(
             ({ hasMore, isLoading }) =>
                 useInfiniteScroll({
                     onLoadMore,
@@ -237,37 +264,61 @@ describe('useInfiniteScroll', () => {
             }
         )
 
+        attachSentinel(result.current)
+
         // Simulate intersection with initial props
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
         expect(onLoadMore).toHaveBeenCalledTimes(1)
+
+        // Sentinel scrolls out of view while loading
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: false } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         // Change isLoading to true
         rerender({ hasMore: true, isLoading: true })
 
-        // Simulate intersection again - should not call onLoadMore
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        // Simulate intersection while loading - should not call onLoadMore
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
         expect(onLoadMore).toHaveBeenCalledTimes(1) // Still 1, not called again
+
+        // Sentinel scrolls out again
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: false } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
 
         // Change isLoading back to false
         rerender({ hasMore: true, isLoading: false })
 
         // Simulate intersection again - should call onLoadMore
-        intersectionObserverCallback(
-            [{ isIntersecting: true } as IntersectionObserverEntry],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
         expect(onLoadMore).toHaveBeenCalledTimes(2)
     })
 
     test('should handle multiple intersection entries correctly', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -275,21 +326,25 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // Simulate multiple entries (hook only uses the first one)
-        intersectionObserverCallback(
-            [
-                { isIntersecting: true } as IntersectionObserverEntry,
-                { isIntersecting: false } as IntersectionObserverEntry
-            ],
-            {} as IntersectionObserver
-        )
+        act(() => {
+            intersectionObserverCallback(
+                [
+                    { isIntersecting: true } as IntersectionObserverEntry,
+                    { isIntersecting: false } as IntersectionObserverEntry
+                ],
+                {} as IntersectionObserver
+            )
+        })
 
         expect(onLoadMore).toHaveBeenCalledTimes(1)
     })
 
     test('should not crash when callback is called with empty entries', () => {
         const onLoadMore = jest.fn()
-        renderHook(() =>
+        const { result } = renderHook(() =>
             useInfiniteScroll({
                 onLoadMore,
                 hasMore: true,
@@ -297,9 +352,13 @@ describe('useInfiniteScroll', () => {
             })
         )
 
+        attachSentinel(result.current)
+
         // This shouldn't happen in practice, but test defensive programming
         expect(() => {
-            intersectionObserverCallback([], {} as IntersectionObserver)
+            act(() => {
+                intersectionObserverCallback([], {} as IntersectionObserver)
+            })
         }).not.toThrow()
 
         expect(onLoadMore).not.toHaveBeenCalled()

@@ -33,7 +33,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
         <main key={poem.id} className='poem__detail'>
             <section className='poem__block' id='poem__block'>
                 <PoemHeader
-                    poemId={poem.id}
+                    poemId={poem.slug || poem.id}
                     title={poem.title}
                     author={poem.author}
                     picture={poem.picture}

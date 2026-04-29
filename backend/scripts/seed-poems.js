@@ -20,6 +20,7 @@ const connectMongo = require('../mongo')
 const Poem = require('../src/models/Poem')
 const User = require('../src/models/User')
 const bcrypt = require('bcrypt')
+const { generatePoemSlug } = require('../src/utils/slugUtils')
 
 const CSV_PATH = process.argv[2]
 
@@ -89,6 +90,11 @@ async function main() {
 
   const seedUser = await getOrCreateSeedUser()
 
+  // Pre-load all slugs already in the DB so we don't generate collisions
+  const existingSlugs = await Poem.find({ slug: { $exists: true } }).select('slug').lean()
+  const usedSlugs = new Set(existingSlugs.map(p => p.slug))
+  console.log(`Pre-loaded ${usedSlugs.size} existing slugs`)
+
   let inserted = 0
   let skipped = 0
   const batchSize = 200
@@ -105,15 +111,24 @@ async function main() {
       continue
     }
 
+    const finalAuthor = author || 'Unknown'
+    let slug = generatePoemSlug(title, finalAuthor)
+    let counter = 2
+    while (usedSlugs.has(slug)) {
+      slug = `${generatePoemSlug(title, finalAuthor)}-${counter++}`
+    }
+    usedSlugs.add(slug)
+
     docs.push({
       title,
       poem,
-      author: author || 'Unknown',
+      author: finalAuthor,
       genre: mapGenre(tags),
       likes: [],
       date: new Date(),
       userId: seedUser._id.toString(),
       origin: 'Poetry Foundation',
+      slug,
     })
   }
 

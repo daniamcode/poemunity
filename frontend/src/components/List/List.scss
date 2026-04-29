@@ -42,6 +42,36 @@
 .list__sort {
     margin-right: 5%;
     margin-bottom: 4px;
+
+    label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #666;
+        white-space: nowrap;
+    }
+
+    select {
+        appearance: none;
+        background-color: #fff;
+        border: 1px solid #d0d5dd;
+        border-radius: 6px;
+        padding: 5px 28px 5px 10px;
+        font-size: 0.85rem;
+        color: #333;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 9px center;
+        transition: border-color 0.15s;
+
+        &:hover,
+        &:focus {
+            border-color: #4f5d73;
+            outline: none;
+        }
+    }
 }
 
 .list__search {
