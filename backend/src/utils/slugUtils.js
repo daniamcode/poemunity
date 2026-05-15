@@ -24,4 +24,12 @@ function generatePoemSlug(title, author) {
   return base || 'poem'
 }
 
-module.exports = { generatePoemSlug }
+function slugifyAuthor(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+}
+
+module.exports = { generatePoemSlug, slugifyAuthor }

@@ -21,14 +21,71 @@
     width: 100%;
 }
 
+.profile__picture-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+
+    &:hover .profile__picture-overlay {
+        opacity: 1;
+    }
+}
+
 .profile__image {
     width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 50%;
-    margin-bottom: 20px;
     border: 4px solid #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: block;
+}
+
+.profile__picture-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.profile__picture-camera {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.profile__picture-spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.profile__picture-input {
+    display: none;
+}
+
+.profile__picture-error {
+    position: absolute;
+    top: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: #e74c3c;
 }
 
 .profile__personal-data {

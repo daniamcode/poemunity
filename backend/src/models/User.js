@@ -14,7 +14,8 @@ const userSchema = new Schema({
   poems: [{
     type: Schema.Types.ObjectId,
     ref: 'Poem'
-  }]
+  }],
+  fake: { type: Boolean, default: false }
 })
 
 userSchema.set('toJSON', {

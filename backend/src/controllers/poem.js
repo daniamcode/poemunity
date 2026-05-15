@@ -1,9 +1,10 @@
-const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const poemRouter = require('express').Router()
 const Poem = require('../models/Poem')
 const findPoemById = require('../middleware/findPoemById')
 const userExtractor = require('../middleware/userExtractor')
+
+const AUTHOR_FIELDS = 'name slug picture username'
 
 poemRouter.get('/:poemId', async (req, res) => {
   try {
@@ -11,11 +12,11 @@ poemRouter.get('/:poemId', async (req, res) => {
     let poem
 
     if (mongoose.Types.ObjectId.isValid(poemId)) {
-      poem = await Poem.findById(poemId)
+      poem = await Poem.findById(poemId).populate('authorId', AUTHOR_FIELDS)
     }
 
     if (!poem) {
-      poem = await Poem.findOne({ slug: poemId })
+      poem = await Poem.findOne({ slug: poemId }).populate('authorId', AUTHOR_FIELDS)
     }
 
     if (!poem) {

@@ -1,84 +1,72 @@
 const authorsRouter = require('express').Router()
-const Poem = require('../models/Poem')
+const Author = require('../models/Author')
 
-// GET /api/authors?limit=15        → top authors by poem count
-// GET /api/authors?letter=A        → all authors starting with letter A
-// GET /api/authors/letters         → which letters have at least one author
+function buildFilter(query) {
+  const filter = {}
+  if (query.origin === 'famous') filter.origin = { $in: ['famous', 'Poetry Foundation'] }
+  else if (query.origin === 'user') filter.origin = 'user'
+  if (query.fake === 'true') filter.fake = true
+  return filter
+}
+
+// GET /api/authors/letters — which letters have at least one author
 authorsRouter.get('/letters', async (req, res) => {
   try {
-    const authors = await Poem.distinct('author', { author: { $ne: null, $ne: '' } })
-    const letters = [...new Set(
-      authors
-        .filter(a => a && a.trim())
-        .map(a => a.trim()[0].toUpperCase())
-        .filter(c => /[A-Z]/.test(c))
-    )].sort()
-    res.json(letters)
+    const results = await Author.aggregate([
+      { $match: buildFilter(req.query) },
+      { $project: { letter: { $toUpper: { $substrCP: [{ $trim: { input: '$name' } }, 0, 1] } } } },
+      { $match: { letter: { $regex: '^[A-Z]$' } } },
+      { $group: { _id: '$letter' } },
+      { $sort: { _id: 1 } }
+    ])
+    res.json(results.map(r => r._id))
   } catch {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
 
+// GET /api/authors?letter=A   — authors starting with a letter (with poem counts)
+// GET /api/authors?limit=15   — top authors by poem count
 authorsRouter.get('/', async (req, res) => {
   try {
+    const filter = buildFilter(req.query)
+
+    const countLookup = {
+      $lookup: {
+        from: 'poems',
+        let: { aid: '$_id' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$authorId', '$$aid'] } } },
+          { $count: 'n' }
+        ],
+        as: 'poemCount'
+      }
+    }
+    const countProject = { name: 1, slug: 1, picture: 1, username: 1, count: { $ifNull: [{ $arrayElemAt: ['$poemCount.n', 0] }, 0] } }
+
     if (req.query.letter) {
       const letter = req.query.letter.toUpperCase()
-      const authors = await Poem.aggregate([
-        {
-          $match: {
-            author: { $regex: `^${letter}`, $options: 'i' }
-          }
-        },
-        {
-          $group: {
-            _id: '$author',
-            count: { $sum: 1 }
-          }
-        },
-        { $sort: { _id: 1 } }
+      const authors = await Author.aggregate([
+        { $match: { name: { $regex: `^${letter}`, $options: 'i' }, ...filter } },
+        countLookup,
+        { $project: countProject },
+        { $sort: { name: 1 } }
       ])
-      return res.json(
-        authors.map(a => ({
-          name: a._id,
-          count: a.count,
-          slug: slugify(a._id)
-        }))
-      )
+      return res.json(authors.map(a => ({ id: String(a._id), name: a.username || a.name, slug: a.slug, picture: a.picture, count: a.count })))
     }
 
     const limit = Math.min(parseInt(req.query.limit) || 15, 100)
-    const authors = await Poem.aggregate([
-      {
-        $match: { author: { $ne: null, $ne: '' } }
-      },
-      {
-        $group: {
-          _id: '$author',
-          count: { $sum: 1 }
-        }
-      },
+    const authors = await Author.aggregate([
+      { $match: filter },
+      countLookup,
+      { $project: countProject },
       { $sort: { count: -1 } },
       { $limit: limit }
     ])
-
-    res.json(
-      authors.map(a => ({
-        name: a._id,
-        count: a.count,
-        slug: slugify(a._id)
-      }))
-    )
+    res.json(authors.map(a => ({ id: String(a._id), name: a.username || a.name, slug: a.slug, picture: a.picture, count: a.count })))
   } catch {
     res.status(500).json({ error: 'Internal server error' })
   }
 })
-
-function slugify(name) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-}
 
 module.exports = authorsRouter

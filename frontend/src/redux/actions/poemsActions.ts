@@ -304,6 +304,49 @@ export function updateAllPoemsCacheAfterLikePoemAction({
     }
 }
 
+interface UpdateAuthorPoemsCacheAfterLikePoemActionProps {
+    context: Context
+    poemId: string
+}
+
+export function updateAuthorPoemsCacheAfterLikePoemAction({
+    poemId,
+    context
+}: UpdateAuthorPoemsCacheAfterLikePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { authorPoemsQuery } = store.getState()
+
+        if (!authorPoemsQuery.item) {
+            return
+        }
+
+        const authorPoemsQueryUpdated = (authorPoemsQuery.item as Poem[]).map((poem: Poem) => {
+            if (poem.id !== poemId) {
+                return poem
+            }
+
+            const isLiked = poem.likes?.includes(context.userId)
+            const newLikes = isLiked
+                ? poem.likes.filter((id: string) => id !== context.userId)
+                : [...(poem.likes || []), context.userId]
+
+            return { ...poem, likes: newLikes }
+        })
+
+        const { fulfilledAction } = getTypes(ACTIONS.AUTHOR_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: authorPoemsQueryUpdated,
+                page: authorPoemsQuery.page,
+                hasMore: authorPoemsQuery.hasMore,
+                total: authorPoemsQuery.total,
+                totalPages: authorPoemsQuery.totalPages
+            }
+        })
+    }
+}
+
 interface GetAuthorPoemsActionProps {
     params?: object | null
     options?: ReduxOptions

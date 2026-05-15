@@ -1,5 +1,7 @@
-import { PROFILE_SELECT_CATEGORY, PROFILE_SELECT_TITLE_AUTHOR, PROFILE_SELECT_LIKES } from '../../../../data/constants'
+import { useEffect, useState } from 'react'
+import { PROFILE_SELECT_CATEGORY, PROFILE_SELECT_LIKES } from '../../../../data/constants'
 import { PoemFormData } from '../../hooks/useProfileForm'
+import { Author } from '../../../../typescript/interfaces'
 
 interface AdminFieldsProps {
     poem: PoemFormData
@@ -7,6 +9,15 @@ interface AdminFieldsProps {
 }
 
 function AdminFields({ poem, updatePoemField }: AdminFieldsProps) {
+    const [fakeAuthors, setFakeAuthors] = useState<Author[]>([])
+
+    useEffect(() => {
+        fetch('/api/authors?origin=user&fake=true&limit=100')
+            .then(r => r.json())
+            .then((data: Author[]) => setFakeAuthors(data.sort((a, b) => a.name.localeCompare(b.name))))
+            .catch(() => {})
+    }, [])
+
     return (
         <>
             <label className='profile__insert-poem-input'>
@@ -24,14 +35,20 @@ function AdminFields({ poem, updatePoemField }: AdminFieldsProps) {
                 </select>
             </label>
             <label className='profile__insert-poem-input'>
-                {PROFILE_SELECT_TITLE_AUTHOR}
-                <input
+                Author
+                <select
                     className='profile__insert-poem-input'
                     name='author'
-                    required
                     value={poem.fakeId}
                     onChange={event => updatePoemField('fakeId', event.target.value)}
-                />
+                >
+                    <option value=''>— post as yourself —</option>
+                    {fakeAuthors.map(author => (
+                        <option key={author.id} value={author.id}>
+                            {author.name}
+                        </option>
+                    ))}
+                </select>
             </label>
             <label className='profile__insert-poem-input'>
                 {PROFILE_SELECT_LIKES}

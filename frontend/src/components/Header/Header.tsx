@@ -68,7 +68,13 @@ function Header() {
                 <p className='list__presentation'>{getSubtitle()}</p>
             </div>
             <div className='separator' />
-            {context?.user ? <Link to='/profile' className='header__profile' /> : <></>}
+            {context?.user ? (
+                <Link to='/profile' className={context?.picture ? 'header__profile-picture' : 'header__profile'}>
+                    {context?.picture && (
+                        <img src={context.picture} alt={context.username} className='header__profile-img' />
+                    )}
+                </Link>
+            ) : <></>}
             {context?.user ? <LogoutButton /> : <LoginButton />}
         </section>
     )

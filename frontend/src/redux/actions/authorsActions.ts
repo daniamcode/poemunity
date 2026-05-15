@@ -25,17 +25,18 @@ export function getTopAuthorsAction({ params, options, callbacks }: GetTopAuthor
 
 interface GetAuthorsByLetterActionProps {
     letter: string
+    origin?: string
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
 }
 
-export function getAuthorsByLetterAction({ letter, options, callbacks }: GetAuthorsByLetterActionProps) {
+export function getAuthorsByLetterAction({ letter, origin, options, callbacks }: GetAuthorsByLetterActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.AUTHORS_BY_LETTER,
             url: API_ENDPOINTS.AUTHORS,
             dispatch,
-            params: { letter },
+            params: { letter, ...(origin && origin !== 'all' ? { origin } : {}) },
             options,
             callbacks
         })
@@ -43,16 +44,18 @@ export function getAuthorsByLetterAction({ letter, options, callbacks }: GetAuth
 }
 
 interface GetAuthorsLettersActionProps {
+    origin?: string
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
 }
 
-export function getAuthorsLettersAction({ options, callbacks }: GetAuthorsLettersActionProps = {}) {
+export function getAuthorsLettersAction({ origin, options, callbacks }: GetAuthorsLettersActionProps = {}) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.AUTHORS_LETTERS,
             url: API_ENDPOINTS.AUTHORS_LETTERS,
             dispatch,
+            params: origin && origin !== 'all' ? { origin } : undefined,
             options,
             callbacks
         })

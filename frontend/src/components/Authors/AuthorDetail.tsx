@@ -15,9 +15,13 @@ interface MatchParams {
 export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>) {
     const { slug } = match.params
     const context = useContext(AppContext)
-    const authorName = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
     const { poems, isLoading, hasMore, total, handleLoadMore } = useAuthorPoems(slug)
+
+    // Use canonical full name (authorName) for the dedicated page heading.
+    // Fall back to slug-derived name while loading.
+    const authorName = poems[0]?.authorName || poems[0]?.author
+        || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
     const sentinelRef = useInfiniteScroll({ onLoadMore: handleLoadMore, hasMore, isLoading })
 

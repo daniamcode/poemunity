@@ -6,6 +6,7 @@ import '../../App.scss'
 import { useSelector } from 'react-redux'
 import { useProfileForm } from './hooks/useProfileForm'
 import ProfileForm from './components/ProfileForm'
+import ProfilePicture from './components/ProfilePicture'
 import ProfileTabs from './components/ProfileTabs'
 
 export default function Profile() {
@@ -36,11 +37,7 @@ export default function Profile() {
                 <div>
                     <section className='profile__intro-wrapper'>
                         <div className='profile__intro'>
-                            <img
-                                className='profile__image'
-                                src='https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
-                                alt={context?.username}
-                            />
+                            <ProfilePicture context={context} />
                             <ProfileForm
                                 context={context}
                                 poem={poem}

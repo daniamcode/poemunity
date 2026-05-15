@@ -1,32 +1,35 @@
-const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const usersRouter = require('express').Router()
-const User = require('../models/User')
+const Author = require('../models/Author')
+const userExtractor = require('../middleware/userExtractor')
 
-usersRouter.get('/', async (request, response) => {
-  const users = await User.find({}).populate('poems', {
-    content: 1,
-    date: 1
-  })
-  response.json(users)
-})
+// Accepts { picture: "data:image/jpeg;base64,..." } — resized client-side
+usersRouter.patch('/picture', userExtractor, async (req, res) => {
+  try {
+    const { picture } = req.body
 
-usersRouter.post('/', async (request, response) => {
-  const { body } = request
-  const { username, name, password } = body
+    if (!picture || !picture.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid image data' })
+    }
 
-  const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password, saltRounds)
+    const author = await Author.findByIdAndUpdate(
+      req.userId,
+      { picture },
+      { new: true }
+    )
 
-  const user = new User({
-    username,
-    name,
-    passwordHash,
-    picture: 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
-  })
+    // No need to update poems — picture comes from Author via populate
+    const newToken = jwt.sign(
+      { id: author._id, username: author.username, picture },
+      process.env.SECRET,
+      { expiresIn: 60 * 60 * 24 * 7 }
+    )
 
-  const savedUser = await user.save()
-
-  response.status(201).json(savedUser)
+    res.json({ token: newToken, picture })
+  } catch (error) {
+    console.error('Picture update error:', error)
+    res.status(500).json({ error: 'Failed to update profile picture' })
+  }
 })
 
 module.exports = usersRouter

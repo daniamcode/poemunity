@@ -1,7 +1,7 @@
 require('./bin/dev')
 
 const connectMongo = require('./mongo')
-const app = require('./app')
+const { app } = require('./app')
 const debug = require('debug')('app')
 
 const port = process.env.PORT || 4200

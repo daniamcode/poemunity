@@ -1,9 +1,10 @@
 import { Poem } from '../typescript/interfaces'
 
-interface RankItem {
+export interface RankItem {
     author: string
     picture: string
     points: number
+    authorSlug?: string
 }
 
 interface RankAccumulator {
@@ -61,7 +62,8 @@ export const getRanking = (poems: Poem[], poemPoints: number, likePoints: number
             accumulator[item.userId] = {
                 author: item.author,
                 picture: item.picture,
-                points
+                points,
+                authorSlug: item.authorSlug
             }
 
             return accumulator

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './Ranking.scss'
-import { getRanking } from '../../utils/getRanking'
+import { getRanking, RankItem } from '../../utils/getRanking'
 import CircularProgress from '../CircularIndeterminate'
 import {
     RANKING_TITLE,
@@ -15,12 +15,6 @@ import { getRankingAction } from '../../redux/actions/poemsActions'
 import { Poem } from '../../typescript/interfaces'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
-
-interface RankItem {
-    author: string
-    picture: string
-    points: number
-}
 
 export default function Ranking() {
     interface RankingStates {
@@ -65,8 +59,8 @@ export default function Ranking() {
             <h3 className='ranking__title'>{RANKING_TITLE}</h3>
             <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
             <div className='ranking__list'>
-                {rank.slice(0, 10).map((item, index) => {
-                    const authorSlug = slugify(item.author)
+                {rank.slice(0, 10).map((item: RankItem, index) => {
+                    const authorSlug = item.authorSlug || slugify(item.author)
                     const rankPos = index + 1
                     return (
                         <Link 

@@ -4,6 +4,7 @@ import { useAppDispatch } from '../redux/store'
 import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import {
     updateAllPoemsCacheAfterLikePoemAction,
+    updateAuthorPoemsCacheAfterLikePoemAction,
     updateMyFavouritePoemsCacheAfterLikePoemAction,
     updateMyPoemsCacheAfterDeletePoemAction,
     updatePoemsListCacheAfterDeletePoemAction,
@@ -59,6 +60,12 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         )
                         dispatch(
                             updateMyFavouritePoemsCacheAfterLikePoemAction({
+                                poemId: poem.id,
+                                context
+                            })
+                        )
+                        dispatch(
+                            updateAuthorPoemsCacheAfterLikePoemAction({
                                 poemId: poem.id,
                                 context
                             })

@@ -9,12 +9,16 @@ export interface Poem {
     title: string
     userId: string
     slug?: string
+    authorSlug?: string
+    authorName?: string
 }
 
 export interface Author {
+    id?: string
     name: string
     count: number
     slug: string
+    picture?: string
 }
 
 export interface User {

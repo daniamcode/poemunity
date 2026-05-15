@@ -7,28 +7,54 @@ import { Author } from '../../typescript/interfaces'
 import './Authors.scss'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const ORIGIN_FILTERS = [
+    { value: 'all', label: 'All' },
+    { value: 'famous', label: 'Famous' },
+    { value: 'user', label: 'Users' }
+]
 
 export default function AuthorsIndex() {
     const dispatch = useAppDispatch()
     const [activeLetter, setActiveLetter] = useState('A')
+    const [activeOrigin, setActiveOrigin] = useState('all')
 
     const { item: letters } = useSelector((state: RootState) => state.authorsLettersQuery)
     const { item: authors, isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
 
     useEffect(() => {
         document.title = 'Authors | Poemunity'
-        dispatch(getAuthorsLettersAction({}))
     }, [])
 
     useEffect(() => {
-        dispatch(getAuthorsByLetterAction({ letter: activeLetter }))
-    }, [activeLetter])
+        dispatch(getAuthorsLettersAction({ origin: activeOrigin }))
+    }, [activeOrigin])
+
+    useEffect(() => {
+        dispatch(getAuthorsByLetterAction({ letter: activeLetter, origin: activeOrigin }))
+    }, [activeLetter, activeOrigin])
 
     const availableLetters = (letters as string[]) || []
+
+    function handleOriginChange(origin: string) {
+        setActiveOrigin(origin)
+        setActiveLetter('A')
+    }
 
     return (
         <main className='authors-index'>
             <h1 className='authors-index__title'>Authors</h1>
+
+            <div className='authors-index__origin-filter'>
+                {ORIGIN_FILTERS.map(f => (
+                    <button
+                        key={f.value}
+                        className={`authors-index__origin-btn${activeOrigin === f.value ? ' active' : ''}`}
+                        onClick={() => handleOriginChange(f.value)}
+                    >
+                        {f.label}
+                    </button>
+                ))}
+            </div>
 
             <nav className='authors-index__alphabet' aria-label='Browse authors by letter'>
                 {ALPHABET.map(letter => {

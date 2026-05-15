@@ -9,10 +9,11 @@ interface PoemHeaderProps {
     author: string
     picture: string
     date: string
+    authorSlug?: string
 }
 
-export function PoemHeader({ poemId, title, author, picture, date }: PoemHeaderProps) {
-    const authorSlug = slugify(author)
+export function PoemHeader({ poemId, title, author, picture, date, authorSlug: authorSlugProp }: PoemHeaderProps) {
+    const authorSlug = authorSlugProp || slugify(author)
 
     return (
         <section>

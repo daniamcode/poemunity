@@ -11,6 +11,36 @@
         text-align: center;
     }
 
+    &__origin-filter {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    &__origin-btn {
+        padding: 8px 20px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #7f8c8d;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        &.active {
+            background: #2c3e50;
+            border-color: #2c3e50;
+            color: #fff;
+        }
+    }
+
     &__alphabet {
         display: flex;
         flex-wrap: wrap;

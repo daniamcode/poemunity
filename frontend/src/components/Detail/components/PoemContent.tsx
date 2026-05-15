@@ -9,7 +9,7 @@ interface PoemContentProps {
 }
 
 export function PoemContent({ poem }: PoemContentProps) {
-    const authorSlug = slugify(poem.author)
+    const authorSlug = poem.authorSlug || slugify(poem.author)
 
     return (
         <>

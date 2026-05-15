@@ -42,6 +42,13 @@ Finally, I implemented Redux, because the goal of this project is to learn as mu
 ### Own build
 Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
 
+## Poem data
+
+The famous poets and poems were seeded from the **Poetry Foundation Kaggle dataset**:
+https://www.kaggle.com/datasets/tgdivy/poetry-foundation-poems
+
+The CSV contains `Title`, `Poem`, `Poet`, and `Tags` columns. Tags are mapped to the app's genre system; the seed script is at `backend/scripts/seed-poems.js`.
+
 ## Deployment (Vercel + MongoDB Atlas)
 
 Migrated from AWS to Vercel (frontend + backend) and MongoDB Atlas M0 (free tier).

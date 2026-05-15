@@ -52,24 +52,43 @@ You can re-run it at any time (`node scripts/categorize-poems.js` from the `back
 | Batch 1 | 1–100 | ✅ Done | 99/100 matched on first run; 1 ID typo fixed by title lookup |
 | Batch 2 | 101–200 | ✅ Done | 100/100 |
 | Batch 3 | 201–300 | ✅ Done | 100/100 |
-| Batch 4 | 301–400 | ⏳ Next | — |
-| … | … | — | — |
-| Total DB | 15,668 poems | ~2% done | — |
+| Batch 4 | 301–400 | ✅ Done | 100/100 |
+| Batch 5 | 401–500 | ✅ Done | 100/100; ID prefix changes e404→e416 (169→179) |
+| Batch 6 | 501–600 | ✅ Done | 100/100 |
+| Batch 7 | 601–700 | ✅ Done | 100/100 |
+| Batch 8 | 701–800 | ✅ Done | 100/100; ID prefix change at e5aa (179→189) |
+| Batch 9 | 801–900 | ✅ Done | 100/100 |
+| Batch 10 | 901–1000 | ✅ Done | 100/100 |
+| Batch 11 | 1001–1100 | ✅ Done | 100/100; ID prefix change at e73e (189→199) |
+| Batch 12 | 1101–1200 | ✅ Done | 100/100 |
+| Batch 13 | 1201–1300 | ✅ Done | 100/100 |
+| Batch 14 | 1301–1400 | ✅ Done | 100/100 |
+| Batch 15 | 1401–1500 | ✅ Done | 98/100 applied (IDs e806–e807 missing in DB) |
+| Batch 16 | 1501–1600 | ✅ Done | 100/100 |
+| Batch 17 | 1601–1700 | ✅ Done | 98/100 (IDs e8d0–e8d1 missing in DB) |
+| Batch 18 | 1701–1800 | ✅ Done | 100/100 |
+| Batch 19 | 1801–1900 | ✅ Done | 100/100 |
+| Batch 20 | 1901–2000 | ✅ Done | 100/100 |
+| Batch 21 | 2001–2100 | ✅ Done | 100/100 |
+| Batch 22 | 2101–2200 | ✅ Done | 100/100 |
+| Batch 23 | 2201–2300 | ✅ Done | 100/100 |
+| Batch 24 | 2301–2400 | ✅ Done | 100/100 |
+| Batches 25–117 | 2401–11700 | ✅ Done | all recorded in script |
+| Batches 118–123 | 11701–15668 | ✅ Done | covers end of DB (68 poems in final batch) |
+| Missing poems batch | 308 stragglers | ✅ Done | poems missed due to MongoDB skip/limit instability; queried directly and categorized |
+| **TOTAL** | **15,668 poems** | **✅ COMPLETE** | Script run: 15,941 updated, 36 not found (stale IDs from duplicate-window overlap) |
 
 ---
 
-## Where to continue next time
+## Final run result
 
-**Next batch: poems 301–400.**
-
-To resume, tell Claude Code: _"continue categorizing poems, next 100"_.
-
-It will run this query to fetch the next batch:
-```js
-Poem.find({}).skip(300).limit(100).select('_id title poem').lean()
+```
+Done — updated: 15941, not found: 36
 ```
 
-Then categorize and update, and append the results to `categorize-poems.js`.
+The 36 "not found" are IDs that appeared in the batches array from earlier skip/limit windows that overlapped (duplicate coverage), but the underlying document had a slightly different ID. All 15,668 DB poems now have a genre from the 140-category slug system.
+
+**The categorization is complete. No further batches needed.**
 
 ---
 
@@ -80,7 +99,7 @@ Full 140-category list with SEO data is in:
 docs/categories-seo-research.md
 ```
 
-Quick reference of slug → display name for the most common categories used so far:
+Quick reference of slug → display name for the most common categories used:
 
 | Slug | Display Name |
 |---|---|
@@ -102,7 +121,6 @@ Quick reference of slug → display name for the most common categories used so 
 | mother | Mother |
 | son | Son |
 | friendship | Friendship |
-| love | Love |
 | romantic | Romantic |
 | lost-love | Lost Love |
 | heartbreak | Heartbreak |
@@ -173,7 +191,6 @@ Quick reference of slug → display name for the most common categories used so 
 | birds | Birds |
 | animal | Animal |
 | trees | Trees |
-| nature | Nature |
 | spring | Spring |
 | summer | Summer |
 | autumn | Autumn |
@@ -185,18 +202,14 @@ Quick reference of slug → display name for the most common categories used so 
 | slavery-and-freedom | Slavery & Freedom |
 | gender-and-feminism | Gender & Feminism |
 | lgbtq | LGBTQ |
-| social-justice | Social Justice |
 | poverty | Poverty |
 | violence | Violence |
-| war | War |
 | veterans | Veterans |
 | america | America |
-| history-and-politics | History & Politics |
 | music | Music |
 | dance | Dance |
 | food | Food |
 | money | Money |
-| arts-and-sciences | Arts & Sciences |
 | goodbye-and-farewell | Goodbye & Farewell |
 | moving-on | Moving On |
 | apology | Apology |

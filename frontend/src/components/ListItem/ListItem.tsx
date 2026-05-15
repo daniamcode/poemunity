@@ -38,6 +38,7 @@ const ListItem = ({ poem, filter, context }: Props) => {
                     author={poem.author}
                     picture={poem.picture}
                     date={poem.date}
+                    authorSlug={poem.authorSlug}
                 />
                 <PoemContent poemId={poem.id} content={poem.poem} />
                 <PoemFooter

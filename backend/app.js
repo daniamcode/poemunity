@@ -9,7 +9,7 @@ const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
 const authorsRouter = require('./src/controllers/authors')
 
-app.use(express.json())
+app.use(express.json({ limit: '2mb' }))
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -29,4 +29,4 @@ app.get('/', (req, res) => {
   res.send('Server is ok')
 })
 
-module.exports = app
+module.exports = { app }
