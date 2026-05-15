@@ -2,12 +2,12 @@
 
 exports[`MUI Components Visual Regression Tests CircularIndeterminate should render loading spinner correctly 1`] = `
 <div
-  class="MuiBox-root css-2l3c9v"
+  class="MuiBox-root css-15jfdev"
 >
   <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
     role="progressbar"
-    style="width: 40px; height: 40px;"
+    style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
   >
     <svg
       class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -18,8 +18,8 @@ exports[`MUI Components Visual Regression Tests CircularIndeterminate should ren
         cx="44"
         cy="44"
         fill="none"
-        r="20.2"
-        stroke-width="3.6"
+        r="20"
+        stroke-width="4"
       />
     </svg>
   </span>
@@ -28,12 +28,12 @@ exports[`MUI Components Visual Regression Tests CircularIndeterminate should ren
 
 exports[`MUI Components Visual Regression Tests List should render List component correctly with genre 1`] = `
 <div
-  class="MuiBox-root css-2l3c9v"
+  class="MuiBox-root css-15jfdev"
 >
   <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
     role="progressbar"
-    style="width: 40px; height: 40px;"
+    style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
   >
     <svg
       class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -44,8 +44,8 @@ exports[`MUI Components Visual Regression Tests List should render List componen
         cx="44"
         cy="44"
         fill="none"
-        r="20.2"
-        stroke-width="3.6"
+        r="20"
+        stroke-width="4"
       />
     </svg>
   </span>
@@ -54,12 +54,12 @@ exports[`MUI Components Visual Regression Tests List should render List componen
 
 exports[`MUI Components Visual Regression Tests List should render List component correctly without genre 1`] = `
 <div
-  class="MuiBox-root css-2l3c9v"
+  class="MuiBox-root css-15jfdev"
 >
   <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
     role="progressbar"
-    style="width: 40px; height: 40px;"
+    style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
   >
     <svg
       class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -70,8 +70,8 @@ exports[`MUI Components Visual Regression Tests List should render List componen
         cx="44"
         cy="44"
         fill="none"
-        r="20.2"
-        stroke-width="3.6"
+        r="20"
+        stroke-width="4"
       />
     </svg>
   </span>
@@ -96,16 +96,21 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <div
         class="poem__author-container"
       >
-        <img
-          alt="testuser"
-          class="poem__picture"
-          src="test-pic.jpg"
-        />
-        <p
+        <a
+          href="/authors/testuser"
+        >
+          <img
+            alt="testuser"
+            class="poem__picture"
+            src="test-pic.jpg"
+          />
+        </a>
+        <a
           class="poem__author"
+          href="/authors/testuser"
         >
           testuser
-        </p>
+        </a>
       </div>
       <div
         class="poem__date"
@@ -206,16 +211,21 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <div
         class="poem__author-container"
       >
-        <img
-          alt="testuser"
-          class="poem__picture"
-          src="test-pic.jpg"
-        />
-        <p
+        <a
+          href="/authors/testuser"
+        >
+          <img
+            alt="testuser"
+            class="poem__picture"
+            src="test-pic.jpg"
+          />
+        </a>
+        <a
           class="poem__author"
+          href="/authors/testuser"
         >
           testuser
-        </p>
+        </a>
       </div>
       <div
         class="poem__date"
@@ -300,12 +310,12 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
 
 exports[`MUI Components Visual Regression Tests MyFavouritePoems should render MyFavouritePoems component correctly 1`] = `
 <div
-  class="MuiBox-root css-2l3c9v"
+  class="MuiBox-root css-15jfdev"
 >
   <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
     role="progressbar"
-    style="width: 40px; height: 40px;"
+    style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
   >
     <svg
       class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -316,8 +326,8 @@ exports[`MUI Components Visual Regression Tests MyFavouritePoems should render M
         cx="44"
         cy="44"
         fill="none"
-        r="20.2"
-        stroke-width="3.6"
+        r="20"
+        stroke-width="4"
       />
     </svg>
   </span>
@@ -326,12 +336,12 @@ exports[`MUI Components Visual Regression Tests MyFavouritePoems should render M
 
 exports[`MUI Components Visual Regression Tests MyPoems should render MyPoems component correctly 1`] = `
 <div
-  class="MuiBox-root css-2l3c9v"
+  class="MuiBox-root css-15jfdev"
 >
   <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
     role="progressbar"
-    style="width: 40px; height: 40px;"
+    style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
   >
     <svg
       class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -342,8 +352,8 @@ exports[`MUI Components Visual Regression Tests MyPoems should render MyPoems co
         cx="44"
         cy="44"
         fill="none"
-        r="20.2"
-        stroke-width="3.6"
+        r="20"
+        stroke-width="4"
       />
     </svg>
   </span>
@@ -493,48 +503,24 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
                   class="list__intro"
                 >
                   <div
-                    class="separator"
-                  />
-                  <div
-                    class="list__search"
+                    class="search-input__container"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-input__icon css-1umw9bq-MuiSvgIcon-root"
                       data-testid="SearchIcon"
                       focusable="false"
-                      style="font-size: 40px; fill: #551A8B;"
                       viewBox="0 0 24 24"
                     >
                       <path
                         d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
                       />
                     </svg>
-                    <div
-                      class="MuiFormControl-root MuiTextField-root css-1xp5r68-MuiFormControl-root-MuiTextField-root"
-                    >
-                      <label
-                        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard css-2hy7sk-MuiFormLabel-root-MuiInputLabel-root"
-                        data-shrink="false"
-                        for="mui-1"
-                        id="mui-1-label"
-                        style="color: rgb(85, 26, 139);"
-                      >
-                        Search author
-                      </label>
-                      <div
-                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-5h82ro-MuiInputBase-root-MuiInput-root"
-                        style="color: rgb(85, 26, 139);"
-                      >
-                        <input
-                          aria-invalid="false"
-                          class="MuiInputBase-input MuiInput-input css-1yrc8ca-MuiInputBase-input-MuiInput-input"
-                          id="mui-1"
-                          type="text"
-                          value=""
-                        />
-                      </div>
-                    </div>
+                    <input
+                      class="search-input__field"
+                      placeholder="Search an author"
+                      type="text"
+                    />
                   </div>
                 </div>
                 <div
@@ -551,29 +537,23 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
 `;
 
 exports[`MUI Components Visual Regression Tests Ranking should render ranking table correctly 1`] = `
-<div
-  class="MuiBox-root css-2l3c9v"
+<main
+  class="ranking"
 >
-  <span
-    class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
-    role="progressbar"
-    style="width: 40px; height: 40px;"
+  <h3
+    class="ranking__title"
   >
-    <svg
-      class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
-      viewBox="22 22 44 44"
-    >
-      <circle
-        class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
-        cx="44"
-        cy="44"
-        fill="none"
-        r="20.2"
-        stroke-width="3.6"
-      />
-    </svg>
-  </span>
-</div>
+    Poets ranking
+  </h3>
+  <h5
+    class="ranking__subtitle"
+  >
+    3 points per poem, 1 per like
+  </h5>
+  <div
+    class="ranking__list"
+  />
+</main>
 `;
 
 exports[`MUI Components Visual Regression Tests SimpleAccordion should render accordion correctly 1`] = `
@@ -637,15 +617,87 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
           id="panel1a-content"
           role="region"
         >
-          <div>
+          <div
+            class="accordion__list"
+          >
             <div
               class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
             >
               <a
                 class="header__dropdown-subcategories"
-                href="/anniversary"
+                href="/america"
               >
-                Anniversary
+                America
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/animal"
+              >
+                Animal
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/arts-and-sciences"
+              >
+                Arts & Sciences
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/beauty"
+              >
+                Beauty
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/childhood"
+              >
+                Childhood
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/children"
+              >
+                Children
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/death"
+              >
+                Death
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/family"
+              >
+                Family
               </a>
             </div>
             <div
@@ -663,9 +715,9 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
             >
               <a
                 class="header__dropdown-subcategories"
-                href="/funny"
+                href="/history-and-politics"
               >
-                Funny
+                History & Politics
               </a>
             </div>
             <div
@@ -673,19 +725,9 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
             >
               <a
                 class="header__dropdown-subcategories"
-                href="/haikus"
+                href="/humor"
               >
-                Haikus
-              </a>
-            </div>
-            <div
-              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
-            >
-              <a
-                class="header__dropdown-subcategories"
-                href="/hope"
-              >
-                Hope
+                Humor
               </a>
             </div>
             <div
@@ -703,6 +745,26 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
             >
               <a
                 class="header__dropdown-subcategories"
+                href="/living"
+              >
+                Living
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/loss"
+              >
+                Loss
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
                 href="/love"
               >
                 Love
@@ -713,9 +775,109 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
             >
               <a
                 class="header__dropdown-subcategories"
-                href="/sad"
+                href="/marriage"
               >
-                Sad
+                Marriage
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/memory"
+              >
+                Memory
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/nature"
+              >
+                Nature
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/philosophy"
+              >
+                Philosophy
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/religion"
+              >
+                Religion
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/social-commentaries"
+              >
+                Social Commentaries
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/sorrow-and-grieving"
+              >
+                Sorrow & Grieving
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/spiritual"
+              >
+                Spiritual
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/teen"
+              >
+                Teen
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/time"
+              >
+                Time
+              </a>
+            </div>
+            <div
+              class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+            >
+              <a
+                class="header__dropdown-subcategories"
+                href="/war"
+              >
+                War
               </a>
             </div>
           </div>
@@ -728,6 +890,15 @@ exports[`MUI Components Visual Regression Tests SimpleAccordion should render ac
             >
               All
             </a>
+          </div>
+          <div
+            class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+          >
+            <button
+              class="header__dropdown-subcategories authors-accordion__browse-all"
+            >
+              Browse all categories →
+            </button>
           </div>
         </div>
       </div>

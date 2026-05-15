@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { Link } from 'react-router-dom'
 import './Ranking.scss'
 import { getRanking, RankItem } from '../../utils/getRanking'
@@ -10,13 +10,12 @@ import {
     LIKE_POINTS
 } from '../../data/constants'
 import { useSelector } from 'react-redux'
-import { useAppDispatch, RootState } from '../../redux/store'
-import { getRankingAction } from '../../redux/actions/poemsActions'
+import { RootState } from '../../redux/store'
 import { Poem } from '../../typescript/interfaces'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
 
-export default function Ranking() {
+function Ranking() {
     interface RankingStates {
         poems: Poem[]
         rank: RankItem[]
@@ -25,18 +24,7 @@ export default function Ranking() {
     const [poems, setPoems] = useState<RankingStates['poems']>([])
     const [rank, setRank] = useState<RankingStates['rank']>([])
 
-    const dispatch = useAppDispatch()
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
-
-    useEffect(() => {
-        dispatch(
-            getRankingAction({
-                params: {
-                    origin: 'user'
-                }
-            })
-        )
-    }, [dispatch])
 
     useEffect(() => {
         if (rankingQuery?.item) {
@@ -85,3 +73,5 @@ export default function Ranking() {
         </main>
     )
 }
+
+export default memo(Ranking)

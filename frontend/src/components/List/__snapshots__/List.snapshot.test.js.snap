@@ -6,12 +6,12 @@ exports[`List should match without id 1`] = `
   "baseElement": <body>
     <div>
       <div
-        class="MuiBox-root css-2l3c9v"
+        class="MuiBox-root css-15jfdev"
       >
         <span
-          class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+          class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
           role="progressbar"
-          style="width: 40px; height: 40px;"
+          style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
         >
           <svg
             class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -22,8 +22,8 @@ exports[`List should match without id 1`] = `
               cx="44"
               cy="44"
               fill="none"
-              r="20.2"
-              stroke-width="3.6"
+              r="20"
+              stroke-width="4"
             />
           </svg>
         </span>
@@ -32,12 +32,12 @@ exports[`List should match without id 1`] = `
   </body>,
   "container": <div>
     <div
-      class="MuiBox-root css-2l3c9v"
+      class="MuiBox-root css-15jfdev"
     >
       <span
-        class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorSecondary css-w58ak0-MuiCircularProgress-root"
+        class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1wxecgq-MuiCircularProgress-root"
         role="progressbar"
-        style="width: 40px; height: 40px;"
+        style="width: 40px; height: 40px; color: rgb(52, 152, 219);"
       >
         <svg
           class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
@@ -48,8 +48,8 @@ exports[`List should match without id 1`] = `
             cx="44"
             cy="44"
             fill="none"
-            r="20.2"
-            stroke-width="3.6"
+            r="20"
+            stroke-width="4"
           />
         </svg>
       </span>

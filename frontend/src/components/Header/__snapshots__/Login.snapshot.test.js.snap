@@ -11,6 +11,9 @@ exports[`Login should match without id 1`] = `
         <div
           class="login-card"
         >
+          <h2>
+            Login
+          </h2>
           <form
             class="login"
             data-testid="login"
@@ -38,7 +41,9 @@ exports[`Login should match without id 1`] = `
                 value=""
               />
             </div>
-            <button>
+            <button
+              disabled=""
+            >
               Login
             </button>
             <a
@@ -58,6 +63,9 @@ exports[`Login should match without id 1`] = `
       <div
         class="login-card"
       >
+        <h2>
+          Login
+        </h2>
         <form
           class="login"
           data-testid="login"
@@ -85,7 +93,9 @@ exports[`Login should match without id 1`] = `
               value=""
             />
           </div>
-          <button>
+          <button
+            disabled=""
+          >
             Login
           </button>
           <a

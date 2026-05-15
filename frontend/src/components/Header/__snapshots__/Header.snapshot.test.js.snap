@@ -71,15 +71,87 @@ exports[`Header should match without id 1`] = `
                     id="panel1a-content"
                     role="region"
                   >
-                    <div>
+                    <div
+                      class="accordion__list"
+                    >
                       <div
                         class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
                       >
                         <a
                           class="header__dropdown-subcategories"
-                          href="/anniversary"
+                          href="/america"
                         >
-                          Anniversary
+                          America
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/animal"
+                        >
+                          Animal
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/arts-and-sciences"
+                        >
+                          Arts & Sciences
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/beauty"
+                        >
+                          Beauty
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/childhood"
+                        >
+                          Childhood
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/children"
+                        >
+                          Children
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/death"
+                        >
+                          Death
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/family"
+                        >
+                          Family
                         </a>
                       </div>
                       <div
@@ -97,9 +169,9 @@ exports[`Header should match without id 1`] = `
                       >
                         <a
                           class="header__dropdown-subcategories"
-                          href="/funny"
+                          href="/history-and-politics"
                         >
-                          Funny
+                          History & Politics
                         </a>
                       </div>
                       <div
@@ -107,19 +179,9 @@ exports[`Header should match without id 1`] = `
                       >
                         <a
                           class="header__dropdown-subcategories"
-                          href="/haikus"
+                          href="/humor"
                         >
-                          Haikus
-                        </a>
-                      </div>
-                      <div
-                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
-                      >
-                        <a
-                          class="header__dropdown-subcategories"
-                          href="/hope"
-                        >
-                          Hope
+                          Humor
                         </a>
                       </div>
                       <div
@@ -137,6 +199,26 @@ exports[`Header should match without id 1`] = `
                       >
                         <a
                           class="header__dropdown-subcategories"
+                          href="/living"
+                        >
+                          Living
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/loss"
+                        >
+                          Loss
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
                           href="/love"
                         >
                           Love
@@ -147,9 +229,109 @@ exports[`Header should match without id 1`] = `
                       >
                         <a
                           class="header__dropdown-subcategories"
-                          href="/sad"
+                          href="/marriage"
                         >
-                          Sad
+                          Marriage
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/memory"
+                        >
+                          Memory
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/nature"
+                        >
+                          Nature
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/philosophy"
+                        >
+                          Philosophy
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/religion"
+                        >
+                          Religion
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/social-commentaries"
+                        >
+                          Social Commentaries
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/sorrow-and-grieving"
+                        >
+                          Sorrow & Grieving
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/spiritual"
+                        >
+                          Spiritual
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/teen"
+                        >
+                          Teen
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/time"
+                        >
+                          Time
+                        </a>
+                      </div>
+                      <div
+                        class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                      >
+                        <a
+                          class="header__dropdown-subcategories"
+                          href="/war"
+                        >
+                          War
                         </a>
                       </div>
                     </div>
@@ -163,6 +345,15 @@ exports[`Header should match without id 1`] = `
                         All
                       </a>
                     </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <button
+                        class="header__dropdown-subcategories authors-accordion__browse-all"
+                      >
+                        Browse all categories →
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -170,30 +361,34 @@ exports[`Header should match without id 1`] = `
           </div>
         </div>
         <div
-          class="header__logo"
+          class="header__brand"
         >
-          <a
-            class="header__text-logo-first"
-            href="/"
+          <div
+            class="header__logo"
           >
-            P
-          </a>
-          <a
-            class="header__logo-icon"
-            href="/"
-          />
-          <a
-            class="header__text-logo-second"
-            href="/"
+            <a
+              class="header__text-logo-first"
+              href="/"
+            >
+              P
+            </a>
+            <a
+              class="header__logo-icon"
+              href="/"
+            />
+            <a
+              class="header__text-logo-second"
+              href="/"
+            >
+              emunity
+            </a>
+          </div>
+          <p
+            class="list__presentation"
           >
-            emunity
-          </a>
+            Your poem community!
+          </p>
         </div>
-        <p
-          class="list__presentation"
-        >
-          Your poem community!
-        </p>
         <div
           class="separator"
         />
@@ -270,15 +465,87 @@ exports[`Header should match without id 1`] = `
                   id="panel1a-content"
                   role="region"
                 >
-                  <div>
+                  <div
+                    class="accordion__list"
+                  >
                     <div
                       class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
                     >
                       <a
                         class="header__dropdown-subcategories"
-                        href="/anniversary"
+                        href="/america"
                       >
-                        Anniversary
+                        America
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/animal"
+                      >
+                        Animal
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/arts-and-sciences"
+                      >
+                        Arts & Sciences
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/beauty"
+                      >
+                        Beauty
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/childhood"
+                      >
+                        Childhood
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/children"
+                      >
+                        Children
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/death"
+                      >
+                        Death
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/family"
+                      >
+                        Family
                       </a>
                     </div>
                     <div
@@ -296,9 +563,9 @@ exports[`Header should match without id 1`] = `
                     >
                       <a
                         class="header__dropdown-subcategories"
-                        href="/funny"
+                        href="/history-and-politics"
                       >
-                        Funny
+                        History & Politics
                       </a>
                     </div>
                     <div
@@ -306,19 +573,9 @@ exports[`Header should match without id 1`] = `
                     >
                       <a
                         class="header__dropdown-subcategories"
-                        href="/haikus"
+                        href="/humor"
                       >
-                        Haikus
-                      </a>
-                    </div>
-                    <div
-                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
-                    >
-                      <a
-                        class="header__dropdown-subcategories"
-                        href="/hope"
-                      >
-                        Hope
+                        Humor
                       </a>
                     </div>
                     <div
@@ -336,6 +593,26 @@ exports[`Header should match without id 1`] = `
                     >
                       <a
                         class="header__dropdown-subcategories"
+                        href="/living"
+                      >
+                        Living
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/loss"
+                      >
+                        Loss
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
                         href="/love"
                       >
                         Love
@@ -346,9 +623,109 @@ exports[`Header should match without id 1`] = `
                     >
                       <a
                         class="header__dropdown-subcategories"
-                        href="/sad"
+                        href="/marriage"
                       >
-                        Sad
+                        Marriage
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/memory"
+                      >
+                        Memory
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/nature"
+                      >
+                        Nature
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/philosophy"
+                      >
+                        Philosophy
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/religion"
+                      >
+                        Religion
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/social-commentaries"
+                      >
+                        Social Commentaries
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/sorrow-and-grieving"
+                      >
+                        Sorrow & Grieving
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/spiritual"
+                      >
+                        Spiritual
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/teen"
+                      >
+                        Teen
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/time"
+                      >
+                        Time
+                      </a>
+                    </div>
+                    <div
+                      class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                    >
+                      <a
+                        class="header__dropdown-subcategories"
+                        href="/war"
+                      >
+                        War
                       </a>
                     </div>
                   </div>
@@ -362,6 +739,15 @@ exports[`Header should match without id 1`] = `
                       All
                     </a>
                   </div>
+                  <div
+                    class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
+                  >
+                    <button
+                      class="header__dropdown-subcategories authors-accordion__browse-all"
+                    >
+                      Browse all categories →
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -369,30 +755,34 @@ exports[`Header should match without id 1`] = `
         </div>
       </div>
       <div
-        class="header__logo"
+        class="header__brand"
       >
-        <a
-          class="header__text-logo-first"
-          href="/"
+        <div
+          class="header__logo"
         >
-          P
-        </a>
-        <a
-          class="header__logo-icon"
-          href="/"
-        />
-        <a
-          class="header__text-logo-second"
-          href="/"
+          <a
+            class="header__text-logo-first"
+            href="/"
+          >
+            P
+          </a>
+          <a
+            class="header__logo-icon"
+            href="/"
+          />
+          <a
+            class="header__text-logo-second"
+            href="/"
+          >
+            emunity
+          </a>
+        </div>
+        <p
+          class="list__presentation"
         >
-          emunity
-        </a>
+          Your poem community!
+        </p>
       </div>
-      <p
-        class="list__presentation"
-      >
-        Your poem community!
-      </p>
       <div
         class="separator"
       />

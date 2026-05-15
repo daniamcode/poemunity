@@ -7,6 +7,7 @@ import {
     updateAllPoemsCacheAfterCreatePoemAction,
     updateMyPoemsCacheAfterCreatePoemAction,
     updatePoemsListCacheAfterCreatePoemAction,
+    updateRankingCacheAfterCreatePoemAction,
     updateAllPoemsCacheAfterSavePoemAction,
     updateMyPoemsCacheAfterSavePoemAction,
     updatePoemsListCacheAfterSavePoemAction
@@ -199,6 +200,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
                         dispatch(updateMyPoemsCacheAfterCreatePoemAction({ response }))
                         dispatch(updatePoemsListCacheAfterCreatePoemAction({ response }))
+                        dispatch(updateRankingCacheAfterCreatePoemAction({ response }))
                         manageSuccess('Poem created successfully')
                     },
                     error: () => {

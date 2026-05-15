@@ -5,6 +5,12 @@ import { MemoryRouter } from 'react-router-dom'
 import store from './redux/store'
 import '@testing-library/jest-dom'
 import React, { useContext } from 'react'
+import * as poemsActions from './redux/actions/poemsActions'
+
+jest.mock('./redux/actions/poemsActions', () => ({
+    ...jest.requireActual('./redux/actions/poemsActions'),
+    getRankingAction: jest.fn(() => ({ type: 'get_ranking' }))
+}))
 
 // Mock child components to isolate routing tests
 jest.mock('./components/Dashboard/Dashboard', () => {
@@ -144,6 +150,18 @@ describe('App', () => {
                 expect(screen.getByTestId('dashboard-component')).toBeInTheDocument()
                 expect(screen.queryByTestId('detail-component')).not.toBeInTheDocument()
             })
+        })
+    })
+
+    describe('Ranking data fetch', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        test('dispatches getRankingAction once on mount', () => {
+            renderAppWithRoute('/')
+            expect(poemsActions.getRankingAction).toHaveBeenCalledTimes(1)
+            expect(poemsActions.getRankingAction).toHaveBeenCalledWith({ params: { origin: 'user' } })
         })
     })
 

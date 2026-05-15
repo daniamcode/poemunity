@@ -159,10 +159,14 @@ export function getAction({
                 }
             })
             .catch(error => {
+                const serializedError = error?.response?.data || {
+                    message: error?.message || 'An error occurred',
+                    status: error?.response?.status,
+                    statusText: error?.response?.statusText
+                }
                 dispatch({
                     type: rejectedAction,
-                    // if there's a network error, for example, we don't get a response in error
-                    payload: error?.response?.data || error
+                    payload: serializedError
                 })
                 manageError(error)
                 if (callbacks?.error) {

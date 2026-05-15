@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Route, Switch, BrowserRouter as Router } from 'react-router-dom'
 import './App.scss'
 import Dashboard from './components/Dashboard/Dashboard'
@@ -11,6 +11,9 @@ import PageNotFound from './components/PageNotFound/PageNotFound'
 import AuthorsIndex from './components/Authors/AuthorsIndex'
 import AuthorDetail from './components/Authors/AuthorDetail'
 import { Context } from './typescript/interfaces'
+import { useAppDispatch } from './redux/store'
+import store from './redux/store'
+import { getRankingAction } from './redux/actions/poemsActions'
 
 export const AppContext = React.createContext<Context>({
     elementToEdit: '',
@@ -24,6 +27,14 @@ export const AppContext = React.createContext<Context>({
 })
 
 function App() {
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        if (!store.getState().rankingQuery.item) {
+            dispatch(getRankingAction({ params: { origin: 'user' } }))
+        }
+    }, [dispatch])
+
     const [contextState, setContextState] = useState({
         elementToEdit: '',
         user: '',
@@ -52,14 +63,13 @@ function App() {
 
                     <div className='margin-body'>
                         <Switch>
-                            <Route path='/' exact component={Dashboard} />
                             <Route path='/profile' component={Profile} />
                             <Route path='/login' component={Login} />
                             <Route path='/register' component={Register} />
                             <Route path='/detail/:poemId' exact component={Detail} />
                             <Route path='/authors' exact component={AuthorsIndex} />
                             <Route path='/authors/:slug' exact component={AuthorDetail} />
-                            <Route path='/:genre' exact component={Dashboard} />
+                            <Route path='/:genre?' exact component={Dashboard} />
                             <Route component={PageNotFound} />
                         </Switch>
                     </div>

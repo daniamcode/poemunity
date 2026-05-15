@@ -534,6 +534,31 @@ export function updatePoemsListCacheAfterDeletePoemAction({ poemId }: UpdatePoem
     }
 }
 
+interface UpdateRankingCacheAfterCreatePoemActionProps {
+    response: Poem
+}
+
+export function updateRankingCacheAfterCreatePoemAction({ response }: UpdateRankingCacheAfterCreatePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const {
+            rankingQuery: { item: rankingQuery }
+        } = store.getState()
+
+        if (!rankingQuery) {
+            return
+        }
+
+        const newRankingQuery = cloneDeep(rankingQuery as Poem[])
+        newRankingQuery.push(response)
+
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING)
+        dispatch({
+            type: fulfilledAction,
+            payload: newRankingQuery
+        })
+    }
+}
+
 interface UpdateRankingCacheAfterDeletePoemActionProps {
     poemId: string
 }

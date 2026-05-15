@@ -220,7 +220,11 @@ describe('commonActions', () => {
 
             expect(dispatch).toHaveBeenCalledWith({
                 type: 'TEST_ACTION_rejected',
-                payload: mockError
+                payload: {
+                    message: 'Network Error',
+                    status: undefined,
+                    statusText: undefined
+                }
             })
             expect(mockCallbacks.error).toHaveBeenCalledWith(mockError)
         })
