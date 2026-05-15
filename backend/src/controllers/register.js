@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const registerRouter = require('express').Router()
 const Author = require('../models/Author')
 const { slugifyAuthor } = require('../utils/slugUtils')

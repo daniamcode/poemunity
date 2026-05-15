@@ -1,5 +1,5 @@
 const request = require('supertest')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const { app } = require('../../app')
 const User = require('../models/User')
 
