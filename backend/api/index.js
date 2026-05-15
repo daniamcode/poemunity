@@ -1,5 +1,5 @@
 const connectMongo = require('../mongo')
-const app = require('../app')
+const { app } = require('../app')
 
 let isConnected = false
 
