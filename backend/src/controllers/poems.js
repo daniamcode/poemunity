@@ -26,9 +26,10 @@ poemsRouter.get('/', async (req, res) => {
       filter.origin = req.query.origin
     }
 
-    // userId filter (MyPoems) — Author._id = old User._id, so direct mapping works
+    // userId filter — check authorId (new) and legacy userId field (string or ObjectId)
     if (req.query.userId) {
-      filter.authorId = new mongoose.Types.ObjectId(req.query.userId)
+      const id = new mongoose.Types.ObjectId(req.query.userId)
+      filter.$or = [{ authorId: id }, { userId: id }, { userId: req.query.userId }]
     }
 
     if (req.query.likedBy) {

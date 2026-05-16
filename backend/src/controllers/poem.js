@@ -48,19 +48,19 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
 
 // modify poem
 poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
-  const { poem } = req;
+  const { poem } = req
 
-  Object.entries(req.body).forEach((item) => {
-    const key = item[0];
-    const value = item[1];
-    poem[key] = value;
-  });
-  poem.save((error) => {
-    if (error) {
-      res.send(error);
-    }
-    res.json(poem);
-  });
+  try {
+    const updated = await Poem.findByIdAndUpdate(
+      poem._id,
+      { $set: req.body },
+      { new: true, strict: false }
+    ).populate('authorId', AUTHOR_FIELDS)
+
+    res.json(updated)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update poem' })
+  }
 })
 
 poemRouter.delete('/:poemId', userExtractor, async (req, res) => {
