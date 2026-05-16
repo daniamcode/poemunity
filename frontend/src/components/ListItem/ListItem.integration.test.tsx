@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
 import * as poemActions from '../../redux/actions/poemActions'
@@ -12,7 +13,7 @@ jest.mock('../../redux/actions/poemActions')
 jest.mock('../../redux/actions/poemsActions')
 jest.mock('../../utils/notifications')
 
-const mockStore = configureStore([])
+const mockStore = configureStore([thunk])
 
 describe('ListItem - Like Functionality Integration Tests', () => {
     let store: ReturnType<typeof mockStore>
@@ -76,6 +77,9 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         })
         ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_POEM_LIKE'
+        })
+        ;(poemsActions.updateAuthorPoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_AUTHOR_POEMS_LIKE'
         })
     })
 

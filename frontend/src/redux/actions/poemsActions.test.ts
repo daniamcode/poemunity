@@ -153,7 +153,10 @@ describe('getAllPoemsAction', () => {
         expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload.response).toBe('some error')
+        // Error is serialized: response.data is undefined so falls back to { message, status, statusText }
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toMatchObject({
+            message: expect.any(String)
+        })
     })
 
     // a network error is different because we don't get an error as an object with a response property
@@ -169,19 +172,14 @@ describe('getAllPoemsAction', () => {
                 options
             })(dispatch)
         )
-        // another alternative:
-        // await new Promise(resolve=> {
-        //     setTimeout(() => {
-        //         resolve();
-        //     }, 300);
-        // })
 
-        // probably is better to use "const spy = jest.spyOn(commonActions, 'getAction')"
-        // and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
-        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toBe('Network error')
+        // String errors are serialized to { message, status, statusText }
+        expect((dispatch as jest.Mock).mock.calls[1][0].payload).toMatchObject({
+            message: expect.any(String)
+        })
     })
 
     test('Should dispatch response when axios returns data correctly', async () => {

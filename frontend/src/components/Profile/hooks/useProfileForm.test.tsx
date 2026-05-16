@@ -76,6 +76,9 @@ describe('useProfileForm', () => {
         ;(poemsActions.updatePoemsListCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_POEMS_LIST_CACHE_AFTER_CREATE'
         })
+        ;(poemsActions.updateRankingCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
+            type: 'UPDATE_RANKING_CACHE_AFTER_CREATE'
+        })
         ;(poemsActions.updateAllPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_ALL_POEMS_CACHE'
         })

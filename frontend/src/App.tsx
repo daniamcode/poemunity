@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Route, Switch, BrowserRouter as Router } from 'react-router-dom'
+import React, { useState, useEffect, useContext } from 'react'
+import { Route, Switch, BrowserRouter as Router, Redirect, RouteProps } from 'react-router-dom'
 import './App.scss'
 import Dashboard from './components/Dashboard/Dashboard'
 import Detail from './components/Detail/Detail'
@@ -14,6 +14,18 @@ import { Context } from './typescript/interfaces'
 import { useAppDispatch } from './redux/store'
 import store from './redux/store'
 import { getRankingAction } from './redux/actions/poemsActions'
+
+function PrivateRoute({ component: Component, ...rest }: RouteProps & { component: React.ComponentType<any> }) {
+    const { user } = useContext(AppContext)
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                user ? <Component {...props} /> : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
+            }
+        />
+    )
+}
 
 export const AppContext = React.createContext<Context>({
     elementToEdit: '',
@@ -74,7 +86,7 @@ function App() {
 
                     <div className='margin-body'>
                         <Switch>
-                            <Route path='/profile' component={Profile} />
+                            <PrivateRoute path='/profile' component={Profile} />
                             <Route path='/login' component={Login} />
                             <Route path='/register' component={Register} />
                             <Route path='/detail/:poemId' exact component={Detail} />

@@ -5,9 +5,10 @@ import { SEARCH_PLACEHOLDER } from '../../../data/constants'
 describe('SearchBar', () => {
     test('should render search icon and input field', () => {
         const mockOnChange = jest.fn()
-        render(<SearchBar onChange={mockOnChange} />)
+        const { container } = render(<SearchBar onChange={mockOnChange} />)
 
         expect(screen.getByLabelText(SEARCH_PLACEHOLDER)).toBeInTheDocument()
+        expect(container.querySelector('svg')).toBeInTheDocument()
     })
 
     test('should call onChange when user types', () => {
@@ -21,19 +22,19 @@ describe('SearchBar', () => {
         expect(mockOnChange).toHaveBeenCalledTimes(1)
     })
 
-    test('should have correct styling for icon', () => {
+    test('should render input with correct placeholder', () => {
         const mockOnChange = jest.fn()
-        const { container } = render(<SearchBar onChange={mockOnChange} />)
+        render(<SearchBar onChange={mockOnChange} />)
 
-        const icon = container.querySelector('svg')
-        expect(icon).toHaveStyle({ fontSize: '40px', fill: '#4F5D73' })
+        const input = screen.getByLabelText(SEARCH_PLACEHOLDER)
+        expect(input).toHaveAttribute('placeholder', SEARCH_PLACEHOLDER)
     })
 
-    test('should render separator', () => {
+    test('should render container with correct class', () => {
         const mockOnChange = jest.fn()
         const { container } = render(<SearchBar onChange={mockOnChange} />)
 
-        const separator = container.querySelector('.separator')
-        expect(separator).toBeInTheDocument()
+        expect(container.querySelector('.search-input__container')).toBeInTheDocument()
+        expect(container.querySelector('.search-input__field')).toBeInTheDocument()
     })
 })

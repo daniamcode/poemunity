@@ -23,6 +23,7 @@ exports[`MyFavouritePoems should match without id 1`] = `
             />
           </svg>
           <input
+            aria-label="Search an author"
             class="search-input__field"
             placeholder="Search an author"
             type="text"
@@ -53,6 +54,7 @@ exports[`MyFavouritePoems should match without id 1`] = `
           />
         </svg>
         <input
+          aria-label="Search an author"
           class="search-input__field"
           placeholder="Search an author"
           type="text"

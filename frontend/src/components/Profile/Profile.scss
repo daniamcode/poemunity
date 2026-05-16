@@ -554,6 +554,42 @@
     padding-top: 20px;
 }
 
+@media screen and (max-width: 699px) {
+    .profile__intro {
+        padding: 24px 16px;
+        gap: 0;
+    }
+
+    .profile__picture-wrapper {
+        width: 84px;
+        height: 84px;
+        margin-bottom: 12px;
+    }
+
+    .profile__image {
+        width: 84px;
+        height: 84px;
+
+        &--initials {
+            font-size: 2rem;
+        }
+    }
+
+    .user-info {
+        margin-top: 0;
+    }
+
+    .user-info__name {
+        font-size: 1.15rem;
+        margin-bottom: 4px;
+    }
+
+    .profile__personal-data {
+        padding: 20px 16px;
+        margin-top: 16px;
+    }
+}
+
 @media screen and (min-width: 700px) {
     .profile__intro {
         flex-direction: row;

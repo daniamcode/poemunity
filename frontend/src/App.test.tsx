@@ -97,9 +97,9 @@ describe('App', () => {
             expect(screen.getByTestId('dashboard-component')).toBeInTheDocument()
         })
 
-        test('renders Profile component on /profile path', () => {
+        test('redirects to /login when accessing /profile unauthenticated', () => {
             renderAppWithRoute('/profile')
-            expect(screen.getByTestId('profile-component')).toBeInTheDocument()
+            expect(screen.getByTestId('login-component')).toBeInTheDocument()
         })
 
         test('renders Login component on /login path', () => {

@@ -76,6 +76,11 @@ describe('Header', () => {
             picture: 'https://example.com/pic.jpg'
         })
         mockLocation.pathname = '/'
+        global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve(null) })
+    })
+
+    afterEach(() => {
+        delete (global as any).fetch
     })
 
     const renderWithContext = (contextValue: any) => {
@@ -113,13 +118,13 @@ describe('Header', () => {
 
     test('should NOT render profile link when user is not logged in', () => {
         const { container } = renderWithContext(mockContextLoggedOut)
-        const profileLink = container.querySelector('.header__profile')
+        const profileLink = container.querySelector('.header__profile-picture')
         expect(profileLink).not.toBeInTheDocument()
     })
 
     test('should render profile link when user is logged in', () => {
         const { container } = renderWithContext(mockContextLoggedIn)
-        const profileLink = container.querySelector('.header__profile')
+        const profileLink = container.querySelector('.header__profile-picture')
         expect(profileLink).toBeInTheDocument()
         expect(profileLink).toHaveAttribute('href', '/profile')
     })
@@ -133,7 +138,7 @@ describe('Header', () => {
     test('should display username subtitle on profile page', () => {
         mockLocation.pathname = '/profile'
         renderWithContext(mockContextLoggedIn)
-        expect(screen.getByText("johndoe's Profile")).toBeInTheDocument()
+        expect(screen.getByText("johndoe's private profile")).toBeInTheDocument()
     })
 
     test('should display default subtitle on non-profile pages', () => {
@@ -229,9 +234,9 @@ describe('Header', () => {
         mockLocation.pathname = '/profile'
         const { container } = renderWithContext(mockContextLoggedIn)
 
-        expect(screen.getByText("johndoe's Profile")).toBeInTheDocument()
+        expect(screen.getByText("johndoe's private profile")).toBeInTheDocument()
         expect(screen.getByTestId('logout-button')).toBeInTheDocument()
-        const profileLink = container.querySelector('.header__profile')
+        const profileLink = container.querySelector('.header__profile-picture')
         expect(profileLink).toBeInTheDocument()
         expect(profileLink).toHaveAttribute('href', '/profile')
     })
@@ -240,8 +245,8 @@ describe('Header', () => {
         mockLocation.pathname = '/profile'
         renderWithContext(mockContextLoggedOut)
 
-        // Username is empty, so should show 's Profile
-        expect(screen.getByText("'s Profile")).toBeInTheDocument()
+        // Username is empty, so should show 's private profile
+        expect(screen.getByText("'s private profile")).toBeInTheDocument()
         expect(screen.getByTestId('login-button')).toBeInTheDocument()
     })
 })

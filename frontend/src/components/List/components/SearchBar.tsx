@@ -14,6 +14,7 @@ export function SearchBar({ onChange }: SearchBarProps) {
                 type='text'
                 className='search-input__field'
                 placeholder={SEARCH_PLACEHOLDER}
+                aria-label={SEARCH_PLACEHOLDER}
                 onChange={onChange}
             />
         </div>

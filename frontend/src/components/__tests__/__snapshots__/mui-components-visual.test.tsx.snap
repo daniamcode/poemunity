@@ -517,6 +517,7 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
                       />
                     </svg>
                     <input
+                      aria-label="Search an author"
                       class="search-input__field"
                       placeholder="Search an author"
                       type="text"

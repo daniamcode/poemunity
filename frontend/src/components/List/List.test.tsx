@@ -248,10 +248,8 @@ describe('List', () => {
             )
         })
 
-        // Should render only love poems
+        // Genre filtering is server-side; the component renders whatever the store returns
         expect(screen.getByTestId('list-item-poem-1')).toBeInTheDocument()
-        expect(screen.getByTestId('list-item-poem-3')).toBeInTheDocument()
-        expect(screen.queryByTestId('list-item-poem-2')).not.toBeInTheDocument()
     })
 
     test('Should display genre title when genre is provided', () => {
@@ -302,7 +300,7 @@ describe('List', () => {
             </Provider>
         )
 
-        const searchInput = container.querySelector('.list__search input') as HTMLInputElement
+        const searchInput = container.querySelector('.search-input__field') as HTMLInputElement
         fireEvent.change(searchInput, { target: { value: 'Author One' } })
 
         // Search input should accept the value
@@ -516,7 +514,7 @@ describe('List', () => {
             </Provider>
         )
 
-        expect(container.querySelector('.list__search')).toBeInTheDocument()
+        expect(container.querySelector('.search-input__container')).toBeInTheDocument()
     })
 
     test('Should have correct CSS classes', () => {
@@ -530,8 +528,8 @@ describe('List', () => {
 
         expect(container.querySelector('.list__container')).toBeInTheDocument()
         expect(container.querySelector('.list__intro')).toBeInTheDocument()
-        expect(container.querySelector('.list__search')).toBeInTheDocument()
-        expect(container.querySelector('.list__sort')).toBeInTheDocument()
+        expect(container.querySelector('.search-input__container')).toBeInTheDocument()
+        expect(container.querySelector('[data-testid="order-select"]')).toBeInTheDocument()
     })
 
     test('Should render all origin options', () => {

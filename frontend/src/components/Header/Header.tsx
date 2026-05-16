@@ -62,7 +62,7 @@ function Header() {
     // Dynamic subtitle based on route
     const getSubtitle = () => {
         if (location.pathname === '/profile') {
-            return `${context?.username}'s Profile`
+            return `${context?.username}'s private profile`
         }
         return WEB_SUBTITLE
     }
