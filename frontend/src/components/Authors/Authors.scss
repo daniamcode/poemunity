@@ -155,11 +155,21 @@
         margin-bottom: 10px;
     }
 
+    &__surname {
+        font-weight: 400;
+    }
+
     &__ai-badge {
         font-size: 1rem;
         font-weight: 400;
         color: #7f8c8d;
         font-family: inherit;
+    }
+
+    &__meta {
+        font-size: 0.95rem;
+        color: #7f8c8d;
+        margin: 4px 0 0;
     }
 
     &__count {
@@ -192,6 +202,13 @@
         color: #2980b9;
         border-radius: 12px;
         font-weight: 500;
+        text-decoration: none;
+        transition: background 0.15s, color 0.15s;
+
+        &:hover {
+            background: #2980b9;
+            color: #fff;
+        }
     }
 
     &__empty {

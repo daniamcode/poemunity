@@ -68,12 +68,33 @@ authorsRouter.get('/', async (req, res) => {
   }
 })
 
-// GET /api/authors/:slug — single author profile (bio, preferredGenres, picture, type)
+// GET /api/authors/:slug — public author profile (personal fields filtered by privateFields)
 authorsRouter.get('/:slug', async (req, res) => {
   try {
-    const author = await Author.findOne({ slug: req.params.slug }, 'name slug picture type bio preferredGenres')
+    const author = await Author.findOne(
+      { slug: req.params.slug },
+      'name slug picture type bio preferredGenres surname city country birthYear gender website privateFields'
+    )
     if (!author) return res.status(404).json({ error: 'Author not found' })
-    res.json(author)
+
+    const priv = new Set(author.privateFields || [])
+    const result = {
+      id: author.id,
+      name: author.name,
+      slug: author.slug,
+      picture: author.picture,
+      type: author.type,
+      bio: author.bio,
+      preferredGenres: author.preferredGenres,
+      website: author.website
+    }
+    if (!priv.has('surname')) result.surname = author.surname
+    if (!priv.has('city')) result.city = author.city
+    if (!priv.has('country')) result.country = author.country
+    if (!priv.has('birthYear')) result.birthYear = author.birthYear
+    if (!priv.has('gender')) result.gender = author.gender
+
+    res.json(result)
   } catch {
     res.status(500).json({ error: 'Internal server error' })
   }

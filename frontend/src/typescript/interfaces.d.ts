@@ -65,6 +65,13 @@ export interface Context {
     picture: string
     bio?: string
     preferredGenres?: string[]
+    name?: string
+    surname?: string
+    city?: string
+    country?: string
+    birthYear?: number | null
+    gender?: string
+    privateFields?: string[]
     config: object
     adminId: string
     setState: (state: Context) => void

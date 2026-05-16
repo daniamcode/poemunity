@@ -28,6 +28,13 @@ function Header() {
                 picture: jwtData?.picture,
                 bio: jwtData?.bio || '',
                 preferredGenres: jwtData?.preferredGenres || [],
+                name: jwtData?.name || '',
+                surname: jwtData?.surname || '',
+                city: jwtData?.city || '',
+                country: jwtData?.country || '',
+                birthYear: jwtData?.birthYear || null,
+                gender: jwtData?.gender || '',
+                privateFields: jwtData?.privateFields || [],
                 config: {
                     headers: {
                         Authorization: `Bearer ${parsedUser}`

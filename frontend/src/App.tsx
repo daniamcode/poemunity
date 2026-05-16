@@ -45,6 +45,13 @@ function App() {
         picture: '',
         bio: '',
         preferredGenres: [] as string[],
+        name: '',
+        surname: '',
+        city: '',
+        country: '',
+        birthYear: null as number | null,
+        gender: '',
+        privateFields: [] as string[],
         config: {},
         // eslint-disable-next-line no-undef
         adminId: process.env.REACT_APP_ADMIN ?? '',

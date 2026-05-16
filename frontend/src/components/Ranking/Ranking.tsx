@@ -59,10 +59,10 @@ function Ranking() {
                             <span className={`ranking__rank-number ranking__rank-number--${rankPos}`}>
                                 {rankPos}
                             </span>
-                            <div className='ranking__author-info'>
+                            <div className='ranking__avatar' title={item.author}>
                                 <AuthorAvatar name={item.author} picture={item.picture} />
-                                <span className='ranking__author-name'>{item.author}</span>
                             </div>
+                            <span className='ranking__author-name' title={item.author}>{item.author}</span>
                             <span className='ranking__points'>
                                 {item.points} pts
                             </span>

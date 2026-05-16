@@ -12,6 +12,15 @@ const authorSchema = new Schema({
   fake: { type: Boolean, default: false },
   bio: String,
   preferredGenres: [String],
+  // personal info fields
+  surname: String,
+  city: String,
+  country: String,
+  birthYear: Number,
+  gender: String,
+  website: String,
+  // fields the user has chosen to hide from their public profile page
+  privateFields: [String],
   // auth fields — only populated for registered users, null for famous authors
   username: { type: String, unique: true, sparse: true },
   email: { type: String, sparse: true },

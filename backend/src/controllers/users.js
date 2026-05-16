@@ -40,11 +40,11 @@ usersRouter.post('/', async (req, res) => {
 
 usersRouter.patch('/profile', userExtractor, async (req, res) => {
   try {
-    const { bio, preferredGenres } = req.body
-
+    const ALLOWED = ['bio', 'preferredGenres', 'name', 'surname', 'city', 'country', 'birthYear', 'gender', 'website', 'privateFields']
     const update = {}
-    if (bio !== undefined) update.bio = bio
-    if (preferredGenres !== undefined) update.preferredGenres = preferredGenres
+    for (const field of ALLOWED) {
+      if (req.body[field] !== undefined) update[field] = req.body[field]
+    }
 
     const author = await Author.findByIdAndUpdate(req.userId, update, { new: true })
     if (!author) return res.status(404).json({ error: 'User not found' })
@@ -55,13 +55,21 @@ usersRouter.patch('/profile', userExtractor, async (req, res) => {
         username: author.username,
         picture: author.picture,
         bio: author.bio || '',
-        preferredGenres: author.preferredGenres || []
+        preferredGenres: author.preferredGenres || [],
+        name: author.name || '',
+        surname: author.surname || '',
+        city: author.city || '',
+        country: author.country || '',
+        birthYear: author.birthYear || null,
+        gender: author.gender || '',
+        website: author.website || '',
+        privateFields: author.privateFields || []
       },
       process.env.SECRET,
       { expiresIn: 60 * 60 * 24 * 7 }
     )
 
-    res.json({ token: newToken, bio: author.bio, preferredGenres: author.preferredGenres })
+    res.json({ token: newToken, author })
   } catch (error) {
     console.error('Profile update error:', error)
     res.status(500).json({ error: 'Failed to update profile' })

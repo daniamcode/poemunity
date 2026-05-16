@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { AppContext } from '../../App'
 import ListItem from '../ListItem/ListItem'
 import CircularProgress from '../CircularIndeterminate'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useAuthorPoems } from './useAuthorPoems'
 import API from '../../redux/actions/axiosInstance'
+import { categoryToSlug } from '../../data/constants'
 import '../List/List.scss'
 import './Authors.scss'
 
@@ -19,6 +20,11 @@ interface AuthorProfile {
     type?: string
     bio?: string
     preferredGenres?: string[]
+    surname?: string
+    city?: string
+    country?: string
+    birthYear?: number
+    gender?: string
 }
 
 export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>) {
@@ -47,14 +53,28 @@ export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>
     }, [slug])
 
     const authorType = authorProfile?.type || poems[0]?.authorType
+    const currentYear = new Date().getFullYear()
+    const age = authorProfile?.birthYear ? currentYear - authorProfile.birthYear : null
+
+    const metaParts = [
+        age !== null && `${age} years old`,
+        authorProfile?.city && authorProfile?.country
+            ? `${authorProfile.city}, ${authorProfile.country}`
+            : authorProfile?.city || authorProfile?.country,
+        authorProfile?.gender
+    ].filter(Boolean)
 
     return (
         <main className='author-detail'>
             <header className='author-detail__header'>
                 <h1 className='author-detail__name'>
                     {authorName}
+                    {authorProfile?.surname && <span className='author-detail__surname'> {authorProfile.surname}</span>}
                     {authorType === 'ai' && <span className='author-detail__ai-badge'> (AI generated)</span>}
                 </h1>
+                {metaParts.length > 0 && (
+                    <p className='author-detail__meta'>{metaParts.join(' · ')}</p>
+                )}
                 {total > 0 && <p className='author-detail__count'>{total} poems</p>}
 
                 {authorProfile?.bio && (
@@ -63,7 +83,9 @@ export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>
                 {authorProfile?.preferredGenres && authorProfile.preferredGenres.length > 0 && (
                     <div className='author-detail__genres'>
                         {authorProfile.preferredGenres.map(genre => (
-                            <span key={genre} className='author-detail__genre-tag'>{genre}</span>
+                            <Link key={genre} to={`/${categoryToSlug(genre)}`} className='author-detail__genre-tag'>
+                                {genre}
+                            </Link>
                         ))}
                     </div>
                 )}
