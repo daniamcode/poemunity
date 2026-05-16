@@ -128,11 +128,10 @@ describe('List', () => {
             id: 'orderBy',
             value: ORDER_BY_RANDOM
         })
-        expect(mockSetParamsData).toHaveBeenCalledWith(
-            expect.objectContaining({
-                orderBy: ORDER_BY_RANDOM
-            })
-        )
+        expect(mockSetParamsData).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockSetParamsData.mock.calls[0][0]({ orderBy: '', origin: 'all' })).toMatchObject({
+            orderBy: ORDER_BY_RANDOM
+        })
     })
 
     test('Should call Helmet', () => {
@@ -323,11 +322,10 @@ describe('List', () => {
             id: 'orderBy',
             value: ORDER_BY_DATE
         })
-        expect(mockSetParamsData).toHaveBeenCalledWith(
-            expect.objectContaining({
-                orderBy: ORDER_BY_DATE
-            })
-        )
+        expect(mockSetParamsData).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockSetParamsData.mock.calls[0][0]({ orderBy: '', origin: 'all' })).toMatchObject({
+            orderBy: ORDER_BY_DATE
+        })
     })
 
     test('Should handle order by change to Likes', () => {
@@ -382,11 +380,10 @@ describe('List', () => {
             id: 'origin',
             value: 'famous'
         })
-        expect(mockSetParamsData).toHaveBeenCalledWith(
-            expect.objectContaining({
-                origin: 'famous'
-            })
-        )
+        expect(mockSetParamsData).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockSetParamsData.mock.calls[0][0]({ orderBy: '', origin: 'all' })).toMatchObject({
+            origin: 'famous'
+        })
     })
 
     test('Should handle origin filter change to Users', () => {
@@ -405,11 +402,10 @@ describe('List', () => {
             id: 'origin',
             value: 'user'
         })
-        expect(mockSetParamsData).toHaveBeenCalledWith(
-            expect.objectContaining({
-                origin: 'user'
-            })
-        )
+        expect(mockSetParamsData).toHaveBeenCalledWith(expect.any(Function))
+        expect(mockSetParamsData.mock.calls[0][0]({ orderBy: '', origin: 'all' })).toMatchObject({
+            origin: 'user'
+        })
     })
 
     test('Should dispatch getPoemsListAction on mount with reset and no fetch', () => {

@@ -29,6 +29,7 @@ export function AuthorAvatar({ name, picture }: AuthorAvatarProps) {
                 className='poem__picture'
                 src={picture}
                 alt={name}
+                loading='lazy'
                 onError={e => {
                     const target = e.currentTarget
                     target.style.display = 'none'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useContext } from 'react'
+import { useState, useContext, useCallback } from 'react'
 import { AppContext } from '../../App'
 import './List.scss'
 import '../Detail/Detail.scss'
@@ -44,31 +44,21 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
         isLoading
     })
 
-    const handleOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        addQueryParam({
-            id: 'orderBy',
-            value: event.target.value
-        })
-        setParamsData({
-            ...paramsData,
-            orderBy: event.target.value
-        })
-    }
+    const handleOrderChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value
+        addQueryParam({ id: 'orderBy', value })
+        setParamsData(prev => ({ ...prev, orderBy: value }))
+    }, [])
 
-    const handleOriginChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        addQueryParam({
-            id: 'origin',
-            value: event.target.value
-        })
-        setParamsData({
-            ...paramsData,
-            origin: event.target.value
-        })
-    }
+    const handleOriginChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value
+        addQueryParam({ id: 'origin', value })
+        setParamsData(prev => ({ ...prev, origin: value }))
+    }, [])
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFilter(normalizeString(event.target.value))
-    }
+    }, [])
 
     // Show full page loader only on initial load (no poems yet)
     if (isLoading && !hasItems) {

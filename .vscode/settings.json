@@ -16,5 +16,8 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["Favourite"]
+  "cSpell.words": [
+    "Favourite"
+  ],
+  "terminal.integrated.gpuAcceleration": "off"
 }

@@ -77,24 +77,24 @@ describe('App', () => {
     }
 
     describe('Route matching', () => {
-        test('renders Dashboard component on root path', () => {
+        test('renders Dashboard component on root path', async () => {
             renderAppWithRoute('/')
-            expect(screen.getByTestId('dashboard-component')).toBeInTheDocument()
+            expect(await screen.findByTestId('dashboard-component')).toBeInTheDocument()
         })
 
-        test('renders Detail component on /detail/:poemId path', () => {
+        test('renders Detail component on /detail/:poemId path', async () => {
             renderAppWithRoute('/detail/123')
-            expect(screen.getByTestId('detail-component')).toBeInTheDocument()
+            expect(await screen.findByTestId('detail-component')).toBeInTheDocument()
         })
 
-        test('renders Detail component on /detail/:poemId path with different ID', () => {
+        test('renders Detail component on /detail/:poemId path with different ID', async () => {
             renderAppWithRoute('/detail/abc-def-456')
-            expect(screen.getByTestId('detail-component')).toBeInTheDocument()
+            expect(await screen.findByTestId('detail-component')).toBeInTheDocument()
         })
 
-        test('renders Dashboard component on /:genre path', () => {
+        test('renders Dashboard component on /:genre path', async () => {
             renderAppWithRoute('/love')
-            expect(screen.getByTestId('dashboard-component')).toBeInTheDocument()
+            expect(await screen.findByTestId('dashboard-component')).toBeInTheDocument()
         })
 
         test('redirects to /login when accessing /profile unauthenticated', () => {
@@ -107,9 +107,9 @@ describe('App', () => {
             expect(screen.getByTestId('login-component')).toBeInTheDocument()
         })
 
-        test('renders Register component on /register path', () => {
+        test('renders Register component on /register path', async () => {
             renderAppWithRoute('/register')
-            expect(screen.getByTestId('register-component')).toBeInTheDocument()
+            expect(await screen.findByTestId('register-component')).toBeInTheDocument()
         })
     })
 

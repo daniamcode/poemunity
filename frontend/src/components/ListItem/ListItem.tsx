@@ -1,3 +1,4 @@
+import React from 'react'
 import '../List/List.scss'
 import '../Detail/Detail.scss'
 import '../../App.scss'
@@ -12,7 +13,7 @@ interface Props {
     context: Context
 }
 
-const ListItem = ({ poem, filter, context }: Props) => {
+const ListItem = React.memo(({ poem, filter, context }: Props) => {
     const { onDelete, onLike, onEdit } = usePoemActions({ poem, context })
 
     // Determine if the current user can see like button (not their own poem)
@@ -54,6 +55,6 @@ const ListItem = ({ poem, filter, context }: Props) => {
             </section>
         </main>
     )
-}
+})
 
 export default ListItem

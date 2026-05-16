@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { Route, Switch, BrowserRouter as Router, Redirect, RouteProps } from 'react-router-dom'
 import './App.scss'
-import Dashboard from './components/Dashboard/Dashboard'
-import Detail from './components/Detail/Detail'
 import Header from './components/Header/Header'
-import Profile from './components/Profile/Profile'
 import Login from './components/Header/Login'
-import Register from './components/Register/Register'
 import PageNotFound from './components/PageNotFound/PageNotFound'
-import AuthorsIndex from './components/Authors/AuthorsIndex'
-import AuthorDetail from './components/Authors/AuthorDetail'
+
+const Dashboard = React.lazy(() => import('./components/Dashboard/Dashboard'))
+const Detail = React.lazy(() => import('./components/Detail/Detail'))
+const Profile = React.lazy(() => import('./components/Profile/Profile'))
+const Register = React.lazy(() => import('./components/Register/Register'))
+const AuthorsIndex = React.lazy(() => import('./components/Authors/AuthorsIndex'))
+const AuthorDetail = React.lazy(() => import('./components/Authors/AuthorDetail'))
 import { Context } from './typescript/interfaces'
 import { useAppDispatch } from './redux/store'
 import store from './redux/store'
@@ -85,16 +86,18 @@ function App() {
                     <Header />
 
                     <div className='margin-body'>
-                        <Switch>
-                            <PrivateRoute path='/profile' component={Profile} />
-                            <Route path='/login' component={Login} />
-                            <Route path='/register' component={Register} />
-                            <Route path='/detail/:poemId' exact component={Detail} />
-                            <Route path='/authors' exact component={AuthorsIndex} />
-                            <Route path='/authors/:slug' exact component={AuthorDetail} />
-                            <Route path='/:genre?' exact component={Dashboard} />
-                            <Route component={PageNotFound} />
-                        </Switch>
+                        <Suspense fallback={null}>
+                            <Switch>
+                                <PrivateRoute path='/profile' component={Profile} />
+                                <Route path='/login' component={Login} />
+                                <Route path='/register' component={Register} />
+                                <Route path='/detail/:poemId' exact component={Detail} />
+                                <Route path='/authors' exact component={AuthorsIndex} />
+                                <Route path='/authors/:slug' exact component={AuthorDetail} />
+                                <Route path='/:genre?' exact component={Dashboard} />
+                                <Route component={PageNotFound} />
+                            </Switch>
+                        </Suspense>
                     </div>
                 </div>
             </Router>

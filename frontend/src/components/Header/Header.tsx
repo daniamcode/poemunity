@@ -95,7 +95,7 @@ function Header() {
             {context?.user ? (
                 <Link to='/profile' className='header__profile-picture'>
                     {context?.picture ? (
-                        <img src={context.picture} alt={context.username} className='header__profile-img' />
+                        <img src={context.picture} alt={context.username} className='header__profile-img' loading='lazy' />
                     ) : (
                         <span
                             className='header__profile-initials'

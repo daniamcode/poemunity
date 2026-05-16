@@ -6,7 +6,7 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 
 ## 🚨 Critical — Fix Before Going Live
 
-- [ ] **Weak JWT secret** (`s3cr3t` is 6 chars, guessable)
+- [x] **Weak JWT secret** (`s3cr3t` is 6 chars, guessable)
   - `backend/.env:3`
   - Generate a strong secret: `openssl rand -base64 32` → store in Vercel env vars, never commit
 
@@ -110,6 +110,134 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 
 ---
 
+## 🖥️ Frontend — UX & Flows
+
+- [ ] **No feedback on failed login**
+  - `frontend/src/components/Header/Login.tsx:34-41` — error callback is commented out; user gets no message on wrong credentials
+  - Uncomment and wire up error state; display inline error below the form
+
+- [ ] **No feedback on failed registration**
+  - `frontend/src/components/Register/Register.tsx:30-32` — error callback is empty
+  - Display inline error message for taken username, weak password, etc.
+
+- [ ] **No confirmation before poem deletion**
+  - `frontend/src/components/ListItem/components/PoemActions.tsx:20-26`
+  - A single click permanently deletes a poem; add a confirmation dialog
+
+- [ ] **Empty state missing when no poems match filters/search**
+  - `frontend/src/components/List/List.tsx:93-95`
+  - When `!isLoading && poems.length === 0`, show a friendly "No poems found" message
+
+- [ ] **No error state when data fetch fails**
+  - `frontend/src/components/List/List.tsx`, `Detail.tsx`, `Ranking.tsx`
+  - App fails silently on network errors; add an error message with a retry option
+
+---
+
+## 🎨 Frontend — UI & Visual
+
+- [ ] **Silver ranking badge fails contrast ratio**
+  - `frontend/src/components/Ranking/Ranking.scss` — `#bdc3c7` on white is ~1.6:1, well below AA 4.5:1
+  - Use `#7f8c8d` or darker for the silver rank badge
+
+- [ ] **`#aaa` placeholder/empty text fails contrast**
+  - `frontend/src/components/Profile/Profile.scss` (`.user-info__bio--empty` and similar)
+  - Use at least `#767676` (AA minimum) for grey text on white
+
+- [ ] **Inconsistent spacing scale across components**
+  - Header uses 20px, List intro uses 15-30px, Detail uses 40px — no shared scale
+  - Define SCSS spacing variables (`$space-sm`, `$space-md`, etc.) and apply uniformly
+
+- [ ] **No branding visible on mobile**
+  - `frontend/src/components/Header/Header.scss:219-230` — logo hidden below 900px
+  - Show at minimum the text "Poemunity" on small screens
+
+- [ ] **Duplicate links on poem list items**
+  - `frontend/src/components/ListItem/components/PoemHeader.tsx` — avatar and name are separate links to the same author page
+  - Wrap both in a single `<Link>` to avoid redundant tab stops
+
+---
+
+## 📱 Frontend — Responsiveness
+
+- [ ] **Poem detail article width breaks on tablets**
+  - `frontend/src/components/Detail/Detail.scss:124` — `width: 50%` with no tablet breakpoint
+  - Add `@media (max-width: 1200px) { width: 100%; }`
+
+- [ ] **PageNotFound fixed dimensions overflow on mobile**
+  - `frontend/src/components/PageNotFound/PageNotFound.scss:7-14` — `width: 500px; height: 500px` fixed
+  - Change to `max-width: 500px` and remove the fixed height
+
+- [ ] **No breakpoint below 600px on list/dashboard layout**
+  - `frontend/src/components/List/List.scss`, `Dashboard.scss` — smallest breakpoint is 900px
+  - Add `@media (max-width: 600px)` rules for single-column mobile layout
+
+- [ ] **Header layout gap between 600px and 900px**
+  - `frontend/src/components/Header/Header.scss` — logo disappears below 900px with no fallback between 600-900px
+  - Add an intermediate 768px breakpoint
+
+---
+
+## ⚡ Frontend — Performance
+
+- [x] **`ListItem` not memoized — re-renders entire list on any state change**
+  - `frontend/src/components/ListItem/ListItem.tsx`
+  - Wrap with `React.memo()` — critical for infinite scroll lists
+
+- [x] **Event handlers in `List` recreated on every render**
+  - `frontend/src/components/List/List.tsx:47-71` — `handleOrderChange`, `handleOriginChange`, `handleSearchChange` are new functions each render
+  - Wrap with `useCallback`
+
+- [x] **No route-based code splitting**
+  - `frontend/src/App.tsx:4-12` — all pages imported statically in one bundle
+  - Use `React.lazy()` + `<Suspense>` for Dashboard, Detail, Profile, Register
+
+- [ ] **Disqus comment thread blocks initial page paint**
+  - `frontend/src/components/Detail/Detail.tsx:59`
+  - Lazy-load Disqus only when the user scrolls near the comments section
+
+- [x] **Profile/avatar images not lazy-loaded**
+  - `frontend/src/components/Header/Header.tsx:98`, `ListItem/components/AuthorAvatar.tsx`
+  - Add `loading="lazy"` to all `<img>` tags
+
+- [ ] **`AppContext` re-renders all consumers on any field change**
+  - `frontend/src/App.tsx:70-78` — single context object; changing `username` re-renders everything reading `adminId`
+  - Split into `AuthContext` (auth/user) and a separate context for rarely-changing data, or use `useReducer`
+
+---
+
+## ♿ Frontend — Accessibility
+
+- [ ] **Email fields use `type="text"` instead of `type="email"`**
+  - `frontend/src/components/Register/Register.tsx:54-60`, `Login.tsx:57-64`
+  - Prevents mobile email keyboard and browser email validation; change to `type="email"`
+
+- [ ] **Like/unlike icons are divs — not keyboard accessible**
+  - `frontend/src/components/ListItem/components/PoemFooter.tsx:36-42`
+  - Replace `<div onClick>` with `<button>` elements so they're reachable by Tab and activatable with Enter/Space
+
+- [ ] **Login, logout, profile icon buttons have no accessible label**
+  - `frontend/src/components/Header/Header.tsx`
+  - Add `aria-label="Log in"`, `aria-label="Log out"`, `aria-label="Your profile"` respectively
+
+- [ ] **No visible focus indicators on interactive elements**
+  - Multiple SCSS files — `:hover` states defined but no `:focus-visible` styles
+  - Add `outline: 2px solid #3498db; outline-offset: 2px` to all interactive elements
+
+- [ ] **Delete and edit icons not keyboard reachable**
+  - `frontend/src/components/ListItem/components/PoemActions.tsx:19-27`
+  - Wrap MUI icon components in `<button>` elements
+
+- [ ] **No skip-navigation link**
+  - Keyboard users must tab through the entire header on every page
+  - Add a visually hidden "Skip to main content" link as the first focusable element
+
+- [ ] **Ranking list not semantically marked up**
+  - `frontend/src/components/Ranking/Ranking.tsx:49-72`
+  - Wrap rank items in `<ol>` + `<li>` so screen readers announce position
+
+---
+
 ## Summary
 
 | Severity | Count |
@@ -118,5 +246,10 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 | High | 8 |
 | Medium | 5 |
 | Low | 5 |
+| Frontend UX | 5 |
+| Frontend UI/Visual | 5 |
+| Frontend Responsiveness | 4 |
+| Frontend Performance | 6 |
+| Frontend Accessibility | 7 |
 
 **Hard blockers for launch:** items marked Critical — especially the ownership check on poem edit/delete (#3), the field injection via `strict: false` (#4), and the weak JWT secret (#1). These can be actively exploited from day one on a public domain.
