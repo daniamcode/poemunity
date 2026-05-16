@@ -42,7 +42,7 @@ export default function ProfilePicture({ context }: Props) {
     }
 
     return (
-        <div className='profile__picture-wrapper' onClick={handleClick} title='Change profile picture'>
+        <div className='profile__picture-wrapper' onClick={handleClick}>
             <img
                 className='profile__image'
                 src={context?.picture || DEFAULT_PICTURE}
@@ -51,7 +51,10 @@ export default function ProfilePicture({ context }: Props) {
             <div className='profile__picture-overlay'>
                 {uploading
                     ? <span className='profile__picture-spinner' />
-                    : <span className='profile__picture-camera'>📷</span>
+                    : <>
+                        <span className='profile__picture-camera'>📷</span>
+                        <span className='profile__picture-label'>Change photo</span>
+                    </>
                 }
             </div>
             <input
