@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import API from '../../../redux/actions/axiosInstance'
 import { CATEGORIES, categoryToSlug } from '../../../data/constants'
 import { Context } from '../../../typescript/interfaces'
+import { slugify } from '../../../utils/urlUtils'
 
 interface Props {
     context: Context
@@ -146,6 +147,9 @@ export default function UserInfo({ context }: Props) {
                 {context.username}
                 {displayName && <span className='user-info__realname'> · {displayName}</span>}
             </h2>
+            <Link to={`/authors/${slugify(context.username || '')}`} className='user-info__public-link'>
+                View public profile →
+            </Link>
 
             {editing ? (
                 <div className='user-info__form'>

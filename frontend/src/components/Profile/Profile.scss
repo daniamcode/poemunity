@@ -42,6 +42,16 @@
     border: 4px solid #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: block;
+
+    &--initials {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 2.5rem;
+        font-weight: 600;
+        user-select: none;
+    }
 }
 
 .profile__picture-overlay {
@@ -334,6 +344,18 @@
     color: #7f8c8d;
 }
 
+.user-info__public-link {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: #3498db;
+    text-decoration: none;
+    margin-bottom: 12px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 .user-info__meta {
     font-size: 0.85rem;
     color: #7f8c8d;
@@ -563,6 +585,10 @@
     .profile__image {
         width: 120px;
         height: 120px;
+
+        &--initials {
+            font-size: 3rem;
+        }
     }
 
     .profile__insert-poem-inputs {

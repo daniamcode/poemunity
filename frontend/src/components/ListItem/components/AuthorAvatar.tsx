@@ -3,7 +3,7 @@ const COLORS = [
     '#42a5f5', '#66bb6a', '#ffa726', '#8d6e63'
 ]
 
-function getColor(name: string) {
+export function getAvatarColor(name: string) {
     let hash = 0
     for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -11,7 +11,7 @@ function getColor(name: string) {
     return COLORS[Math.abs(hash) % COLORS.length]
 }
 
-function getInitials(name: string) {
+export function getInitials(name: string) {
     const parts = name.trim().split(/\s+/)
     if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? '?'
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
@@ -42,7 +42,7 @@ export function AuthorAvatar({ name, picture }: AuthorAvatarProps) {
     return (
         <span
             className='poem__picture poem__picture--initials'
-            style={{ backgroundColor: getColor(name) }}
+            style={{ backgroundColor: getAvatarColor(name) }}
             aria-label={name}
         >
             {getInitials(name)}

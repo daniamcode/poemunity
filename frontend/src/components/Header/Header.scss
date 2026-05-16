@@ -91,6 +91,20 @@
     object-fit: cover;
     border: 2px solid #eaeaea;
 }
+
+.header__profile-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    user-select: none;
+    border: 2px solid #eaeaea;
+}
 .header__dropdown-categories-icon {
     background-image: url(../../icons/hamburger.svg);
     background-repeat: no-repeat;

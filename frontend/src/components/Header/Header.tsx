@@ -10,6 +10,7 @@ import { WEB_SUBTITLE } from '../../data/constants'
 import { AppContext } from '../../App'
 import { useLocation } from 'react-router-dom'
 import parseJWT from '../../utils/parseJWT'
+import { getAvatarColor, getInitials } from '../ListItem/components/AuthorAvatar'
 
 function Header() {
     const context = useContext(AppContext)
@@ -17,12 +18,16 @@ function Header() {
 
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
-        if (loggedUserJSON) {
-            const parsedUser = JSON.parse(loggedUserJSON)
-            const jwtData = parseJWT(parsedUser)
+        if (!loggedUserJSON) return
+
+        const parsedUser = JSON.parse(loggedUserJSON)
+        const config = { headers: { Authorization: `Bearer ${parsedUser}` } }
+
+        const applyToken = (token: string) => {
+            const jwtData = parseJWT(token)
             context.setState({
                 ...context,
-                user: parsedUser,
+                user: token,
                 userId: jwtData?.id,
                 username: jwtData?.username,
                 picture: jwtData?.picture,
@@ -35,13 +40,23 @@ function Header() {
                 birthYear: jwtData?.birthYear || null,
                 gender: jwtData?.gender || '',
                 privateFields: jwtData?.privateFields || [],
-                config: {
-                    headers: {
-                        Authorization: `Bearer ${parsedUser}`
-                    }
-                }
+                config
             })
         }
+
+        // Apply cached token immediately so the UI isn't blank while fetching
+        applyToken(parsedUser)
+
+        // Then refresh from DB to pick up any changes made in other sessions
+        fetch('/api/users/me', { headers: config.headers })
+            .then(res => res.ok ? res.json() : null)
+            .then(freshToken => {
+                if (freshToken && freshToken !== parsedUser) {
+                    window.localStorage.setItem('loggedUser', JSON.stringify(freshToken))
+                    applyToken(freshToken)
+                }
+            })
+            .catch(() => {})
     }, [JSON.stringify(location)])
 
     // Dynamic subtitle based on route
@@ -78,9 +93,16 @@ function Header() {
             </div>
             <div className='separator' />
             {context?.user ? (
-                <Link to='/profile' className={context?.picture ? 'header__profile-picture' : 'header__profile'}>
-                    {context?.picture && (
+                <Link to='/profile' className='header__profile-picture'>
+                    {context?.picture ? (
                         <img src={context.picture} alt={context.username} className='header__profile-img' />
+                    ) : (
+                        <span
+                            className='header__profile-initials'
+                            style={{ backgroundColor: getAvatarColor(context.username || '') }}
+                        >
+                            {getInitials(context.username || '?')}
+                        </span>
                     )}
                 </Link>
             ) : <></>}

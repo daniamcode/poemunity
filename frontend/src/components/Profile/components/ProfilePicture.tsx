@@ -2,12 +2,11 @@ import { useRef, useState } from 'react'
 import API from '../../../redux/actions/axiosInstance'
 import { resizeImageToBase64 } from '../../../utils/imageUtils'
 import { Context } from '../../../typescript/interfaces'
+import { getAvatarColor, getInitials } from '../../ListItem/components/AuthorAvatar'
 
 interface Props {
     context: Context
 }
-
-const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
 
 export default function ProfilePicture({ context }: Props) {
     const [uploading, setUploading] = useState(false)
@@ -41,13 +40,25 @@ export default function ProfilePicture({ context }: Props) {
         }
     }
 
+    const username = context?.username || '?'
+
     return (
         <div className='profile__picture-wrapper' onClick={handleClick}>
-            <img
-                className='profile__image'
-                src={context?.picture || DEFAULT_PICTURE}
-                alt={context?.username}
-            />
+            {context?.picture ? (
+                <img
+                    className='profile__image'
+                    src={context.picture}
+                    alt={username}
+                />
+            ) : (
+                <div
+                    className='profile__image profile__image--initials'
+                    style={{ backgroundColor: getAvatarColor(username) }}
+                    aria-label={username}
+                >
+                    {getInitials(username)}
+                </div>
+            )}
             <div className='profile__picture-overlay'>
                 {uploading
                     ? <span className='profile__picture-spinner' />

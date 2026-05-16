@@ -38,6 +38,38 @@ usersRouter.post('/', async (req, res) => {
   }
 })
 
+usersRouter.get('/me', userExtractor, async (req, res) => {
+  try {
+    const author = await Author.findById(req.userId)
+    if (!author) return res.status(404).json({ error: 'User not found' })
+
+    const freshToken = jwt.sign(
+      {
+        id: author._id,
+        username: author.username,
+        picture: author.picture,
+        bio: author.bio || '',
+        preferredGenres: author.preferredGenres || [],
+        name: author.name || '',
+        surname: author.surname || '',
+        city: author.city || '',
+        country: author.country || '',
+        birthYear: author.birthYear || null,
+        gender: author.gender || '',
+        website: author.website || '',
+        privateFields: author.privateFields || []
+      },
+      process.env.SECRET,
+      { expiresIn: 60 * 60 * 24 * 7 }
+    )
+
+    res.json(freshToken)
+  } catch (error) {
+    console.error('Token refresh error:', error)
+    res.status(500).json({ error: 'Failed to refresh token' })
+  }
+})
+
 usersRouter.patch('/profile', userExtractor, async (req, res) => {
   try {
     const ALLOWED = ['bio', 'preferredGenres', 'name', 'surname', 'city', 'country', 'birthYear', 'gender', 'website', 'privateFields']
