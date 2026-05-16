@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import './Login.scss'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { NavLink } from 'react-router-dom'
 // import { FormElement } from '../typescript/types'
 // import { manageSuccess } from '../utils/notifications'
@@ -9,6 +9,7 @@ import { loginAction } from '../../redux/actions/loginActions'
 
 const Login = (): React.JSX.Element => {
     const history = useHistory()
+    const location = useLocation<{ from?: Location }>()
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -28,7 +29,7 @@ const Login = (): React.JSX.Element => {
                 callbacks: {
                     success: data => {
                         window.localStorage.setItem('loggedUser', JSON.stringify(data))
-                        history.push('profile')
+                        history.push(location.state?.from?.pathname ?? '/profile')
                     },
                     error: () => {
                         // setErrorMessage('Wrong credentials')

@@ -35,7 +35,7 @@ describe('Poems API - Create and Update', () => {
     )
   })
 
-  describe('POST /api/poems', () => {
+  describe('POST /api/v1/poems', () => {
     test('should create a new poem successfully', async () => {
       const newPoem = {
         title: 'New Poem',
@@ -45,7 +45,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -68,7 +68,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -86,7 +86,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -105,7 +105,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -122,7 +122,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -139,7 +139,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -158,7 +158,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .send(newPoem)
         .expect(401)
 
@@ -174,7 +174,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', 'Bearer invalid-token')
         .send(newPoem)
         .expect(401)
@@ -196,13 +196,13 @@ describe('Poems API - Create and Update', () => {
       }
 
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(poem1)
         .expect(201)
 
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(poem2)
         .expect(201)
@@ -216,7 +216,7 @@ describe('Poems API - Create and Update', () => {
 
       for (const genre of genres) {
         const response = await request(app)
-          .post('/api/poems')
+          .post('/api/v1/poems')
           .set('Authorization', `Bearer ${authToken}`)
           .send({
             title: `${genre} poem`,
@@ -240,7 +240,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -258,7 +258,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -276,7 +276,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -303,7 +303,7 @@ describe('Poems API - Create and Update', () => {
 
       // Create poem with first user
       const response1 = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'User 1 Poem',
@@ -315,7 +315,7 @@ describe('Poems API - Create and Update', () => {
 
       // Create poem with second user
       const response2 = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${token2}`)
         .send({
           title: 'User 2 Poem',
@@ -339,7 +339,7 @@ describe('Poems API - Create and Update', () => {
       }
 
       const response = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${authToken}`)
         .send(newPoem)
         .expect(201)
@@ -349,7 +349,7 @@ describe('Poems API - Create and Update', () => {
     })
   })
 
-  describe('PATCH /api/poems (bulk update)', () => {
+  describe('PATCH /api/v1/poems (bulk update)', () => {
     test('should add new property to all poems', async () => {
       // Create test poems
       await Poem.create([
@@ -376,7 +376,7 @@ describe('Poems API - Create and Update', () => {
       ])
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ newField: 'newValue' })
         .expect(204)
 
@@ -414,7 +414,7 @@ describe('Poems API - Create and Update', () => {
       ])
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ status: 'published' })
         .expect(204)
 
@@ -425,7 +425,7 @@ describe('Poems API - Create and Update', () => {
 
     test('should handle empty database', async () => {
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ newField: 'value' })
         .expect(204)
 
@@ -467,7 +467,7 @@ describe('Poems API - Create and Update', () => {
       ])
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ verified: true })
         .expect(204)
 
@@ -490,7 +490,7 @@ describe('Poems API - Create and Update', () => {
       })
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({
           featured: true,
           verified: true,
@@ -517,7 +517,7 @@ describe('Poems API - Create and Update', () => {
       })
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ viewCount: 0 })
         .expect(204)
 
@@ -538,7 +538,7 @@ describe('Poems API - Create and Update', () => {
       })
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ isPinned: false })
         .expect(204)
 
@@ -559,7 +559,7 @@ describe('Poems API - Create and Update', () => {
       })
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ tags: ['poetry', 'modern', 'featured'] })
         .expect(204)
 
@@ -583,7 +583,7 @@ describe('Poems API - Create and Update', () => {
 
       // No Authorization header
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ newField: 'value' })
         .expect(204)
     })
@@ -603,7 +603,7 @@ describe('Poems API - Create and Update', () => {
       await Poem.insertMany(poems)
 
       await request(app)
-        .patch('/api/poems')
+        .patch('/api/v1/poems')
         .send({ bulkUpdate: true })
         .expect(204)
 

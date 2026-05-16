@@ -44,9 +44,9 @@ describe('Author → Poem integration', () => {
     })
   })
 
-  describe('GET /api/poem/:poemId — author fields are populated and flattened', () => {
+  describe('GET /api/v1/poem/:poemId — author fields are populated and flattened', () => {
     test('returns author name from Author doc, not a raw string', async () => {
-      const res = await request(app).get(`/api/poem/${famousPoem._id}`).expect(200)
+      const res = await request(app).get(`/api/v1/poem/${famousPoem._id}`).expect(200)
 
       expect(res.body.author).toBe('A. F. Moritz')
       expect(res.body.authorSlug).toBe('a-f-moritz')
@@ -55,7 +55,7 @@ describe('Author → Poem integration', () => {
     })
 
     test('returns authorSlug for user poems', async () => {
-      const res = await request(app).get(`/api/poem/${userPoem._id}`).expect(200)
+      const res = await request(app).get(`/api/v1/poem/${userPoem._id}`).expect(200)
 
       expect(res.body.author).toBe('Emily Hart')
       expect(res.body.authorSlug).toBe('emily-hart')
@@ -63,16 +63,16 @@ describe('Author → Poem integration', () => {
     })
 
     test('does not expose authorId as a raw object in the response', async () => {
-      const res = await request(app).get(`/api/poem/${famousPoem._id}`).expect(200)
+      const res = await request(app).get(`/api/v1/poem/${famousPoem._id}`).expect(200)
 
       expect(res.body.authorId).toBeUndefined()
     })
   })
 
-  describe('GET /api/poems?author=<slug> — slug-based author lookup', () => {
+  describe('GET /api/v1/poems?author=<slug> — slug-based author lookup', () => {
     test('returns poems for a famous author by slug', async () => {
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ author: 'a-f-moritz', page: 1, limit: 10 })
         .expect(200)
 
@@ -83,7 +83,7 @@ describe('Author → Poem integration', () => {
 
     test('returns poems for a user author by slug', async () => {
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ author: 'emily-hart', page: 1, limit: 10 })
         .expect(200)
 
@@ -93,7 +93,7 @@ describe('Author → Poem integration', () => {
 
     test('returns empty result for unknown slug', async () => {
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ author: 'no-such-author', page: 1, limit: 10 })
         .expect(200)
 
@@ -104,7 +104,7 @@ describe('Author → Poem integration', () => {
     test('handles authors with dots in name — slug "a-f-moritz" matches "A. F. Moritz"', async () => {
       // This is the root bug this architecture fixes — no regex reconstruction needed
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ author: 'a-f-moritz', page: 1, limit: 10 })
         .expect(200)
 
@@ -113,16 +113,16 @@ describe('Author → Poem integration', () => {
     })
   })
 
-  describe('GET /api/authors/letters — reads from Author collection', () => {
+  describe('GET /api/v1/authors/letters — reads from Author collection', () => {
     test('returns letters for authors that exist', async () => {
-      const res = await request(app).get('/api/authors/letters').expect(200)
+      const res = await request(app).get('/api/v1/authors/letters').expect(200)
 
       expect(res.body).toContain('A')
       expect(res.body).toContain('E')
     })
 
     test('returns only letters that have at least one author', async () => {
-      const res = await request(app).get('/api/authors/letters').expect(200)
+      const res = await request(app).get('/api/v1/authors/letters').expect(200)
 
       expect(Array.isArray(res.body)).toBe(true)
       res.body.forEach(letter => {
@@ -132,7 +132,7 @@ describe('Author → Poem integration', () => {
 
     test('filters letters by type=famous', async () => {
       const res = await request(app)
-        .get('/api/authors/letters')
+        .get('/api/v1/authors/letters')
         .query({ type: 'famous' })
         .expect(200)
 
@@ -142,7 +142,7 @@ describe('Author → Poem integration', () => {
 
     test('filters letters by type=user', async () => {
       const res = await request(app)
-        .get('/api/authors/letters')
+        .get('/api/v1/authors/letters')
         .query({ type: 'user' })
         .expect(200)
 
@@ -151,10 +151,10 @@ describe('Author → Poem integration', () => {
     })
   })
 
-  describe('GET /api/authors?letter=<L> — returns authors with poem counts', () => {
+  describe('GET /api/v1/authors?letter=<L> — returns authors with poem counts', () => {
     test('returns authors starting with the given letter with poem count', async () => {
       const res = await request(app)
-        .get('/api/authors')
+        .get('/api/v1/authors')
         .query({ letter: 'A' })
         .expect(200)
 
@@ -175,7 +175,7 @@ describe('Author → Poem integration', () => {
       })
 
       const res = await request(app)
-        .get('/api/authors')
+        .get('/api/v1/authors')
         .query({ letter: 'A' })
         .expect(200)
 
@@ -184,7 +184,7 @@ describe('Author → Poem integration', () => {
 
     test('filters by type=user', async () => {
       const res = await request(app)
-        .get('/api/authors')
+        .get('/api/v1/authors')
         .query({ letter: 'E', type: 'user' })
         .expect(200)
 

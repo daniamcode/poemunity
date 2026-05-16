@@ -18,12 +18,12 @@ app.use(
   })
 )
 
-app.use('/api/login', loginRouter)
-app.use('/api/register', registerRouter)
-app.use('/api/users', usersRouter)
-app.use('/api/poems', poemsRouter)
-app.use('/api/poem', poemRouter)
-app.use('/api/authors', authorsRouter)
+app.use('/api/v1/login', loginRouter)
+app.use('/api/v1/register', registerRouter)
+app.use('/api/v1/users', usersRouter)
+app.use('/api/v1/poems', poemsRouter)
+app.use('/api/v1/poem', poemRouter)
+app.use('/api/v1/authors', authorsRouter)
 
 app.get('/', (req, res) => {
   res.send('Server is ok')

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Route, Switch, BrowserRouter as Router, Redirect, RouteProps } from 'react-router-dom'
 import './App.scss'
 import Dashboard from './components/Dashboard/Dashboard'
@@ -16,12 +16,12 @@ import store from './redux/store'
 import { getRankingAction } from './redux/actions/poemsActions'
 
 function PrivateRoute({ component: Component, ...rest }: RouteProps & { component: React.ComponentType<any> }) {
-    const { user } = useContext(AppContext)
+    const isLoggedIn = !!window.localStorage.getItem('loggedUser')
     return (
         <Route
             {...rest}
             render={props =>
-                user ? <Component {...props} /> : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
+                isLoggedIn ? <Component {...props} /> : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
             }
         />
     )

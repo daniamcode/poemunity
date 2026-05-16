@@ -48,7 +48,7 @@ function Header() {
         applyToken(parsedUser)
 
         // Then refresh from DB to pick up any changes made in other sessions
-        fetch('/api/users/me', { headers: config.headers })
+        fetch('/api/v1/users/me', { headers: config.headers })
             .then(res => res.ok ? res.json() : null)
             .then(freshToken => {
                 if (freshToken && freshToken !== parsedUser) {

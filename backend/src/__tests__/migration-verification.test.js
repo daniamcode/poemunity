@@ -32,10 +32,10 @@ describe('Migration verification', () => {
     token = makeToken(author)
   })
 
-  describe('POST /api/poems — new poems store authorId, not author string', () => {
+  describe('POST /api/v1/poems — new poems store authorId, not author string', () => {
     test('saved poem has authorId referencing the Author doc', async () => {
       const res = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${token}`)
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(201)
@@ -47,7 +47,7 @@ describe('Migration verification', () => {
 
     test('response already has author name and authorSlug flattened from Author doc', async () => {
       const res = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${token}`)
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(201)
@@ -61,7 +61,7 @@ describe('Migration verification', () => {
 
     test('response does not expose a raw authorId object', async () => {
       const res = await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${token}`)
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(201)
@@ -71,16 +71,16 @@ describe('Migration verification', () => {
 
     test('returns 401 without a token', async () => {
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(401)
     })
   })
 
-  describe('POST /api/register — new Author gets a slug', () => {
+  describe('POST /api/v1/register — new Author gets a slug', () => {
     test('registered user has a slug derived from username', async () => {
       const res = await request(app)
-        .post('/api/register')
+        .post('/api/v1/register')
         .send({ username: 'newuser', email: 'new@example.com', password: 'pass123' })
         .expect(200)
 
@@ -91,12 +91,12 @@ describe('Migration verification', () => {
 
     test('slug is unique when two usernames produce the same base', async () => {
       await request(app)
-        .post('/api/register')
+        .post('/api/v1/register')
         .send({ username: 'john doe', email: 'john1@example.com', password: 'pass' })
         .expect(200)
 
       await request(app)
-        .post('/api/register')
+        .post('/api/v1/register')
         .send({ username: 'john.doe', email: 'john2@example.com', password: 'pass' })
         .expect(200)
 
@@ -107,7 +107,7 @@ describe('Migration verification', () => {
 
     test('returns 401 when username is already taken', async () => {
       const res = await request(app)
-        .post('/api/register')
+        .post('/api/v1/register')
         .send({ username: 'janedoe', email: 'other@example.com', password: 'pass' })
         .expect(401)
 
@@ -116,7 +116,7 @@ describe('Migration verification', () => {
 
     test('returns 401 when email is already taken', async () => {
       const res = await request(app)
-        .post('/api/register')
+        .post('/api/v1/register')
         .send({ username: 'someoneelse', email: 'jane@example.com', password: 'pass' })
         .expect(401)
 
@@ -124,10 +124,10 @@ describe('Migration verification', () => {
     })
   })
 
-  describe('POST /api/login — authenticates against Author collection', () => {
+  describe('POST /api/v1/login — authenticates against Author collection', () => {
     test('returns a JWT token on valid credentials', async () => {
       const res = await request(app)
-        .post('/api/login')
+        .post('/api/v1/login')
         .send({ username: 'janedoe', password: 'password123' })
         .expect(200)
 
@@ -137,7 +137,7 @@ describe('Migration verification', () => {
 
     test('JWT payload carries the Author _id', async () => {
       const res = await request(app)
-        .post('/api/login')
+        .post('/api/v1/login')
         .send({ username: 'janedoe', password: 'password123' })
         .expect(200)
 
@@ -148,7 +148,7 @@ describe('Migration verification', () => {
 
     test('returns 401 with wrong password', async () => {
       const res = await request(app)
-        .post('/api/login')
+        .post('/api/v1/login')
         .send({ username: 'janedoe', password: 'wrong' })
         .expect(401)
 
@@ -157,7 +157,7 @@ describe('Migration verification', () => {
 
     test('returns 401 for unknown username', async () => {
       const res = await request(app)
-        .post('/api/login')
+        .post('/api/v1/login')
         .send({ username: 'nobody', password: 'pass' })
         .expect(401)
 
@@ -165,11 +165,11 @@ describe('Migration verification', () => {
     })
   })
 
-  describe('PATCH /api/users/picture — updates Author, no poem sync required', () => {
+  describe('PATCH /api/v1/users/picture — updates Author, no poem sync required', () => {
     test('updates picture on the Author document', async () => {
       const newPic = 'data:image/jpeg;base64,/9j/fakepicture'
       await request(app)
-        .patch('/api/users/picture')
+        .patch('/api/v1/users/picture')
         .set('Authorization', `Bearer ${token}`)
         .send({ picture: newPic })
         .expect(200)
@@ -181,7 +181,7 @@ describe('Migration verification', () => {
     test('returns a new JWT token with updated picture', async () => {
       const newPic = 'data:image/jpeg;base64,/9j/fakepicture'
       const res = await request(app)
-        .patch('/api/users/picture')
+        .patch('/api/v1/users/picture')
         .set('Authorization', `Bearer ${token}`)
         .send({ picture: newPic })
         .expect(200)
@@ -205,7 +205,7 @@ describe('Migration verification', () => {
 
       const newPic = 'data:image/jpeg;base64,/9j/newpic'
       await request(app)
-        .patch('/api/users/picture')
+        .patch('/api/v1/users/picture')
         .set('Authorization', `Bearer ${token}`)
         .send({ picture: newPic })
         .expect(200)
@@ -216,7 +216,7 @@ describe('Migration verification', () => {
 
     test('rejects invalid picture data', async () => {
       await request(app)
-        .patch('/api/users/picture')
+        .patch('/api/v1/users/picture')
         .set('Authorization', `Bearer ${token}`)
         .send({ picture: 'https://not-a-base64-image.com/pic.jpg' })
         .expect(400)
@@ -224,13 +224,13 @@ describe('Migration verification', () => {
 
     test('returns 401 without a token', async () => {
       await request(app)
-        .patch('/api/users/picture')
+        .patch('/api/v1/users/picture')
         .send({ picture: 'data:image/jpeg;base64,abc' })
         .expect(401)
     })
   })
 
-  describe('GET /api/poems?userId=<id> — filters by authorId (post-migration)', () => {
+  describe('GET /api/v1/poems?userId=<id> — filters by authorId (post-migration)', () => {
     let otherAuthor
 
     beforeEach(async () => {
@@ -251,7 +251,7 @@ describe('Migration verification', () => {
 
     test('returns only poems belonging to the requested author', async () => {
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ userId: String(author._id), page: 1, limit: 10 })
         .expect(200)
 
@@ -269,7 +269,7 @@ describe('Migration verification', () => {
       })
 
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ userId: String(empty._id), page: 1, limit: 10 })
         .expect(200)
 
@@ -278,13 +278,13 @@ describe('Migration verification', () => {
 
     test('userId from JWT matches poem.userId in response (ownership check)', async () => {
       await request(app)
-        .post('/api/poems')
+        .post('/api/v1/poems')
         .set('Authorization', `Bearer ${token}`)
         .send({ title: 'Mine', poem: 'verse', genre: 'love', date: new Date() })
         .expect(201)
 
       const res = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ userId: String(author._id), page: 1, limit: 10 })
         .expect(200)
 

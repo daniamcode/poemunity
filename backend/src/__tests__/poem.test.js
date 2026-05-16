@@ -35,7 +35,7 @@ describe('Poem API', () => {
     )
   })
 
-  describe('GET /api/poem/:poemId', () => {
+  describe('GET /api/v1/poem/:poemId', () => {
     test('should fetch poem successfully', async () => {
       const poem = await Poem.create({
         title: 'Test Poem',
@@ -49,7 +49,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .get(`/api/poem/${poem._id}`)
+        .get(`/api/v1/poem/${poem._id}`)
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -64,7 +64,7 @@ describe('Poem API', () => {
       const fakeId = '507f1f77bcf86cd799439011'
 
       const response = await request(app)
-        .get(`/api/poem/${fakeId}`)
+        .get(`/api/v1/poem/${fakeId}`)
         .expect(404)
 
       expect(response.body.error).toBe('poem not found')
@@ -72,7 +72,7 @@ describe('Poem API', () => {
 
     test('should return 404 for invalid poem ID format', async () => {
       const response = await request(app)
-        .get('/api/poem/invalid-id')
+        .get('/api/v1/poem/invalid-id')
         .expect(404)
 
       expect(response.body.error).toBe('poem not found')
@@ -91,7 +91,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .get(`/api/poem/${poem._id}`)
+        .get(`/api/v1/poem/${poem._id}`)
         .expect(200)
 
       expect(response.body).toHaveProperty('id')
@@ -125,7 +125,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .get(`/api/poem/${poem._id}`)
+        .get(`/api/v1/poem/${poem._id}`)
         .expect(200)
 
       expect(Array.isArray(response.body.likes)).toBe(true)
@@ -133,7 +133,7 @@ describe('Poem API', () => {
     })
   })
 
-  describe('PUT /api/poem/:poemId (like/unlike)', () => {
+  describe('PUT /api/v1/poem/:poemId (like/unlike)', () => {
     test('should like a poem when user has not liked it', async () => {
       const poem = await Poem.create({
         title: 'Test Poem',
@@ -147,7 +147,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -168,7 +168,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -190,7 +190,7 @@ describe('Poem API', () => {
 
       // Like the poem
       let response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -198,7 +198,7 @@ describe('Poem API', () => {
 
       // Unlike the poem
       response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -206,7 +206,7 @@ describe('Poem API', () => {
 
       // Like again
       response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -226,7 +226,7 @@ describe('Poem API', () => {
       })
 
       const response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .expect(401)
 
       expect(response.body.error).toBe('token missing or invalid')
@@ -245,7 +245,7 @@ describe('Poem API', () => {
       })
 
       await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', 'Bearer invalid-token')
         .expect(401)
     })
@@ -254,7 +254,7 @@ describe('Poem API', () => {
       const fakeId = '507f1f77bcf86cd799439011'
 
       const response = await request(app)
-        .put(`/api/poem/${fakeId}`)
+        .put(`/api/v1/poem/${fakeId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(404)
 
@@ -274,7 +274,7 @@ describe('Poem API', () => {
       })
 
       await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -310,13 +310,13 @@ describe('Poem API', () => {
 
       // First user likes
       await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
       // Second user likes
       const response = await request(app)
-        .put(`/api/poem/${poem._id}`)
+        .put(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${otherToken}`)
         .expect(200)
 
@@ -324,7 +324,7 @@ describe('Poem API', () => {
     })
   })
 
-  describe('PATCH /api/poem/:poemId (update)', () => {
+  describe('PATCH /api/v1/poem/:poemId (update)', () => {
     test('should update poem title', async () => {
       const poem = await Poem.create({
         title: 'Original Title',
@@ -332,13 +332,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ title: 'Updated Title' })
         .expect(200)
@@ -353,13 +353,13 @@ describe('Poem API', () => {
         poem: 'Original content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ poem: 'Updated content' })
         .expect(200)
@@ -374,13 +374,13 @@ describe('Poem API', () => {
         poem: 'Original content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'New Title',
@@ -401,13 +401,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ genre: 'happy' })
         .expect(200)
@@ -422,13 +422,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .send({ title: 'New Title' })
         .expect(401)
 
@@ -439,7 +439,7 @@ describe('Poem API', () => {
       const fakeId = '507f1f77bcf86cd799439011'
 
       const response = await request(app)
-        .patch(`/api/poem/${fakeId}`)
+        .patch(`/api/v1/poem/${fakeId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ title: 'New Title' })
         .expect(404)
@@ -454,13 +454,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       await request(app)
-        .patch(`/api/poem/${poem._id}`)
+        .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ title: 'Updated Title' })
         .expect(200)
@@ -469,29 +469,107 @@ describe('Poem API', () => {
       expect(updatedPoem.title).toBe('Updated Title')
     })
 
-    test('should update picture URL', async () => {
+    test('should return 403 when non-owner tries to update a poem', async () => {
+      const otherUser = await User.create({
+        username: 'otheruser',
+        email: 'other@example.com',
+        passwordHash: await bcrypt.hash('pass', 10),
+        picture: 'pic.jpg'
+      })
+      const otherToken = jwt.sign(
+        { id: otherUser._id, username: otherUser.username },
+        process.env.SECRET,
+        { expiresIn: '1d' }
+      )
       const poem = await Poem.create({
-        title: 'Test Poem',
+        title: 'Original Title',
         author: 'testuser',
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
-        picture: 'old-pic.jpg',
+        authorId: testUser._id,
+        picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .patch(`/api/poem/${poem._id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ picture: 'new-pic.jpg' })
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .send({ title: 'Hacked Title' })
+        .expect(403)
+
+      expect(response.body.error).toBe('Forbidden')
+      const unchanged = await Poem.findById(poem._id)
+      expect(unchanged.title).toBe('Original Title')
+    })
+
+    test('should allow admin to update any poem', async () => {
+      const poem = await Poem.create({
+        title: 'Original Title',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      const adminUser = await User.create({
+        username: 'adminuser',
+        email: 'admin@example.com',
+        passwordHash: await bcrypt.hash('pass', 10),
+        picture: 'pic.jpg'
+      })
+      const adminEnvKey = process.env.NODE_ENV === 'development' ? 'REACT_APP_ADMIN_PRE' : 'REACT_APP_ADMIN'
+      process.env[adminEnvKey] = String(adminUser._id)
+      const adminToken = jwt.sign(
+        { id: adminUser._id, username: adminUser.username },
+        process.env.SECRET,
+        { expiresIn: '1d' }
+      )
+
+      const response = await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ title: 'Admin Updated Title' })
         .expect(200)
 
-      expect(response.body.picture).toBe('new-pic.jpg')
+      expect(response.body.title).toBe('Admin Updated Title')
+      delete process.env[adminEnvKey]
+    })
+
+    test('should ignore non-whitelisted fields in request body', async () => {
+      const poem = await Poem.create({
+        title: 'Original Title',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          title: 'Updated Title',
+          authorId: '000000000000000000000000', // should be ignored
+          slug: 'injected-slug',               // should be ignored
+          __v: 99                               // should be ignored
+        })
+        .expect(200)
+
+      const raw = await Poem.findById(poem._id)
+      expect(raw.title).toBe('Updated Title')
+      expect(String(raw.authorId)).toBe(String(testUser._id))
+      expect(raw.slug).toBeUndefined()
     })
   })
 
-  describe('DELETE /api/poem/:poemId', () => {
+  describe('DELETE /api/v1/poem/:poemId', () => {
     test('should delete poem successfully', async () => {
       const poem = await Poem.create({
         title: 'Test Poem',
@@ -499,13 +577,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       await request(app)
-        .delete(`/api/poem/${poem._id}`)
+        .delete(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204)
     })
@@ -517,13 +595,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       await request(app)
-        .delete(`/api/poem/${poem._id}`)
+        .delete(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204)
 
@@ -535,11 +613,11 @@ describe('Poem API', () => {
       const fakeId = '507f1f77bcf86cd799439011'
 
       const response = await request(app)
-        .delete(`/api/poem/${fakeId}`)
+        .delete(`/api/v1/poem/${fakeId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(404)
 
-      expect(response.body.error).toBe('poem not found or not deleted')
+      expect(response.body.error).toBe('poem not found')
     })
 
     test('should return 401 without authentication token', async () => {
@@ -549,13 +627,13 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       const response = await request(app)
-        .delete(`/api/poem/${poem._id}`)
+        .delete(`/api/v1/poem/${poem._id}`)
         .expect(401)
 
       expect(response.body.error).toBe('token missing or invalid')
@@ -563,11 +641,11 @@ describe('Poem API', () => {
 
     test('should return 404 for invalid poem ID format', async () => {
       const response = await request(app)
-        .delete('/api/poem/invalid-id')
+        .delete('/api/v1/poem/invalid-id')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(404)
 
-      expect(response.body.error).toBe('poem not found or not deleted')
+      expect(response.body.error).toBe('poem not found')
     })
 
     test('should only delete specified poem', async () => {
@@ -577,7 +655,7 @@ describe('Poem API', () => {
         poem: 'Content 1',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
@@ -588,13 +666,13 @@ describe('Poem API', () => {
         poem: 'Content 2',
         genre: 'sad',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
 
       await request(app)
-        .delete(`/api/poem/${poem1._id}`)
+        .delete(`/api/v1/poem/${poem1._id}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204)
 
@@ -610,7 +688,7 @@ describe('Poem API', () => {
         poem: 'Content',
         genre: 'love',
         likes: [],
-        userId: testUser._id,
+        authorId: testUser._id,
         picture: 'pic.jpg',
         date: new Date()
       })
@@ -618,12 +696,81 @@ describe('Poem API', () => {
       const poemId = poem._id
 
       await request(app)
-        .delete(`/api/poem/${poemId}`)
+        .delete(`/api/v1/poem/${poemId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(204)
 
       const poemCount = await Poem.countDocuments({ _id: poemId })
       expect(poemCount).toBe(0)
+    })
+
+    test('should return 403 when non-owner tries to delete a poem', async () => {
+      const otherUser = await User.create({
+        username: 'otheruser2',
+        email: 'other2@example.com',
+        passwordHash: await bcrypt.hash('pass', 10),
+        picture: 'pic.jpg'
+      })
+      const otherToken = jwt.sign(
+        { id: otherUser._id, username: otherUser.username },
+        process.env.SECRET,
+        { expiresIn: '1d' }
+      )
+      const poem = await Poem.create({
+        title: 'Test Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      const response = await request(app)
+        .delete(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${otherToken}`)
+        .expect(403)
+
+      expect(response.body.error).toBe('Forbidden')
+      const stillExists = await Poem.findById(poem._id)
+      expect(stillExists).not.toBeNull()
+    })
+
+    test('should allow admin to delete any poem', async () => {
+      const poem = await Poem.create({
+        title: 'Test Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      const adminUser = await User.create({
+        username: 'adminuser2',
+        email: 'admin2@example.com',
+        passwordHash: await bcrypt.hash('pass', 10),
+        picture: 'pic.jpg'
+      })
+      const adminEnvKey = process.env.NODE_ENV === 'development' ? 'REACT_APP_ADMIN_PRE' : 'REACT_APP_ADMIN'
+      process.env[adminEnvKey] = String(adminUser._id)
+      const adminToken = jwt.sign(
+        { id: adminUser._id, username: adminUser.username },
+        process.env.SECRET,
+        { expiresIn: '1d' }
+      )
+
+      await request(app)
+        .delete(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(204)
+
+      delete process.env[adminEnvKey]
+      const deleted = await Poem.findById(poem._id)
+      expect(deleted).toBeNull()
     })
   })
 })

@@ -3,7 +3,7 @@ const { app } = require('../../app')
 const Poem = require('../models/Poem')
 
 describe('Poems API - Pagination', () => {
-  describe('GET /api/poems with pagination', () => {
+  describe('GET /api/v1/poems with pagination', () => {
     test('should return paginated poems with default limit', async () => {
       // Create 25 test poems
       const poems = Array.from({ length: 25 }, (_, i) => ({
@@ -18,7 +18,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10 })
         .expect(200)
         .expect('Content-Type', /application\/json/)
@@ -44,7 +44,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 2, limit: 10 })
         .expect(200)
 
@@ -66,7 +66,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 3, limit: 10 })
         .expect(200)
 
@@ -88,7 +88,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 5, limit: 10 })
         .expect(200)
 
@@ -110,7 +110,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1 })
         .expect(200)
 
@@ -140,7 +140,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany([...classicPoems, ...modernPoems])
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10, origin: 'classic' })
         .expect(200)
 
@@ -154,7 +154,7 @@ describe('Poems API - Pagination', () => {
 
     test('should validate page parameter', async () => {
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 0, limit: 10 })
         .expect(400)
 
@@ -163,7 +163,7 @@ describe('Poems API - Pagination', () => {
 
     test('should validate limit parameter', async () => {
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 0 })
         .expect(400)
 
@@ -183,7 +183,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 200 })
         .expect(200)
 
@@ -224,7 +224,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10 })
         .expect(200)
 
@@ -259,7 +259,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany([...user1Poems, ...user2Poems])
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10, userId: user1Id })
         .expect(200)
 
@@ -297,7 +297,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10, likedBy: user1Id })
         .expect(200)
 
@@ -323,7 +323,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 2, limit: 10, userId })
         .expect(200)
 
@@ -359,7 +359,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany(poems)
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ page: 1, limit: 10, userId, origin: 'classic' })
         .expect(200)
 
@@ -384,7 +384,7 @@ describe('Poems API - Pagination', () => {
       }))
       await Poem.insertMany(poems)
 
-      const response = await request(app).get('/api/poems').expect(200)
+      const response = await request(app).get('/api/v1/poems').expect(200)
 
       // Should return simple array without pagination metadata
       expect(Array.isArray(response.body)).toBe(true)
@@ -417,7 +417,7 @@ describe('Poems API - Pagination', () => {
       await Poem.insertMany([...userPoems, ...classicPoems])
 
       const response = await request(app)
-        .get('/api/poems')
+        .get('/api/v1/poems')
         .query({ origin: 'user' })
         .expect(200)
 

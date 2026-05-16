@@ -1,8 +1,8 @@
 export const API_ENDPOINTS = {
-    POEMS: '/api/poems',
-    POEM: '/api/poem',
-    LOGIN: '/api/login',
-    REGISTER: '/api/register',
-    AUTHORS: '/api/authors',
-    AUTHORS_LETTERS: '/api/authors/letters'
+    POEMS: '/api/v1/poems',
+    POEM: '/api/v1/poem',
+    LOGIN: '/api/v1/login',
+    REGISTER: '/api/v1/register',
+    AUTHORS: '/api/v1/authors',
+    AUTHORS_LETTERS: '/api/v1/authors/letters'
 }

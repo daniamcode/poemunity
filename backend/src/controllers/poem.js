@@ -46,15 +46,33 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   })
 })
 
+const isOwnerOrAdmin = (req, res, next) => {
+  const { poem, userId } = req
+  const adminId = process.env.NODE_ENV === 'development'
+    ? process.env.REACT_APP_ADMIN_PRE
+    : process.env.REACT_APP_ADMIN
+
+  if (String(poem.authorId) !== userId && userId !== adminId) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+  next()
+}
+
+const ALLOWED_PATCH_FIELDS = ['poem', 'title', 'genre', 'date', 'likes', 'origin', 'userId']
+
 // modify poem
-poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
-  const { poem } = req
+poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async (req, res) => {
+  const doc = req.poem
+
+  const update = Object.fromEntries(
+    Object.entries(req.body).filter(([key]) => ALLOWED_PATCH_FIELDS.includes(key))
+  )
 
   try {
     const updated = await Poem.findByIdAndUpdate(
-      poem._id,
-      { $set: req.body },
-      { new: true, strict: false }
+      doc._id,
+      { $set: update },
+      { new: true }
     ).populate('authorId', AUTHOR_FIELDS)
 
     res.json(updated)
@@ -63,11 +81,11 @@ poemRouter.patch('/:poemId', userExtractor, findPoemById, async (req, res) => {
   }
 })
 
-poemRouter.delete('/:poemId', userExtractor, async (req, res) => {
-  const { poemId } = req.params
+poemRouter.delete('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async (req, res) => {
+  const { poem } = req
 
   try {
-    const response = await Poem.findByIdAndDelete(poemId)
+    const response = await Poem.findByIdAndDelete(poem._id)
     if (response === null) {
       return res.status(404).json({
         error: 'poem not found or not deleted'

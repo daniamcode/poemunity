@@ -5,7 +5,7 @@ const User = require('../models/User')
 const Poem = require('../models/Poem')
 
 describe('Users API', () => {
-  describe('GET /api/users', () => {
+  describe('GET /api/v1/users', () => {
     test('should return all users successfully', async () => {
       // Create test users
       const passwordHash = await bcrypt.hash('password123', 10)
@@ -27,7 +27,7 @@ describe('Users API', () => {
       ])
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -38,7 +38,7 @@ describe('Users API', () => {
 
     test('should return empty array when no users exist', async () => {
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -73,7 +73,7 @@ describe('Users API', () => {
       await user.save()
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
 
       expect(response.body).toHaveLength(1)
@@ -95,7 +95,7 @@ describe('Users API', () => {
       })
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
 
       expect(response.body[0]).toHaveProperty('username')
@@ -115,7 +115,7 @@ describe('Users API', () => {
       })
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
 
       expect(response.body[0].password).toBeUndefined()
@@ -133,7 +133,7 @@ describe('Users API', () => {
       })
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
 
       expect(response.body[0].poems).toBeDefined()
@@ -186,7 +186,7 @@ describe('Users API', () => {
       await user1.save()
 
       const response = await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
 
       expect(response.body).toHaveLength(2)
@@ -198,10 +198,10 @@ describe('Users API', () => {
     })
   })
 
-  describe('POST /api/users', () => {
+  describe('POST /api/v1/users', () => {
     test('should create a new user successfully', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'newuser',
           name: 'New User',
@@ -219,7 +219,7 @@ describe('Users API', () => {
 
     test('should hash the password', async () => {
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'testuser',
           name: 'Test User',
@@ -238,7 +238,7 @@ describe('Users API', () => {
 
     test('should assign default profile picture', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'testuser',
           name: 'Test User',
@@ -251,7 +251,7 @@ describe('Users API', () => {
 
     test('should create user in database', async () => {
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'dbuser',
           name: 'DB User',
@@ -267,7 +267,7 @@ describe('Users API', () => {
 
     test('should not expose password in response', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'secureuser',
           name: 'Secure User',
@@ -281,7 +281,7 @@ describe('Users API', () => {
 
     test('should handle special characters in username', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'user_123-test',
           name: 'Special User',
@@ -294,7 +294,7 @@ describe('Users API', () => {
 
     test('should handle special characters in name', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'testuser',
           name: 'John O\'Brien-Smith',
@@ -308,7 +308,7 @@ describe('Users API', () => {
     test('should create multiple different users', async () => {
       // First user
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'user1',
           name: 'User One',
@@ -318,7 +318,7 @@ describe('Users API', () => {
 
       // Second user
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'user2',
           name: 'User Two',
@@ -333,7 +333,7 @@ describe('Users API', () => {
 
     test('should use bcrypt with salt rounds of 10', async () => {
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'bcryptuser',
           name: 'Bcrypt User',
@@ -349,7 +349,7 @@ describe('Users API', () => {
 
     test('should initialize user with empty poems array', async () => {
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'newuser',
           name: 'New User',
@@ -366,7 +366,7 @@ describe('Users API', () => {
     test('should allow users with same name but different usernames', async () => {
       // First user
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'user1',
           name: 'John Smith',
@@ -376,7 +376,7 @@ describe('Users API', () => {
 
       // Second user with same name but different username
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'user2',
           name: 'John Smith',
@@ -390,7 +390,7 @@ describe('Users API', () => {
 
     test('should handle user creation with minimal required fields', async () => {
       const response = await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({
           username: 'minimaluser',
           name: 'Minimal',

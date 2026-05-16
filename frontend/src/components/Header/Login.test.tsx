@@ -172,7 +172,7 @@ describe('Login', () => {
         const form = screen.getByTestId('login')
         fireEvent.submit(form)
 
-        expect(mockHistoryPush).toHaveBeenCalledWith('profile')
+        expect(mockHistoryPush).toHaveBeenCalledWith('/profile')
     })
 
     test('should log error on failed login', () => {

@@ -28,7 +28,7 @@ export default function ProfilePicture({ context }: Props) {
             const base64 = await resizeImageToBase64(file, 200)
 
             const api = API({}, context.config)
-            const { data } = await api.patch('/api/users/picture', { picture: base64 })
+            const { data } = await api.patch('/api/v1/users/picture', { picture: base64 })
 
             window.localStorage.setItem('loggedUser', JSON.stringify(data.token))
             context.setState({ ...context, picture: data.picture })

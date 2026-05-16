@@ -12,7 +12,7 @@ function AdminFields({ poem, updatePoemField }: AdminFieldsProps) {
     const [fakeAuthors, setFakeAuthors] = useState<Author[]>([])
 
     useEffect(() => {
-        fetch('/api/authors?type=human&fake=true&limit=100')
+        fetch('/api/v1/authors?type=human&fake=true&limit=100')
             .then(r => r.json())
             .then((data: Author[]) => setFakeAuthors(data.sort((a, b) => a.name.localeCompare(b.name))))
             .catch(() => {})
