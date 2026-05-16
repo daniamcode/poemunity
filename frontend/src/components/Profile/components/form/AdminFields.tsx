@@ -12,7 +12,7 @@ function AdminFields({ poem, updatePoemField }: AdminFieldsProps) {
     const [fakeAuthors, setFakeAuthors] = useState<Author[]>([])
 
     useEffect(() => {
-        fetch('/api/authors?origin=user&fake=true&limit=100')
+        fetch('/api/authors?type=human&fake=true&limit=100')
             .then(r => r.json())
             .then((data: Author[]) => setFakeAuthors(data.sort((a, b) => a.name.localeCompare(b.name))))
             .catch(() => {})
@@ -31,7 +31,8 @@ function AdminFields({ poem, updatePoemField }: AdminFieldsProps) {
                 >
                     <option value=''>{PROFILE_SELECT_CATEGORY}</option>
                     <option value='famous'>Famous</option>
-                    <option value='user'>User</option>
+                    <option value='user'>Human</option>
+                    <option value='ai'>AI</option>
                 </select>
             </label>
             <label className='profile__insert-poem-input'>

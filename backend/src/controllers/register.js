@@ -38,7 +38,7 @@ registerRouter.post('/', async (req, res) => {
       email,
       passwordHash,
       picture: null,
-      origin: 'user',
+      type: 'user',
       fake: false
     })
 

@@ -5,7 +5,10 @@ const authorSchema = new Schema({
   name: String,
   slug: { type: String, unique: true, index: true },
   picture: String,
-  origin: String,
+  // public category: 'famous' | 'user' | 'ai'
+  type: { type: String, enum: ['famous', 'user', 'ai'], index: true },
+  // internal: where famous poems were sourced from (e.g. 'poetry-foundation')
+  source: String,
   fake: { type: Boolean, default: false },
   // auth fields — only populated for registered users, null for famous authors
   username: { type: String, unique: true, sparse: true },

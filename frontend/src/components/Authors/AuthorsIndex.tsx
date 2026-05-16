@@ -10,7 +10,8 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const ORIGIN_FILTERS = [
     { value: 'all', label: 'All' },
     { value: 'famous', label: 'Famous' },
-    { value: 'user', label: 'Users' }
+    { value: 'user', label: 'Users' },
+    { value: 'ai', label: 'AI' }
 ]
 
 export default function AuthorsIndex() {

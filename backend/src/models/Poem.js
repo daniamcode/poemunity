@@ -24,6 +24,7 @@ poemSchema.set('toJSON', {
       returnedObject.picture = a.picture
       returnedObject.userId = String(a._id || a.id)
       returnedObject.authorSlug = a.slug
+      returnedObject.authorType = a.type
       delete returnedObject.authorId
     }
   }

@@ -2,10 +2,11 @@ const mongoose = require('mongoose')
 const poemsRouter = require('express').Router()
 const Poem = require('../models/Poem')
 const Author = require('../models/Author')
+const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 const { generatePoemSlug } = require('../utils/slugUtils')
 
-const AUTHOR_FIELDS = 'name slug picture username'
+const AUTHOR_FIELDS = 'name slug picture username type'
 
 async function buildUniqueSlug(title, authorName) {
   const base = generatePoemSlug(title, authorName)
@@ -22,9 +23,7 @@ poemsRouter.get('/', async (req, res) => {
     const filter = {}
 
     if (req.query.origin) {
-      filter.origin = req.query.origin === 'famous'
-        ? { $in: ['famous', 'Poetry Foundation'] }
-        : req.query.origin
+      filter.origin = req.query.origin
     }
 
     // userId filter (MyPoems) — Author._id = old User._id, so direct mapping works
@@ -103,17 +102,22 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
     ? poemData.userId
     : userId
 
-  const author = await Author.findById(authorId)
+  let author = await Author.findById(authorId)
+  let isLegacyUser = false
+  if (!author) {
+    author = await User.findById(authorId)
+    isLegacyUser = true
+  }
   if (!author) {
     return res.status(404).json({ error: 'Author not found' })
   }
 
-  const slug = await buildUniqueSlug(poemData.title, author.name)
+  const slug = await buildUniqueSlug(poemData.title, author.name || author.username)
 
   const newPoem = new Poem({
     ...poemData,
     authorId: author._id,
-    origin: poemData.origin || 'user',
+    origin: author.type || 'user',
     slug
   })
 
@@ -122,6 +126,18 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
 
     author.poems = author.poems.concat(savedPoem._id)
     await author.save()
+
+    if (isLegacyUser) {
+      // populate won't cross collections; build response manually
+      const poemObj = savedPoem.toJSON()
+      poemObj.author = author.username || author.name
+      poemObj.authorName = author.name
+      poemObj.picture = author.picture
+      poemObj.userId = String(author._id)
+      poemObj.authorSlug = author.slug
+      delete poemObj.authorId
+      return res.status(201).json(poemObj)
+    }
 
     const populated = await savedPoem.populate('authorId', AUTHOR_FIELDS)
     res.status(201).json(populated)

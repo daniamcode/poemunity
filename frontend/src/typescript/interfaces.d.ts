@@ -11,6 +11,7 @@ export interface Poem {
     slug?: string
     authorSlug?: string
     authorName?: string
+    authorType?: 'famous' | 'user' | 'ai'
 }
 
 export interface Author {
@@ -19,6 +20,7 @@ export interface Author {
     count: number
     slug: string
     picture?: string
+    type?: 'famous' | 'user' | 'ai'
 }
 
 export interface User {

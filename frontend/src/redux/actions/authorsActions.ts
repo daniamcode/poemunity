@@ -36,7 +36,7 @@ export function getAuthorsByLetterAction({ letter, origin, options, callbacks }:
             type: ACTIONS.AUTHORS_BY_LETTER,
             url: API_ENDPOINTS.AUTHORS,
             dispatch,
-            params: { letter, ...(origin && origin !== 'all' ? { origin } : {}) },
+            params: { letter, ...(origin && origin !== 'all' ? { type: origin } : {}) },
             options,
             callbacks
         })
@@ -55,7 +55,7 @@ export function getAuthorsLettersAction({ origin, options, callbacks }: GetAutho
             type: ACTIONS.AUTHORS_LETTERS,
             url: API_ENDPOINTS.AUTHORS_LETTERS,
             dispatch,
-            params: origin && origin !== 'all' ? { origin } : undefined,
+            params: origin && origin !== 'all' ? { type: origin } : undefined,
             options,
             callbacks
         })

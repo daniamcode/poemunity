@@ -26,7 +26,7 @@ describe('Migration verification', () => {
       email: 'jane@example.com',
       passwordHash,
       picture: 'https://example.com/jane.jpg',
-      origin: 'user',
+      type: 'user',
       fake: false
     })
     token = makeToken(author)
@@ -199,7 +199,7 @@ describe('Migration verification', () => {
         poem: 'verse',
         genre: 'love',
         authorId: author._id,
-        origin: 'user',
+        origin: 'human',
         date: new Date()
       })
 
@@ -239,13 +239,13 @@ describe('Migration verification', () => {
         slug: 'other-person',
         username: 'other',
         email: 'other@example.com',
-        origin: 'user'
+        type: 'user'
       })
 
       await Poem.insertMany([
-        { title: 'Jane 1', poem: 'v', genre: 'love', authorId: author._id, origin: 'user', date: new Date() },
-        { title: 'Jane 2', poem: 'v', genre: 'sad', authorId: author._id, origin: 'user', date: new Date() },
-        { title: 'Other 1', poem: 'v', genre: 'love', authorId: otherAuthor._id, origin: 'user', date: new Date() }
+        { title: 'Jane 1', poem: 'v', genre: 'love', authorId: author._id, origin: 'human', date: new Date() },
+        { title: 'Jane 2', poem: 'v', genre: 'sad', authorId: author._id, origin: 'human', date: new Date() },
+        { title: 'Other 1', poem: 'v', genre: 'love', authorId: otherAuthor._id, origin: 'human', date: new Date() }
       ])
     })
 
@@ -265,7 +265,7 @@ describe('Migration verification', () => {
         slug: 'no-poems',
         username: 'nopoems',
         email: 'nopoems@example.com',
-        origin: 'user'
+        type: 'user'
       })
 
       const res = await request(app)

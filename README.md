@@ -42,6 +42,21 @@ Finally, I implemented Redux, because the goal of this project is to learn as mu
 ### Own build
 Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
 
+## Author / User types
+
+The app uses a single `Author` collection (after migrating away from a separate `User` collection). Authors are distinguished by two fields:
+
+| Type | `origin` | `fake` | Has credentials? |
+|---|---|---|---|
+| Real registered user | `'user'` | `false` | Yes (username, email, passwordHash) |
+| Fake seeded user | `'user'` | `true` | Maybe |
+| Famous poet (manually added) | `'famous'` | `false` | No |
+| Famous poet (Poetry Foundation) | `'Poetry Foundation'` | `false` | No |
+
+**Important:** the `origin=famous` filter used in the API (`/api/poems?origin=famous` and `/api/authors?origin=famous`) is the **union** of `'famous'` and `'Poetry Foundation'` — both map to the same "famous" concept in the UI.
+
+The legacy `User` model still exists in `backend/src/models/User.js` but is no longer used after the Author migration.
+
 ## Poem data
 
 The famous poets and poems were seeded from the **Poetry Foundation Kaggle dataset**:

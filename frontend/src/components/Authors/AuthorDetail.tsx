@@ -29,10 +29,15 @@ export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>
         document.title = `${authorName} - Poems | Poemunity`
     }, [authorName])
 
+    const authorType = poems[0]?.authorType
+
     return (
         <main className='author-detail'>
             <header className='author-detail__header'>
-                <h1 className='author-detail__name'>{authorName}</h1>
+                <h1 className='author-detail__name'>
+                    {authorName}
+                    {authorType === 'ai' && <span className='author-detail__ai-badge'> (AI generated)</span>}
+                </h1>
                 {total > 0 && <p className='author-detail__count'>{total} poems</p>}
             </header>
 

@@ -13,6 +13,7 @@ export function OriginFilter({ value, onChange }: OriginFilterProps) {
                     <option value='all'>All</option>
                     <option value='famous'>Famous</option>
                     <option value='user'>Users</option>
+                    <option value='ai'>AI</option>
                 </select>
             </label>
         </form>

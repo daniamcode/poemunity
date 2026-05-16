@@ -3,8 +3,7 @@ const Author = require('../models/Author')
 
 function buildFilter(query) {
   const filter = {}
-  if (query.origin === 'famous') filter.origin = { $in: ['famous', 'Poetry Foundation'] }
-  else if (query.origin === 'user') filter.origin = 'user'
+  if (query.type) filter.type = query.type
   if (query.fake === 'true') filter.fake = true
   return filter
 }

@@ -14,14 +14,14 @@ describe('Author → Poem integration', () => {
       name: 'A. F. Moritz',
       slug: 'a-f-moritz',
       picture: 'https://example.com/moritz.jpg',
-      origin: 'famous'
+      type: 'famous'
     })
 
     userAuthor = await Author.create({
       name: 'Emily Hart',
       slug: 'emily-hart',
       picture: 'https://example.com/emily.jpg',
-      origin: 'user',
+      type: 'user',
       fake: true
     })
 
@@ -130,20 +130,20 @@ describe('Author → Poem integration', () => {
       })
     })
 
-    test('filters letters by origin=famous', async () => {
+    test('filters letters by type=famous', async () => {
       const res = await request(app)
         .get('/api/authors/letters')
-        .query({ origin: 'famous' })
+        .query({ type: 'famous' })
         .expect(200)
 
       expect(res.body).toContain('A')
       expect(res.body).not.toContain('E')
     })
 
-    test('filters letters by origin=user', async () => {
+    test('filters letters by type=user', async () => {
       const res = await request(app)
         .get('/api/authors/letters')
-        .query({ origin: 'user' })
+        .query({ type: 'user' })
         .expect(200)
 
       expect(res.body).toContain('E')
@@ -182,10 +182,10 @@ describe('Author → Poem integration', () => {
       expect(res.body[0].count).toBe(2)
     })
 
-    test('filters by origin=user', async () => {
+    test('filters by type=user', async () => {
       const res = await request(app)
         .get('/api/authors')
-        .query({ letter: 'E', origin: 'user' })
+        .query({ letter: 'E', type: 'user' })
         .expect(200)
 
       expect(res.body).toHaveLength(1)
