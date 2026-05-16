@@ -10,7 +10,7 @@ process.env.SECRET = '1234'
 // Suppress strictQuery warning
 mongoose.set('strictQuery', false)
 
-async function createTestUser() {
+async function createTestUser () {
   // Import User model after mongoose connection is established
   const User = require('./src/models/User')
 
@@ -33,7 +33,7 @@ async function createTestUser() {
   console.log('👤 Created test user (username: test, password: 1234)')
 }
 
-async function setupInMemoryDatabase() {
+async function setupInMemoryDatabase () {
   console.log('🔧 Setting up in-memory MongoDB for Cypress tests...')
 
   // Create in-memory MongoDB instance
@@ -58,7 +58,7 @@ async function setupInMemoryDatabase() {
 }
 
 // Cleanup function for graceful shutdown
-async function cleanupInMemoryDatabase() {
+async function cleanupInMemoryDatabase () {
   console.log('🧹 Cleaning up in-memory MongoDB...')
 
   // Disconnect from in-memory database

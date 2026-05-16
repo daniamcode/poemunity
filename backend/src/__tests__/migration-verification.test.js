@@ -5,7 +5,7 @@ const { app } = require('../../app')
 const Author = require('../models/Author')
 const Poem = require('../models/Poem')
 
-function makeToken(author) {
+function makeToken (author) {
   return jwt.sign(
     { id: author._id, username: author.username, picture: author.picture },
     process.env.SECRET,

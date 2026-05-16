@@ -38,6 +38,36 @@ usersRouter.post('/', async (req, res) => {
   }
 })
 
+usersRouter.patch('/profile', userExtractor, async (req, res) => {
+  try {
+    const { bio, preferredGenres } = req.body
+
+    const update = {}
+    if (bio !== undefined) update.bio = bio
+    if (preferredGenres !== undefined) update.preferredGenres = preferredGenres
+
+    const author = await Author.findByIdAndUpdate(req.userId, update, { new: true })
+    if (!author) return res.status(404).json({ error: 'User not found' })
+
+    const newToken = jwt.sign(
+      {
+        id: author._id,
+        username: author.username,
+        picture: author.picture,
+        bio: author.bio || '',
+        preferredGenres: author.preferredGenres || []
+      },
+      process.env.SECRET,
+      { expiresIn: 60 * 60 * 24 * 7 }
+    )
+
+    res.json({ token: newToken, bio: author.bio, preferredGenres: author.preferredGenres })
+  } catch (error) {
+    console.error('Profile update error:', error)
+    res.status(500).json({ error: 'Failed to update profile' })
+  }
+})
+
 // Accepts { picture: "data:image/jpeg;base64,..." } — resized client-side
 usersRouter.patch('/picture', userExtractor, async (req, res) => {
   try {

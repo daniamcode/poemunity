@@ -16,7 +16,13 @@ loginRouter.post('/', async (request, response) => {
   }
 
   const token = jwt.sign(
-    { id: author._id, username: author.username, picture: author.picture },
+    {
+      id: author._id,
+      username: author.username,
+      picture: author.picture,
+      bio: author.bio || '',
+      preferredGenres: author.preferredGenres || []
+    },
     process.env.SECRET,
     { expiresIn: 60 * 60 * 24 * 7 }
   )

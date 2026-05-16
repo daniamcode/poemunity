@@ -11,7 +11,7 @@ const connectMongo = require('../mongo')
 const User = require('../src/models/User')
 const Poem = require('../src/models/Poem')
 
-function shouldCapitalize(id) {
+function shouldCapitalize (id) {
   let hash = 0
   const str = id.toString()
   for (let i = 0; i < str.length; i++) {
@@ -20,12 +20,12 @@ function shouldCapitalize(id) {
   return (hash % 100) < 85
 }
 
-function capitalize(text) {
+function capitalize (text) {
   if (!text) return text
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
-async function run() {
+async function run () {
   await connectMongo()
 
   const fakeUsers = await User.find({ fake: true }).select('_id')

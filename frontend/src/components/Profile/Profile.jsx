@@ -8,6 +8,7 @@ import { useProfileForm } from './hooks/useProfileForm'
 import ProfileForm from './components/ProfileForm'
 import ProfilePicture from './components/ProfilePicture'
 import ProfileTabs from './components/ProfileTabs'
+import UserInfo from './components/UserInfo'
 
 export default function Profile() {
     const [value, setValue] = useState(0)
@@ -37,7 +38,10 @@ export default function Profile() {
                 <div>
                     <section className='profile__intro-wrapper'>
                         <div className='profile__intro'>
-                            <ProfilePicture context={context} />
+                            <div className='profile__user-column'>
+                                <ProfilePicture context={context} />
+                                <UserInfo context={context} />
+                            </div>
                             <ProfileForm
                                 context={context}
                                 poem={poem}

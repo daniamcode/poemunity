@@ -5,7 +5,7 @@ const Author = require('../src/models/Author')
 const Poem = require('../src/models/Poem')
 const { slugifyAuthor } = require('../src/utils/slugUtils')
 
-function buildSlugsInMemory(names, seedSlugs = new Set()) {
+function buildSlugsInMemory (names, seedSlugs = new Set()) {
   const usedSlugs = new Set(seedSlugs)
   const result = new Map()
   for (const name of names) {
@@ -21,7 +21,7 @@ function buildSlugsInMemory(names, seedSlugs = new Set()) {
   return result
 }
 
-async function main() {
+async function main () {
   await mongoose.connect(process.env.MONGODB_PRE)
   console.log('Connected to MongoDB')
 

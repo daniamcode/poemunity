@@ -21,6 +21,8 @@ export const AppContext = React.createContext<Context>({
     userId: '',
     username: '',
     picture: '',
+    bio: '',
+    preferredGenres: [],
     config: {},
     adminId: '',
     setState: () => {}
@@ -41,6 +43,8 @@ function App() {
         userId: '',
         username: '',
         picture: '',
+        bio: '',
+        preferredGenres: [] as string[],
         config: {},
         // eslint-disable-next-line no-undef
         adminId: process.env.REACT_APP_ADMIN ?? '',

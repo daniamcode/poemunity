@@ -10,6 +10,8 @@ const authorSchema = new Schema({
   // internal: where famous poems were sourced from (e.g. 'poetry-foundation')
   source: String,
   fake: { type: Boolean, default: false },
+  bio: String,
+  preferredGenres: [String],
   // auth fields — only populated for registered users, null for famous authors
   username: { type: String, unique: true, sparse: true },
   email: { type: String, sparse: true },

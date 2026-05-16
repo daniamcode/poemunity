@@ -1,7 +1,7 @@
 const authorsRouter = require('express').Router()
 const Author = require('../models/Author')
 
-function buildFilter(query) {
+function buildFilter (query) {
   const filter = {}
   if (query.type) filter.type = query.type
   if (query.fake === 'true') filter.fake = true
@@ -63,6 +63,17 @@ authorsRouter.get('/', async (req, res) => {
       { $limit: limit }
     ])
     res.json(authors.map(a => ({ id: String(a._id), name: a.username || a.name, slug: a.slug, picture: a.picture, count: a.count })))
+  } catch {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// GET /api/authors/:slug — single author profile (bio, preferredGenres, picture, type)
+authorsRouter.get('/:slug', async (req, res) => {
+  try {
+    const author = await Author.findOne({ slug: req.params.slug }, 'name slug picture type bio preferredGenres')
+    if (!author) return res.status(404).json({ error: 'Author not found' })
+    res.json(author)
   } catch {
     res.status(500).json({ error: 'Internal server error' })
   }

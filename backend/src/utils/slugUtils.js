@@ -5,7 +5,7 @@ const STOP_WORDS = new Set([
   'their', 'i', 'you', 'he', 'she', 'we', 'they', 'not', 'no', 'so'
 ])
 
-function slugifyText(text) {
+function slugifyText (text) {
   return text
     .toLowerCase()
     .normalize('NFD')
@@ -17,14 +17,14 @@ function slugifyText(text) {
     .join('-')
 }
 
-function generatePoemSlug(title, author) {
+function generatePoemSlug (title, author) {
   const titlePart = slugifyText(title || '')
   const authorPart = slugifyText(author || '')
   const base = [titlePart, authorPart].filter(Boolean).join('-')
   return base || 'poem'
 }
 
-function slugifyAuthor(name) {
+function slugifyAuthor (name) {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')

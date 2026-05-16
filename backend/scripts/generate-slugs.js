@@ -13,7 +13,7 @@ const connectMongo = require('../mongo')
 const Poem = require('../src/models/Poem')
 const { generatePoemSlug } = require('../src/utils/slugUtils')
 
-async function buildUniqueSlug(base, usedSlugs) {
+async function buildUniqueSlug (base, usedSlugs) {
   let slug = base
   let counter = 2
   while (usedSlugs.has(slug)) {
@@ -22,7 +22,7 @@ async function buildUniqueSlug(base, usedSlugs) {
   return slug
 }
 
-async function run() {
+async function run () {
   await connectMongo()
 
   const poems = await Poem.find({ slug: { $exists: false } }).select('_id title author')

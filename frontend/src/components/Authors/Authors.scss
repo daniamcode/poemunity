@@ -166,6 +166,32 @@
         color: #7f8c8d;
         font-size: 1.1rem;
         font-weight: 400;
+        margin-bottom: 16px;
+    }
+
+    &__bio {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.7;
+        max-width: 600px;
+        margin: 0 auto 16px;
+    }
+
+    &__genres {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        margin-top: 8px;
+    }
+
+    &__genre-tag {
+        font-size: 0.78rem;
+        padding: 4px 12px;
+        background: #eaf3fb;
+        color: #2980b9;
+        border-radius: 12px;
+        font-weight: 500;
     }
 
     &__empty {

@@ -8,7 +8,7 @@ const { generatePoemSlug } = require('../utils/slugUtils')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
 
-async function buildUniqueSlug(title, authorName) {
+async function buildUniqueSlug (title, authorName) {
   const base = generatePoemSlug(title, authorName)
   let slug = base
   let counter = 2

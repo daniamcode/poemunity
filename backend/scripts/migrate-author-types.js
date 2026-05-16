@@ -5,7 +5,7 @@ const Poem = require('../src/models/Poem')
 
 const MONGODB = process.env.MONGODB_PRE || process.env.MONGODB
 
-async function run() {
+async function run () {
   await mongoose.connect(MONGODB)
   console.log('Connected to MongoDB')
 
@@ -58,11 +58,11 @@ async function run() {
   // ── Step 2: update poem origins to match author type ─────────────────────
   // 3 bulk queries instead of one-per-author
   const famousIds = (await col.find({ type: 'famous' }, { projection: { _id: 1 } }).toArray()).map(a => a._id)
-  const aiIds     = (await col.find({ type: 'ai' },     { projection: { _id: 1 } }).toArray()).map(a => a._id)
+  const aiIds = (await col.find({ type: 'ai' }, { projection: { _id: 1 } }).toArray()).map(a => a._id)
 
   const pFamous = await Poem.collection.updateMany({ authorId: { $in: famousIds } }, { $set: { origin: 'famous' } })
-  const pAi     = await Poem.collection.updateMany({ authorId: { $in: aiIds } },     { $set: { origin: 'ai' } })
-  const pHuman  = await Poem.collection.updateMany(
+  const pAi = await Poem.collection.updateMany({ authorId: { $in: aiIds } }, { $set: { origin: 'ai' } })
+  const pHuman = await Poem.collection.updateMany(
     { authorId: { $nin: [...famousIds, ...aiIds] } },
     { $set: { origin: 'user' } }
   )

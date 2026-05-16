@@ -26,6 +26,8 @@ function Header() {
                 userId: jwtData?.id,
                 username: jwtData?.username,
                 picture: jwtData?.picture,
+                bio: jwtData?.bio || '',
+                preferredGenres: jwtData?.preferredGenres || [],
                 config: {
                     headers: {
                         Authorization: `Bearer ${parsedUser}`

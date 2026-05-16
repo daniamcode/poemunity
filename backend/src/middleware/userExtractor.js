@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
-  const authorization = req.get('authorization') //express method to get this header
+  const authorization = req.get('authorization') // express method to get this header
   let token = ''
 
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {
-    token = authorization.split(' ')[1] //token comes after the word bearer
+    token = authorization.split(' ')[1] // token comes after the word bearer
   }
 
   try {

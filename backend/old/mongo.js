@@ -20,7 +20,7 @@ if (!isTestMode) {
 
   mongoose.connect(connectionString, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
   })
     .then(() => {
       console.log(`Database connected (${NODE_ENV} mode)`)

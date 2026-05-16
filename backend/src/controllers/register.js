@@ -3,7 +3,7 @@ const registerRouter = require('express').Router()
 const Author = require('../models/Author')
 const { slugifyAuthor } = require('../utils/slugUtils')
 
-async function buildUniqueSlug(name) {
+async function buildUniqueSlug (name) {
   const base = slugifyAuthor(name) || 'author'
   let slug = base
   let counter = 2

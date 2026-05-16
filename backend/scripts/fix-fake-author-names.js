@@ -24,7 +24,7 @@ const fakeUsernames = [
   'siblinghood', 'soberlife_', 'birthdays_hurt', 'immigrantpen', 'grievingmom_'
 ]
 
-async function run() {
+async function run () {
   await connectMongo()
 
   let updated = 0

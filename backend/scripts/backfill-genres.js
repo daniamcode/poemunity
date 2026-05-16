@@ -29,7 +29,7 @@ const TOP_GENRES = new Set([
   'War & Conflict'
 ])
 
-function mapGenre(tags) {
+function mapGenre (tags) {
   if (!tags) return null
   const parts = tags.split(',').map(t => t.trim()).filter(Boolean)
   // Prefer a top-level genre if one matches
@@ -42,7 +42,7 @@ function mapGenre(tags) {
 
 const normalize = s => s.replace(/\r/g, '').replace(/\n/g, '').trim().toLowerCase()
 
-async function run() {
+async function run () {
   await connectMongo()
 
   const csv = fs.readFileSync(path.resolve(OLD_CSV), 'utf8')
@@ -59,7 +59,7 @@ async function run() {
   const poems = await Poem.find({ origin: 'Poetry Foundation' }).select('_id title author genre')
   console.log(`Found ${poems.length} Poetry Foundation poems in DB`)
 
-  let updated = 0, skipped = 0
+  let updated = 0; let skipped = 0
   const batchSize = 500
   const bulkOps = []
 

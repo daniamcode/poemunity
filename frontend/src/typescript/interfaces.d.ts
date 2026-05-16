@@ -63,6 +63,8 @@ export interface Context {
     userId: string
     username: string
     picture: string
+    bio?: string
+    preferredGenres?: string[]
     config: object
     adminId: string
     setState: (state: Context) => void

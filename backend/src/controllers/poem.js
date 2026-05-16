@@ -28,7 +28,7 @@ poemRouter.get('/:poemId', async (req, res) => {
   }
 })
 
-//like poem
+// like poem
 poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req
   if (poem.likes.some((id) => id == req.userId)) {
@@ -82,4 +82,4 @@ poemRouter.delete('/:poemId', userExtractor, async (req, res) => {
   }
 })
 
-module.exports = poemRouter 
+module.exports = poemRouter

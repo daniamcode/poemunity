@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)
 
-let cached = global.mongoose || { conn: null, promise: null }
+const cached = global.mongoose || { conn: null, promise: null }
 global.mongoose = cached
 
 const connectMongo = async () => {
@@ -18,7 +18,7 @@ const connectMongo = async () => {
   if (!cached.promise) {
     cached.promise = mongoose.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
+      useUnifiedTopology: true
     })
   }
 

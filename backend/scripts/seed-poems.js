@@ -34,25 +34,25 @@ const SEED_USER = {
   name: 'Poetry',
   surname: 'Foundation',
   email: 'seed@poetryfoundation.org',
-  picture: '',
+  picture: ''
 }
 
 // Maps Poetry Foundation tags to the genres your app uses.
 // Extend this list as needed.
 const TAG_MAP = {
-  'love': 'Love',
-  'nature': 'Nature',
-  'death': 'Death',
-  'war': 'War',
-  'life': 'Life',
-  'friendship': 'Friendship',
-  'family': 'Family',
-  'religion': 'Religion',
-  'philosophy': 'Philosophy',
-  'humor': 'Humor',
+  love: 'Love',
+  nature: 'Nature',
+  death: 'Death',
+  war: 'War',
+  life: 'Life',
+  friendship: 'Friendship',
+  family: 'Family',
+  religion: 'Religion',
+  philosophy: 'Philosophy',
+  humor: 'Humor'
 }
 
-function mapGenre(tags) {
+function mapGenre (tags) {
   if (!tags) return 'Other'
   const parts = tags.split(',').map(t => t.trim().toLowerCase())
   for (const part of parts) {
@@ -65,7 +65,7 @@ function mapGenre(tags) {
   return first ? first.charAt(0).toUpperCase() + first.slice(1) : 'Other'
 }
 
-async function getOrCreateSeedUser() {
+async function getOrCreateSeedUser () {
   let user = await User.findOne({ username: SEED_USER.username })
   if (user) return user
 
@@ -76,14 +76,14 @@ async function getOrCreateSeedUser() {
   return user
 }
 
-async function main() {
+async function main () {
   await connectMongo()
 
   const csvContent = fs.readFileSync(path.resolve(CSV_PATH), 'utf8')
   const records = parse(csvContent, {
     columns: true,
     skip_empty_lines: true,
-    relax_column_count: true,
+    relax_column_count: true
   })
 
   console.log(`Parsed ${records.length} rows from CSV`)
@@ -101,10 +101,10 @@ async function main() {
   const docs = []
 
   for (const row of records) {
-    const title = (row['Title'] || row['title'] || '').trim()
-    const poem = (row['Poem'] || row['poem'] || row['Content'] || row['content'] || '').trim()
-    const author = (row['Poet'] || row['poet'] || row['Author'] || row['author'] || '').trim()
-    const tags = row['Tags'] || row['tags'] || ''
+    const title = (row.Title || row.title || '').trim()
+    const poem = (row.Poem || row.poem || row.Content || row.content || '').trim()
+    const author = (row.Poet || row.poet || row.Author || row.author || '').trim()
+    const tags = row.Tags || row.tags || ''
 
     if (!title || !poem) {
       skipped++
@@ -128,7 +128,7 @@ async function main() {
       date: new Date(),
       userId: seedUser._id.toString(),
       origin: 'Poetry Foundation',
-      slug,
+      slug
     })
   }
 
