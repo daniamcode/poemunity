@@ -25,6 +25,7 @@ interface AuthorAvatarProps {
 export function AuthorAvatar({ name, picture }: AuthorAvatarProps) {
     if (picture) {
         return (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
                 className='poem__picture'
                 src={picture}

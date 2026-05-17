@@ -1,8 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
 import { AppContext } from '../../App'
-import './Profile.scss'
-import '../../App.scss'
 import { useSelector } from 'react-redux'
 import { useProfileForm } from './hooks/useProfileForm'
 import ProfileForm from './components/ProfileForm'
@@ -13,15 +10,13 @@ import UserInfo from './components/UserInfo'
 export default function Profile() {
     const [value, setValue] = useState(0)
     const context = useContext(AppContext)
-    const location = useLocation()
     const poemQuery = useSelector(state => state.poemQuery)
     const poemsListQuery = useSelector(state => state.poemsListQuery)
 
     const { poem, isEditing, updatePoemField, handleSend, handleReset, handleCancel } = useProfileForm(
         context,
         poemQuery,
-        poemsListQuery,
-        location
+        poemsListQuery
     )
 
     const handleChange = (_event, newValue) => {

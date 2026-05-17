@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
+import mockRouter from 'next-router-mock'
 import Header from './Header'
 import { AppContext } from '../../App'
 import * as parseJWTModule from '../../utils/parseJWT'
@@ -22,19 +22,6 @@ jest.mock('./Logout', () => {
         return <button data-testid='logout-button'>Logout</button>
     }
 })
-
-// Mock useLocation
-const mockLocation = {
-    pathname: '/',
-    search: '',
-    hash: '',
-    state: null
-}
-
-jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useLocation: () => mockLocation
-}))
 
 // Mock parseJWT
 jest.mock('../../utils/parseJWT')
@@ -75,7 +62,7 @@ describe('Header', () => {
             username: 'johndoe',
             picture: 'https://example.com/pic.jpg'
         })
-        mockLocation.pathname = '/'
+        mockRouter.setCurrentUrl('/')
         global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve(null) })
     })
 
@@ -85,11 +72,9 @@ describe('Header', () => {
 
     const renderWithContext = (contextValue: any) => {
         return render(
-            <BrowserRouter>
-                <AppContext.Provider value={contextValue}>
-                    <Header />
-                </AppContext.Provider>
-            </BrowserRouter>
+            <AppContext.Provider value={contextValue}>
+                <Header />
+            </AppContext.Provider>
         )
     }
 
@@ -130,19 +115,19 @@ describe('Header', () => {
     })
 
     test('should display default subtitle on home page', () => {
-        mockLocation.pathname = '/'
+        mockRouter.setCurrentUrl('/')
         renderWithContext(mockContextLoggedOut)
         expect(screen.getByText('Your poem community!')).toBeInTheDocument()
     })
 
     test('should display username subtitle on profile page', () => {
-        mockLocation.pathname = '/profile'
+        mockRouter.setCurrentUrl('/profile')
         renderWithContext(mockContextLoggedIn)
         expect(screen.getByText("johndoe's private profile")).toBeInTheDocument()
     })
 
     test('should display default subtitle on non-profile pages', () => {
-        mockLocation.pathname = '/detail/123'
+        mockRouter.setCurrentUrl('/detail/123')
         renderWithContext(mockContextLoggedOut)
         expect(screen.getByText('Your poem community!')).toBeInTheDocument()
     })
@@ -231,7 +216,7 @@ describe('Header', () => {
     })
 
     test('should handle profile page with logged in user', () => {
-        mockLocation.pathname = '/profile'
+        mockRouter.setCurrentUrl('/profile')
         const { container } = renderWithContext(mockContextLoggedIn)
 
         expect(screen.getByText("johndoe's private profile")).toBeInTheDocument()
@@ -242,7 +227,7 @@ describe('Header', () => {
     })
 
     test('should handle profile page with logged out user', () => {
-        mockLocation.pathname = '/profile'
+        mockRouter.setCurrentUrl('/profile')
         renderWithContext(mockContextLoggedOut)
 
         // Username is empty, so should show 's private profile

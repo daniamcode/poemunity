@@ -63,7 +63,7 @@ Audit performed on 2026-05-16. Issues ordered by severity.
   - Add `morgan` for HTTP request logs
   - Integrate Sentry (or equivalent) for production error tracking
 
-- [ ] **GitHub Actions use deprecated action versions**
+- [x] **GitHub Actions use deprecated action versions**
   - `.github/workflows/*.yml`
   - Bump `actions/checkout` → `@v4`, `actions/setup-node` → `@v4`, `node-version` `13.x` → `20.x`
 
@@ -75,7 +75,7 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 ## 🟡 Medium — Address Before or Shortly After Launch
 
 - [ ] **JWT tokens stored in `localStorage`** (XSS can steal them)
-  - Migrate to `httpOnly` cookies — requires backend to issue `Set-Cookie` header
+  - `httpOnly` cookie auth added (Phase 3); `localStorage` still present as legacy fallback — remove it to complete the migration
 
 - [ ] **No CSRF protection**
   - Once on `httpOnly` cookies, enforce `SameSite=Strict`
@@ -93,8 +93,8 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 
 ## 🟢 Low — Nice to Have
 
-- [ ] **SEO meta tags are sparse** (`og:image`, `description`, `canonical` missing on most pages)
-  - Flesh out `react-helmet` usage per route
+- [x] **SEO meta tags are sparse** (`og:image`, `description`, `canonical` missing on most pages)
+  - `react-helmet` removed; replaced with Next.js `<Head>` via shared `SeoHead` component — `og:title`, `og:description`, `og:image`, `canonical`, and `robots.txt` added across all pages
 
 - [x] **Unused backend dependencies** (`passport`, `passport-local`, `mssql`, `ejs`, `csv-parse`)
   - Removed from `backend/package.json`

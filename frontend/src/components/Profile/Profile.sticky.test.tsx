@@ -1,6 +1,5 @@
 import { render } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 import Profile from './Profile'
 import store from '../../redux/store'
 import { AppContext } from '../../App'
@@ -25,9 +24,7 @@ describe('Profile - Sticky Elements', () => {
         return render(
             <AppContext.Provider value={mockContext}>
                 <Provider store={store}>
-                    <BrowserRouter>
                         <Profile />
-                    </BrowserRouter>
                 </Provider>
             </AppContext.Provider>
         )

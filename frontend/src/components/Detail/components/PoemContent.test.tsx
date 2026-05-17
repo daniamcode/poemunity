@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemContent } from './PoemContent'
 import { Poem } from '../../../typescript/interfaces'
 
@@ -17,35 +16,35 @@ describe('PoemContent', () => {
     }
 
     test('should render poem title', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         expect(screen.getByText('A Beautiful Poem')).toBeInTheDocument()
     })
 
     test('should render poem author', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         expect(screen.getByText('John Doe')).toBeInTheDocument()
     })
 
     test('should render author picture with correct src and alt', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         const image = screen.getByAltText('John Doe')
         expect(image).toBeInTheDocument()
         expect(image).toHaveAttribute('src', 'https://example.com/avatar.jpg')
     })
 
     test('should render poem content', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         expect(screen.getByText(/This is a beautiful poem/)).toBeInTheDocument()
     })
 
     test('should render formatted date', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         // Date format is MM/dd/yyyy HH:mm'h' but may vary based on timezone
         expect(screen.getByText(/01\/15\/2024 \d{2}:\d{2}h/)).toBeInTheDocument()
     })
 
     test('should apply correct CSS classes', () => {
-        const { container } = render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        const { container } = render(<PoemContent poem={mockPoem} />)
         expect(container.querySelector('.poem__title')).toBeInTheDocument()
         expect(container.querySelector('.poem__author-container')).toBeInTheDocument()
         expect(container.querySelector('.poem__picture')).toBeInTheDocument()
@@ -59,14 +58,14 @@ describe('PoemContent', () => {
             ...mockPoem,
             poem: ''
         }
-        const { container } = render(<BrowserRouter><PoemContent poem={emptyPoem} /></BrowserRouter>)
+        const { container } = render(<PoemContent poem={emptyPoem} />)
         const content = container.querySelector('.poem__content')
         expect(content).toBeInTheDocument()
         expect(content?.textContent).toBe('')
     })
 
     test('should render title as h2 element', () => {
-        render(<BrowserRouter><PoemContent poem={mockPoem} /></BrowserRouter>)
+        render(<PoemContent poem={mockPoem} />)
         const title = screen.getByText('A Beautiful Poem')
         expect(title.tagName).toBe('H2')
     })

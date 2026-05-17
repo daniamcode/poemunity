@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 
 interface LikeButtonProps {
     isLiked: boolean
@@ -13,10 +12,10 @@ export function LikeButton({ isLiked, onLike, show }: LikeButtonProps) {
     }
 
     return (
-        <Link
+        <a
             className={isLiked ? 'poem__likes-icon' : 'poem__unlikes-icon'}
             onClick={onLike}
-            to='#'
+            href='#'
             data-testid={isLiked ? 'like-icon' : 'unlike-icon'}
         />
     )

@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemHeader } from './PoemHeader'
 
 describe('PoemHeader', () => {
@@ -12,7 +11,7 @@ describe('PoemHeader', () => {
     }
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(<BrowserRouter>{component}</BrowserRouter>)
+        return render(component)
     }
 
     test('should render poem title as a link', () => {

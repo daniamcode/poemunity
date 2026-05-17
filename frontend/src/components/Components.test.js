@@ -1,5 +1,4 @@
 import { render, waitFor } from '@testing-library/react'
-import { createMemoryHistory } from 'history'
 import Ranking from './Ranking/Ranking'
 import MyPoems from './MyPoems/MyPoems'
 import MyFavouritePoems from './MyFavouritePoems/MyFavouritePoems'
@@ -7,7 +6,6 @@ import Login from './Header/Login'
 import Logout from './Header/Logout'
 import Profile from './Profile/Profile'
 import Header from './Header/Header'
-import { BrowserRouter as Router } from 'react-router-dom'
 import '@testing-library/jest-dom'
 import store from '../redux/store'
 import { Provider } from 'react-redux'
@@ -52,7 +50,7 @@ describe('Login component', () => {
     const wrapperFactory = () => {
         const TestWrapper = ({ children }) => (
             <Provider store={store}>
-                <Router>{children}</Router>
+                {children}
             </Provider>
         )
         TestWrapper.displayName = 'TestWrapper'
@@ -92,9 +90,7 @@ describe('Profile component', () => {
     test('renders', () => {
         const { container } = render(
             <Provider store={store}>
-                <Router>
                     <Profile />
-                </Router>
             </Provider>
         )
         expect(container).not.toBeNull()
@@ -103,12 +99,9 @@ describe('Profile component', () => {
 
 describe('Header component', () => {
     test('renders', () => {
-        const history = createMemoryHistory()
         const { container } = render(
             <Provider store={store}>
-                <Router history={history}>
                     <Header />
-                </Router>
             </Provider>
         )
         expect(container).not.toBeNull()

@@ -1,9 +1,4 @@
 {
   "installCommand": "pnpm install --prod=false",
-  "buildCommand": "pnpm build",
-  "outputDirectory": "build",
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(?!api/).*", "dest": "/index.html" }
-  ]
+  "buildCommand": "pnpm build"
 }

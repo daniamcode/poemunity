@@ -1,18 +1,39 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../../redux/store'
 import { getAuthorPoemsAction } from '../../redux/actions/poemsActions'
+import { getTypes } from '../../redux/actions/commonActions'
+import { ACTIONS } from '../../redux/reducers/poemsReducers'
 import { PAGINATION_LIMIT } from '../../data/constants'
+import { Poem } from '../../typescript/interfaces'
 
-export function useAuthorPoems(slug: string) {
+export interface InitialAuthorPoemsData {
+    poems: Poem[]
+    page: number
+    hasMore: boolean
+    total: number
+}
+
+export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsData) {
     const dispatch = useAppDispatch()
     const authorPoemsQuery = useSelector((state: RootState) => state.authorPoemsQuery)
+    const isSeeded = useRef(false)
 
     useEffect(() => {
-        dispatch(getAuthorPoemsAction({ options: { reset: true, fetch: false } }))
+        if (initialData) {
+            const { fulfilledAction } = getTypes(ACTIONS.AUTHOR_POEMS)
+            dispatch({ type: fulfilledAction, payload: initialData })
+            isSeeded.current = true
+        } else {
+            dispatch(getAuthorPoemsAction({ options: { reset: true, fetch: false } }))
+        }
     }, [dispatch])
 
     useEffect(() => {
+        if (isSeeded.current) {
+            isSeeded.current = false
+            return
+        }
         if (!slug) return
         dispatch(
             getAuthorPoemsAction({
@@ -35,7 +56,7 @@ export function useAuthorPoems(slug: string) {
     }
 
     return {
-        poems: (authorPoemsQuery.item as any[]) || [],
+        poems: (authorPoemsQuery.item as Poem[]) || [],
         isLoading: authorPoemsQuery.isFetching,
         hasMore: authorPoemsQuery.hasMore || false,
         total: authorPoemsQuery.total || 0,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../../../redux/store'
 import { getPoemAction } from '../../../redux/actions/poemActions'
@@ -16,49 +16,28 @@ const initialPoemState: Poem = {
     userId: ''
 }
 
-export function useDetailPoem(poemId: string) {
-    const [poem, setPoem] = useState<Poem>(initialPoemState)
+export function useDetailPoem(poemId: string, initialPoem?: Poem) {
     const dispatch = useAppDispatch()
     const poemQuery = useSelector((state: RootState) => state.poemQuery)
 
-    // Initialize poem query on mount
     useEffect(() => {
-        const queryOptions = {
-            reset: true,
-            fetch: false
-        }
-        dispatch(
-            getPoemAction({
-                options: queryOptions
-            })
-        )
+        dispatch(getPoemAction({ options: { reset: true, fetch: false } }))
     }, [dispatch])
 
-    // Load poem when poemId changes
     useEffect(() => {
         if (poemId) {
-            const queryOptions = {
-                reset: true,
-                fetch: true
-            }
-            dispatch(
-                getPoemAction({
-                    params: { poemId },
-                    options: queryOptions
-                })
-            )
+            dispatch(getPoemAction({
+                params: { poemId },
+                options: { reset: true, fetch: true }
+            }))
         }
     }, [dispatch, poemId])
 
-    // Update local poem state when query data changes
-    useEffect(() => {
-        if (poemQuery?.item) {
-            setPoem(poemQuery.item)
-        }
-    }, [poemQuery?.item])
+    // Use Redux data when available, fall back to SSR data, then empty state
+    const poem: Poem = poemQuery?.item || initialPoem || initialPoemState
 
-    return {
-        poem,
-        isLoading: poemQuery.isFetching
-    }
+    // Show spinner only when we have no data at all (not while refreshing with fresh data)
+    const isLoading = poemQuery.isFetching && !poem.id
+
+    return { poem, isLoading }
 }

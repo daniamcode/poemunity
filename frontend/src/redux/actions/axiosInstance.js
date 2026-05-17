@@ -7,7 +7,7 @@ const getBaseURL = () => {
         return 'http://localhost:4201'
     }
     if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_API_URL
+        return process.env.NEXT_PUBLIC_API_URL
     }
     return 'http://localhost:4200'
 }

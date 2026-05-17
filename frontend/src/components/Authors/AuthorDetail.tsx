@@ -1,20 +1,15 @@
 import { useContext, useEffect, useState } from 'react'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { AppContext } from '../../App'
 import ListItem from '../ListItem/ListItem'
 import CircularProgress from '../CircularIndeterminate'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
-import { useAuthorPoems } from './useAuthorPoems'
+import { useAuthorPoems, InitialAuthorPoemsData } from './useAuthorPoems'
 import API from '../../redux/actions/axiosInstance'
 import { categoryToSlug } from '../../data/constants'
-import '../List/List.scss'
-import './Authors.scss'
 
-interface MatchParams {
-    slug: string
-}
-
-interface AuthorProfile {
+export interface AuthorProfile {
     name: string
     picture?: string
     type?: string
@@ -27,22 +22,24 @@ interface AuthorProfile {
     gender?: string
 }
 
-export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>) {
-    const { slug } = match.params
-    const context = useContext(AppContext)
-    const [authorProfile, setAuthorProfile] = useState<AuthorProfile | null>(null)
+interface AuthorDetailProps {
+    initialPoems?: InitialAuthorPoemsData
+    initialAuthor?: AuthorProfile | null
+}
 
-    const { poems, isLoading, hasMore, total, handleLoadMore } = useAuthorPoems(slug)
+export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDetailProps) {
+    const router = useRouter()
+    const slug = router.query.slug as string
+    const context = useContext(AppContext)
+    const [authorProfile, setAuthorProfile] = useState<AuthorProfile | null>(initialAuthor ?? null)
+
+    const { poems, isLoading, hasMore, total, handleLoadMore } = useAuthorPoems(slug, initialPoems)
 
     const authorName = authorProfile?.name
         || poems[0]?.authorName || poems[0]?.author
-        || slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+        || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '')
 
     const sentinelRef = useInfiniteScroll({ onLoadMore: handleLoadMore, hasMore, isLoading })
-
-    useEffect(() => {
-        document.title = `${authorName} - Poems | Poemunity`
-    }, [authorName])
 
     useEffect(() => {
         if (!slug) return
@@ -83,7 +80,7 @@ export default function AuthorDetail({ match }: RouteComponentProps<MatchParams>
                 {authorProfile?.preferredGenres && authorProfile.preferredGenres.length > 0 && (
                     <div className='author-detail__genres'>
                         {authorProfile.preferredGenres.map(genre => (
-                            <Link key={genre} to={`/${categoryToSlug(genre)}`} className='author-detail__genre-tag'>
+                            <Link key={genre} href={`/${categoryToSlug(genre)}`} className='author-detail__genre-tag'>
                                 {genre}
                             </Link>
                         ))}

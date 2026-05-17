@@ -1,66 +1,68 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useAppDispatch, RootState } from '../../../redux/store'
 import { getPoemsListAction } from '../../../redux/actions/poemsActions'
+import { getTypes } from '../../../redux/actions/commonActions'
+import { ACTIONS } from '../../../redux/reducers/poemsReducers'
 import sortPoems from '../../../utils/sortPoems'
 import { PAGINATION_LIMIT } from '../../../data/constants'
+import { Poem } from '../../../typescript/interfaces'
+
+export interface InitialPoemsData {
+    poems: Poem[]
+    page: number
+    hasMore: boolean
+    total: number
+    totalPages?: number
+}
 
 export interface UsePoemsListParams {
     genre?: string
     origin: string
     orderBy: string
+    initialData?: InitialPoemsData
 }
 
-export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
+export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsListParams) {
     const dispatch = useAppDispatch()
     const poemsListQuery = useSelector((state: RootState) => state.poemsListQuery)
+    const isSeeded = useRef(false)
 
-    // Initial reset on mount
+    // On mount: seed store with SSR data (skip reset+fetch) or do normal reset
     useEffect(() => {
-        const queryOptions = {
-            reset: true,
-            fetch: false
+        if (initialData) {
+            const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
+            dispatch({ type: fulfilledAction, payload: initialData })
+            isSeeded.current = true
+        } else {
+            dispatch(getPoemsListAction({ options: { reset: true, fetch: false } }))
         }
-        dispatch(
-            getPoemsListAction({
-                options: queryOptions
-            })
-        )
     }, [dispatch])
 
-    // Fetch poems when origin or genre changes
+    // Fetch when origin/genre changes — skip the first run if we seeded from SSR
     useEffect(() => {
-        function handleLoadPoems() {
-            if (origin) {
-                const queryOptions = {
-                    reset: true,
-                    fetch: true
-                }
-                dispatch(
-                    getPoemsListAction({
-                        params: {
-                            page: 1,
-                            limit: PAGINATION_LIMIT,
-                            ...(origin !== 'all' && { origin }),
-                            ...(genre && { genre })
-                        },
-                        options: queryOptions
-                    })
-                )
-            }
+        if (isSeeded.current) {
+            isSeeded.current = false
+            return
         }
-        handleLoadPoems()
+        if (origin) {
+            dispatch(
+                getPoemsListAction({
+                    params: {
+                        page: 1,
+                        limit: PAGINATION_LIMIT,
+                        ...(origin !== 'all' && { origin }),
+                        ...(genre && { genre })
+                    },
+                    options: { reset: true, fetch: true }
+                })
+            )
+        }
     }, [origin, genre, dispatch])
 
-    // Derive sorted/filtered poems directly from Redux state (no local state)
     const poems = (() => {
-        if (!poemsListQuery?.item?.length) {
-            return []
-        }
-
-        const data = [...poemsListQuery.item]
-
-        return sortPoems(orderBy, data)
+        if (!poemsListQuery?.item?.length) return []
+        return sortPoems(orderBy, [...poemsListQuery.item])
     })()
 
     const handleLoadMore = () => {
@@ -74,10 +76,7 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
                         ...(origin !== 'all' && { origin }),
                         ...(genre && { genre })
                     },
-                    options: {
-                        fetch: true,
-                        reset: false
-                    }
+                    options: { fetch: true, reset: false }
                 })
             )
         }
@@ -87,7 +86,7 @@ export function usePoemsList({ genre, origin, orderBy }: UsePoemsListParams) {
         poems,
         isLoading: poemsListQuery?.isFetching,
         hasMore: poemsListQuery?.hasMore || false,
-        hasItems: poemsListQuery?.item && poemsListQuery?.item?.length > 0,
+        hasItems: (poemsListQuery?.item?.length ?? 0) > 0,
         handleLoadMore
     }
 }

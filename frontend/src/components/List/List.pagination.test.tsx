@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 import List from './List'
 import store from '../../redux/store'
 import * as poemsActions from '../../redux/actions/poemsActions'
@@ -35,9 +34,7 @@ describe('List Component - Infinite Scrolling', () => {
     const renderList = (props = {}) =>
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List {...props} />
-                </BrowserRouter>
             </Provider>
         )
 

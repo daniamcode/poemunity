@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { READ_MORE } from '../../../data/constants'
 
 interface PoemContentProps {
@@ -11,7 +11,7 @@ export function PoemContent({ poemId, content }: PoemContentProps) {
         <section>
             <div className='poem__content poems__content'>{content}</div>
             <div className='poems__read-more'>
-                <Link to={`/detail/${poemId}`} className='poems__read-more'>
+                <Link href={`/detail/${poemId}`} className='poems__read-more'>
                     {READ_MORE}
                 </Link>
             </div>

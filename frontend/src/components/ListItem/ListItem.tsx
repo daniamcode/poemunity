@@ -1,7 +1,4 @@
 import React from 'react'
-import '../List/List.scss'
-import '../Detail/Detail.scss'
-import '../../App.scss'
 import normalizeString from '../../utils/normalizeString'
 import { Poem, Context } from '../../typescript/interfaces'
 import { PoemHeader, PoemContent, PoemFooter } from './components'
@@ -13,7 +10,7 @@ interface Props {
     context: Context
 }
 
-const ListItem = React.memo(({ poem, filter, context }: Props) => {
+const ListItem = React.memo(function ListItem({ poem, filter, context }: Props) {
     const { onDelete, onLike, onEdit } = usePoemActions({ poem, context })
 
     // Determine if the current user can see like button (not their own poem)

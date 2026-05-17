@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { getAuthorsByLetterAction, getAuthorsLettersAction } from '../../redux/actions/authorsActions'
+import { getTypes } from '../../redux/actions/commonActions'
+import { ACTIONS } from '../../redux/reducers/authorsReducers'
 import { RootState, useAppDispatch } from '../../redux/store'
 import { Author } from '../../typescript/interfaces'
-import './Authors.scss'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 const ORIGIN_FILTERS = [
@@ -14,23 +15,50 @@ const ORIGIN_FILTERS = [
     { value: 'ai', label: 'AI' }
 ]
 
-export default function AuthorsIndex() {
+interface AuthorsIndexProps {
+    initialLetters?: string[]
+    initialAuthors?: Author[]
+}
+
+export default function AuthorsIndex({ initialLetters, initialAuthors }: AuthorsIndexProps) {
     const dispatch = useAppDispatch()
     const [activeLetter, setActiveLetter] = useState('A')
     const [activeOrigin, setActiveOrigin] = useState('all')
+    const lettersSeeded = useRef(false)
+    const authorsSeeded = useRef(false)
 
     const { item: letters } = useSelector((state: RootState) => state.authorsLettersQuery)
     const { item: authors, isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
 
     useEffect(() => {
-        document.title = 'Authors | Poemunity'
-    }, [])
+        if (initialLetters) {
+            const { fulfilledAction } = getTypes(ACTIONS.AUTHORS_LETTERS)
+            dispatch({ type: fulfilledAction, payload: initialLetters })
+            lettersSeeded.current = true
+        }
+    }, [dispatch])
 
     useEffect(() => {
+        if (initialAuthors) {
+            const { fulfilledAction } = getTypes(ACTIONS.AUTHORS_BY_LETTER)
+            dispatch({ type: fulfilledAction, payload: initialAuthors })
+            authorsSeeded.current = true
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        if (lettersSeeded.current) {
+            lettersSeeded.current = false
+            return
+        }
         dispatch(getAuthorsLettersAction({ origin: activeOrigin }))
     }, [activeOrigin])
 
     useEffect(() => {
+        if (authorsSeeded.current) {
+            authorsSeeded.current = false
+            return
+        }
         dispatch(getAuthorsByLetterAction({ letter: activeLetter, origin: activeOrigin }))
     }, [activeLetter, activeOrigin])
 
@@ -82,7 +110,7 @@ export default function AuthorsIndex() {
                     <Link
                         key={author.slug}
                         className='authors-index__author'
-                        to={`/authors/${author.slug}`}
+                        href={`/authors/${author.slug}`}
                     >
                         <span className='authors-index__author-name'>{author.name}</span>
                         <span className='authors-index__author-count'>{author.count} poems</span>

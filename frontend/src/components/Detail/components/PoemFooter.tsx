@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
 import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
@@ -56,7 +56,7 @@ export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFoot
                 />
             )}
 
-            <Link to={`/detail/${poem.id}`} className='poem__comments-icon'>
+            <Link href={`/detail/${poem.id}`} className='poem__comments-icon'>
                 <SubjectSharpIcon
                     style={{
                         fill: '#000'

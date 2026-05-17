@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useRouter } from 'next/router'
 import { useAppDispatch } from '../../../redux/store'
 import { getPoemAction, savePoemAction } from '../../../redux/actions/poemActions'
 import {
@@ -42,20 +42,16 @@ const initialPoemState: PoemFormData = {
     likes: []
 }
 
-export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any, location: any): UseProfileFormReturn {
+export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any): UseProfileFormReturn {
     const dispatch = useAppDispatch()
-    const history = useHistory()
+    const router = useRouter()
     const isAdmin = context?.userId === context?.adminId
 
     // Get elementToEdit from URL query params (e.g., /profile?edit=poemId)
-    const searchParams = new URLSearchParams(location.search)
-    const elementToEdit = searchParams.get('edit') || ''
+    const elementToEdit = (router.query.edit as string) || ''
     const isEditing = Boolean(elementToEdit)
 
-    // Get poem data from location state (passed during navigation for immediate loading)
-    const locationState = location.state
-
-    // Track if we initialized from cache to avoid unnecessary fetches
+    // Navigation state is not available in Next.js — edit param drives all loading
     const initializedFromCache = React.useRef(false)
 
     // Track previous elementToEdit to detect when user switches between poems
@@ -66,20 +62,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
     const [poem, setPoem] = useState<PoemFormData>(() => {
         // If editing, try to get poem data from cache to avoid flicker
         if (isEditing) {
-            // HIGHEST PRIORITY: location state (passed during navigation)
-            if (locationState?.poemData) {
-                initializedFromCache.current = true
-                return {
-                    title: locationState.poemData.title || '',
-                    content: locationState.poemData.poem || '',
-                    fakeId: locationState.poemData.userId || '',
-                    likes: locationState.poemData.likes?.toString() || [],
-                    category: locationState.poemData.genre || '',
-                    origin: locationState.poemData.origin || ''
-                }
-            }
-
-            // Second priority: poemQuery (most specific cache)
+            // First priority: poemQuery (most specific cache)
             if (poemQuery?.item && poemQuery.item.id === elementToEdit) {
                 return {
                     title: poemQuery.item.title || '',
@@ -128,11 +111,11 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 Array.isArray(poemsListQuery?.item) && poemsListQuery.item.some((p: any) => p.id === elementToEdit)
 
             // If we initialized from cache, never fetch
-            if (initializedFromCache.current && (alreadyInPoemsList || locationState?.poemData)) {
+            if (initializedFromCache.current && alreadyInPoemsList) {
                 return
             }
 
-            if (!alreadyInPoemQuery && !alreadyInPoemsList && !locationState?.poemData) {
+            if (!alreadyInPoemQuery && !alreadyInPoemsList) {
                 dispatch(
                     getPoemAction({
                         params: { poemId: elementToEdit },
@@ -141,7 +124,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 )
             }
         }
-    }, [dispatch, isEditing, elementToEdit, poemQuery?.item?.id, poemsListQuery?.item, locationState?.poemData])
+    }, [dispatch, isEditing, elementToEdit, poemQuery?.item?.id, poemsListQuery?.item])
 
     // Detect when user switches from one poem to another and reset form
     useEffect(() => {
@@ -227,7 +210,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         dispatch(updatePoemsListCacheAfterSavePoemAction(updatePayload))
                         manageSuccess('Poem saved')
                         // Clear edit state by navigating to profile without query params
-                        history.push('/profile')
+                        router.push('/profile')
                         setPoem(initialPoemState)
                     },
                     error: () => {
@@ -259,7 +242,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
     function handleCancel(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault()
         // Exit edit mode by navigating to profile without query params
-        history.push('/profile')
+        router.push('/profile')
         setPoem(initialPoemState)
     }
 

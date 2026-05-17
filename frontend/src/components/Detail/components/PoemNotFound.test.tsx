@@ -1,10 +1,9 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemNotFound } from './PoemNotFound'
 
 const renderWithRouter = (component: React.ReactElement) => {
-    return render(<BrowserRouter>{component}</BrowserRouter>)
+    return render(component)
 }
 
 describe('PoemNotFound', () => {

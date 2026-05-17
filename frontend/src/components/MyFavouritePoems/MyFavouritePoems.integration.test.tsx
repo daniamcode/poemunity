@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import MyFavouritePoems from './MyFavouritePoems'
@@ -52,7 +51,7 @@ describe('MyFavouritePoems - Integration Tests', () => {
         return render(
             <Provider store={testStore}>
                 <AppContext.Provider value={mockContext}>
-                    <BrowserRouter>{component}</BrowserRouter>
+                    {component}
                 </AppContext.Provider>
             </Provider>
         )

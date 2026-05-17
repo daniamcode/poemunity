@@ -1,12 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { LikeButton } from './LikeButton'
 
 describe('LikeButton', () => {
     const mockOnLike = jest.fn()
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(<BrowserRouter>{component}</BrowserRouter>)
+        return render(component)
     }
 
     beforeEach(() => {
@@ -104,9 +103,7 @@ describe('LikeButton', () => {
 
             // Re-render with isLiked=true (simulating successful like action)
             rerender(
-                <BrowserRouter>
                     <LikeButton isLiked={true} onLike={mockOnLike} show={true} />
-                </BrowserRouter>
             )
 
             // Now should be liked

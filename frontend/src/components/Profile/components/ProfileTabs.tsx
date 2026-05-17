@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import SwipeableViews from 'react-swipeable-views'
 import { PROFILE_POEMS, PROFILE_FAVOURITE_POEMS } from '../../../data/constants'
 import MyPoems from '../../MyPoems/MyPoems'
 import MyFavouritePoems from '../../MyFavouritePoems/MyFavouritePoems'
@@ -15,7 +14,7 @@ interface ProfileTabsProps {
     handleChangeIndex: (index: number) => void
 }
 
-function ProfileTabs({ value, handleChange, handleChangeIndex }: ProfileTabsProps) {
+function ProfileTabs({ value, handleChange }: ProfileTabsProps) {
     const theme = useTheme()
 
     return (
@@ -36,18 +35,12 @@ function ProfileTabs({ value, handleChange, handleChangeIndex }: ProfileTabsProp
                 </AppBar>
             </div>
             <div className='profile__tabs-content'>
-                <SwipeableViews
-                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                    index={value}
-                    onChangeIndex={handleChangeIndex}
-                >
-                    <TabPanel className='profile__myPoems' value={value} index={0} dir={theme.direction}>
-                        <MyPoems />
-                    </TabPanel>
-                    <TabPanel className='profile__myPoems' value={value} index={1} dir={theme.direction}>
-                        <MyFavouritePoems />
-                    </TabPanel>
-                </SwipeableViews>
+                <TabPanel className='profile__myPoems' value={value} index={0} dir={theme.direction}>
+                    <MyPoems />
+                </TabPanel>
+                <TabPanel className='profile__myPoems' value={value} index={1} dir={theme.direction}>
+                    <MyFavouritePoems />
+                </TabPanel>
             </div>
         </section>
     )

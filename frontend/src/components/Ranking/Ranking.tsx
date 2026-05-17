@@ -1,6 +1,5 @@
 import { useState, useEffect, memo } from 'react'
-import { Link } from 'react-router-dom'
-import './Ranking.scss'
+import Link from 'next/link'
 import { getRanking, RankItem } from '../../utils/getRanking'
 import CircularProgress from '../CircularIndeterminate'
 import {
@@ -53,7 +52,7 @@ function Ranking() {
                     return (
                         <Link 
                             key={index} 
-                            to={`/authors/${authorSlug}`} 
+                            href={`/authors/${authorSlug}`} 
                             className='ranking__item'
                         >
                             <span className={`ranking__rank-number ranking__rank-number--${rankPos}`}>

@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import MyPoems from './MyPoems'
 import { AppContext } from '../../App'
@@ -16,7 +15,7 @@ jest.mock('../../utils/notifications', () => ({
 jest.mock('../../redux/actions/poemActions', () => ({
     ...jest.requireActual('../../redux/actions/poemActions'),
     deletePoemAction: jest.fn(({ callbacks }) => {
-        return (dispatch: any) => {
+        return (_dispatch: any) => {
             // Simulate successful deletion
             if (callbacks?.success) {
                 callbacks.success()
@@ -42,7 +41,7 @@ describe('MyPoems - Delete Integration Tests', () => {
         return render(
             <Provider store={store}>
                 <AppContext.Provider value={mockContext}>
-                    <BrowserRouter>{component}</BrowserRouter>
+                    {component}
                 </AppContext.Provider>
             </Provider>
         )

@@ -1,6 +1,5 @@
 import { render } from '@testing-library/react'
 import Logout from './Logout'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from '../../redux/store'
 
@@ -15,9 +14,7 @@ function renderLogout(arg) {
 
     return render(
         <Provider store={store}>
-            <BrowserRouter>
                 <Logout {...props} />
-            </BrowserRouter>
         </Provider>
     )
 }

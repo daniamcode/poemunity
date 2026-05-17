@@ -39,7 +39,7 @@ describe('ListHeader', () => {
     })
 
     test('should pass correct props to sub-components', () => {
-        const { container } = render(<ListHeader {...mockProps} />)
+        render(<ListHeader {...mockProps} />)
 
         const originSelect = screen.getByLabelText(/authors:/i) as HTMLSelectElement
         const sortSelect = screen.getByTestId('order-select') as HTMLSelectElement

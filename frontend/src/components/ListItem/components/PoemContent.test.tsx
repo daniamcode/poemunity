@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemContent } from './PoemContent'
 import { READ_MORE } from '../../../data/constants'
 
@@ -10,7 +9,7 @@ describe('PoemContent', () => {
     }
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(<BrowserRouter>{component}</BrowserRouter>)
+        return render(component)
     }
 
     test('should render poem content', () => {

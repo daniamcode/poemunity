@@ -477,64 +477,57 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
     class="profile__tabs-content"
   >
     <div
-      style="overflow-x: hidden;"
+      aria-labelledby="full-width-tab-0"
+      class="profile__myPoems"
+      dir="ltr"
+      id="full-width-tabpanel-0"
+      role="tabpanel"
     >
       <div
-        class="react-swipeable-view-container"
-        style="flex-direction: row; transition: all 0s ease 0s; direction: ltr; display: flex; will-change: transform;"
+        class="MuiBox-root css-19kzrtu"
       >
-        <div
-          aria-hidden="false"
-          data-swipeable="true"
-          style="width: 100%; flex-shrink: 0; overflow: auto;"
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
         >
           <div
-            aria-labelledby="full-width-tab-0"
-            class="profile__myPoems"
-            dir="ltr"
-            id="full-width-tabpanel-0"
-            role="tabpanel"
+            class="list__intro"
           >
             <div
-              class="MuiBox-root css-19kzrtu"
+              class="search-input__container"
             >
-              <p
-                class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-input__icon css-1umw9bq-MuiSvgIcon-root"
+                data-testid="SearchIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
               >
-                <div
-                  class="list__intro"
-                >
-                  <div
-                    class="search-input__container"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-input__icon css-1umw9bq-MuiSvgIcon-root"
-                      data-testid="SearchIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
-                      />
-                    </svg>
-                    <input
-                      aria-label="Search an author"
-                      class="search-input__field"
-                      placeholder="Search an author"
-                      type="text"
-                    />
-                  </div>
-                </div>
-                <div
-                  style="height: 20px;"
+                <path
+                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
                 />
-              </p>
+              </svg>
+              <input
+                aria-label="Search an author"
+                class="search-input__field"
+                placeholder="Search an author"
+                type="text"
+              />
             </div>
           </div>
-        </div>
+          <div
+            style="height: 20px;"
+          />
+        </p>
       </div>
     </div>
+    <div
+      aria-labelledby="full-width-tab-1"
+      class="profile__myPoems"
+      dir="ltr"
+      hidden=""
+      id="full-width-tabpanel-1"
+      role="tabpanel"
+    />
   </div>
 </section>
 `;

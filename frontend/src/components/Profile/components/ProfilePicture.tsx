@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import API from '../../../redux/actions/axiosInstance'
 import { resizeImageToBase64 } from '../../../utils/imageUtils'
 import { Context } from '../../../typescript/interfaces'
@@ -45,6 +45,7 @@ export default function ProfilePicture({ context }: Props) {
     return (
         <div className='profile__picture-wrapper' onClick={handleClick}>
             {context?.picture ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                     className='profile__image'
                     src={context.picture}

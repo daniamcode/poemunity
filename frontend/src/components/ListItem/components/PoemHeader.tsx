@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { format } from 'date-fns'
 import { AuthorAvatar } from './AuthorAvatar'
 import { slugify } from '../../../utils/urlUtils'
@@ -17,14 +17,14 @@ export function PoemHeader({ poemId, title, author, picture, date, authorSlug: a
 
     return (
         <section>
-            <Link to={`/detail/${poemId}`} className='poem__title'>
+            <Link href={`/detail/${poemId}`} className='poem__title'>
                 {title}
             </Link>
             <div className='poem__author-container'>
-                <Link to={`/authors/${authorSlug}`}>
+                <Link href={`/authors/${authorSlug}`}>
                     <AuthorAvatar name={author} picture={picture} />
                 </Link>
-                <Link to={`/authors/${authorSlug}`} className='poem__author'>
+                <Link href={`/authors/${authorSlug}`} className='poem__author'>
                     {author}
                 </Link>
             </div>

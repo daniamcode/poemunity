@@ -1,17 +1,14 @@
 import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import './Register.scss'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { registerAction } from '../../redux/actions/loginActions'
-import { useHistory } from 'react-router-dom'
 import { useAppDispatch } from '../../redux/store'
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const history = useHistory()
-
-    // Redux
+    const router = useRouter()
     const dispatch = useAppDispatch()
 
     const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
@@ -25,7 +22,7 @@ const Register: React.FC = () => {
                 },
                 callbacks: {
                     success: () => {
-                        history.push('/login')
+                        router.push('/login')
                     },
                     error: () => {
                         console.error('Something went wrong')
@@ -71,7 +68,7 @@ const Register: React.FC = () => {
                     <button disabled={username.length === 0 || email.length === 0 || password.length === 0}>
                         Register
                     </button>
-                    <NavLink to='/login'>Login</NavLink>
+                    <Link href='/login'>Login</Link>
                 </form>
             </div>
         </div>

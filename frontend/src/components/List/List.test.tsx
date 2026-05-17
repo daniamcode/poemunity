@@ -6,8 +6,6 @@ import store from '../../redux/store'
 import { Provider } from 'react-redux'
 import * as Redux from 'react-redux'
 import { ORDER_BY_RANDOM, ORDER_BY_DATE, ORDER_BY_LIKES, ORDER_BY_TITLE } from '../../data/constants'
-import { Helmet } from 'react-helmet'
-import { BrowserRouter } from 'react-router-dom'
 import * as poemsActions from '../../redux/actions/poemsActions'
 import * as urlUtils from '../../utils/urlUtils'
 import { Poem } from '../../typescript/interfaces'
@@ -17,7 +15,6 @@ jest.mock('react-redux', () => ({
     ...jest.requireActual('react-redux'),
     useSelector: jest.fn()
 }))
-jest.mock('react-helmet')
 jest.mock('../../redux/actions/poemsActions')
 jest.mock('../../utils/urlUtils', () => ({
     ...jest.requireActual('../../utils/urlUtils'),
@@ -110,9 +107,7 @@ describe('List', () => {
     test('Should select order by random', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -134,18 +129,6 @@ describe('List', () => {
         })
     })
 
-    test('Should call Helmet', () => {
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List />
-                </BrowserRouter>
-            </Provider>
-        )
-        expect(Helmet).toHaveBeenCalled()
-        expect((Helmet as unknown as jest.Mock).mock.calls[0][0]).toBeTruthy()
-    })
-
     test('Should render CircularProgress on initial load when fetching', () => {
         ;(Redux.useSelector as jest.Mock).mockImplementation(callback => {
             return callback({
@@ -159,9 +142,7 @@ describe('List', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -184,9 +165,7 @@ describe('List', () => {
         await act(async () => {
             render(
                 <Provider store={store}>
-                    <BrowserRouter>
                         <List />
-                    </BrowserRouter>
                 </Provider>
             )
         })
@@ -212,9 +191,7 @@ describe('List', () => {
         await act(async () => {
             render(
                 <Provider store={store}>
-                    <BrowserRouter>
                         <List />
-                    </BrowserRouter>
                 </Provider>
             )
         })
@@ -240,9 +217,7 @@ describe('List', () => {
         await act(async () => {
             render(
                 <Provider store={store}>
-                    <BrowserRouter>
                         <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
-                    </BrowserRouter>
                 </Provider>
             )
         })
@@ -254,9 +229,7 @@ describe('List', () => {
     test('Should display genre title when genre is provided', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
-                    <List match={{ params: { genre: 'love' }, isExact: true, path: '/love', url: '/love' }} />
-                </BrowserRouter>
+                    <List genre='love' />
             </Provider>
         )
 
@@ -267,35 +240,17 @@ describe('List', () => {
     test('Should NOT display genre title when genre is not provided', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
         expect(screen.queryByText(/Category:/i)).not.toBeInTheDocument()
     })
 
-    test('Should update Helmet title based on genre', () => {
-        render(
-            <Provider store={store}>
-                <BrowserRouter>
-                    <List match={{ params: { genre: 'sad' }, isExact: true, path: '/sad', url: '/sad' }} />
-                </BrowserRouter>
-            </Provider>
-        )
-
-        const helmetCalls = (Helmet as unknown as jest.Mock).mock.calls
-        const lastCall = helmetCalls[helmetCalls.length - 1][0]
-        expect(lastCall.children.props.children).toBe('Sad poems')
-    })
-
     test('Should handle search input change', () => {
         const { container } = render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -309,9 +264,7 @@ describe('List', () => {
     test('Should handle order by change to Date', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -331,9 +284,7 @@ describe('List', () => {
     test('Should handle order by change to Likes', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -349,9 +300,7 @@ describe('List', () => {
     test('Should handle order by change to Title', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -367,9 +316,7 @@ describe('List', () => {
     test('Should handle origin filter change to Famous', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -389,9 +336,7 @@ describe('List', () => {
     test('Should handle origin filter change to Users', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -411,9 +356,7 @@ describe('List', () => {
     test('Should dispatch getPoemsListAction on mount with reset and no fetch', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -433,9 +376,7 @@ describe('List', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -460,9 +401,7 @@ describe('List', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -490,9 +429,7 @@ describe('List', () => {
         await act(async () => {
             render(
                 <Provider store={store}>
-                    <BrowserRouter>
                         <List />
-                    </BrowserRouter>
                 </Provider>
             )
         })
@@ -504,9 +441,7 @@ describe('List', () => {
     test('Should render search icon', () => {
         const { container } = render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -516,9 +451,7 @@ describe('List', () => {
     test('Should have correct CSS classes', () => {
         const { container } = render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -531,9 +464,7 @@ describe('List', () => {
     test('Should render all origin options', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -545,9 +476,7 @@ describe('List', () => {
     test('Should render all order by options', () => {
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <List />
-                </BrowserRouter>
             </Provider>
         )
 

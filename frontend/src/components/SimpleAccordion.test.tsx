@@ -1,11 +1,10 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import SimpleAccordion from './SimpleAccordion'
 import { CATEGORIES_TITLE, CATEGORIES, MUST_HAVE_CATEGORIES, ALL, CATEGORIES_BROWSE_ALL, categoryToSlug } from '../data/constants'
 
 const renderWithRouter = (component: React.ReactElement) => {
-    return render(<BrowserRouter>{component}</BrowserRouter>)
+    return render(component)
 }
 
 describe('SimpleAccordion', () => {
@@ -162,9 +161,7 @@ describe('SimpleAccordion', () => {
         expect(accordion).not.toHaveClass('Mui-expanded')
 
         rerender(
-            <BrowserRouter>
                 <SimpleAccordion genre='love' />
-            </BrowserRouter>
         )
 
         expect(accordion).toHaveClass('Mui-expanded')

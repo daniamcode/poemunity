@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react'
 import { useInfiniteScroll } from './useInfiniteScroll'
 
 describe('useInfiniteScroll', () => {

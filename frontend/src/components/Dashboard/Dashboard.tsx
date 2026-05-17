@@ -1,26 +1,26 @@
-import '../List/List.scss'
-import '../Detail/Detail.scss'
-import '../../App.scss'
-import '../Dashboard/Dashboard.scss'
+import { useRouter } from 'next/router'
 import Accordion from '../SimpleAccordion'
 import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
 import List from '../List/List'
-import { RouteComponentProps } from 'react-router-dom'
+import { InitialPoemsData } from '../List/hooks/usePoemsList'
 
-interface MatchParams {
-    genre?: string
+interface DashboardProps {
+    initialData?: InitialPoemsData
 }
 
-function Dashboard(props: RouteComponentProps<MatchParams>) {
+function Dashboard({ initialData }: DashboardProps) {
+    const router = useRouter()
+    const genre = router.query.genre as string | undefined
+
     return (
-        <main className='dashboard'>
+        <main className='dashboard' data-testid='dashboard-component'>
             <div className='dashboard__accordion'>
-                <Accordion genre={props.match.params.genre} />
+                <Accordion genre={genre} />
                 <AuthorsAccordion />
             </div>
             <div className='dashboard__list'>
-                <List {...props} />
+                <List genre={genre} initialData={initialData} />
             </div>
             <div className='dashboard__ranking'>
                 <Ranking />
@@ -28,4 +28,5 @@ function Dashboard(props: RouteComponentProps<MatchParams>) {
         </main>
     )
 }
+
 export default Dashboard

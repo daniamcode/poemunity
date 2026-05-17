@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react'
-import { createBrowserHistory } from 'history'
-
-const history = createBrowserHistory()
 
 export function parseQuery(url: string = window.location.search): Record<string, any> {
     const urlParams = new URLSearchParams(url)
@@ -50,10 +47,7 @@ export function addQueryParam({ id, value }: addQueryParamProps) {
         const urlParams = new URLSearchParams(window.location.search)
         const parsedValue = JSON.stringify(value)
         urlParams.set(id, parsedValue)
-        history.push({
-            search: urlParams.toString(),
-            pathname: history.location.pathname
-        })
+        window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
     } catch (error: any) {
         console.error(error.stack)
     }
@@ -73,11 +67,8 @@ export function addQueryParams(data: { key: string; value: string }[], keysToDel
             urlParams.set(key, parsedValue)
         })
         const newQuery = urlParams.toString()
-        if (newQuery !== window.location.search) {
-            history.push({
-                search: urlParams.toString(),
-                pathname: history.location.pathname
-            })
+        if (newQuery !== window.location.search.slice(1)) {
+            window.history.pushState({}, '', `${window.location.pathname}?${newQuery}`)
         }
     } catch (error: any) {
         console.error(error.stack)

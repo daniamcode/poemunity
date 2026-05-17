@@ -1,26 +1,20 @@
 import React from 'react'
 import { useState, useContext, useCallback } from 'react'
 import { AppContext } from '../../App'
-import './List.scss'
-import '../Detail/Detail.scss'
-import '../../App.scss'
 import CircularProgress from '../CircularIndeterminate'
-import { Helmet } from 'react-helmet'
-import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter'
 import normalizeString from '../../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../../utils/urlUtils'
 import ListItem from '../ListItem/ListItem'
-import { RouteComponentProps } from 'react-router-dom'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { ListHeader } from './components/ListHeader'
-import { usePoemsList } from './hooks/usePoemsList'
+import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
 
-interface MatchParams {
+interface ListProps {
     genre?: string
+    initialData?: InitialPoemsData
 }
 
-function List(props: Partial<RouteComponentProps<MatchParams>>) {
-    const genre = props?.match?.params?.genre
+function List({ genre, initialData }: ListProps) {
     const [filter, setFilter] = useState<string>('')
 
     const [paramsData, setParamsData] = useFiltersFromQuery({
@@ -34,7 +28,8 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
     const { poems, isLoading, hasMore, hasItems, handleLoadMore } = usePoemsList({
         genre,
         origin: paramsData.origin,
-        orderBy: paramsData.orderBy
+        orderBy: paramsData.orderBy,
+        initialData
     })
 
     // Setup infinite scroll
@@ -47,13 +42,13 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
     const handleOrderChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value
         addQueryParam({ id: 'orderBy', value })
-        setParamsData(prev => ({ ...prev, orderBy: value }))
+        setParamsData((prev: any) => ({ ...prev, orderBy: value }))
     }, [])
 
     const handleOriginChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value
         addQueryParam({ id: 'origin', value })
-        setParamsData(prev => ({ ...prev, origin: value }))
+        setParamsData((prev: any) => ({ ...prev, origin: value }))
     }, [])
 
     const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,9 +62,6 @@ function List(props: Partial<RouteComponentProps<MatchParams>>) {
 
     return (
         <>
-            <Helmet>
-                <title>{genre ? `${capitalizeFirstLetter(genre)} poems` : 'Poemunity'}</title>
-            </Helmet>
             <div className='list__container'>
                 <ListHeader
                     genre={genre}

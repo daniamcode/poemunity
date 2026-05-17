@@ -5,6 +5,8 @@ import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js'
 import { fixupConfigRules } from '@eslint/compat'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import unusedImports from 'eslint-plugin-unused-imports'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import nextPlugin from '@next/eslint-plugin-next'
 
 export default [
     {
@@ -14,14 +16,28 @@ export default [
         languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } }
     },
     {
-        languageOptions: { globals: globals.browser }
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                process: 'readonly' // Next.js polyfills process for both client and server
+            }
+        }
+    },
+    // Server-side utilities run in Node.js (getServerSideProps, API routes)
+    {
+        files: ['src/lib/**/*.{ts,js}', 'pages/api/**/*.{ts,js}'],
+        languageOptions: { globals: { ...globals.node } }
     },
     {
-        files: ['**/build*.js'],
-        languageOptions: { globals: { ...globals.node } },
+        plugins: {
+            'react-hooks': pluginReactHooks,
+            '@next/next': nextPlugin
+        },
         rules: {
-            '@typescript-eslint/no-require-imports': 'off',
-            'no-console': 'off'
+            ...pluginReactHooks.configs.recommended.rules,
+            'react-hooks/exhaustive-deps': 'off', // pre-existing violations; enable and fix separately
+            ...nextPlugin.configs.recommended.rules,
+            ...nextPlugin.configs['core-web-vitals'].rules
         }
     },
     {
@@ -299,9 +315,14 @@ export default [
             ]
         }
     },
-    // Test files: Allow Node.js globals and relax strict rules
+    // Test files and Jest setup: Allow Node.js globals and relax strict rules
     {
-        files: ['**/*.test.{js,ts,jsx,tsx}', '**/*.spec.{js,ts,jsx,tsx}', '**/__tests__/**/*.{js,ts,jsx,tsx}'],
+        files: [
+            '**/*.test.{js,ts,jsx,tsx}',
+            '**/*.spec.{js,ts,jsx,tsx}',
+            '**/__tests__/**/*.{js,ts,jsx,tsx}',
+            '**/setupTests.ts'
+        ],
         languageOptions: {
             globals: {
                 ...globals.jest,
@@ -311,9 +332,11 @@ export default [
         rules: {
             '@typescript-eslint/no-var-requires': 'off', // Allow require() in tests for dynamic imports/mocking
             '@typescript-eslint/no-require-imports': 'off', // Allow require() in tests
+            '@typescript-eslint/no-unused-vars': 'off', // unused-imports plugin handles this with _ prefix support
             'no-undef': 'off', // TypeScript handles this, and Node.js globals are available
             'no-console': 'off', // Allow console in tests
-            'max-lines': 'off' // Allow longer test files
+            'max-lines': 'off', // Allow longer test files
+            'max-len': 'off' // Allow long lines in tests (long assertion strings are common)
         }
     }
 ]

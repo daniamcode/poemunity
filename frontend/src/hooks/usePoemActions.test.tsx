@@ -1,4 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
+import mockRouter from 'next-router-mock'
 import { usePoemActions } from './usePoemActions'
 import * as poemActions from '../redux/actions/poemActions'
 import * as poemsActions from '../redux/actions/poemsActions'
@@ -9,14 +10,6 @@ import { Poem, Context } from '../typescript/interfaces'
 jest.mock('../redux/actions/poemActions')
 jest.mock('../redux/actions/poemsActions')
 jest.mock('../utils/notifications')
-
-const mockHistoryPush = jest.fn()
-jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useHistory: () => ({
-        push: mockHistoryPush
-    })
-}))
 
 const mockDispatch = jest.fn()
 
@@ -209,12 +202,7 @@ describe('usePoemActions', () => {
 
         result.current.onEdit()
 
-        expect(mockHistoryPush).toHaveBeenCalledWith({
-            pathname: '/profile',
-            search: '?edit=poem-123',
-            state: {
-                poemData: mockPoem
-            }
-        })
+        expect(mockRouter.pathname).toBe('/profile')
+        expect(mockRouter.query).toEqual({ edit: 'poem-123' })
     })
 })

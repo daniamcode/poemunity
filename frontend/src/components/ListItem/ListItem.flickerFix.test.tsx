@@ -1,5 +1,4 @@
 import { render, screen, waitFor, act } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
@@ -47,7 +46,7 @@ describe('ListItem - No Flicker Tests', () => {
     const renderWithProviders = (component: React.ReactElement) => {
         return render(
             <Provider store={store}>
-                <BrowserRouter>{component}</BrowserRouter>
+                {component}
             </Provider>
         )
     }
@@ -73,9 +72,7 @@ describe('ListItem - No Flicker Tests', () => {
             await act(async () => {
                 rerender(
                     <Provider store={store}>
-                        <BrowserRouter>
                             <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                        </BrowserRouter>
                     </Provider>
                 )
             })
@@ -114,26 +111,22 @@ describe('ListItem - No Flicker Tests', () => {
                 likes: ['user-1', 'user-2']
             }
 
-            // Simulate rapid re-renders (like what might happen with multiple Redux dispatches)
-            await act(async () => {
-                for (let i = 0; i < 5; i++) {
+            // Each rerender gets its own act so React 18 flushes the DOM between iterations
+            for (let i = 0; i < 5; i++) {
+                await act(async () => {
                     rerender(
                         <Provider store={store}>
-                            <BrowserRouter>
                                 <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                            </BrowserRouter>
                         </Provider>
                     )
+                })
 
-                    // Capture icon state after each render
-                    await new Promise(resolve => setTimeout(resolve, 10))
-                    if (screen.queryByTestId('like-icon')) {
-                        iconStates.push('liked')
-                    } else if (screen.queryByTestId('unlike-icon')) {
-                        iconStates.push('unliked')
-                    }
+                if (screen.queryByTestId('like-icon')) {
+                    iconStates.push('liked')
+                } else if (screen.queryByTestId('unlike-icon')) {
+                    iconStates.push('unliked')
                 }
-            })
+            }
 
             // All states should be 'unliked' - no flicker to 'liked'
             expect(iconStates).toEqual(['unliked', 'unliked', 'unliked', 'unliked', 'unliked'])
@@ -161,9 +154,7 @@ describe('ListItem - No Flicker Tests', () => {
             await act(async () => {
                 rerender(
                     <Provider store={store}>
-                        <BrowserRouter>
                             <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                        </BrowserRouter>
                     </Provider>
                 )
             })
@@ -202,26 +193,22 @@ describe('ListItem - No Flicker Tests', () => {
                 likes: ['user-1', 'user-2', 'user-456']
             }
 
-            // Simulate rapid re-renders
-            await act(async () => {
-                for (let i = 0; i < 5; i++) {
+            // Each rerender gets its own act so React 18 flushes the DOM between iterations
+            for (let i = 0; i < 5; i++) {
+                await act(async () => {
                     rerender(
                         <Provider store={store}>
-                            <BrowserRouter>
                                 <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                            </BrowserRouter>
                         </Provider>
                     )
+                })
 
-                    // Capture icon state after each render
-                    await new Promise(resolve => setTimeout(resolve, 10))
-                    if (screen.queryByTestId('like-icon')) {
-                        iconStates.push('liked')
-                    } else if (screen.queryByTestId('unlike-icon')) {
-                        iconStates.push('unliked')
-                    }
+                if (screen.queryByTestId('like-icon')) {
+                    iconStates.push('liked')
+                } else if (screen.queryByTestId('unlike-icon')) {
+                    iconStates.push('unliked')
                 }
-            })
+            }
 
             // All states should be 'liked' - no flicker to 'unliked'
             expect(iconStates).toEqual(['liked', 'liked', 'liked', 'liked', 'liked'])
@@ -241,22 +228,19 @@ describe('ListItem - No Flicker Tests', () => {
                 likes: ['user-1', 'user-2']
             }
 
-            await act(async () => {
-                for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
+                await act(async () => {
                     rerender(
                         <Provider store={store}>
-                            <BrowserRouter>
                                 <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                            </BrowserRouter>
                         </Provider>
                     )
+                })
 
-                    await new Promise(resolve => setTimeout(resolve, 10))
-                    const likesText = screen.getByText(/\d+ Like(s)?/i).textContent
-                    const count = parseInt(likesText?.match(/\d+/)?.[0] || '0')
-                    likesCounts.push(count)
-                }
-            })
+                const likesText = screen.getByText(/\d+ Like(s)?/i).textContent
+                const count = parseInt(likesText?.match(/\d+/)?.[0] || '0')
+                likesCounts.push(count)
+            }
 
             // All counts should be 2 - no flicker to 3
             expect(likesCounts).toEqual([2, 2, 2, 2, 2])
@@ -274,22 +258,19 @@ describe('ListItem - No Flicker Tests', () => {
                 likes: ['user-1', 'user-2', 'user-456']
             }
 
-            await act(async () => {
-                for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
+                await act(async () => {
                     rerender(
                         <Provider store={store}>
-                            <BrowserRouter>
                                 <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                            </BrowserRouter>
                         </Provider>
                     )
+                })
 
-                    await new Promise(resolve => setTimeout(resolve, 10))
-                    const likesText = screen.getByText(/\d+ Like(s)?/i).textContent
-                    const count = parseInt(likesText?.match(/\d+/)?.[0] || '0')
-                    likesCounts.push(count)
-                }
-            })
+                const likesText = screen.getByText(/\d+ Like(s)?/i).textContent
+                const count = parseInt(likesText?.match(/\d+/)?.[0] || '0')
+                likesCounts.push(count)
+            }
 
             // All counts should be 3 - no flicker to 2
             expect(likesCounts).toEqual([3, 3, 3, 3, 3])

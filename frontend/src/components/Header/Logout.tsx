@@ -1,20 +1,17 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../App'
-import { useHistory } from 'react-router-dom'
-import './Header.scss'
+import { useRouter } from 'next/router'
 
 const Logout = () => {
-    const history = useHistory()
+    const router = useRouter()
     const context = useContext(AppContext)
 
-    const handleLogout = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const handleLogout = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault()
-        context.setState({
-            ...context,
-            user: ''
-        })
+        await fetch('/api/auth/logout', { method: 'DELETE' }).catch(() => {})
+        context.setState({ ...context, user: '' })
         window.localStorage.removeItem('loggedUser')
-        history.push('/')
+        router.push('/')
     }
 
     return <button className='header__logout' onClick={handleLogout} />

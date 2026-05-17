@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 import Dashboard from './Dashboard'
 import store from '../../redux/store'
 import { AppContext } from '../../App'
@@ -82,9 +81,7 @@ describe('Dashboard - Sticky Elements', () => {
         return render(
             <AppContext.Provider value={mockContext}>
                 <Provider store={store}>
-                    <BrowserRouter>
                         <Dashboard match={mockMatch} location={mockLocation} history={mockHistory} />
-                    </BrowserRouter>
                 </Provider>
             </AppContext.Provider>
         )

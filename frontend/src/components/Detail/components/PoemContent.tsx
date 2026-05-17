@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { format } from 'date-fns'
 import { Poem } from '../../../typescript/interfaces'
 import { AuthorAvatar } from '../../ListItem/components/AuthorAvatar'
@@ -16,10 +16,10 @@ export function PoemContent({ poem }: PoemContentProps) {
             <section>
                 <h2 className='poem__title'>{poem.title}</h2>
                 <div className='poem__author-container'>
-                    <Link to={`/authors/${authorSlug}`}>
+                    <Link href={`/authors/${authorSlug}`}>
                         <AuthorAvatar name={poem.author} picture={poem.picture} />
                     </Link>
-                    <Link to={`/authors/${authorSlug}`} className='poem__author'>
+                    <Link href={`/authors/${authorSlug}`} className='poem__author'>
                         {poem.author}
                     </Link>
                 </div>

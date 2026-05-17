@@ -1,11 +1,10 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemFooter } from './PoemFooter'
 import { Poem, Context } from '../../../typescript/interfaces'
 
 const renderWithRouter = (component: React.ReactElement) => {
-    return render(<BrowserRouter>{component}</BrowserRouter>)
+    return render(component)
 }
 
 describe('PoemFooter', () => {

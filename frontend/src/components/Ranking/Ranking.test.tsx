@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter } from 'react-router-dom'
 import configureStore from 'redux-mock-store'
 import Ranking from './Ranking'
 import * as poemsActions from '../../redux/actions/poemsActions'
@@ -12,9 +11,7 @@ const mockStore = configureStore([])
 const renderRanking = (store: ReturnType<typeof mockStore>) =>
     render(
         <Provider store={store}>
-            <MemoryRouter>
                 <Ranking />
-            </MemoryRouter>
         </Provider>
     )
 

@@ -1,123 +1,66 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: React CI/CD
+name: CI — master
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
-  pull:
-    name: pull all but specially for the backend
+  frontend:
+    name: Frontend — test & build
     runs-on: ubuntu-latest
 
     defaults:
-          run:
-            working-directory: ./poemunity-redux/backend
+      run:
+        working-directory: ./frontend
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    # - run: npm test
-    # - run: npm ci
-    - run: npm i
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ubuntu
-        key: ${{ secrets.PASSWORD }}
-        script: |
-          pwd
-          cd projects/poemunity/poemunity-redux
-          git reset --hard
-          git pull origin master
-          git status
-          pwd
-    # rm -r ./backend/public
-    # echo test1
-    # pwd
-    # mkdir ./backend/public
-    # pwd
-    # mv ./frontend/build ./backend/public
-    # pwd
-    # mkdir ./backend/public/img
-    # pwd
-    # cp ./frontend/src/img/poemunity.svg ./backend/public/img
-    # pwd
-    # pwd
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-  build:
+      - name: Lint
+        run: pnpm lint
 
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --no-coverage
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_ADMIN: ${{ secrets.NEXT_PUBLIC_ADMIN }}
+
+  backend:
+    name: Backend — test
     runs-on: ubuntu-latest
-    env:
-      SKIP_PREFLIGHT_CHECK: true
-      REACT_APP_ADMIN: ${{ secrets.REACT_APP_ADMIN }}
-
-    strategy:
-      matrix:
-        node-version: [13.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     defaults:
-          run:
-            working-directory: ./poemunity-redux/frontend
+      run:
+        working-directory: ./backend
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    # - run: npm clean-install
-    # - run: npm cache clean --force
+      - name: Install dependencies
+        run: npm ci
 
-    - run: npm ci
-    # - run: npm test
-    
-    - run: npm run build --verbose
-    - run: echo where i am
-    - run: pwd
-    - name: upload artifact with public folder
-      uses: actions/upload-artifact@master
-      with:
-        name: build
-        path: poemunity-redux/frontend/build
-
-  deploy:
-    name: deploy
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@master
-
-    - name: Download artifact with files to publish
-      uses: actions/download-artifact@v2
-      with:
-        name: build
-        path: poemunity-redux/frontend/build
-
-    - name: copy file via ssh password
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ubuntu
-        key: ${{ secrets.PASSWORD }}
-        source: "poemunity-redux/frontend/build/*"
-        target: "projects/poemunity"
-        rm: false
-
-    
-    
+      - name: Test
+        run: npm test

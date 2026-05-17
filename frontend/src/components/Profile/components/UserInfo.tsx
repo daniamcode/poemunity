@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+/* eslint-disable max-lines */
+import React, { useState } from 'react'
+import Link from 'next/link'
 import API from '../../../redux/actions/axiosInstance'
 import { CATEGORIES, categoryToSlug } from '../../../data/constants'
 import { Context } from '../../../typescript/interfaces'
@@ -22,7 +23,11 @@ function PrivacyToggle({ field, privateFields, onToggle }: {
             type='button'
             className={`privacy-toggle${isPrivate ? ' privacy-toggle--private' : ''}`}
             onClick={() => onToggle(field)}
-            title={isPrivate ? 'Hidden from public profile — click to make public' : 'Visible on public profile — click to hide'}
+            title={
+                isPrivate
+                    ? 'Hidden from public profile — click to make public'
+                    : 'Visible on public profile — click to hide'
+            }
         >
             {isPrivate ? '🔒 Private' : '🌐 Public'}
         </button>
@@ -147,7 +152,7 @@ export default function UserInfo({ context }: Props) {
                 {context.username}
                 {displayName && <span className='user-info__realname'> · {displayName}</span>}
             </h2>
-            <Link to={`/authors/${slugify(context.username || '')}`} className='user-info__public-link'>
+            <Link href={`/authors/${slugify(context.username || '')}`} className='user-info__public-link'>
                 View public profile →
             </Link>
 
@@ -159,14 +164,28 @@ export default function UserInfo({ context }: Props) {
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>First name</label>
                             </div>
-                            <input className='user-info__input' value={form.name} onChange={set('name')} placeholder='Emily' />
+                            <input
+                                className='user-info__input'
+                                value={form.name}
+                                onChange={set('name')}
+                                placeholder='Emily'
+                            />
                         </div>
                         <div className='user-info__field-group'>
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>Last name</label>
-                                <PrivacyToggle field='surname' privateFields={form.privateFields} onToggle={togglePrivacy} />
+                                <PrivacyToggle
+                                    field='surname'
+                                    privateFields={form.privateFields}
+                                    onToggle={togglePrivacy}
+                                />
                             </div>
-                            <input className='user-info__input' value={form.surname} onChange={set('surname')} placeholder='Hart' />
+                            <input
+                                className='user-info__input'
+                                value={form.surname}
+                                onChange={set('surname')}
+                                placeholder='Hart'
+                            />
                         </div>
                     </div>
 
@@ -174,16 +193,34 @@ export default function UserInfo({ context }: Props) {
                         <div className='user-info__field-group'>
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>City</label>
-                                <PrivacyToggle field='city' privateFields={form.privateFields} onToggle={togglePrivacy} />
+                                <PrivacyToggle
+                                    field='city'
+                                    privateFields={form.privateFields}
+                                    onToggle={togglePrivacy}
+                                />
                             </div>
-                            <input className='user-info__input' value={form.city} onChange={set('city')} placeholder='San Francisco' />
+                            <input
+                                className='user-info__input'
+                                value={form.city}
+                                onChange={set('city')}
+                                placeholder='San Francisco'
+                            />
                         </div>
                         <div className='user-info__field-group'>
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>Country</label>
-                                <PrivacyToggle field='country' privateFields={form.privateFields} onToggle={togglePrivacy} />
+                                <PrivacyToggle
+                                    field='country'
+                                    privateFields={form.privateFields}
+                                    onToggle={togglePrivacy}
+                                />
                             </div>
-                            <input className='user-info__input' value={form.country} onChange={set('country')} placeholder='USA' />
+                            <input
+                                className='user-info__input'
+                                value={form.country}
+                                onChange={set('country')}
+                                placeholder='USA'
+                            />
                         </div>
                     </div>
 
@@ -191,7 +228,11 @@ export default function UserInfo({ context }: Props) {
                         <div className='user-info__field-group'>
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>Birth year</label>
-                                <PrivacyToggle field='birthYear' privateFields={form.privateFields} onToggle={togglePrivacy} />
+                                <PrivacyToggle
+                                    field='birthYear'
+                                    privateFields={form.privateFields}
+                                    onToggle={togglePrivacy}
+                                />
                             </div>
                             <input
                                 className='user-info__input'
@@ -206,9 +247,18 @@ export default function UserInfo({ context }: Props) {
                         <div className='user-info__field-group'>
                             <div className='user-info__label-row'>
                                 <label className='user-info__label'>Gender</label>
-                                <PrivacyToggle field='gender' privateFields={form.privateFields} onToggle={togglePrivacy} />
+                                <PrivacyToggle
+                                    field='gender'
+                                    privateFields={form.privateFields}
+                                    onToggle={togglePrivacy}
+                                />
                             </div>
-                            <input className='user-info__input' value={form.gender} onChange={set('gender')} placeholder='e.g. She/Her, He/Him, They/Them…' />
+                            <input
+                                className='user-info__input'
+                                value={form.gender}
+                                onChange={set('gender')}
+                                placeholder='e.g. She/Her, He/Him, They/Them…'
+                            />
                         </div>
                     </div>
 
@@ -233,7 +283,9 @@ export default function UserInfo({ context }: Props) {
                             <button
                                 key={genre}
                                 type='button'
-                                className={`user-info__genre-option${form.preferredGenres.includes(genre) ? ' user-info__genre-option--selected' : ''}`}
+                                className={`user-info__genre-option${
+                                    form.preferredGenres.includes(genre) ? ' user-info__genre-option--selected' : ''
+                                }`}
                                 onClick={() => toggleGenre(genre)}
                             >
                                 {genre}
@@ -247,7 +299,11 @@ export default function UserInfo({ context }: Props) {
                         <button className='user-info__btn user-info__btn--save' onClick={handleSave} disabled={saving}>
                             {saving ? 'Saving…' : 'Save'}
                         </button>
-                        <button className='user-info__btn user-info__btn--cancel' onClick={handleCancel} disabled={saving}>
+                        <button
+                            className='user-info__btn user-info__btn--cancel'
+                            onClick={handleCancel}
+                            disabled={saving}
+                        >
                             Cancel
                         </button>
                     </div>
@@ -267,7 +323,7 @@ export default function UserInfo({ context }: Props) {
                     {displayGenres.length > 0 && (
                         <div className='user-info__genres'>
                             {displayGenres.map(genre => (
-                                <Link key={genre} to={`/${categoryToSlug(genre)}`} className='user-info__genre-tag'>
+                                <Link key={genre} href={`/${categoryToSlug(genre)}`} className='user-info__genre-tag'>
                                     {genre}
                                 </Link>
                             ))}

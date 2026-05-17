@@ -4,7 +4,7 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { AUTHORS_TITLE, AUTHORS_BROWSE_ALL } from '../data/constants'
 import { getTopAuthorsAction } from '../redux/actions/authorsActions'
 import { RootState, useAppDispatch } from '../redux/store'
@@ -43,7 +43,7 @@ export default function AuthorsAccordion({ authorSlug }: AuthorsAccordionProps) 
                     <AccordionDetails key={author.slug}>
                         <Link
                             className={`header__dropdown-subcategories${authorSlug === author.slug ? ' active' : ''}`}
-                            to={`/authors/${author.slug}`}
+                            href={`/authors/${author.slug}`}
                         >
                             {author.name}
                         </Link>
@@ -51,7 +51,7 @@ export default function AuthorsAccordion({ authorSlug }: AuthorsAccordionProps) 
                 ))}
             </div>
             <AccordionDetails>
-                <Link className='header__dropdown-subcategories authors-accordion__browse-all' to='/authors'>
+                <Link className='header__dropdown-subcategories authors-accordion__browse-all' href='/authors'>
                     {AUTHORS_BROWSE_ALL}
                 </Link>
             </AccordionDetails>

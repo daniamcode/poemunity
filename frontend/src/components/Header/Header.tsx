@@ -1,20 +1,18 @@
 import { useEffect, useContext } from 'react'
-import { Link } from 'react-router-dom'
-import './Header.scss'
-import '../../App.scss'
+import Link from 'next/link'
 import Accordion from '../SimpleAccordion'
 // import CircularProgress from './CircularIndeterminate'
 import LoginButton from './LoginButton'
 import LogoutButton from './Logout'
 import { WEB_SUBTITLE } from '../../data/constants'
 import { AppContext } from '../../App'
-import { useLocation } from 'react-router-dom'
+import { useRouter } from 'next/router'
 import parseJWT from '../../utils/parseJWT'
 import { getAvatarColor, getInitials } from '../ListItem/components/AuthorAvatar'
 
 function Header() {
     const context = useContext(AppContext)
-    const location = useLocation()
+    const router = useRouter()
 
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedUser') || ''
@@ -48,7 +46,8 @@ function Header() {
         applyToken(parsedUser)
 
         // Then refresh from DB to pick up any changes made in other sessions
-        fetch('/api/v1/users/me', { headers: config.headers })
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
+        fetch(`${apiBase}/api/v1/users/me`, { headers: config.headers })
             .then(res => res.ok ? res.json() : null)
             .then(freshToken => {
                 if (freshToken && freshToken !== parsedUser) {
@@ -57,17 +56,17 @@ function Header() {
                 }
             })
             .catch(() => {})
-    }, [JSON.stringify(location)])
+    }, [router.asPath])
 
     // Dynamic subtitle based on route
     const getSubtitle = () => {
-        if (location.pathname === '/profile') {
+        if (router.pathname === '/profile') {
             return `${context?.username}'s private profile`
         }
         return WEB_SUBTITLE
     }
 
-    const isAuthOrProfilePage = ['/login', '/register', '/profile'].includes(location.pathname)
+    const isAuthOrProfilePage = ['/login', '/register', '/profile'].includes(router.pathname)
 
     // if (isLoading) {
     //   return <CircularProgress />
@@ -81,11 +80,11 @@ function Header() {
             )}
             <div className='header__brand'>
                 <div className='header__logo'>
-                    <Link to='/' className='header__text-logo-first'>
+                    <Link href='/' className='header__text-logo-first'>
                         P
                     </Link>
-                    <Link to='/' className='header__logo-icon' />
-                    <Link to='/' className='header__text-logo-second'>
+                    <Link href='/' className='header__logo-icon' />
+                    <Link href='/' className='header__text-logo-second'>
                         emunity
                     </Link>
                 </div>
@@ -93,9 +92,15 @@ function Header() {
             </div>
             <div className='separator' />
             {context?.user ? (
-                <Link to='/profile' className='header__profile-picture'>
+                <Link href='/profile' className='header__profile-picture'>
                     {context?.picture ? (
-                        <img src={context.picture} alt={context.username} className='header__profile-img' loading='lazy' />
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={context.picture}
+                            alt={context.username}
+                            className='header__profile-img'
+                            loading='lazy'
+                        />
                     ) : (
                         <span
                             className='header__profile-initials'

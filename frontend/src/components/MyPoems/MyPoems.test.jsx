@@ -1,7 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import MyPoems from './MyPoems'
@@ -45,11 +44,9 @@ describe('MyPoems Component - Pagination', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <AppContext.Provider value={mockContext}>
                         <MyPoems />
                     </AppContext.Provider>
-                </BrowserRouter>
             </Provider>
         )
 
@@ -64,11 +61,9 @@ describe('MyPoems Component - Pagination', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <AppContext.Provider value={mockContext}>
                         <MyPoems />
                     </AppContext.Provider>
-                </BrowserRouter>
             </Provider>
         )
 
@@ -110,11 +105,9 @@ describe('MyPoems Component - Pagination', () => {
 
         render(
             <Provider store={store}>
-                <BrowserRouter>
                     <AppContext.Provider value={mockContext}>
                         <MyPoems />
                     </AppContext.Provider>
-                </BrowserRouter>
             </Provider>
         )
 

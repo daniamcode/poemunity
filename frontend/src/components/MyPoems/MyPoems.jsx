@@ -1,8 +1,5 @@
 import { useEffect, useState, useContext } from 'react'
 import { AppContext } from '../../App'
-import '../List/List.scss'
-import '../Detail/Detail.scss'
-import '../../App.scss'
 import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'

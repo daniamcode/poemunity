@@ -1,47 +1,33 @@
 import React, { useState } from 'react'
-import './Login.scss'
-import { useHistory, useLocation } from 'react-router-dom'
-import { NavLink } from 'react-router-dom'
-// import { FormElement } from '../typescript/types'
-// import { manageSuccess } from '../utils/notifications'
-import { useAppDispatch } from '../../redux/store'
-import { loginAction } from '../../redux/actions/loginActions'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 const Login = (): React.JSX.Element => {
-    const history = useHistory()
-    const location = useLocation<{ from?: Location }>()
-
+    const router = useRouter()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
 
-    // Redux
-    const dispatch = useAppDispatch()
-
-    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-        // manageSuccess('Logging in...') // I don't need this, I used it just for testing purposes
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
-        dispatch(
-            loginAction({
-                data: {
-                    username,
-                    password
-                },
-                callbacks: {
-                    success: data => {
-                        window.localStorage.setItem('loggedUser', JSON.stringify(data))
-                        history.push(location.state?.from?.pathname ?? '/profile')
-                    },
-                    error: () => {
-                        // setErrorMessage('Wrong credentials')
-                        console.error('something went wrong in login!')
-                        // history.push('/')
-                        // setTimeout(()=> {
-                        //   setErrorMessage(null)
-                        // }, 3000)
-                    }
-                }
+        setError('')
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             })
-        )
+            if (!res.ok) {
+                setError('Invalid username or password')
+                return
+            }
+            const token = await res.json()
+            window.localStorage.setItem('loggedUser', JSON.stringify(token))
+            const from = router.query.from as string | undefined
+            router.push(from ?? '/profile')
+        } catch {
+            setError('Something went wrong. Please try again.')
+        }
         setUsername('')
         setPassword('')
     }
@@ -72,9 +58,9 @@ const Login = (): React.JSX.Element => {
                             onChange={event => setPassword(event.target.value)}
                         />
                     </div>
+                    {error && <p className='login__error'>{error}</p>}
                     <button disabled={username.length === 0 || password.length === 0}>Login</button>
-                    <NavLink to='/register'>Register</NavLink>
-                    {/* <Notification message={errorMessage}/> */}
+                    <Link href='/register'>Register</Link>
                 </form>
             </div>
         </div>

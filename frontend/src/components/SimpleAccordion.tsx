@@ -5,7 +5,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import cx from 'classnames'
 import './Header/Header'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { CATEGORIES_TITLE, CATEGORIES, MUST_HAVE_CATEGORIES, ALL, CATEGORIES_BROWSE_ALL, categoryToSlug } from '../data/constants'
 
 interface SimpleAccordionProps {
@@ -49,7 +49,7 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                             className={cx('header__dropdown-subcategories', {
                                 active: isActiveCategory(category)
                             })}
-                            to={`/${categoryToSlug(category)}`}
+                            href={`/${categoryToSlug(category)}`}
                         >
                             {category}
                         </Link>
@@ -61,7 +61,7 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                     className={cx('header__dropdown-subcategories', {
                         active: !genre
                     })}
-                    to='/'
+                    href='/'
                 >
                     {ALL}
                 </Link>

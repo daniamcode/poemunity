@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useRouter } from 'next/router'
 import { useAppDispatch } from '../redux/store'
 import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
 import {
@@ -28,7 +28,7 @@ export interface UsePoemActionsParams {
 
 export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemActionsParams) {
     const dispatch = useAppDispatch()
-    const history = useHistory()
+    const router = useRouter()
 
     const onLike = (event: React.SyntheticEvent) => {
         event.preventDefault()
@@ -125,14 +125,9 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
     }
 
     const onEdit = () => {
-        // Navigate to profile with edit query param
-        // Pass poem data in location state for immediate loading
-        history.push({
+        router.push({
             pathname: '/profile',
-            search: `?edit=${poem.id}`,
-            state: {
-                poemData: poem
-            }
+            query: { edit: poem.id }
         })
     }
 

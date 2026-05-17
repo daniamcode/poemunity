@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
+import mockRouter from 'next-router-mock'
 import Detail from './Detail'
 import store from '../../redux/store'
 import * as useDetailPoemHook from './hooks/useDetailPoem'
@@ -27,21 +27,11 @@ jest.mock('../../App', () => {
 
 const renderWithProviders = (component: React.ReactElement) => {
     return render(
-        <BrowserRouter>
             <Provider store={store}>{component}</Provider>
-        </BrowserRouter>
     )
 }
 
 describe('Detail', () => {
-    const mockProps = {
-        match: {
-            params: {
-                poemId: 'poem-123'
-            }
-        }
-    }
-
     const mockPoem: Poem = {
         id: 'poem-123',
         author: 'John Doe',
@@ -62,6 +52,7 @@ describe('Detail', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        mockRouter.setCurrentUrl({ pathname: '/detail/[poemId]', query: { poemId: 'poem-123' } })
         ;(useDetailPoemHook.useDetailPoem as jest.Mock).mockReturnValue({
             poem: mockPoem,
             isLoading: false
@@ -75,7 +66,7 @@ describe('Detail', () => {
             isLoading: true
         })
 
-        renderWithProviders(<Detail {...mockProps} />)
+        renderWithProviders(<Detail />)
         // CircularProgress component should be rendered
         expect(screen.getByRole('progressbar')).toBeInTheDocument()
     })
@@ -98,20 +89,20 @@ describe('Detail', () => {
             isLoading: false
         })
 
-        renderWithProviders(<Detail {...mockProps} />)
+        renderWithProviders(<Detail />)
         expect(screen.getByText('Error - 404')).toBeInTheDocument()
         expect(screen.getByText('Nothing to see here')).toBeInTheDocument()
     })
 
     test('should render poem content when poem exists', () => {
-        renderWithProviders(<Detail {...mockProps} />)
+        renderWithProviders(<Detail />)
         expect(screen.getByText('A Beautiful Poem')).toBeInTheDocument()
         expect(screen.getByText('John Doe')).toBeInTheDocument()
         expect(screen.getByText(/This is a beautiful poem/)).toBeInTheDocument()
     })
 
     test('should render Helmet component', () => {
-        const { container } = renderWithProviders(<Detail {...mockProps} />)
+        const { container } = renderWithProviders(<Detail />)
         // Helmet component is rendered (title updates are handled by react-helmet)
         expect(container).toBeInTheDocument()
         // We can verify the poem is displayed which confirms Helmet would have the title
@@ -119,12 +110,12 @@ describe('Detail', () => {
     })
 
     test('should call useDetailPoem with correct poemId', () => {
-        renderWithProviders(<Detail {...mockProps} />)
-        expect(useDetailPoemHook.useDetailPoem).toHaveBeenCalledWith('poem-123')
+        renderWithProviders(<Detail />)
+        expect(useDetailPoemHook.useDetailPoem).toHaveBeenCalledWith('poem-123', undefined)
     })
 
     test('should call usePoemActions with correct poem, context, and onDeleteSuccess', () => {
-        renderWithProviders(<Detail {...mockProps} />)
+        renderWithProviders(<Detail />)
         expect(usePoemActionsHook.usePoemActions).toHaveBeenCalledWith(
             expect.objectContaining({
                 poem: expect.objectContaining({ id: 'poem-123' }),
@@ -135,18 +126,18 @@ describe('Detail', () => {
     })
 
     test('should render PoemFooter with correct props', () => {
-        renderWithProviders(<Detail {...mockProps} />)
+        renderWithProviders(<Detail />)
         // PoemFooter displays likes count
         expect(screen.getByText('2 Likes')).toBeInTheDocument()
     })
 
     test('should render Disqus comments section', () => {
-        const { container } = renderWithProviders(<Detail {...mockProps} />)
+        const { container } = renderWithProviders(<Detail />)
         expect(container.querySelector('.article-container')).toBeInTheDocument()
     })
 
     test('should apply correct CSS classes to main container', () => {
-        const { container } = renderWithProviders(<Detail {...mockProps} />)
+        const { container } = renderWithProviders(<Detail />)
         expect(container.querySelector('.poem__detail')).toBeInTheDocument()
         expect(container.querySelector('.poem__block')).toBeInTheDocument()
     })

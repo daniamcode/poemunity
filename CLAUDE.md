@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Poemunity is a social poetry website with a React frontend and Node.js/Express backend. The project has migrated away from Create React App to a custom esbuild-based build system. It uses Redux for state management and custom token-based authentication.
+Poemunity is a social poetry website with a React/Next.js frontend and Node.js/Express backend. It uses Redux for state management and custom token-based authentication.
 
 **Monorepo Structure:**
 
-- `frontend/`: React application with TypeScript
+- `frontend/`: Next.js application with TypeScript (migrating from esbuild SPA — see `docs/NEXTJS_MIGRATION.md`)
 - `backend/`: Node.js/Express API server
-- Deployed on AWS with CI/CD via GitHub Actions
+- Both frontend and backend deployed on Vercel, CI/CD via GitHub Actions
 
 ## Common Commands
 
@@ -101,7 +101,7 @@ pnpm lint           # Uses Standard.js, auto-fixes
 **Component Structure:**
 
 - Main components: Dashboard, Detail, Header, List, Profile, Ranking, Register
-- Material-UI v4 for UI components
+- MUI v7 (`@mui/material`) with Emotion for UI components
 - Components typically include TypeScript interfaces, styles (SCSS), and tests
 
 **API Integration:**

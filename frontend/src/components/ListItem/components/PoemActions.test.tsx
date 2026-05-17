@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { PoemActions } from './PoemActions'
 
 describe('PoemActions', () => {
@@ -14,7 +13,7 @@ describe('PoemActions', () => {
     }
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(<BrowserRouter>{component}</BrowserRouter>)
+        return render(component)
     }
 
     beforeEach(() => {

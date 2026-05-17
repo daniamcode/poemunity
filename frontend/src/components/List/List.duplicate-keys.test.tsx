@@ -1,6 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter } from 'react-router-dom'
 import store from '../../redux/store'
 import List from './List'
 import { AppContext } from '../../App'
@@ -133,9 +132,7 @@ describe('List component - Duplicate keys bug', () => {
         const { container } = render(
             <Provider store={store}>
                 <AppContext.Provider value={mockContext}>
-                    <MemoryRouter>
                         <List match={{ params: {}, isExact: true, path: '/', url: '/' }} />
-                    </MemoryRouter>
                 </AppContext.Provider>
             </Provider>
         )

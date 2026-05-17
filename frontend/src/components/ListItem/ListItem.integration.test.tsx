@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
@@ -18,7 +17,7 @@ const mockStore = configureStore([thunk])
 describe('ListItem - Like Functionality Integration Tests', () => {
     let store: ReturnType<typeof mockStore>
     let likePoemActionSpy: jest.SpyInstance
-    let updateCacheSpy: jest.SpyInstance
+    let _updateCacheSpy: jest.SpyInstance
 
     const mockPoem: Poem = {
         id: 'poem-123',
@@ -60,7 +59,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         // Mock the action creators to return actions with callbacks
         likePoemActionSpy = jest.spyOn(poemActions, 'likePoemAction')
-        updateCacheSpy = jest.spyOn(poemsActions, 'updatePoemsListCacheAfterLikePoemAction')
+        _updateCacheSpy = jest.spyOn(poemsActions, 'updatePoemsListCacheAfterLikePoemAction')
 
         // Make sure the mocked actions return objects
         ;(poemsActions.updatePoemsListCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
@@ -86,7 +85,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
     const renderWithProviders = (component: React.ReactElement) => {
         return render(
             <Provider store={store}>
-                <BrowserRouter>{component}</BrowserRouter>
+                {component}
             </Provider>
         )
     }
@@ -207,9 +206,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Re-render with updated poem prop
         rerender(
             <Provider store={store}>
-                <BrowserRouter>
                     <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -235,9 +232,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Re-render with updated poem prop
         rerender(
             <Provider store={store}>
-                <BrowserRouter>
                     <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                </BrowserRouter>
             </Provider>
         )
 
@@ -260,9 +255,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         rerender(
             <Provider store={store}>
-                <BrowserRouter>
                     <ListItem poem={updatedPoem} filter='' context={mockContext} />
-                </BrowserRouter>
             </Provider>
         )
 

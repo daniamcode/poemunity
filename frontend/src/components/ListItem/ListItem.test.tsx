@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
 import * as usePoemActionsModule from '../../hooks/usePoemActions'
@@ -59,7 +58,7 @@ describe('ListItem (Refactored)', () => {
     })
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(<BrowserRouter>{component}</BrowserRouter>)
+        return render(component)
     }
 
     test('should render all child components when filter matches', () => {

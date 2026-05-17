@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { useDetailPoem } from './useDetailPoem'
 import store from '../../../redux/store'
@@ -8,7 +8,7 @@ import React from 'react'
 jest.mock('../../../redux/actions/poemActions')
 
 describe('useDetailPoem', () => {
-    const wrapper = ({ children }: any) => React.createElement(Provider, { store, children })
+    const wrapper = ({ children }: any) => React.createElement(Provider, { store }, children)
 
     beforeEach(() => {
         jest.clearAllMocks()

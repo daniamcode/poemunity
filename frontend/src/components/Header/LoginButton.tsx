@@ -1,9 +1,8 @@
-import { useHistory } from 'react-router-dom'
-import './Header.scss'
+import { useRouter } from 'next/router'
 
 const LoginButton = () => {
-    const history = useHistory()
-    return <button className='header__login' onClick={() => history.push('/login')} />
+    const router = useRouter()
+    return <button className='header__login' onClick={() => router.push('/login')} />
 }
 
 export default LoginButton
