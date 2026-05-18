@@ -1,13 +1,8 @@
 # Poemunity
 
-This App WAS online at https://poemunity.com 
+A social poetry website. Frontend: Next.js (SSR). Backend: Node.js/Express deployed as a Vercel serverless function. Authentication is custom token-based (JWT + httpOnly cookies).
 
-I'M ON AMAZON WEB SERVICES, I DO CI/CD WITH GITHUB ACTIONS AND I MANAGE AUTHENTICATION MYSELF WITH TOKENS.
-I'M REMOVING CREATE-REACT-APP AND MANAGING ESBUILD, ESLINT etc on my own.
-
-I made the frontend with React, and the backend with Node.js. I keep adding Typescript and Testing with Jest and React Testing Library.
-
-In the branch named "old" there are three folders: flux, Poemunity-React-Query and poemunity-redux, that are now deprecated. In the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app.
+Deployed on Vercel (two separate projects). CI via GitHub Actions (lint, typecheck, tests — no deploy step; Vercel triggers automatically on push).
 
 
 # TL;DR:
@@ -39,8 +34,8 @@ Then, I created the Poemunity-React-Query folder and continued from there, manag
 ## Redux
 Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
 
-### Own build
-Finally, I'm removing create-react-app. I'm moving to custom build with esbuild, so all those 3 folders on the branch named "old" are deprecated. Now, in the "development" branch (and eventually also in the "master" branch), I only have "backend" and "frontend" folders continuing the redux approach but without create-react-app
+### Next.js migration
+With the introduction of agentic AI, the frontend was migrated from a custom esbuild SPA to Next.js (Pages Router) for SSR and SEO. See `docs/NEXTJS_MIGRATION.md` for the full migration log. The `old` branch still has the three deprecated folders (flux, React-Query, Redux+esbuild) for reference.
 
 ## Author / User types
 
@@ -66,23 +61,64 @@ The CSV contains `Title`, `Poem`, `Poet`, and `Tags` columns. Tags are mapped to
 
 ## Deployment (Vercel + MongoDB Atlas)
 
-Migrated from AWS to Vercel (frontend + backend) and MongoDB Atlas M0 (free tier).
+Two separate Vercel projects, both connected to this GitHub repo:
 
-The backend uses an Express adapter pattern for Vercel serverless: the existing Express app is wrapped in a single serverless function at `backend/api/index.js`, which Vercel invokes on each request. MongoDB connections are cached across warm invocations to avoid connection pool exhaustion.
+| Project | Framework | Root directory | Triggers deploy on push to |
+|---|---|---|---|
+| `poemunity-frontend` | Next.js | `frontend/` | `master`, `development` |
+| `poemunity-backend` | Node.js (Express) | `backend/` | `master`, `development` |
 
-The original Express server entry point is preserved in `backend/old/` for reference.
+### How deploys work
 
-### Env vars required
+Vercel detects pushes to the connected branches and deploys automatically — no manual step needed.
 
-**Backend (Vercel project):**
-- `MONGODB` — MongoDB Atlas connection string
-- `SECRET` — JWT secret
-- `FRONTEND_URL` — Vercel frontend URL (e.g. `https://poemunity.vercel.app`)
-- `NODE_ENV=production`
+GitHub Actions and Vercel run **in parallel and independently**. A failing Actions run does not block the Vercel deploy (this needs improvement). The two pipelines cover different things:
 
-**Frontend (Vercel project):**
-- `REACT_APP_API_URL` — Vercel backend URL (e.g. `https://poemunity-api.vercel.app`)
-- `REACT_APP_ADMIN` — admin user ID
+| Step | GitHub Actions | Vercel |
+|---|---|---|
+| Lint | ✅ | ✗ |
+| Typecheck | ✅ | ✗ |
+| Frontend tests | ✅ | ✗ |
+| Backend tests | ✅ | ✗ |
+| Build (frontend) | ✅ verification | ✅ actual deploy |
+| Build (backend) | ✗ | ✅ actual deploy |
 
-### TODO
-- `frontend/vercel.json` uses `"installCommand": "pnpm install --prod=false"` to work around pnpm skipping devDependencies when `NODE_ENV=production` is set. Build tools like `esbuild-sass-plugin` should be moved to `dependencies` (or the build pipeline restructured) so the install step is solid and not relying on a flag override.
+To make Actions gate the deploy (block bad code from reaching production), enable **branch protection rules** in GitHub → Settings → Branches → require status checks to pass before merging.
+
+### Backend
+
+Express app wrapped in a single Vercel serverless function at `backend/index.js`. MongoDB connections are cached across warm invocations to avoid pool exhaustion. `backend/vercel.json` routes all traffic to that handler.
+
+### Frontend
+
+Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json` only sets `buildCommand: "pnpm build"` — framework detection is automatic.
+
+`NEXT_PUBLIC_API_URL` is baked into the bundle at build time. In local dev the axios instance falls back to `http://localhost:4200` so the env var is only required in Vercel.
+
+### Required env vars
+
+**Backend Vercel project:**
+| Variable | Description |
+|---|---|
+| `MONGODB` | MongoDB Atlas connection string |
+| `SECRET` | JWT signing secret (generate with `openssl rand -base64 32`) |
+| `FRONTEND_URL` | Frontend Vercel URL, no trailing slash (e.g. `https://poemunity-frontend.vercel.app`) |
+| `NODE_ENV` | `production` |
+
+**Frontend Vercel project:**
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Full backend URL with protocol (e.g. `https://poemunity-backend.vercel.app`) |
+| `NEXT_PUBLIC_ADMIN` | Admin author ID |
+
+### Local development
+
+```bash
+# Terminal 1 — backend (port 4200)
+cd backend && pnpm dev
+
+# Terminal 2 — frontend (port 3000)
+cd frontend && pnpm dev
+```
+
+`frontend/.env.local` only needs `NEXT_PUBLIC_ADMIN` for admin features locally. `NEXT_PUBLIC_API_URL` is not needed — the axios instance defaults to `http://localhost:4200`.

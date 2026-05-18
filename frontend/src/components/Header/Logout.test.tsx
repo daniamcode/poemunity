@@ -101,7 +101,7 @@ describe('Logout', () => {
         })
     })
 
-    test('should preserve other context properties when logging out', async () => {
+    test('should clear all auth fields and preserve non-auth properties when logging out', async () => {
         render(<Logout />)
         const button = screen.getByRole('button')
         fireEvent.click(button)
@@ -109,9 +109,12 @@ describe('Logout', () => {
         await waitFor(() => {
             expect(mockSetState).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    userId: 'user-123',
-                    adminId: 'admin-456',
-                    user: ''
+                    user: '',
+                    userId: '',
+                    username: '',
+                    picture: '',
+                    config: {},
+                    adminId: 'admin-456'
                 })
             )
         })

@@ -1,6 +1,6 @@
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 
 let mongoServer
 
@@ -10,27 +10,24 @@ process.env.SECRET = '1234'
 // Suppress strictQuery warning
 mongoose.set('strictQuery', false)
 
-async function createTestUser () {
-  // Import User model after mongoose connection is established
-  const User = require('./src/models/User')
+async function createTestUsers () {
+  const Author = require('./src/models/Author')
 
-  // Check if test user already exists
-  const existingUser = await User.findOne({ username: 'test' })
-  if (existingUser) {
-    console.log('ℹ️  Test user already exists')
-    return
+  const users = [
+    { username: 'test', name: 'Test User', email: 'test@example.com', slug: 'test-user' },
+    { username: 'test2', name: 'Test User Two', email: 'test2@example.com', slug: 'test-user-two' }
+  ]
+
+  for (const u of users) {
+    const exists = await Author.findOne({ username: u.username })
+    if (exists) {
+      console.log(`ℹ️  Author "${u.username}" already exists`)
+      continue
+    }
+    const passwordHash = await bcrypt.hash('1234', 10)
+    await Author.create({ ...u, passwordHash, type: 'user', fake: false })
+    console.log(`👤 Created Author "${u.username}" (password: 1234)`)
   }
-
-  // Create test user
-  const hashedPassword = await bcrypt.hash('1234', 10)
-  const testUser = new User({
-    username: 'test',
-    passwordHash: hashedPassword,
-    picture: 'default.jpg'
-  })
-
-  await testUser.save()
-  console.log('👤 Created test user (username: test, password: 1234)')
 }
 
 async function setupInMemoryDatabase () {
@@ -53,8 +50,7 @@ async function setupInMemoryDatabase () {
 
   console.log('✅ Connected to in-memory MongoDB')
 
-  // Create test user
-  await createTestUser()
+  await createTestUsers()
 }
 
 // Cleanup function for graceful shutdown

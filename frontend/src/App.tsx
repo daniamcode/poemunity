@@ -26,7 +26,8 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if (!store.getState().rankingQuery.item) {
+        const rankingState = store.getState().rankingQuery
+        if (!rankingState.item && !rankingState.isFetching) {
             dispatch(getRankingAction({ params: { origin: 'user' } }))
         }
     }, [dispatch])

@@ -9,8 +9,24 @@ const Logout = () => {
     const handleLogout = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault()
         await fetch('/api/auth/logout', { method: 'DELETE' }).catch(() => {})
-        context.setState({ ...context, user: '' })
         window.localStorage.removeItem('loggedUser')
+        context.setState({
+            ...context,
+            user: '',
+            userId: '',
+            username: '',
+            picture: '',
+            bio: '',
+            preferredGenres: [],
+            name: '',
+            surname: '',
+            city: '',
+            country: '',
+            birthYear: null,
+            gender: '',
+            privateFields: [],
+            config: {}
+        })
         router.push('/')
     }
 

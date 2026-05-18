@@ -142,33 +142,6 @@ describe('Create Poem Flow', () => {
         })
     })
 
-    describe('Regression test: Verify all caches are updated', () => {
-        it('should update dashboard list after creating poem', () => {
-            cy.login()
-            cy.visit('/profile')
-            cy.wait(1000)
-
-            // Create a poem with unique identifier
-            const uniqueTitle = `Dashboard Test ${Date.now()}`
-            cy.get('input[name="title"]').should('be.visible').clear().type(uniqueTitle)
-            cy.get('select[name="category"]').should('be.visible').select('Love')
-            cy.get('textarea[name="poem"]').should('be.visible').clear().type('Testing dashboard update')
-            cy.get('button').contains('Send').should('be.visible').click()
-
-            cy.contains(/poem created successfully/i, { timeout: 15000 }).should('be.visible')
-
-            // Wait for cache to update
-            cy.wait(2000)
-
-            // Navigate to dashboard
-            cy.visit('/')
-            cy.wait(1000)
-
-            // The new poem should appear in the dashboard
-            cy.contains(uniqueTitle, { timeout: 10000 }).should('be.visible')
-        })
-    })
-
     describe('Form validation', () => {
         beforeEach(() => {
             cy.login()

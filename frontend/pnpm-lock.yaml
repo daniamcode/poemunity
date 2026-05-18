@@ -49,9 +49,6 @@ importers:
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
-      disqus-react:
-        specifier: ^1.1.7
-        version: 1.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lodash:
         specifier: ^4.17.21
         version: 4.18.1
@@ -2241,12 +2238,6 @@ packages:
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
-
-  disqus-react@1.1.7:
-    resolution: {integrity: sha512-O+3q6weESpfCBumz45F+8Ue26zUn7UI62BCYwscoBszSr9vWPJohMiTtZWL/m8AyFba53bsSEhwyJcrTnXDMpg==}
-    peerDependencies:
-      react: ^15.6.1 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^15.6.1 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
@@ -7117,11 +7108,6 @@ snapshots:
   dir-glob@3.0.1:
     dependencies:
       path-type: 4.0.0
-
-  disqus-react@1.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   doctrine@2.1.0:
     dependencies:

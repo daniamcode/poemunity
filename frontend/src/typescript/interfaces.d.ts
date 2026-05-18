@@ -1,3 +1,17 @@
+export interface Comment {
+    id: string
+    targetType: 'poem' | 'profile'
+    targetId: string
+    authorId: string
+    authorName: string
+    authorPicture?: string | null
+    authorSlug?: string | null
+    body: string
+    parentId: string | null
+    createdAt: string
+    updatedAt: string
+}
+
 export interface Poem {
     id: string
     author: string

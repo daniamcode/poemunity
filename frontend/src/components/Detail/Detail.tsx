@@ -1,13 +1,13 @@
 import { useContext } from 'react'
 import { useRouter } from 'next/router'
 import { AppContext } from '../../App'
-import Disqus from 'disqus-react'
 import CircularProgress from '../CircularIndeterminate'
 import { useDetailPoem } from './hooks/useDetailPoem'
 import { usePoemActions } from '../../hooks/usePoemActions'
 import { PoemNotFound } from './components/PoemNotFound'
 import { PoemContent } from './components/PoemContent'
 import { PoemFooter } from './components/PoemFooter'
+import CommentsSection from '../Comments/CommentsSection'
 import { Poem } from '../../typescript/interfaces'
 
 interface DetailProps {
@@ -29,13 +29,6 @@ function Detail({ initialPoem }: DetailProps) {
         return <CircularProgress />
     }
 
-    const disqusShortname = 'poemunity'
-    const disqusConfig = {
-        url: `${typeof window !== 'undefined' ? window.location.origin : ''}/detail/${poemId}`,
-        identifier: poemId,
-        title: poem.title || 'Poem'
-    }
-
     return (
         <>
             {!poem.id ? (
@@ -47,9 +40,7 @@ function Detail({ initialPoem }: DetailProps) {
                         <br />
                         <PoemFooter poem={poem} context={context} onLike={onLike} onDelete={onDelete} onEdit={onEdit} />
                     </section>
-                    <div className='article-container'>
-                        <Disqus.DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
-                    </div>
+                    <CommentsSection targetType='poem' targetId={poem.id} />
                 </main>
             )}
         </>

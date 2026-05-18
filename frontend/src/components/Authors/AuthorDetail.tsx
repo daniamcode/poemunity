@@ -8,8 +8,10 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useAuthorPoems, InitialAuthorPoemsData } from './useAuthorPoems'
 import API from '../../redux/actions/axiosInstance'
 import { categoryToSlug } from '../../data/constants'
+import CommentsSection from '../Comments/CommentsSection'
 
 export interface AuthorProfile {
+    id?: string
     name: string
     picture?: string
     type?: string
@@ -98,6 +100,10 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
                 )}
                 <div ref={sentinelRef} />
             </div>
+
+            {authorProfile?.id && (
+                <CommentsSection targetType='profile' targetId={authorProfile.id} />
+            )}
         </main>
     )
 }

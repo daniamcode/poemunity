@@ -23,7 +23,7 @@ export function PoemContent({ poem }: PoemContentProps) {
                         {poem.author}
                     </Link>
                 </div>
-                <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>
+                {poem.date && <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>}
             </section>
             <section>
                 <div className='poem__content'>{poem.poem}</div>

@@ -4,5 +4,6 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/v1/login',
     REGISTER: '/api/v1/register',
     AUTHORS: '/api/v1/authors',
-    AUTHORS_LETTERS: '/api/v1/authors/letters'
+    AUTHORS_LETTERS: '/api/v1/authors/letters',
+    COMMENTS: '/api/v1/comments'
 }

@@ -1,11 +1,28 @@
+/**
+ * E2E: Ranking component behaviour
+ *
+ * The ranking data is fetched once on app mount (AppProvider useEffect) with
+ * a Redux cache guard: only fetches if rankingQuery.item is not already set.
+ * Switching genre categories must NOT trigger a second fetch.
+ *
+ * Actual endpoints (port 4201 in Cypress):
+ *   GET /api/v1/poems?origin=user          ← ranking
+ *   GET /api/v1/poems?page=1&limit=...     ← poem list
+ *   GET /api/v1/authors?limit=10           ← authors accordion
+ */
+
 describe('Ranking', () => {
     describe('No re-fetch on category navigation', () => {
         beforeEach(() => {
-            // Stub all API calls so the test doesn't depend on backend data
-            cy.intercept('GET', '**/api/authors*', { body: [] }).as('authorsRequest')
-            cy.intercept('GET', '**/api/poems*page*', { body: { items: [], total: 0 } }).as('poemsListRequest')
+            // Stub authors accordion so it resolves immediately
+            cy.intercept('GET', '**/api/v1/authors*', { body: [] }).as('authorsRequest')
+
+            // Stub the poem list (has `page` query param, no `origin`)
+            cy.intercept('GET', '**/api/v1/poems*page*', { body: [] }).as('poemsListRequest')
+
+            // Stub the ranking fetch (has `origin=user`, no `page`)
             cy.intercept(
-                { method: 'GET', url: '**/api/poems*', query: { origin: 'user' } },
+                { method: 'GET', url: '**/api/v1/poems*', query: { origin: 'user' } },
                 { body: [] }
             ).as('rankingRequest')
         })
@@ -14,8 +31,7 @@ describe('Ranking', () => {
             cy.visit('/')
             cy.wait('@rankingRequest')
 
-            // The Header also renders the categories accordion inside a hidden dropdown.
-            // Target the one in .dashboard__accordion to avoid the hidden header version.
+            // Target the genre links in the dashboard accordion (not the hidden header version)
             cy.get('.dashboard__accordion')
                 .contains('a', 'Love')
                 .click({ force: true })

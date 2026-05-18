@@ -11,6 +11,10 @@ import { Poem } from '../../typescript/interfaces'
 // Mock the hooks
 jest.mock('./hooks/useDetailPoem')
 jest.mock('../../hooks/usePoemActions')
+jest.mock('../Comments/CommentsSection', () => ({
+    __esModule: true,
+    default: () => <div data-testid='comments-section'>Comments</div>
+}))
 
 // Mock AppContext - define mockContext first
 jest.mock('../../App', () => {
@@ -131,9 +135,9 @@ describe('Detail', () => {
         expect(screen.getByText('2 Likes')).toBeInTheDocument()
     })
 
-    test('should render Disqus comments section', () => {
-        const { container } = renderWithProviders(<Detail />)
-        expect(container.querySelector('.article-container')).toBeInTheDocument()
+    test('should render CommentsSection', () => {
+        renderWithProviders(<Detail />)
+        expect(screen.getByText(/comment/i)).toBeInTheDocument()
     })
 
     test('should apply correct CSS classes to main container', () => {

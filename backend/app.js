@@ -8,6 +8,7 @@ const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
 const authorsRouter = require('./src/controllers/authors')
+const commentsRouter = require('./src/controllers/comments')
 
 app.use(express.json({ limit: '2mb' }))
 app.use(
@@ -24,6 +25,7 @@ app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)
 app.use('/api/v1/poem', poemRouter)
 app.use('/api/v1/authors', authorsRouter)
+app.use('/api/v1/comments', commentsRouter)
 
 app.get('/', (req, res) => {
   res.send('Server is ok')

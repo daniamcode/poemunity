@@ -1,0 +1,287 @@
+.comments {
+    width: 90vw;
+    max-width: 800px;
+    margin: 0 auto 40px;
+}
+
+.commentsTitle {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.commentsList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+}
+
+.commentsEmpty,
+.commentsLoading {
+    color: #95a5a6;
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+.commentsError {
+    color: #e74c3c;
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+.commentsLogin {
+    font-size: 14px;
+    color: #7f8c8d;
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.comment {
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.commentHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.commentAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.commentAvatarInitials {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.commentMeta {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.commentAuthor {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.commentDate {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+.commentDelete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #bdc3c7;
+    line-height: 1;
+    padding: 0 4px;
+
+    &:hover {
+        color: #e74c3c;
+    }
+}
+
+.commentBody {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #444;
+    margin: 0 0 8px 46px;
+    white-space: pre-wrap;
+}
+
+.commentFooter {
+    margin-left: 46px;
+}
+
+.commentReplyBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: #7f8c8d;
+    padding: 0;
+
+    &:hover {
+        color: #3498db;
+    }
+}
+
+.commentReplies {
+    list-style: none;
+    padding: 0 0 0 16px;
+    margin: 12px 0 0 46px;
+    border-left: 2px solid #ecf0f1;
+}
+
+.commentForm {
+    margin-top: 16px;
+}
+
+.commentFormTextarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dce1e7;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+    color: #2c3e50;
+    background: #fafafa;
+    transition: border-color 0.15s;
+
+    &:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #fff;
+    }
+
+    &::placeholder {
+        color: #bdc3c7;
+    }
+}
+
+.commentFormActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.commentFormBtn {
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+}
+
+.commentFormBtnSubmit {
+    background: #3498db;
+    color: #fff;
+
+    &:hover:not(:disabled) {
+        background: #2980b9;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+}
+
+.commentFormBtnCancel {
+    background: none;
+    color: #7f8c8d;
+    border: 1px solid #dce1e7;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.confirmOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirmBox {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 28px 24px;
+    width: 340px;
+    max-width: 90vw;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.confirmTitle {
+    font-size: 17px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px;
+}
+
+.confirmMessage {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin: 0 0 22px;
+}
+
+.confirmActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirmCancel {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    background: none;
+    border: 1px solid #dce1e7;
+    color: #7f8c8d;
+    font-family: inherit;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.confirmDelete {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #e74c3c;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+
+    &:hover {
+        background: #c0392b;
+    }
+}
