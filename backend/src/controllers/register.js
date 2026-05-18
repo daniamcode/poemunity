@@ -16,6 +16,14 @@ async function buildUniqueSlug (name) {
 registerRouter.post('/', async (req, res) => {
   try {
     const { username, email, password } = req.body
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Username, email and password are required', code: '0' })
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format', code: '0' })
+    }
+
     const passwordHash = await bcrypt.hash(password, 10)
 
     const authorExists = await Author.findOne({ $or: [{ username }, { email }] })

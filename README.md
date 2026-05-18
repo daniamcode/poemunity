@@ -111,6 +111,38 @@ Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json`
 | `NEXT_PUBLIC_API_URL` | Full backend URL with protocol (e.g. `https://poemunity-backend.vercel.app`) |
 | `NEXT_PUBLIC_ADMIN` | Admin author ID |
 
+## Testing
+
+### Backend unit tests
+
+```bash
+cd backend && pnpm test
+```
+
+Covers registration (happy path, missing fields, email validation, duplicate detection).
+
+### Frontend unit / integration tests
+
+```bash
+cd frontend && pnpm test
+```
+
+### Selenium + Applitools visual regression
+
+```bash
+cd frontend && pnpm selenium
+```
+
+Requires a running dev stack (backend on 4200, frontend on 3000) and the following env vars in `frontend/.env`:
+
+| Variable | Description |
+|---|---|
+| `APPLITOOLS_API_KEY` | From eyes.applitools.com → Account → API Key |
+| `SELENIUM_USERNAME` | Username of a real account in the dev database |
+| `SELENIUM_PASSWORD` | Password for that account |
+
+**Note:** Visual diffs do not fail the test run (`eyes.closeAsync()` is used). Diff results are still recorded in the Applitools dashboard for review. When you want to enforce visual quality (e.g. pre-release), switch to `eyes.close()` in `frontend/selenium/visual.spec.ts` — any unaccepted diff will then fail the test.
+
 ### Local development
 
 ```bash
