@@ -1,43 +1,45 @@
+@use '../../styles/variables' as *;
+
 .authors-index {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: $space-xl auto;
+    padding: 0 $space-5;
 
     &__title {
-        font-family: 'Quattrocento', serif;
-        font-size: 2.5rem;
-        color: #2c3e50;
-        margin-bottom: 24px;
+        font-family: $font-heading;
+        font-size: $fs-3xl;
+        color: $color-text-dark;
+        margin-bottom: $space-lg;
         text-align: center;
     }
 
     &__origin-filter {
         display: flex;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 24px;
+        gap: $space-sm;
+        margin-bottom: $space-lg;
     }
 
     &__origin-btn {
-        padding: 8px 20px;
-        border: 1px solid #e0e0e0;
-        background: #fff;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #7f8c8d;
+        padding: $space-sm $space-5;
+        border: 1px solid $color-border;
+        background: $color-bg-surface;
+        border-radius: $radius-pill;
+        font-size: $fs-sm-plus;
+        font-weight: $fw-medium;
+        color: $color-text-secondary;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: $transition-base;
 
         &:hover {
-            border-color: #3498db;
-            color: #3498db;
+            border-color: $color-primary;
+            color: $color-primary;
         }
 
         &.active {
-            background: #2c3e50;
-            border-color: #2c3e50;
-            color: #fff;
+            background: $color-text-dark;
+            border-color: $color-text-dark;
+            color: $color-bg-surface;
         }
     }
 
@@ -45,46 +47,46 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 8px;
-        margin-bottom: 40px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 12px;
+        gap: $space-sm;
+        margin-bottom: $space-xl;
+        padding: $space-5;
+        background: $color-bg-subtle;
+        border-radius: $radius-lg;
     }
 
     &__letter {
         width: 38px;
         height: 38px;
-        border: 1px solid #e0e0e0;
-        background: #fff;
+        border: 1px solid $color-border;
+        background: $color-bg-surface;
         cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 8px;
-        color: #7f8c8d;
+        font-size: $fs-base;
+        font-weight: $fw-semibold;
+        border-radius: $radius-md;
+        color: $color-text-secondary;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
+        transition: $transition-base;
 
         &:hover:not(:disabled) {
-            background: #3498db;
-            color: #fff;
-            border-color: #3498db;
+            background: $color-primary;
+            color: $color-bg-surface;
+            border-color: $color-primary;
             transform: translateY(-2px);
         }
 
         &.active {
-            background: #2c3e50;
-            color: #fff;
-            border-color: #2c3e50;
+            background: $color-text-dark;
+            color: $color-bg-surface;
+            border-color: $color-text-dark;
         }
 
         &.disabled {
             color: #d0d5dd;
             cursor: default;
-            border-color: #f0f0f0;
-            background: #fafafa;
+            border-color: $color-border-subtle;
+            background: $color-bg-subtle;
         }
     }
 
@@ -98,93 +100,93 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 20px;
+        padding: 15px $space-5;
         text-decoration: none;
-        color: #2c3e50;
-        background: #fff;
-        border: 1px solid #f0f0f0;
+        color: $color-text-dark;
+        background: $color-bg-surface;
+        border: 1px solid $color-border-subtle;
         border-radius: 10px;
-        transition: all 0.2s;
+        transition: $transition-base;
 
         &:hover {
-            border-color: #3498db;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
-            color: #3498db;
+            border-color: $color-primary;
+            box-shadow: 0 4px 12px $color-primary-focus-shadow;
+            color: $color-primary;
             transform: translateY(-2px);
         }
     }
 
     &__author-name {
-        font-size: 1.05rem;
-        font-weight: 500;
+        font-size: $fs-base;
+        font-weight: $fw-medium;
     }
 
     &__author-count {
-        font-size: 0.85rem;
-        color: #95a5a6;
-        background: #f8f9fa;
-        padding: 2px 8px;
-        border-radius: 12px;
+        font-size: $fs-sm;
+        color: $color-text-muted;
+        background: $color-bg-subtle;
+        padding: 2px $space-sm;
+        border-radius: $radius-lg;
     }
 
     &__loading,
     &__empty {
-        color: #95a5a6;
-        font-size: 1rem;
+        color: $color-text-muted;
+        font-size: $fs-base;
         text-align: center;
-        padding: 40px 0;
+        padding: $space-xl 0;
     }
 }
 
 .author-detail {
     max-width: 800px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: $space-xl auto;
+    padding: 0 $space-5;
 
     &__header {
-        margin-bottom: 40px;
+        margin-bottom: $space-xl;
         text-align: center;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid $color-border-subtle;
         padding-bottom: 30px;
     }
 
     &__name {
-        font-family: 'Quattrocento', serif;
-        font-size: 2.8rem;
-        color: #2c3e50;
+        font-family: $font-heading;
+        font-size: $fs-4xl;
+        color: $color-text-dark;
         margin-bottom: 10px;
     }
 
     &__surname {
-        font-weight: 400;
+        font-weight: $fw-regular;
     }
 
     &__ai-badge {
-        font-size: 1rem;
-        font-weight: 400;
-        color: #7f8c8d;
+        font-size: $fs-base;
+        font-weight: $fw-regular;
+        color: $color-text-secondary;
         font-family: inherit;
     }
 
     &__meta {
-        font-size: 0.95rem;
-        color: #7f8c8d;
+        font-size: $fs-base-minus;
+        color: $color-text-secondary;
         margin: 4px 0 0;
     }
 
     &__count {
-        color: #7f8c8d;
-        font-size: 1.1rem;
-        font-weight: 400;
-        margin-bottom: 16px;
+        color: $color-text-secondary;
+        font-size: $fs-md;
+        font-weight: $fw-regular;
+        margin-bottom: $space-md;
     }
 
     &__bio {
-        font-size: 1rem;
-        color: #555;
-        line-height: 1.7;
+        font-size: $fs-base;
+        color: $color-text-medium;
+        line-height: $lh-loose;
         max-width: 600px;
-        margin: 0 auto 16px;
+        margin: 0 auto $space-md;
     }
 
     &__genres {
@@ -192,38 +194,38 @@
         flex-wrap: wrap;
         gap: 6px;
         justify-content: center;
-        margin-top: 8px;
+        margin-top: $space-sm;
     }
 
     &__genre-tag {
-        font-size: 0.78rem;
+        font-size: $fs-xs;
         padding: 4px 12px;
-        background: #eaf3fb;
-        color: #2980b9;
-        border-radius: 12px;
-        font-weight: 500;
+        background: $color-primary-bg;
+        color: $color-primary-hover;
+        border-radius: $radius-lg;
+        font-weight: $fw-medium;
         text-decoration: none;
         transition: background 0.15s, color 0.15s;
 
         &:hover {
-            background: #2980b9;
-            color: #fff;
+            background: $color-primary-hover;
+            color: $color-bg-surface;
         }
     }
 
     &__empty {
-        color: #95a5a6;
-        font-size: 1rem;
+        color: $color-text-muted;
+        font-size: $fs-base;
         text-align: center;
-        padding: 40px 0;
+        padding: $space-xl 0;
     }
 }
 
 .authors-accordion__browse-all {
-    color: #3498db;
+    color: $color-primary;
     font-style: italic;
     text-decoration: none;
-    
+
     &:hover {
         text-decoration: underline;
     }

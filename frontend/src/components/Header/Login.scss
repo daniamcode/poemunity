@@ -1,28 +1,30 @@
+@use '../../styles/variables' as *;
+
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     min-height: 80vh;
-    padding: 20px;
+    padding: $space-5;
 }
 
 .login-card {
-    background: #fff;
-    padding: 40px;
+    background: $color-bg-surface;
+    padding: $space-xl;
     width: 100%;
     max-width: 450px;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f0f0f0;
+    border: 1px solid $color-border-subtle;
 
     h2 {
-        font-family: 'EB Garamond', serif;
-        font-size: 2.2rem;
-        color: #2c3e50;
+        font-family: $font-heading;
+        font-size: $fs-display;
+        color: $color-text-dark;
         text-align: center;
         margin-bottom: 10px;
-        font-weight: 600;
+        font-weight: $fw-semibold;
     }
 
     .login {
@@ -32,12 +34,12 @@
         width: 100%;
 
         label {
-            font-family: 'Quattrocento', serif;
-            font-size: 1.1rem;
-            color: #2c3e50;
+            font-family: $font-heading;
+            font-size: $fs-md;
+            color: $color-text-dark;
             text-align: center;
             margin-bottom: 30px;
-            line-height: 1.5;
+            line-height: $lh-base;
         }
 
         .login__username,
@@ -48,18 +50,18 @@
             input {
                 width: 100%;
                 padding: 12px 15px;
-                font-size: 1rem;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                background: #f8f9fa;
-                color: #2c3e50;
-                transition: all 0.2s;
+                font-size: $fs-base;
+                border: 1px solid $color-border;
+                border-radius: $radius-md;
+                background: $color-bg-subtle;
+                color: $color-text-dark;
+                transition: $transition-base;
 
                 &:focus {
                     outline: none;
-                    border-color: #3498db;
-                    background: #fff;
-                    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+                    border-color: $color-primary;
+                    background: $color-bg-surface;
+                    box-shadow: 0 0 0 3px $color-primary-focus-shadow;
                 }
             }
         }
@@ -67,18 +69,18 @@
         button {
             width: 100%;
             padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            background-color: #3498db;
+            font-size: $fs-md;
+            font-weight: $fw-semibold;
+            color: $color-bg-surface;
+            background-color: $color-primary;
             border: none;
-            border-radius: 8px;
+            border-radius: $radius-md;
             cursor: pointer;
-            margin: 20px 0;
-            transition: all 0.2s;
+            margin: $space-5 0;
+            transition: $transition-base;
 
             &:hover:not(:disabled) {
-                background-color: #2980b9;
+                background-color: $color-primary-hover;
                 transform: translateY(-1px);
             }
 
@@ -87,16 +89,16 @@
             }
 
             &:disabled {
-                background-color: #bdc3c7;
+                background-color: $color-text-placeholder;
                 cursor: not-allowed;
             }
         }
 
         a {
-            color: #3498db;
+            color: $color-primary;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
+            font-weight: $fw-medium;
+            font-size: $fs-base-minus;
 
             &:hover {
                 text-decoration: underline;
@@ -105,8 +107,8 @@
     }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: $bp-sm) {
     .login-card {
-        padding: 30px 20px;
+        padding: 30px $space-5;
     }
 }

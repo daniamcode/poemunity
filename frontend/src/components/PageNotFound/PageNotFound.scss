@@ -1,3 +1,5 @@
+@use '../../styles/variables' as *;
+
 .page-not-found__container {
     display: flex;
     flex-direction: column;
@@ -5,7 +7,7 @@
 }
 
 .page-not-found__message {
-    font-size: 30px;
+    font-size: $fs-2xl;
     display: flex;
     flex-direction: column;
     width: 500px;

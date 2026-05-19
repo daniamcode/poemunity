@@ -1,24 +1,26 @@
+@use '../../styles/variables' as *;
+
 .ranking {
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
+    padding: $space-5;
+    background: $color-bg-surface;
+    border-radius: $radius-lg;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .ranking__title {
-    color: #2c3e50;
-    font-size: 1.4rem;
+    color: $color-text-dark;
+    font-size: $fs-lg;
     margin-bottom: 5px;
-    font-family: 'Quattrocento', serif;
+    font-family: $font-heading;
 }
 
 .ranking__subtitle {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-    font-weight: 400;
+    color: $color-text-secondary;
+    font-size: $fs-sm-plus;
+    margin-bottom: $space-5;
+    font-weight: $fw-regular;
 }
 
 .ranking__item {
@@ -27,9 +29,9 @@
     column-gap: 12px;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid $color-bg-subtle;
     text-decoration: none;
-    transition: transform 0.2s;
+    transition: $transition-base;
 
     &:hover {
         transform: translateX(5px);
@@ -41,20 +43,20 @@
 }
 
 .ranking__rank-number {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #bdc3c7;
+    font-size: $fs-md;
+    font-weight: $fw-bold;
+    color: $color-text-placeholder;
     text-align: center;
 
-    &--1 { color: #f1c40f; }
-    &--2 { color: #bdc3c7; }
-    &--3 { color: #e67e22; }
+    &--1 { color: $color-rank-gold; }
+    &--2 { color: $color-text-placeholder; }
+    &--3 { color: $color-rank-bronze; }
 }
 
 .ranking__avatar {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: $radius-full;
     overflow: hidden;
 
     img, span {
@@ -68,28 +70,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
-        font-size: 16px;
-        font-weight: 600;
+        color: $color-bg-surface;
+        font-size: $fs-base;
+        font-weight: $fw-semibold;
         user-select: none;
     }
 }
 
 .ranking__author-name {
-    font-size: 1rem;
+    font-size: $fs-base;
     color: #34495e;
-    font-weight: 500;
+    font-weight: $fw-medium;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .ranking__points {
-    background: #f8f9fa;
+    background: $color-bg-subtle;
     padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #7f8c8d;
+    border-radius: $radius-pill;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    color: $color-text-secondary;
     white-space: nowrap;
 }

@@ -1,0 +1,125 @@
+// =============================================================================
+// GLOBAL DESIGN TOKENS
+// Import this file in any SCSS file that needs shared values:
+//   @use '../../styles/variables' as *;
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Colors — primary (blue)
+// -----------------------------------------------------------------------------
+$color-primary:              #3498db;
+$color-primary-hover:        #2980b9;
+$color-primary-dark:         #1a6ea0;
+$color-primary-bg:           #eaf3fb;   // light blue bg for tags / edit hover
+$color-primary-focus-shadow: rgba(52, 152, 219, 0.1);
+$color-primary-active-bg:    rgba(52, 152, 219, 0.05);
+
+// Colors — text
+$color-text-dark:        #2c3e50;   // headings, labels, main content
+$color-text-medium:      #555;      // body text, secondary content
+$color-text-secondary:   #7f8c8d;  // meta, labels, muted
+$color-text-muted:       #95a5a6;  // empty states, dates, counts
+$color-text-placeholder: #bdc3c7;  // input placeholders, disabled text
+
+// Colors — surfaces & borders
+$color-bg-surface:  #ffffff;
+$color-bg-subtle:   #f8f9fa;   // input backgrounds, subtle panels
+$color-border:      #e0e0e0;   // standard input/card borders
+$color-border-subtle: #f0f0f0; // very soft separators
+
+// Colors — semantic
+$color-error:         #e74c3c;
+$color-error-hover:   #c0392b;
+$color-warning:       #e67e22;   // orange — cancel, edit actions
+$color-warning-hover: #d35400;
+
+// Colors — brand / special
+$color-logo:         #4f5d73;   // brand name text in header
+$color-rank-gold:    #f1c40f;   // rank #1
+$color-rank-bronze:  #e67e22;   // rank #3 (same value as $color-warning)
+
+// Colors — overlays
+$color-overlay: rgba(0, 0, 0, 0.45);
+
+// -----------------------------------------------------------------------------
+// Typography — families
+// -----------------------------------------------------------------------------
+$font-body:    'EB Garamond', serif;
+$font-heading: 'Quattrocento', serif;
+
+// Typography — size scale
+$fs-xs:        0.75rem;  // ~12px  small labels, tags
+$fs-sm:        0.85rem;  // ~14px  meta, dates, captions
+$fs-sm-plus:   0.9rem;   // ~14.4px between sm and base (used widely)
+$fs-base-minus: 0.95rem; // ~15px  just below body size (used widely)
+$fs-base:      1rem;     // 16px   body text, inputs
+$fs-md:        1.1rem;   // ~18px  slightly prominent text, buttons
+$fs-lg:        1.3rem;   // ~21px  sub-section titles
+$fs-xl:        1.5rem;   // 24px   section titles
+$fs-2xl:       2rem;     // 32px   page titles
+$fs-display:   2.2rem;   // ~35px  form page headings (login, register)
+$fs-3xl:       2.5rem;   // 40px   large display headings
+$fs-4xl:       2.8rem;   // ~45px  hero / author name headings
+
+// Typography — weights
+$fw-regular:  400;
+$fw-medium:   500;
+$fw-semibold: 600;
+$fw-bold:     700;
+
+// Typography — line heights
+$lh-tight:  1.2;
+$lh-base:   1.5;
+$lh-relaxed: 1.6;
+$lh-loose:  1.7;
+
+// -----------------------------------------------------------------------------
+// Spacing scale
+// -----------------------------------------------------------------------------
+$space-1:  4px;
+$space-2:  8px;
+$space-3:  12px;
+$space-4:  16px;
+$space-5:  20px;
+$space-6:  24px;
+$space-7:  30px;
+$space-8:  40px;
+$space-9:  60px;
+
+// Named aliases for common cases
+$space-xs: $space-1;   // 4px
+$space-sm: $space-2;   // 8px
+$space-md: $space-4;   // 16px
+$space-lg: $space-6;   // 24px
+$space-xl: $space-8;   // 40px
+$space-2xl: $space-9;  // 60px
+
+// -----------------------------------------------------------------------------
+// Border radius
+// -----------------------------------------------------------------------------
+$radius-sm:   6px;    // buttons, small elements
+$radius-md:   8px;    // inputs, standard cards
+$radius-lg:   12px;   // modals, larger cards
+$radius-pill: 20px;   // pill/badge shapes
+$radius-full: 50%;    // circular avatars
+
+// -----------------------------------------------------------------------------
+// Transitions
+// -----------------------------------------------------------------------------
+$transition-fast: all 0.15s;
+$transition-base: all 0.2s;
+
+// -----------------------------------------------------------------------------
+// Breakpoints
+// -----------------------------------------------------------------------------
+$bp-sm: 480px;
+$bp-md: 700px;
+$bp-lg: 900px;
+$bp-xl: 1200px;
+
+// -----------------------------------------------------------------------------
+// Layout
+// -----------------------------------------------------------------------------
+$header-height:    70px;
+$max-width-narrow: 800px;
+$max-width-wide:   1200px;

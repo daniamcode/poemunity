@@ -1,41 +1,43 @@
+@use '../../styles/variables' as *;
+
 .comments {
     width: 90vw;
     max-width: 800px;
-    margin: 0 auto 40px;
+    margin: 0 auto $space-xl;
 }
 
 .commentsTitle {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 20px;
-    font-weight: 600;
+    font-size: $fs-lg;
+    color: $color-text-dark;
+    margin-bottom: $space-5;
+    font-weight: $fw-semibold;
 }
 
 .commentsList {
     list-style: none;
     padding: 0;
-    margin: 0 0 24px;
+    margin: 0 0 $space-lg;
 }
 
 .commentsEmpty,
 .commentsLoading {
-    color: #95a5a6;
-    font-size: 14px;
+    color: $color-text-muted;
+    font-size: $fs-sm;
     margin: 12px 0;
 }
 
 .commentsError {
-    color: #e74c3c;
-    font-size: 14px;
+    color: $color-error;
+    font-size: $fs-sm;
     margin: 12px 0;
 }
 
 .commentsLogin {
-    font-size: 14px;
-    color: #7f8c8d;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
 
     a {
-        color: #3498db;
+        color: $color-primary;
         text-decoration: none;
 
         &:hover {
@@ -45,8 +47,8 @@
 }
 
 .comment {
-    padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
+    padding: $space-md 0;
+    border-bottom: 1px solid $color-border-subtle;
 
     &:last-child {
         border-bottom: none;
@@ -57,13 +59,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: $space-sm;
 }
 
 .commentAvatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: $radius-full;
     object-fit: cover;
     flex-shrink: 0;
 }
@@ -71,14 +73,14 @@
 .commentAvatarInitials {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: $radius-full;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
+    color: $color-bg-surface;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
     user-select: none;
 }
 
@@ -89,9 +91,9 @@
 }
 
 .commentAuthor {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    color: $color-text-dark;
     text-decoration: none;
 
     &:hover {
@@ -100,29 +102,29 @@
 }
 
 .commentDate {
-    font-size: 12px;
-    color: #95a5a6;
+    font-size: $fs-xs;
+    color: $color-text-muted;
 }
 
 .commentDelete {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 20px;
-    color: #bdc3c7;
+    font-size: $fs-lg;
+    color: $color-text-placeholder;
     line-height: 1;
     padding: 0 4px;
 
     &:hover {
-        color: #e74c3c;
+        color: $color-error;
     }
 }
 
 .commentBody {
-    font-size: 15px;
-    line-height: 1.5;
-    color: #444;
-    margin: 0 0 8px 46px;
+    font-size: $fs-sm-plus;
+    line-height: $lh-base;
+    color: $color-text-medium;
+    margin: 0 0 $space-sm 46px;
     white-space: pre-wrap;
 }
 
@@ -134,72 +136,72 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 13px;
-    color: #7f8c8d;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
     padding: 0;
 
     &:hover {
-        color: #3498db;
+        color: $color-primary;
     }
 }
 
 .commentReplies {
     list-style: none;
-    padding: 0 0 0 16px;
+    padding: 0 0 0 $space-md;
     margin: 12px 0 0 46px;
     border-left: 2px solid #ecf0f1;
 }
 
 .commentForm {
-    margin-top: 16px;
+    margin-top: $space-md;
 }
 
 .commentFormTextarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #dce1e7;
-    border-radius: 6px;
-    font-size: 14px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $fs-sm;
     font-family: inherit;
     resize: vertical;
     box-sizing: border-box;
-    color: #2c3e50;
-    background: #fafafa;
+    color: $color-text-dark;
+    background: $color-bg-subtle;
     transition: border-color 0.15s;
 
     &:focus {
         outline: none;
-        border-color: #3498db;
-        background: #fff;
+        border-color: $color-primary;
+        background: $color-bg-surface;
     }
 
     &::placeholder {
-        color: #bdc3c7;
+        color: $color-text-placeholder;
     }
 }
 
 .commentFormActions {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 8px;
+    gap: $space-sm;
+    margin-top: $space-sm;
 }
 
 .commentFormBtn {
-    padding: 8px 18px;
+    padding: $space-sm 18px;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: $fs-sm;
     cursor: pointer;
     border: none;
     font-family: inherit;
 }
 
 .commentFormBtnSubmit {
-    background: #3498db;
-    color: #fff;
+    background: $color-primary;
+    color: $color-bg-surface;
 
     &:hover:not(:disabled) {
-        background: #2980b9;
+        background: $color-primary-hover;
     }
 
     &:disabled {
@@ -210,18 +212,18 @@
 
 .commentFormBtnCancel {
     background: none;
-    color: #7f8c8d;
-    border: 1px solid #dce1e7;
+    color: $color-text-secondary;
+    border: 1px solid $color-border;
 
     &:hover {
-        background: #f5f5f5;
+        background: $color-bg-subtle;
     }
 }
 
 .confirmOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: $color-overlay;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -229,8 +231,8 @@
 }
 
 .confirmBox {
-    background: #fff;
-    border-radius: 12px;
+    background: $color-bg-surface;
+    border-radius: $radius-lg;
     padding: 28px 28px 24px;
     width: 340px;
     max-width: 90vw;
@@ -238,15 +240,15 @@
 }
 
 .confirmTitle {
-    font-size: 17px;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0 0 8px;
+    font-size: $fs-md;
+    font-weight: $fw-semibold;
+    color: $color-text-dark;
+    margin: 0 0 $space-sm;
 }
 
 .confirmMessage {
-    font-size: 14px;
-    color: #7f8c8d;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
     margin: 0 0 22px;
 }
 
@@ -257,31 +259,31 @@
 }
 
 .confirmCancel {
-    padding: 8px 18px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: $space-sm 18px;
+    border-radius: $radius-sm;
+    font-size: $fs-sm;
     cursor: pointer;
     background: none;
-    border: 1px solid #dce1e7;
-    color: #7f8c8d;
+    border: 1px solid $color-border;
+    color: $color-text-secondary;
     font-family: inherit;
 
     &:hover {
-        background: #f5f5f5;
+        background: $color-bg-subtle;
     }
 }
 
 .confirmDelete {
-    padding: 8px 18px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: $space-sm 18px;
+    border-radius: $radius-sm;
+    font-size: $fs-sm;
     cursor: pointer;
-    background: #e74c3c;
+    background: $color-error;
     border: none;
-    color: #fff;
+    color: $color-bg-surface;
     font-family: inherit;
 
     &:hover {
-        background: #c0392b;
+        background: $color-error-hover;
     }
 }

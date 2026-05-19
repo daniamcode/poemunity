@@ -1,13 +1,15 @@
+@use '../../styles/variables' as *;
+
 .profile__main {
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding-bottom: 40px;
+    padding-bottom: $space-xl;
 }
 
 .profile__intro-wrapper {
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: $color-bg-subtle;
     border-bottom: 1px solid #eaeaea;
 }
 
@@ -15,8 +17,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
-    max-width: 1200px;
+    padding: $space-xl $space-5;
+    max-width: $max-width-wide;
     margin: 0 auto;
     width: 100%;
 }
@@ -25,9 +27,9 @@
     position: relative;
     width: 100px;
     height: 100px;
-    margin-bottom: 20px;
+    margin-bottom: $space-5;
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: $radius-full;
 
     &:hover .profile__picture-overlay {
         opacity: 1;
@@ -38,8 +40,8 @@
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border-radius: 50%;
-    border: 4px solid #fff;
+    border-radius: $radius-full;
+    border: 4px solid $color-bg-surface;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: block;
 
@@ -47,9 +49,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
-        font-size: 2.5rem;
-        font-weight: 600;
+        color: $color-bg-surface;
+        font-size: $fs-3xl;
+        font-weight: $fw-semibold;
         user-select: none;
     }
 }
@@ -57,8 +59,8 @@
 .profile__picture-overlay {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.45);
+    border-radius: $radius-full;
+    background: $color-overlay;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -69,24 +71,24 @@
 }
 
 .profile__picture-camera {
-    font-size: 1.3rem;
+    font-size: $fs-lg;
     line-height: 1;
 }
 
 .profile__picture-label {
     font-size: 0.6rem;
-    color: #fff;
+    color: $color-bg-surface;
     text-align: center;
-    line-height: 1.2;
+    line-height: $lh-tight;
     padding: 0 6px;
 }
 
 .profile__picture-spinner {
     width: 22px;
     height: 22px;
-    border: 3px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-top-color: $color-bg-surface;
+    border-radius: $radius-full;
     animation: spin 0.7s linear infinite;
 }
 
@@ -104,24 +106,24 @@
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 0.8rem;
-    color: #e74c3c;
+    font-size: $fs-sm;
+    color: $color-error;
 }
 
 .profile__personal-data {
     width: 100%;
-    background: #fff;
+    background: $color-bg-surface;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .profile__insert-poem-title {
-    font-family: 'Quattrocento', serif;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-weight: 600;
+    font-family: $font-heading;
+    font-size: $fs-xl;
+    margin-bottom: $space-5;
+    color: $color-text-dark;
+    font-weight: $fw-semibold;
 }
 
 .profile__insert-poem-inputs {
@@ -135,24 +137,24 @@
     width: 100%;
     border: none;
     padding: 0;
-    
+
     input, select {
         width: 100%;
         padding: 12px 15px;
-        font-size: 1rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        background: #fff;
-        color: #2c3e50;
-        transition: all 0.2s;
+        font-size: $fs-base;
+        border: 1px solid $color-border;
+        border-radius: $radius-md;
+        background: $color-bg-surface;
+        color: $color-text-dark;
+        transition: $transition-base;
 
         &:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: $color-primary;
+            box-shadow: 0 0 0 3px $color-primary-focus-shadow;
         }
     }
-    
+
     select {
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23bdc3c7'/%3E%3C/svg%3E");
@@ -165,20 +167,20 @@
 .profile__text-area {
     width: 100%;
     height: 180px;
-    font-size: 1rem;
+    font-size: $fs-base;
     padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    margin-bottom: $space-5;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
     resize: vertical;
     font-family: inherit;
-    color: #2c3e50;
-    transition: all 0.2s;
+    color: $color-text-dark;
+    transition: $transition-base;
 
     &:focus {
         outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px $color-primary-focus-shadow;
     }
 }
 
@@ -189,52 +191,52 @@
 }
 
 .profile__send-poem {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: $fs-base-minus;
+    font-weight: $fw-semibold;
     padding: 12px 24px;
-    background-color: #3498db;
+    background-color: $color-primary;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: $radius-md;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: $transition-base;
 
     &:hover:not([disabled]) {
-        background-color: #2980b9;
+        background-color: $color-primary-hover;
         transform: translateY(-1px);
     }
 
     &[disabled] {
         background-color: #ebedef;
-        color: #bdc3c7;
+        color: $color-text-placeholder;
         cursor: not-allowed;
     }
 
     &.profile__reset-btn {
-        background-color: #fff;
-        color: #7f8c8d;
-        border: 1px solid #e0e0e0;
-        
+        background-color: $color-bg-surface;
+        color: $color-text-secondary;
+        border: 1px solid $color-border;
+
         &:hover {
-            background-color: #f8f9fa;
-            border-color: #bdc3c7;
+            background-color: $color-bg-subtle;
+            border-color: $color-text-placeholder;
         }
     }
 }
 
 .profile__cancel-edit {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: $fs-base-minus;
+    font-weight: $fw-semibold;
     padding: 12px 24px;
-    background-color: #e67e22;
+    background-color: $color-warning;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: $radius-md;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: $transition-base;
 
     &:hover {
-        background-color: #d35400;
+        background-color: $color-warning-hover;
         transform: translateY(-1px);
     }
 }
@@ -248,22 +250,22 @@
 
 .user-info {
     width: 100%;
-    margin-top: 16px;
+    margin-top: $space-md;
     text-align: center;
 }
 
 .user-info__name {
-    font-family: 'Quattrocento', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #2c3e50;
+    font-family: $font-heading;
+    font-size: $fs-lg;
+    font-weight: $fw-bold;
+    color: $color-text-dark;
     margin: 0 0 10px;
 }
 
 .user-info__bio {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.6;
+    font-size: $fs-sm-plus;
+    color: $color-text-medium;
+    line-height: $lh-relaxed;
     margin: 0 0 12px;
 
     &--empty {
@@ -281,18 +283,18 @@
 }
 
 .user-info__genre-tag {
-    font-size: 0.75rem;
+    font-size: $fs-xs;
     padding: 3px 10px;
-    background: #eaf3fb;
-    color: #2980b9;
-    border-radius: 12px;
-    font-weight: 500;
+    background: $color-primary-bg;
+    color: $color-primary-hover;
+    border-radius: $radius-lg;
+    font-weight: $fw-medium;
     text-decoration: none;
     transition: background 0.15s, color 0.15s;
 
     &:hover {
-        background: #2980b9;
-        color: #fff;
+        background: $color-primary-hover;
+        color: $color-bg-surface;
     }
 }
 
@@ -303,51 +305,51 @@
     max-height: 200px;
     overflow-y: auto;
     padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: #fafafa;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-bg-subtle;
 }
 
 .user-info__genre-option {
-    font-size: 0.75rem;
+    font-size: $fs-xs;
     padding: 4px 10px;
-    border-radius: 12px;
-    border: 1px solid #d0d5dd;
-    background: #fff;
-    color: #555;
+    border-radius: $radius-lg;
+    border: 1px solid $color-border;
+    background: $color-bg-surface;
+    color: $color-text-medium;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: $transition-fast;
     font-family: inherit;
     white-space: nowrap;
 
     &:hover {
-        border-color: #3498db;
-        color: #3498db;
+        border-color: $color-primary;
+        color: $color-primary;
     }
 
     &--selected {
-        background: #2980b9;
-        border-color: #2980b9;
-        color: #fff;
+        background: $color-primary-hover;
+        border-color: $color-primary-hover;
+        color: $color-bg-surface;
 
         &:hover {
-            background: #1a6ea0;
-            border-color: #1a6ea0;
-            color: #fff;
+            background: $color-primary-dark;
+            border-color: $color-primary-dark;
+            color: $color-bg-surface;
         }
     }
 }
 
 .user-info__realname {
-    font-size: 0.95rem;
-    font-weight: 400;
-    color: #7f8c8d;
+    font-size: $fs-base-minus;
+    font-weight: $fw-regular;
+    color: $color-text-secondary;
 }
 
 .user-info__public-link {
     display: inline-block;
-    font-size: 0.82rem;
-    color: #3498db;
+    font-size: $fs-sm;
+    color: $color-primary;
     text-decoration: none;
     margin-bottom: 12px;
 
@@ -357,9 +359,9 @@
 }
 
 .user-info__meta {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    margin: 0 0 8px;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    margin: 0 0 $space-sm;
 }
 
 .user-info__field-row {
@@ -386,27 +388,27 @@
     font-size: 0.7rem;
     padding: 1px 7px;
     border-radius: 10px;
-    border: 1px solid #d0d5dd;
+    border: 1px solid $color-border;
     background: #f0f8ff;
-    color: #2980b9;
+    color: $color-primary-hover;
     cursor: pointer;
     margin-left: 6px;
     font-family: inherit;
     vertical-align: middle;
-    transition: all 0.15s;
+    transition: $transition-fast;
 
     &:hover {
-        border-color: #2980b9;
+        border-color: $color-primary-hover;
     }
 
     &--private {
-        background: #f5f5f5;
+        background: $color-bg-subtle;
         color: #888;
         border-color: #ccc;
 
         &:hover {
-            border-color: #555;
-            color: #555;
+            border-color: $color-text-medium;
+            color: $color-text-medium;
         }
     }
 }
@@ -419,14 +421,14 @@
 }
 
 .user-info__label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #2c3e50;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    color: $color-text-dark;
     margin-bottom: 2px;
 }
 
 .user-info__hint {
-    font-weight: 400;
+    font-weight: $fw-regular;
     color: #999;
 }
 
@@ -434,11 +436,11 @@
 .user-info__input {
     width: 100%;
     padding: 10px 12px;
-    font-size: 0.9rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: #fff;
-    color: #2c3e50;
+    font-size: $fs-sm-plus;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-bg-surface;
+    color: $color-text-dark;
     font-family: inherit;
     resize: vertical;
     transition: border-color 0.2s;
@@ -446,63 +448,63 @@
 
     &:focus {
         outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px $color-primary-focus-shadow;
     }
 }
 
 .user-info__error {
-    font-size: 0.8rem;
-    color: #e74c3c;
+    font-size: $fs-sm;
+    color: $color-error;
     margin: 0;
 }
 
 .user-info__actions {
     display: flex;
-    gap: 8px;
+    gap: $space-sm;
 }
 
 .user-info__btn {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 8px;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    padding: $space-sm 18px;
+    border-radius: $radius-md;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: $transition-base;
 
     &--edit {
         background: transparent;
-        color: #3498db;
-        border: 1px solid #3498db;
+        color: $color-primary;
+        border: 1px solid $color-primary;
         margin-top: 2px;
 
         &:hover {
-            background: #eaf3fb;
+            background: $color-primary-bg;
         }
     }
 
     &--save {
-        background: #3498db;
-        color: #fff;
+        background: $color-primary;
+        color: $color-bg-surface;
 
         &:hover:not([disabled]) {
-            background: #2980b9;
+            background: $color-primary-hover;
         }
 
         &[disabled] {
-            background: #bdc3c7;
+            background: $color-text-placeholder;
             cursor: not-allowed;
         }
     }
 
     &--cancel {
-        background: #fff;
-        color: #7f8c8d;
-        border: 1px solid #e0e0e0;
+        background: $color-bg-surface;
+        color: $color-text-secondary;
+        border: 1px solid $color-border;
 
         &:hover:not([disabled]) {
-            background: #f8f9fa;
+            background: $color-bg-subtle;
         }
 
         &[disabled] {
@@ -513,50 +515,50 @@
 }
 
 .profile__outro {
-    max-width: 1200px;
+    max-width: $max-width-wide;
     margin: 30px auto 0;
 }
 
 .profile__tabs-header {
-    background-color: #fff;
-    border-radius: 12px 12px 0 0;
+    background-color: $color-bg-surface;
+    border-radius: $radius-lg $radius-lg 0 0;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 
     .MuiAppBar-root {
         box-shadow: none;
-        border-bottom: 1px solid #eee;
-        background: #fff;
+        border-bottom: 1px solid $color-border-subtle;
+        background: $color-bg-surface;
     }
 
     .MuiTab-root {
-        font-family: 'Quattrocento', serif;
-        font-weight: 600;
+        font-family: $font-heading;
+        font-weight: $fw-semibold;
         text-transform: none;
-        font-size: 1rem;
-        color: #7f8c8d;
+        font-size: $fs-base;
+        color: $color-text-secondary;
 
         &.Mui-selected {
-            color: #3498db;
+            color: $color-primary;
         }
     }
 
     .MuiTabs-indicator {
-        background-color: #3498db;
+        background-color: $color-primary;
         height: 3px;
     }
 }
 
 .profile__tabs-content {
-    background: #fff;
-    border-radius: 0 0 12px 12px;
+    background: $color-bg-surface;
+    border-radius: 0 0 $radius-lg $radius-lg;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    padding-top: 20px;
+    padding-top: $space-5;
 }
 
 @media screen and (max-width: 699px) {
     .profile__intro {
-        padding: 24px 16px;
+        padding: 24px $space-md;
         gap: 0;
     }
 
@@ -571,7 +573,7 @@
         height: 84px;
 
         &--initials {
-            font-size: 2rem;
+            font-size: $fs-2xl;
         }
     }
 
@@ -580,22 +582,22 @@
     }
 
     .user-info__name {
-        font-size: 1.15rem;
+        font-size: $fs-md;
         margin-bottom: 4px;
     }
 
     .profile__personal-data {
-        padding: 20px 16px;
-        margin-top: 16px;
+        padding: $space-5 $space-md;
+        margin-top: $space-md;
     }
 }
 
-@media screen and (min-width: 700px) {
+@media screen and (min-width: $bp-md) {
     .profile__intro {
         flex-direction: row;
-        gap: 40px;
+        gap: $space-xl;
         align-items: flex-start;
-        padding: 60px 20px;
+        padding: $space-2xl $space-5;
     }
 
     .profile__user-column {
@@ -632,7 +634,7 @@
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: $bp-xl) {
     .profile__intro-wrapper {
         position: static;
     }
