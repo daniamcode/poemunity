@@ -20,7 +20,7 @@ const ListItem = React.memo(function ListItem({ poem, filter, context }: Props) 
     const isLiked = poem.likes?.some(id => id === context.userId) || false
 
     // Determine if the user is the owner or admin
-    const isOwner = !!(context.user && (poem.userId === context.userId || context.userId === context.adminId))
+    const isOwner = !!(context.user && (poem.userId === context.userId || context.isAdmin))
 
     // Filter by author name
     if (!normalizeString(poem.author).includes(filter)) {

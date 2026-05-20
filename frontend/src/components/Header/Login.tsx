@@ -18,7 +18,12 @@ const Login = (): React.JSX.Element => {
                 body: JSON.stringify({ username, password })
             })
             if (!res.ok) {
-                setError('Invalid username or password')
+                if (res.status === 429) {
+                    const body = await res.json().catch(() => ({}))
+                    setError(body.error ?? 'Too many login attempts. Please try again later.')
+                } else {
+                    setError('Invalid username or password.')
+                }
                 return
             }
             const token = await res.json()

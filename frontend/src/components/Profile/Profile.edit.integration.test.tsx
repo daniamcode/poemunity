@@ -18,7 +18,7 @@ describe('Profile - Edit Flow Integration Tests', () => {
         userId: 'user-123',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-456',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }

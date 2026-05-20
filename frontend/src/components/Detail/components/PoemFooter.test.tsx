@@ -26,7 +26,7 @@ describe('PoemFooter', () => {
         username: 'testuser',
         picture: 'default.jpg',
         config: {},
-        adminId: 'admin-123',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn()
     }
@@ -106,7 +106,7 @@ describe('PoemFooter', () => {
     })
 
     test('should show edit and delete icons when user is admin', () => {
-        const contextAdmin = { ...mockContext, userId: mockContext.adminId }
+        const contextAdmin = { ...mockContext, isAdmin: true }
         renderWithRouter(<PoemFooter poem={mockPoem} context={contextAdmin} {...mockHandlers} />)
         expect(screen.getByTestId('edit-icon')).toBeInTheDocument()
         expect(screen.getByTestId('delete-icon')).toBeInTheDocument()

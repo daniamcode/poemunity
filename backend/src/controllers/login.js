@@ -15,6 +15,10 @@ loginRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'invalid user or password' })
   }
 
+  const adminId = process.env.NODE_ENV === 'development'
+    ? process.env.REACT_APP_ADMIN_PRE
+    : process.env.REACT_APP_ADMIN
+
   const token = jwt.sign(
     {
       id: author._id,
@@ -29,7 +33,8 @@ loginRouter.post('/', async (request, response) => {
       birthYear: author.birthYear || null,
       gender: author.gender || '',
       website: author.website || '',
-      privateFields: author.privateFields || []
+      privateFields: author.privateFields || [],
+      isAdmin: String(author._id) === adminId
     },
     process.env.SECRET,
     { expiresIn: 60 * 60 * 24 * 7 }

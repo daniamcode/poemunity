@@ -228,7 +228,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -285,7 +285,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -342,7 +342,7 @@ describe('updatePoemsListCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -414,7 +414,7 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -461,7 +461,7 @@ describe('updateRankingCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -523,7 +523,7 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -570,7 +570,7 @@ describe('updateAllPoemsCacheAfterLikePoemAction', () => {
             username: 'username',
             picture: '1.jpg',
             config: {},
-            adminId: '1',
+            isAdmin: false,
             setState: () => {}
         }
 
@@ -625,7 +625,7 @@ describe('createPoemAction', () => {
                 Authorization: 'Bearer 123'
             }
         },
-        adminId: '1',
+        isAdmin: false,
         setState: () => {}
     }
 
@@ -2179,7 +2179,7 @@ describe('updateMyFavouritePoemsCacheAfterLikePoemAction', () => {
         userId: 'user-123',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-1',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }

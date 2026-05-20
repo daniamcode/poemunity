@@ -33,6 +33,9 @@ describe('Poems API - Create and Update', () => {
         expiresIn: 60 * 60 * 24 * 7
       }
     )
+
+    // Make testUser the admin for bulk PATCH tests
+    process.env.REACT_APP_ADMIN = testUser._id.toString()
   })
 
   describe('POST /api/v1/poems', () => {
@@ -377,6 +380,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ newField: 'newValue' })
         .expect(204)
 
@@ -415,6 +419,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ status: 'published' })
         .expect(204)
 
@@ -426,6 +431,7 @@ describe('Poems API - Create and Update', () => {
     test('should handle empty database', async () => {
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ newField: 'value' })
         .expect(204)
 
@@ -468,6 +474,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ verified: true })
         .expect(204)
 
@@ -491,6 +498,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           featured: true,
           verified: true,
@@ -518,6 +526,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ viewCount: 0 })
         .expect(204)
 
@@ -539,6 +548,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ isPinned: false })
         .expect(204)
 
@@ -560,6 +570,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ tags: ['poetry', 'modern', 'featured'] })
         .expect(204)
 
@@ -569,7 +580,7 @@ describe('Poems API - Create and Update', () => {
       expect(poem.tags).toContain('poetry')
     })
 
-    test('should not require authentication', async () => {
+    test('should require admin authentication', async () => {
       await Poem.create({
         title: 'Test Poem',
         author: 'testuser',
@@ -585,7 +596,7 @@ describe('Poems API - Create and Update', () => {
       await request(app)
         .patch('/api/v1/poems')
         .send({ newField: 'value' })
-        .expect(204)
+        .expect(401)
     })
 
     test('should update poems with large batch', async () => {
@@ -604,6 +615,7 @@ describe('Poems API - Create and Update', () => {
 
       await request(app)
         .patch('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({ bulkUpdate: true })
         .expect(204)
 

@@ -35,7 +35,7 @@ describe('usePoemActions', () => {
         userId: 'user-1',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-1',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }

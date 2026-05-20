@@ -30,7 +30,7 @@ const loggedInContext: Context = {
     gender: '',
     privateFields: [],
     config: { headers: { Authorization: 'Bearer jwt-token' } },
-    adminId: 'admin-456',
+    isAdmin: false,
     elementToEdit: '',
     setState: jest.fn()
 }

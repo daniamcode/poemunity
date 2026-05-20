@@ -38,15 +38,15 @@ importers:
       express:
         specifier: ^4.17.1
         version: 4.22.2
+      express-rate-limit:
+        specifier: ^8.5.2
+        version: 8.5.2(express@4.22.2)
       express-session:
         specifier: ^1.17.1
         version: 1.19.0
-      forever:
-        specifier: ^4.0.3
-        version: 4.0.3
-      jest:
-        specifier: ^27.2.5
-        version: 27.5.1
+      helmet:
+        specifier: ^8.1.0
+        version: 8.1.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
@@ -65,16 +65,19 @@ importers:
       multer:
         specifier: ^2.1.1
         version: 2.1.1
-      nodemon:
-        specifier: ^2.0.4
-        version: 2.0.22
-      supertest:
-        specifier: ^4.0.2
-        version: 4.0.2
     devDependencies:
+      forever:
+        specifier: ^4.0.3
+        version: 4.0.3
+      jest:
+        specifier: ^27.2.5
+        version: 27.5.1
       mongodb-memory-server:
         specifier: ^11.0.1
         version: 11.1.0(@aws-sdk/credential-providers@3.1047.0)(socks@2.8.9)
+      nodemon:
+        specifier: ^2.0.4
+        version: 2.0.22
       nyc:
         specifier: ^15.1.0
         version: 15.1.0
@@ -84,6 +87,9 @@ importers:
       standard:
         specifier: 16.0.3
         version: 16.0.3
+      supertest:
+        specifier: ^4.0.2
+        version: 4.0.2
 
 packages:
 
@@ -1573,6 +1579,12 @@ packages:
     resolution: {integrity: sha512-E1q5hSUG2AmYQwQJ041nvgpkODHQvB+RKlB4IYdru6uJsyFTRyZAP463M+1lINorwbqAmUggi6+WwkD8lCS/Dw==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
 
+  express-rate-limit@8.5.2:
+    resolution: {integrity: sha512-5Kb34ipNX694DH48vN9irak1Qx30nb0PLYHXfJgw4YEjiC3ZEmZJhwOp+VfiCYwFzvFTdB9QkArYS5kXa2cx2A==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express: '>= 4.11'
+
   express-session@1.19.0:
     resolution: {integrity: sha512-0csaMkGq+vaiZTmSMMGkfdCOabYv192VbytFypcvI0MANrp+4i/7yEkJ0sbAEhycQjntaKGzYfjfXQyVb7BHMA==}
     engines: {node: '>= 0.8.0'}
@@ -1882,6 +1894,10 @@ packages:
   hasown@2.0.3:
     resolution: {integrity: sha512-ej4AhfhfL2Q2zpMmLo7U1Uv9+PyhIZpgQLGT1F9miIGmiCJIoCgSmczFdrc97mWT4kVY72KA+WnnhJ5pghSvSg==}
     engines: {node: '>= 0.4'}
+
+  helmet@8.1.0:
+    resolution: {integrity: sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==}
+    engines: {node: '>=18.0.0'}
 
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
@@ -5986,6 +6002,11 @@ snapshots:
       jest-matcher-utils: 27.5.1
       jest-message-util: 27.5.1
 
+  express-rate-limit@8.5.2(express@4.22.2):
+    dependencies:
+      express: 4.22.2
+      ip-address: 10.2.0
+
   express-session@1.19.0:
     dependencies:
       cookie: 0.7.2
@@ -6372,6 +6393,8 @@ snapshots:
   hasown@2.0.3:
     dependencies:
       function-bind: 1.1.2
+
+  helmet@8.1.0: {}
 
   hosted-git-info@2.8.9: {}
 

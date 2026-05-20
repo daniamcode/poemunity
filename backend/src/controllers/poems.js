@@ -148,8 +148,16 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
   }
 })
 
-// add new property to all existing poems
-poemsRouter.patch('/', async (req, res) => {
+// add new property to all existing poems — admin only
+poemsRouter.patch('/', userExtractor, async (req, res) => {
+  const adminId = process.env.NODE_ENV === 'development'
+    ? process.env.REACT_APP_ADMIN_PRE
+    : process.env.REACT_APP_ADMIN
+
+  if (req.userId !== adminId) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+
   const newProperty = req.body
   const response = await Poem.updateMany({}, { $set: newProperty })
   if (response === null) {

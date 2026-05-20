@@ -36,13 +36,13 @@ const loggedInCtx: Context = {
     gender: '',
     privateFields: [],
     config: {},
-    adminId: 'admin-id',
+    isAdmin: false,
     elementToEdit: '',
     setState: jest.fn()
 }
 
 const ownerCtx: Context = { ...loggedInCtx, userId: 'author-1' }
-const adminCtx: Context = { ...loggedInCtx, userId: 'admin-id' }
+const adminCtx: Context = { ...loggedInCtx, userId: 'admin-id', isAdmin: true }
 const loggedOutCtx: Context = { ...loggedInCtx, user: '', userId: '' }
 
 const renderItem = (

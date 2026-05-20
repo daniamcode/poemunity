@@ -13,7 +13,7 @@ interface FormButtonsProps {
 
 function FormButtons({ context, poem, isEditing, handleReset, handleSend, handleCancel }: FormButtonsProps) {
     const isDisabled =
-        !poem.title || !poem.category || !poem.content || (context?.userId === context.adminId && !poem.origin)
+        !poem.title || !poem.category || !poem.content || (context?.isAdmin && !poem.origin)
 
     return (
         <div className='profile__form-buttons'>

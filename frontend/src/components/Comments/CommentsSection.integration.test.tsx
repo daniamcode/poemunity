@@ -45,7 +45,7 @@ const buildCtx = (overrides: Partial<Context> = {}): Context => ({
     gender: '',
     privateFields: [],
     config: { headers: { Authorization: 'Bearer jwt-token' } },
-    adminId: 'admin-1',
+    isAdmin: false,
     elementToEdit: '',
     setState: jest.fn(),
     ...overrides
@@ -337,7 +337,7 @@ describe('cross-user rendering', () => {
         const aliceComment = makeComment({ id: 'c-alice', authorId: 'user-a', body: 'Admins can delete me' })
         mockGet.mockResolvedValue({ data: [aliceComment] })
 
-        const adminCtx = buildCtx({ userId: 'admin-1', adminId: 'admin-1' })
+        const adminCtx = buildCtx({ userId: 'admin-1', isAdmin: true })
         render(
             <AppContext.Provider value={adminCtx}>
                 <CommentsSection targetType='poem' targetId='poem-1' />

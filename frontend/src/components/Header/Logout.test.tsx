@@ -7,7 +7,7 @@ jest.mock('../../App', () => ({
     AppContext: React.createContext({
         user: 'testuser',
         userId: 'user-123',
-        adminId: 'admin-456',
+        isAdmin: false,
         setState: jest.fn()
     })
 }))
@@ -114,7 +114,7 @@ describe('Logout', () => {
                     username: '',
                     picture: '',
                     config: {},
-                    adminId: 'admin-456'
+                    isAdmin: false
                 })
             )
         })

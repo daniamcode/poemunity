@@ -10,7 +10,7 @@ describe('Profile - Sticky Elements', () => {
         userId: '123',
         username: 'Test User',
         picture: 'test.jpg',
-        adminId: '456',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: {

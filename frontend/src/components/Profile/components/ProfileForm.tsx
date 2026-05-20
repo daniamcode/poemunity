@@ -27,7 +27,7 @@ function ProfileForm({
     handleReset,
     handleCancel
 }: ProfileFormProps) {
-    const isAdmin = context?.userId === context.adminId
+    const isAdmin = context?.isAdmin ?? false
 
     return (
         <div className='profile__personal-data'>

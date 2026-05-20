@@ -100,7 +100,7 @@ describe('MUI Components Visual Regression Tests', () => {
             userId: 'test-user-id',
             username: 'testuser',
             picture: 'test-pic.jpg',
-            adminId: 'admin-id',
+            isAdmin: false,
             setState: jest.fn(),
             config: {
                 headers: {
@@ -151,7 +151,7 @@ describe('MUI Components Visual Regression Tests', () => {
             userId: 'test-user-id',
             username: 'testuser',
             picture: 'test-pic.jpg',
-            adminId: 'admin-id',
+            isAdmin: false,
             setState: jest.fn(),
             config: {
                 headers: {
@@ -183,7 +183,7 @@ describe('MUI Components Visual Regression Tests', () => {
             userId: 'test-user-id',
             username: 'testuser',
             picture: 'test-pic.jpg',
-            adminId: 'admin-id',
+            isAdmin: false,
             setState: jest.fn(),
             config: {
                 headers: {
@@ -210,7 +210,7 @@ describe('MUI Components Visual Regression Tests', () => {
             userId: 'test-user-id',
             username: 'testuser',
             picture: 'test-pic.jpg',
-            adminId: 'admin-id',
+            isAdmin: false,
             setState: jest.fn(),
             config: {
                 headers: {
@@ -237,7 +237,7 @@ describe('MUI Components Visual Regression Tests', () => {
             userId: 'test-user-id',
             username: 'testuser',
             picture: 'test-pic.jpg',
-            adminId: 'admin-id',
+            isAdmin: false,
             setState: jest.fn(),
             config: {
                 headers: {

@@ -38,7 +38,7 @@ describe('Dashboard - Sticky Elements', () => {
         userId: '',
         username: '',
         picture: '',
-        adminId: '',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: {

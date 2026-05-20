@@ -20,8 +20,14 @@ registerRouter.post('/', async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'Username, email and password are required', code: '0' })
     }
+    if (username.length < 3 || username.length > 30) {
+      return res.status(400).json({ error: 'Username must be between 3 and 30 characters', code: '0' })
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Invalid email format', code: '0' })
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters', code: '0' })
     }
 
     const passwordHash = await bcrypt.hash(password, 10)

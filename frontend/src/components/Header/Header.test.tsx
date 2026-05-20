@@ -34,7 +34,7 @@ describe('Header', () => {
         userId: '',
         username: '',
         picture: '',
-        adminId: '',
+        isAdmin: false,
         setState: mockSetState,
         config: {}
     }
@@ -44,7 +44,7 @@ describe('Header', () => {
         userId: 'user-123',
         username: 'johndoe',
         picture: 'https://example.com/pic.jpg',
-        adminId: 'admin-456',
+        isAdmin: false,
         setState: mockSetState,
         config: {
             headers: {

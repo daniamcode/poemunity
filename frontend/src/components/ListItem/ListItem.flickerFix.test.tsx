@@ -37,7 +37,7 @@ describe('ListItem - No Flicker Tests', () => {
         userId: 'user-456',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-789',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }

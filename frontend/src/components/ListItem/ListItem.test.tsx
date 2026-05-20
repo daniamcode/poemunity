@@ -43,7 +43,7 @@ describe('ListItem (Refactored)', () => {
         userId: 'user-456',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-789',
+        isAdmin: false,
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }
     }
@@ -114,8 +114,8 @@ describe('ListItem (Refactored)', () => {
         expect(screen.getByText(/IsOwner: true/)).toBeInTheDocument()
     })
 
-    test('should show user as owner when userId matches adminId', () => {
-        const contextAsAdmin = { ...mockContext, userId: 'admin-789' }
+    test('should show user as owner when user is admin', () => {
+        const contextAsAdmin = { ...mockContext, userId: 'admin-789', isAdmin: true }
         renderWithRouter(<ListItem poem={mockPoem} filter='' context={contextAsAdmin} />)
 
         expect(screen.getByText(/IsOwner: true/)).toBeInTheDocument()

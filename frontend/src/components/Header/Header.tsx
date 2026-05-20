@@ -38,6 +38,7 @@ function Header() {
                 birthYear: jwtData?.birthYear || null,
                 gender: jwtData?.gender || '',
                 privateFields: jwtData?.privateFields || [],
+                isAdmin: jwtData?.isAdmin || false,
                 config
             })
         }

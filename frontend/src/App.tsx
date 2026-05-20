@@ -13,7 +13,7 @@ export const AppContext = React.createContext<Context>({
     bio: '',
     preferredGenres: [],
     config: {},
-    adminId: '',
+    isAdmin: false,
     setState: () => {}
 })
 
@@ -48,7 +48,7 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
         gender: '',
         privateFields: [] as string[],
         config: initialUser?.config ?? {},
-        adminId: process.env.NEXT_PUBLIC_ADMIN ?? '',
+        isAdmin: false,
         setState(data: Context) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars, unused-imports/no-unused-vars
             const { setState: _setState, ...res } = data

@@ -67,6 +67,14 @@
             }
         }
 
+        .register__error {
+            width: 100%;
+            font-size: $fs-sm;
+            color: $color-error;
+            margin: 0 0 $space-3;
+            text-align: left;
+        }
+
         button {
             width: 100%;
             padding: 14px;

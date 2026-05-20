@@ -50,13 +50,13 @@ describe('ProfileForm', () => {
 
     const regularUserContext = {
         userId: 'user123',
-        adminId: 'admin456',
+        isAdmin: false,
         elementToEdit: ''
     }
 
     const adminUserContext = {
         userId: 'admin456',
-        adminId: 'admin456',
+        isAdmin: true,
         elementToEdit: ''
     }
 

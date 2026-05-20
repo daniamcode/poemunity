@@ -9,7 +9,7 @@ describe('FormButtons', () => {
     const mockHandleCancel = jest.fn()
     const mockContext = {
         userId: 'user123',
-        adminId: 'admin456'
+        isAdmin: false
     }
 
     const mockPoem: PoemFormData = {
@@ -136,7 +136,7 @@ describe('FormButtons', () => {
     it('should disable send button when admin user has no origin', () => {
         const adminContext = {
             userId: 'admin456',
-            adminId: 'admin456'
+            isAdmin: true
         }
         const poemWithoutOrigin = { ...mockPoem, origin: '' }
 
@@ -174,7 +174,7 @@ describe('FormButtons', () => {
     it('should enable send button when all required fields are filled for admin user', () => {
         const adminContext = {
             userId: 'admin456',
-            adminId: 'admin456'
+            isAdmin: true
         }
         const adminPoem = { ...mockPoem, origin: 'famous' }
 

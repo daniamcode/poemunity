@@ -42,7 +42,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         userId: 'user-456',
         username: 'testuser',
         picture: 'avatar.jpg',
-        adminId: 'admin-789',
+        isAdmin: false,
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }
     }

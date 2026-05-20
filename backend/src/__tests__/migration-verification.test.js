@@ -81,7 +81,7 @@ describe('Migration verification', () => {
     test('registered user has a slug derived from username', async () => {
       const res = await request(app)
         .post('/api/v1/register')
-        .send({ username: 'newuser', email: 'new@example.com', password: 'pass123' })
+        .send({ username: 'newuser', email: 'new@example.com', password: 'password123' })
         .expect(200)
 
       const saved = await Author.findOne({ username: 'newuser' })
@@ -92,12 +92,12 @@ describe('Migration verification', () => {
     test('slug is unique when two usernames produce the same base', async () => {
       await request(app)
         .post('/api/v1/register')
-        .send({ username: 'john doe', email: 'john1@example.com', password: 'pass' })
+        .send({ username: 'john doe', email: 'john1@example.com', password: 'password123' })
         .expect(200)
 
       await request(app)
         .post('/api/v1/register')
-        .send({ username: 'john.doe', email: 'john2@example.com', password: 'pass' })
+        .send({ username: 'john.doe', email: 'john2@example.com', password: 'password123' })
         .expect(200)
 
       const authors = await Author.find({ slug: /^john-doe/ })
@@ -108,7 +108,7 @@ describe('Migration verification', () => {
     test('returns 401 when username is already taken', async () => {
       const res = await request(app)
         .post('/api/v1/register')
-        .send({ username: 'janedoe', email: 'other@example.com', password: 'pass' })
+        .send({ username: 'janedoe', email: 'other@example.com', password: 'password123' })
         .expect(401)
 
       expect(res.body.code).toBe('1')
@@ -117,7 +117,7 @@ describe('Migration verification', () => {
     test('returns 401 when email is already taken', async () => {
       const res = await request(app)
         .post('/api/v1/register')
-        .send({ username: 'someoneelse', email: 'jane@example.com', password: 'pass' })
+        .send({ username: 'someoneelse', email: 'jane@example.com', password: 'password123' })
         .expect(401)
 
       expect(res.body.code).toBe('2')
@@ -158,7 +158,7 @@ describe('Migration verification', () => {
     test('returns 401 for unknown username', async () => {
       const res = await request(app)
         .post('/api/v1/login')
-        .send({ username: 'nobody', password: 'pass' })
+        .send({ username: 'nobody', password: 'password123' })
         .expect(401)
 
       expect(res.body.error).toBe('invalid user or password')

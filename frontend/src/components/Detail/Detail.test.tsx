@@ -21,7 +21,7 @@ jest.mock('../../App', () => {
     const mockContext = {
         user: 'testuser',
         userId: 'user-123',
-        adminId: 'admin-456',
+        isAdmin: false,
         setState: jest.fn()
     }
     return {

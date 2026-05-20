@@ -10,9 +10,8 @@ Audit performed on 2026-05-16. Issues ordered by severity.
   - `backend/.env:3`
   - Generate a strong secret: `openssl rand -base64 32` → store in Vercel env vars, never commit
 
-- [ ] **DB credentials committed to .env**
-  - `backend/.env:1-4`
-  - Move MongoDB connection strings to hosting environment variables
+- [x] **DB credentials committed to .env**
+  - `backend/.env` is gitignored (not tracked). Created `backend/.env.example` to document all required vars.
 
 - [x] **Backend has no ownership check on poem edit / delete**
   - `backend/src/controllers/poem.js:50-83`
@@ -23,52 +22,43 @@ Audit performed on 2026-05-16. Issues ordered by severity.
   - `backend/src/controllers/poem.js:57`
   - Whitelist allowed fields explicitly: `{ $set: { title, poem, genre, origin } }`
 
-- [ ] **Bulk `PATCH /poems` has no authentication**
-  - `backend/src/controllers/poems.js:152-159`
-  - Delete endpoint or add authentication + admin role check
+- [x] **Bulk `PATCH /poems` has no authentication**
+  - `backend/src/controllers/poems.js` — added `userExtractor` + admin ID check; returns 403 for non-admins
 
-- [ ] **Disqus config hardcoded to `localhost:3000`**
-  - `frontend/src/components/Detail/Detail.tsx:39-40`
-  - Use dynamic origin: `` url: `${window.location.origin}/detail/${poemId}` ``
+- [x] **Disqus config hardcoded to `localhost:3000`**
+  - Disqus removed from codebase; replaced by custom `CommentsSection` component. No longer applicable.
 
-- [ ] **No rate limiting on login / register**
-  - `backend/app.js`
-  - `npm i express-rate-limit` → 5 attempts / 15 min on `/api/login`, 3 / hour on `/api/register`
+- [x] **No rate limiting on login / register**
+  - `backend/app.js` — added `express-rate-limit`: 5 req/15 min on `/api/v1/login`, 3 req/hour on `/api/v1/register`
 
 ---
 
 ## 🔴 High — Strongly Recommended Before Launch
 
-- [ ] **No security headers** (XSS, clickjacking, HSTS, CSP all unset)
-  - `backend/app.js`
-  - `npm i helmet` → `app.use(helmet())`
+- [x] **No security headers** (XSS, clickjacking, HSTS, CSP all unset)
+  - `backend/app.js` — `helmet` installed and added; `morgan` HTTP logging wired up (skipped in test env)
 
-- [ ] **CORS falls back to `localhost` if env var missing**
-  - `backend/app.js:15`
-  - Throw on startup if `FRONTEND_URL` is not set in production
+- [x] **CORS falls back to `localhost` if env var missing**
+  - `backend/app.js` — throws on startup if `FRONTEND_URL` is not set when `NODE_ENV=production`
 
-- [ ] **Admin ID exposed in the frontend bundle**
-  - `frontend/.env:1` (`REACT_APP_ADMIN`)
-  - Remove from frontend; derive admin status from JWT payload or `/api/users/me`
+- [x] **Admin ID exposed in the frontend bundle**
+  - `NEXT_PUBLIC_ADMIN` removed from `frontend/.env`. JWT now carries `isAdmin: boolean`; all frontend admin checks use `context.isAdmin` instead of ID comparison.
 
-- [ ] **No input validation on register / login**
-  - `backend/src/controllers/register.js`
-  - Validate: email format, password ≥ 8 chars, username 3–30 chars (use `joi` or `zod`)
+- [x] **No input validation on register / login**
+  - `backend/src/controllers/register.js` — added: username 3–30 chars, password ≥ 8 chars (email format was already validated)
 
-- [ ] **Raw error objects sent to the client** (may leak stack traces)
-  - `backend/src/controllers/poem.js:42`
-  - Return a generic message: `res.status(500).json({ error: 'Failed to save poem' })`
+- [x] **Raw error objects sent to the client** (may leak stack traces)
+  - `backend/src/controllers/poem.js` — like endpoint now returns `{ error: 'Failed to update poem' }` instead of the raw error object
 
-- [ ] **No logging or error monitoring**
-  - Add `morgan` for HTTP request logs
-  - Integrate Sentry (or equivalent) for production error tracking
+- [x] **No logging or error monitoring**
+  - `morgan` added to `backend/app.js` (HTTP request logging). Sentry integration still optional / not yet added.
 
 - [x] **GitHub Actions use deprecated action versions**
   - `.github/workflows/*.yml`
   - Bump `actions/checkout` → `@v4`, `actions/setup-node` → `@v4`, `node-version` `13.x` → `20.x`
 
-- [ ] **Known dependency vulnerabilities likely present**
-  - Run `npm audit --fix` in both `frontend/` and `backend/`
+- [x] **Known dependency vulnerabilities likely present**
+  - Moved `forever`, `jest`, `nodemon`, `supertest` to `devDependencies` in `backend/package.json`. `pnpm audit --prod` now reports 0 vulnerabilities.
 
 ---
 
@@ -116,9 +106,8 @@ Audit performed on 2026-05-16. Issues ordered by severity.
   - `frontend/src/components/Header/Login.tsx:34-41` — error callback is commented out; user gets no message on wrong credentials
   - Uncomment and wire up error state; display inline error below the form
 
-- [ ] **No feedback on failed registration**
-  - `frontend/src/components/Register/Register.tsx:30-32` — error callback is empty
-  - Display inline error message for taken username, weak password, etc.
+- [x] **No feedback on failed registration**
+  - `Register.tsx` — client-side validation shows rules as you type; server errors (duplicate username/email, etc.) surfaced via `role="alert"` paragraph
 
 - [ ] **No confirmation before poem deletion**
   - `frontend/src/components/ListItem/components/PoemActions.tsx:20-26`
@@ -208,9 +197,8 @@ Audit performed on 2026-05-16. Issues ordered by severity.
 
 ## ♿ Frontend — Accessibility
 
-- [ ] **Email fields use `type="text"` instead of `type="email"`**
-  - `frontend/src/components/Register/Register.tsx:54-60`, `Login.tsx:57-64`
-  - Prevents mobile email keyboard and browser email validation; change to `type="email"`
+- [x] **Email fields use `type="text"` instead of `type="email"`**
+  - `Register.tsx` fixed. `Login.tsx` — login uses username, not email, so no change needed there.
 
 - [ ] **Like/unlike icons are divs — not keyboard accessible**
   - `frontend/src/components/ListItem/components/PoemFooter.tsx:36-42`

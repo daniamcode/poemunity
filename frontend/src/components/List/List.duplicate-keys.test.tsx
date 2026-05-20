@@ -32,7 +32,7 @@ const mockContext = {
     username: 'testuser',
     picture: '',
     config: {},
-    adminId: 'admin123',
+    isAdmin: false,
     setState: jest.fn()
 }
 

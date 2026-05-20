@@ -45,7 +45,7 @@ const initialPoemState: PoemFormData = {
 export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any): UseProfileFormReturn {
     const dispatch = useAppDispatch()
     const router = useRouter()
-    const isAdmin = context?.userId === context?.adminId
+    const isAdmin = context?.isAdmin ?? false
 
     // Get elementToEdit from URL query params (e.g., /profile?edit=poemId)
     const elementToEdit = (router.query.edit as string) || ''

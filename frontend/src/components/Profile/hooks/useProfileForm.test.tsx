@@ -22,7 +22,7 @@ jest.mock('../../../redux/actions/poemsActions')
 describe('useProfileForm', () => {
     const mockContext = {
         userId: 'user-123',
-        adminId: 'admin-456',
+        isAdmin: false,
         elementToEdit: '',
         setState: jest.fn()
     }

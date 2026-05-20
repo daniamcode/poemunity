@@ -87,6 +87,6 @@ export interface Context {
     gender?: string
     privateFields?: string[]
     config: object
-    adminId: string
+    isAdmin: boolean
     setState: (state: Context) => void
 }

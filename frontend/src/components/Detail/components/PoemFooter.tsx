@@ -16,7 +16,7 @@ interface PoemFooterProps {
 
 export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFooterProps) {
     const isUserLiked = poem.likes.some(id => id === context.userId)
-    const isOwner = poem.userId === context.userId || context.userId === context.adminId
+    const isOwner = poem.userId === context.userId || context.isAdmin
     const canLike = context.user && poem.userId !== context.userId
 
     return (

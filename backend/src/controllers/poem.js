@@ -39,7 +39,7 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
 
   poem.save((error) => {
     if (error) {
-      res.send(error)
+      res.status(500).json({ error: 'Failed to update poem' })
     } else {
       res.json(poem)
     }

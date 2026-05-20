@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const helmet = require('helmet')
+const morgan = require('morgan')
+const rateLimit = require('express-rate-limit')
 
 const loginRouter = require('./src/controllers/login')
 const registerRouter = require('./src/controllers/register')
@@ -10,6 +13,14 @@ const poemRouter = require('./src/controllers/poem')
 const authorsRouter = require('./src/controllers/authors')
 const commentsRouter = require('./src/controllers/comments')
 
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  throw new Error('FRONTEND_URL env var must be set in production')
+}
+
+app.use(helmet())
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'))
+}
 app.use(express.json({ limit: '2mb' }))
 app.use(
   cors({
@@ -19,8 +30,26 @@ app.use(
   })
 )
 
-app.use('/api/v1/login', loginRouter)
-app.use('/api/v1/register', registerRouter)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many login attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test'
+})
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: { error: 'Too many registration attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test'
+})
+
+app.use('/api/v1/login', loginLimiter, loginRouter)
+app.use('/api/v1/register', registerLimiter, registerRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)
 app.use('/api/v1/poem', poemRouter)

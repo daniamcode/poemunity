@@ -37,7 +37,7 @@ export default function CommentItem({ comment, replies, context, onDelete, onRep
     const [showConfirm, setShowConfirm] = useState(false)
 
     const isOwner = !!context.user && context.userId === comment.authorId
-    const isAdmin = !!context.user && context.userId === context.adminId
+    const isAdmin = !!context.user && context.isAdmin
     const canDelete = isOwner || isAdmin
 
     const handleDelete = () => {
