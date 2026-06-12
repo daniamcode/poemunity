@@ -68,10 +68,6 @@ function loginApi(username: string, password: string): Promise<string> {
 async function seedAuth(driver: WebDriver, token: string): Promise<void> {
     await driver.get(APP_URL)
     await driver.manage().addCookie({ name: 'token', value: token, path: '/' })
-    await driver.executeScript(
-        `window.localStorage.setItem('loggedUser', JSON.stringify(arguments[0]))`,
-        token,
-    )
 }
 
 async function isDisplayed(el: WebElement): Promise<boolean> {

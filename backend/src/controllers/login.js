@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const loginRouter = require('express').Router()
 const Author = require('../models/Author')
+const { signAuthorToken } = require('../utils/authToken')
 
 loginRouter.post('/', async (request, response) => {
   const { username, password } = request.body
@@ -15,32 +15,7 @@ loginRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'invalid user or password' })
   }
 
-  const adminId = process.env.NODE_ENV === 'development'
-    ? process.env.REACT_APP_ADMIN_PRE
-    : process.env.REACT_APP_ADMIN
-
-  const token = jwt.sign(
-    {
-      id: author._id,
-      username: author.username,
-      picture: author.picture,
-      bio: author.bio || '',
-      preferredGenres: author.preferredGenres || [],
-      name: author.name || '',
-      surname: author.surname || '',
-      city: author.city || '',
-      country: author.country || '',
-      birthYear: author.birthYear || null,
-      gender: author.gender || '',
-      website: author.website || '',
-      privateFields: author.privateFields || [],
-      isAdmin: String(author._id) === adminId
-    },
-    process.env.SECRET,
-    { expiresIn: 60 * 60 * 24 * 7 }
-  )
-
-  response.send(token)
+  response.send(signAuthorToken(author))
 })
 
 module.exports = loginRouter

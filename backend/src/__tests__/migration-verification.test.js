@@ -75,6 +75,16 @@ describe('Migration verification', () => {
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(401)
     })
+
+    test('accepts token from cookie on protected endpoints', async () => {
+      const res = await request(app)
+        .post('/api/v1/poems')
+        .set('Cookie', [`token=${token}`])
+        .send({ title: 'Cookie Poem', poem: 'cookie verse', genre: 'love', date: new Date() })
+        .expect(201)
+
+      expect(res.body.userId).toBe(String(author._id))
+    })
   })
 
   describe('POST /api/v1/register — new Author gets a slug', () => {

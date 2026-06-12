@@ -1,11 +1,21 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4200'
 
 export interface ServerUser {
-    user: string   // raw JWT (= context.user)
+    user: string
     userId: string
     username: string
     picture: string
-    config: { headers: { Authorization: string } }
+    bio: string
+    preferredGenres: string[]
+    name: string
+    surname: string
+    city: string
+    country: string
+    birthYear: number | null
+    gender: string
+    privateFields: string[]
+    isAdmin: boolean
+    config: { withCredentials: true }
 }
 
 // JWT decode using Node.js Buffer — works in getServerSideProps (no browser atob needed)
@@ -22,11 +32,21 @@ export function buildServerUser(token: string): ServerUser | null {
     const jwt = decodeServerToken(token)
     if (!jwt) return null
     return {
-        user: token,
+        user: 'authenticated',
         userId: jwt.id ?? '',
         username: jwt.username ?? '',
         picture: jwt.picture ?? '',
-        config: { headers: { Authorization: `Bearer ${token}` } }
+        bio: jwt.bio ?? '',
+        preferredGenres: jwt.preferredGenres ?? [],
+        name: jwt.name ?? '',
+        surname: jwt.surname ?? '',
+        city: jwt.city ?? '',
+        country: jwt.country ?? '',
+        birthYear: jwt.birthYear ?? null,
+        gender: jwt.gender ?? '',
+        privateFields: jwt.privateFields ?? [],
+        isAdmin: jwt.isAdmin ?? false,
+        config: { withCredentials: true }
     }
 }
 

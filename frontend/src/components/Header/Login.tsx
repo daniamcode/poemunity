@@ -26,10 +26,9 @@ const Login = (): React.JSX.Element => {
                 }
                 return
             }
-            const token = await res.json()
-            window.localStorage.setItem('loggedUser', JSON.stringify(token))
             const from = router.query.from as string | undefined
-            router.push(from ?? '/profile')
+            const destination = from?.startsWith('/') ? from : '/profile'
+            router.push(destination)
         } catch {
             setError('Something went wrong. Please try again.')
         }

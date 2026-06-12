@@ -3,6 +3,7 @@ import { Context } from './typescript/interfaces'
 import { useAppDispatch } from './redux/store'
 import store from './redux/store'
 import { getRankingAction } from './redux/actions/poemsActions'
+import type { ServerUser } from './lib/serverApi'
 
 export const AppContext = React.createContext<Context>({
     elementToEdit: '',
@@ -19,7 +20,27 @@ export const AppContext = React.createContext<Context>({
 
 interface AppProviderProps {
     children: React.ReactNode
-    initialUser?: import('./lib/serverApi').ServerUser | null
+    initialUser?: ServerUser | null
+}
+
+function getAuthState(user?: ServerUser | null): Omit<Context, 'elementToEdit' | 'setState'> {
+    return {
+        user: user?.user ?? '',
+        userId: user?.userId ?? '',
+        username: user?.username ?? '',
+        picture: user?.picture ?? '',
+        bio: user?.bio ?? '',
+        preferredGenres: user?.preferredGenres ?? [],
+        name: user?.name ?? '',
+        surname: user?.surname ?? '',
+        city: user?.city ?? '',
+        country: user?.country ?? '',
+        birthYear: user?.birthYear ?? null,
+        gender: user?.gender ?? '',
+        privateFields: user?.privateFields ?? [],
+        config: user?.config ?? { withCredentials: true },
+        isAdmin: user?.isAdmin ?? false
+    }
 }
 
 export function AppProvider({ children, initialUser }: AppProviderProps) {
@@ -32,23 +53,9 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
         }
     }, [dispatch])
 
-    const [contextState, setContextState] = useState({
+    const [contextState, setContextState] = useState<Context>({
         elementToEdit: '',
-        user: initialUser?.user ?? '',
-        userId: initialUser?.userId ?? '',
-        username: initialUser?.username ?? '',
-        picture: initialUser?.picture ?? '',
-        bio: '',
-        preferredGenres: [] as string[],
-        name: '',
-        surname: '',
-        city: '',
-        country: '',
-        birthYear: null as number | null,
-        gender: '',
-        privateFields: [] as string[],
-        config: initialUser?.config ?? {},
-        isAdmin: false,
+        ...getAuthState(initialUser),
         setState(data: Context) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars, unused-imports/no-unused-vars
             const { setState: _setState, ...res } = data
@@ -58,6 +65,35 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
             }))
         }
     })
+
+    useEffect(() => {
+        if (initialUser !== undefined) {
+            setContextState(prevState => ({
+                ...prevState,
+                ...getAuthState(initialUser)
+            }))
+            return
+        }
+
+        if (typeof fetch !== 'function') return
+
+        let cancelled = false
+        fetch('/api/auth/session')
+            .then(res => res.ok && res.status !== 204 ? res.json() : null)
+            .then(user => {
+                if (!cancelled && user) {
+                    setContextState(prevState => ({
+                        ...prevState,
+                        ...getAuthState(user)
+                    }))
+                }
+            })
+            .catch(() => {})
+
+        return () => {
+            cancelled = true
+        }
+    }, [initialUser])
 
     return (
         <AppContext.Provider value={contextState}>

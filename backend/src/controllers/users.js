@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const usersRouter = require('express').Router()
 const Author = require('../models/Author')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
+const { signAuthorToken } = require('../utils/authToken')
 
 const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
 
@@ -43,27 +43,7 @@ usersRouter.get('/me', userExtractor, async (req, res) => {
     const author = await Author.findById(req.userId)
     if (!author) return res.status(404).json({ error: 'User not found' })
 
-    const freshToken = jwt.sign(
-      {
-        id: author._id,
-        username: author.username,
-        picture: author.picture,
-        bio: author.bio || '',
-        preferredGenres: author.preferredGenres || [],
-        name: author.name || '',
-        surname: author.surname || '',
-        city: author.city || '',
-        country: author.country || '',
-        birthYear: author.birthYear || null,
-        gender: author.gender || '',
-        website: author.website || '',
-        privateFields: author.privateFields || []
-      },
-      process.env.SECRET,
-      { expiresIn: 60 * 60 * 24 * 7 }
-    )
-
-    res.json(freshToken)
+    res.json(signAuthorToken(author))
   } catch (error) {
     console.error('Token refresh error:', error)
     res.status(500).json({ error: 'Failed to refresh token' })
@@ -81,25 +61,7 @@ usersRouter.patch('/profile', userExtractor, async (req, res) => {
     const author = await Author.findByIdAndUpdate(req.userId, update, { new: true })
     if (!author) return res.status(404).json({ error: 'User not found' })
 
-    const newToken = jwt.sign(
-      {
-        id: author._id,
-        username: author.username,
-        picture: author.picture,
-        bio: author.bio || '',
-        preferredGenres: author.preferredGenres || [],
-        name: author.name || '',
-        surname: author.surname || '',
-        city: author.city || '',
-        country: author.country || '',
-        birthYear: author.birthYear || null,
-        gender: author.gender || '',
-        website: author.website || '',
-        privateFields: author.privateFields || []
-      },
-      process.env.SECRET,
-      { expiresIn: 60 * 60 * 24 * 7 }
-    )
+    const newToken = signAuthorToken(author)
 
     res.json({ token: newToken, author })
   } catch (error) {
@@ -124,11 +86,7 @@ usersRouter.patch('/picture', userExtractor, async (req, res) => {
     )
 
     // No need to update poems — picture comes from Author via populate
-    const newToken = jwt.sign(
-      { id: author._id, username: author.username, picture },
-      process.env.SECRET,
-      { expiresIn: 60 * 60 * 24 * 7 }
-    )
+    const newToken = signAuthorToken(author)
 
     res.json({ token: newToken, picture })
   } catch (error) {

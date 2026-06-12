@@ -50,7 +50,7 @@ Added comprehensive unit tests for cache update actions:
   - Create poem and verify My Poems tab updates
   - Create multiple poems sequentially
   - Create poem on fresh page load (no cache)
-  - Create poem with empty localStorage
+  - Create poem from a fresh cookie session
   - Verify dashboard list updates
   - Form validation tests
   - Console error checking
@@ -134,7 +134,7 @@ Logs in a user. Defaults to `test` / `1234`.
 - Fills username and password fields using name selectors
 - Clicks the "Login" button
 - Waits for redirect to `/profile`
-- Verifies `loggedUser` is stored in localStorage
+- Verifies the auth cookie is present
 
 ```typescript
 cy.login() // Uses default credentials (test/1234)
@@ -175,7 +175,7 @@ describe('My Feature', () => {
    - Poem form: `cy.get('input[name="title"]')`, `cy.get('select[name="category"]')`, `cy.get('textarea[name="poem"]')`
    - Buttons: `cy.get('button').contains('Text')`
    - Tabs: `cy.contains('Tab Name')`
-2. **Clean state**: Always clear cookies/localStorage in `beforeEach()`
+2. **Clean state**: Always clear cookies in `beforeEach()`
 3. **Scroll into view**: Use `.scrollIntoView()` before interacting with elements
 4. **Clear fields**: Use `.clear()` before typing to ensure clean input
 5. **Strategic waits**:
@@ -184,7 +184,7 @@ describe('My Feature', () => {
    - `{ timeout: 15000 }` for API operations that show toasts
 6. **Element visibility**: Use `.should('exist').scrollIntoView().should('be.visible')` for assertions
 7. **Console error checks**: Verify no errors in console after critical operations
-8. **Authentication verification**: After login, verify localStorage contains `loggedUser` token
+8. **Authentication verification**: After login, verify the `token` cookie exists
 
 ## Debugging Tests
 

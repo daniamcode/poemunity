@@ -18,6 +18,7 @@ describe('axiosInstance', () => {
         expect(Axios.create).toHaveBeenCalledWith({
             baseURL: 'http://localhost:4200',
             timeout: 40000,
+            withCredentials: true,
             headers
         })
         expect(result).toBe(mockAxiosInstance)
@@ -37,6 +38,7 @@ describe('axiosInstance', () => {
         expect(Axios.create).toHaveBeenCalledWith({
             baseURL: 'http://localhost:4200',
             timeout: 40000,
+            withCredentials: true,
             headers: customHeaders
         })
     })
@@ -50,6 +52,7 @@ describe('axiosInstance', () => {
         expect(Axios.create).toHaveBeenCalledWith({
             baseURL: 'http://localhost:4200',
             timeout: 40000,
+            withCredentials: true,
             headers: {}
         })
     })
@@ -87,6 +90,7 @@ describe('axiosInstance', () => {
         expect(Axios.create).toHaveBeenCalledWith({
             baseURL: 'http://localhost:4200',
             timeout: 60000,
+            withCredentials: true,
             headers
         })
     })

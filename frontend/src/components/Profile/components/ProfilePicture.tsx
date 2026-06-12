@@ -30,7 +30,6 @@ export default function ProfilePicture({ context }: Props) {
             const api = API({}, context.config)
             const { data } = await api.patch('/api/v1/users/picture', { picture: base64 })
 
-            window.localStorage.setItem('loggedUser', JSON.stringify(data.token))
             context.setState({ ...context, picture: data.picture })
         } catch {
             setError('Upload failed. Please try again.')

@@ -11,11 +11,9 @@ Cypress.on('uncaughtException', (err) => {
 // test  / 1234  — primary user
 // test2 / 1234  — secondary user for cross-user tests
 
-// Programmatic login: bypass the UI form entirely.
-// The UI form goes through Next.js /api/auth/login which proxies to port 4200
-// (dev backend). Cypress tests use port 4201, so the UI route always 401s.
-// Instead: call the test backend directly, then seed localStorage via
-// onBeforeLoad so the token is present before the app's JS hydrates.
+// Programmatic login: bypass the UI form entirely and seed the auth cookie.
+// Cypress tests use the test backend on port 4201, while the app reads the same
+// cookie through Next.js middleware/session hydration.
 Cypress.Commands.add('login', (username = 'test', password = '1234') => {
     cy.request({
         method: 'POST',
@@ -23,21 +21,14 @@ Cypress.Commands.add('login', (username = 'test', password = '1234') => {
         body: { username, password }
     }).then(res => {
         const token = res.body
-        // Set the HttpOnly-equivalent cookie so Next.js middleware allows /profile.
-        // cy.setCookie bypasses HttpOnly — it runs in Cypress's privileged context.
+        // cy.setCookie bypasses HttpOnly because it runs in Cypress's privileged context.
         cy.setCookie('token', token, { path: '/' })
-        // Seed localStorage before React hydrates so the Header reads the token
-        // immediately on first render without waiting for the /users/me refresh.
-        cy.visit('/', {
-            onBeforeLoad(win) {
-                win.localStorage.setItem('loggedUser', JSON.stringify(token))
-            }
-        })
+        cy.visit('/')
     })
 })
 
 Cypress.Commands.add('logout', () => {
-    cy.clearLocalStorage('loggedUser')
+    cy.clearCookie('token')
     cy.visit('/')
 })
 
@@ -51,9 +42,9 @@ Cypress.Commands.add('seedComment', (poemId: string, body: string, token: string
     })
 })
 
-// Get the JWT token from localStorage
+// Get the JWT token from the Cypress-managed cookie for direct API setup calls.
 Cypress.Commands.add('getToken', () => {
-    return cy.window().then(win => win.localStorage.getItem('loggedUser'))
+    return cy.getCookie('token').then(cookie => cookie?.value ?? null)
 })
 
 declare global {

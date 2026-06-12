@@ -13,9 +13,12 @@ const renderLogin = () =>
     )
 
 describe('Login', () => {
+    let storageSetItemSpy: jest.Mock
+
     beforeEach(() => {
         jest.clearAllMocks()
-        Storage.prototype.setItem = jest.fn()
+        storageSetItemSpy = jest.fn()
+        Storage.prototype.setItem = storageSetItemSpy
         mockRouter.setCurrentUrl('/login')
         global.fetch = jest.fn()
     })
@@ -76,11 +79,9 @@ describe('Login', () => {
         expect(passwordInput.value).toBe('password123')
     })
 
-    test('should store user data in localStorage and navigate to profile on successful login', async () => {
-        const mockToken = 'abc123'
+    test('should navigate to profile on successful login', async () => {
         ;(global.fetch as jest.Mock).mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve(mockToken)
+            ok: true
         })
 
         renderLogin()
@@ -92,10 +93,36 @@ describe('Login', () => {
         fireEvent.change(passwordInput, { target: { value: 'secret' } })
         fireEvent.submit(form)
 
-        await waitFor(() => {
-            expect(window.localStorage.setItem).toHaveBeenCalledWith('loggedUser', JSON.stringify(mockToken))
+        await waitFor(() => expect(mockRouter.pathname).toBe('/profile'))
+        expect(storageSetItemSpy).not.toHaveBeenCalled()
+    })
+
+    test('should preserve safe internal redirect after login', async () => {
+        ;(global.fetch as jest.Mock).mockResolvedValue({
+            ok: true
         })
-        expect(mockRouter.pathname).toBe('/profile')
+        mockRouter.setCurrentUrl('/login?from=/profile')
+
+        renderLogin()
+        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'john' } })
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'secret' } })
+        fireEvent.submit(screen.getByTestId('login'))
+
+        await waitFor(() => expect(mockRouter.pathname).toBe('/profile'))
+    })
+
+    test('should ignore external redirect after login', async () => {
+        ;(global.fetch as jest.Mock).mockResolvedValue({
+            ok: true
+        })
+        mockRouter.setCurrentUrl('/login?from=https://example.com')
+
+        renderLogin()
+        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'john' } })
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'secret' } })
+        fireEvent.submit(screen.getByTestId('login'))
+
+        await waitFor(() => expect(mockRouter.pathname).toBe('/profile'))
     })
 
     test('should show error message on failed login', async () => {

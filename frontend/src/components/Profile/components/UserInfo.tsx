@@ -104,7 +104,6 @@ export default function UserInfo({ context }: Props) {
             const api = API({}, context.config)
             const { data } = await api.patch('/api/v1/users/profile', payload)
 
-            window.localStorage.setItem('loggedUser', JSON.stringify(data.token))
             const a = data.author
             context.setState({
                 ...context,

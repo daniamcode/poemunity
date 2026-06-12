@@ -21,7 +21,6 @@ const mockSetState = (AppContext as any)._currentValue.setState
 describe('Logout', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        Storage.prototype.removeItem = jest.fn()
         mockRouter.setCurrentUrl('/')
         global.fetch = jest.fn().mockResolvedValue({ ok: true })
     })
@@ -60,12 +59,12 @@ describe('Logout', () => {
         })
     })
 
-    test('should remove loggedUser from localStorage when clicked', async () => {
+    test('should call logout API when clicked', async () => {
         render(<Logout />)
         const button = screen.getByRole('button')
         fireEvent.click(button)
         await waitFor(() => {
-            expect(window.localStorage.removeItem).toHaveBeenCalledWith('loggedUser')
+            expect(global.fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'DELETE' })
         })
     })
 
@@ -85,7 +84,7 @@ describe('Logout', () => {
 
         await waitFor(() => {
             expect(mockSetState).toHaveBeenCalled()
-            expect(window.localStorage.removeItem).toHaveBeenCalledWith('loggedUser')
+            expect(global.fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'DELETE' })
             expect(mockRouter.pathname).toBe('/')
         })
     })
@@ -97,7 +96,7 @@ describe('Logout', () => {
 
         await waitFor(() => {
             expect(mockSetState).toHaveBeenCalledTimes(1)
-            expect(window.localStorage.removeItem).toHaveBeenCalledTimes(1)
+            expect(global.fetch).toHaveBeenCalledTimes(1)
         })
     })
 

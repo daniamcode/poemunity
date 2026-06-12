@@ -114,9 +114,8 @@ describe('Create Poem Flow', () => {
             cy.contains('Fresh Load Poem', { timeout: 10000 }).should('be.visible')
         })
 
-        it('should handle creating poem when localStorage is empty', () => {
-            // Clear all storage to ensure no cached data
-            cy.clearLocalStorage()
+        it('should handle creating poem from a fresh cookie session', () => {
+            // Clear cookies to ensure auth is recreated from the test login helper
             cy.clearCookies()
 
             cy.login()

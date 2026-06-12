@@ -1,10 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { authCookie } from '../../../src/lib/authCookie'
+import { rejectCrossOriginUnsafeRequest } from '../../../src/lib/requestGuards'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
-const SEVEN_DAYS_SECONDS = 60 * 60 * 24 * 7
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return res.status(405).end()
+    if (rejectCrossOriginUnsafeRequest(req, res)) return
 
     try {
         const backendRes = await fetch(`${BACKEND_URL}/api/v1/login`, {
@@ -22,14 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Backend returns raw JWT string (not JSON-wrapped)
         const token = text
 
-        const secure = process.env.NODE_ENV === 'production' ? '; Secure' : ''
-        res.setHeader(
-            'Set-Cookie',
-            `token=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${SEVEN_DAYS_SECONDS}${secure}`
-        )
+        res.setHeader('Set-Cookie', authCookie(token))
 
-        // Return JSON-parsed token so the client can still store it in localStorage
-        return res.json(token)
+        return res.status(204).end()
     } catch {
         return res.status(500).json({ error: 'Login failed' })
     }
