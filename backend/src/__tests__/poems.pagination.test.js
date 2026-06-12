@@ -234,6 +234,51 @@ describe('Poems API - Pagination', () => {
       expect(response.body.poems[2].title).toBe('Old')
     })
 
+    test('should sort by likes before paginating', async () => {
+      const poems = [
+        {
+          poem: 'Newest poem',
+          title: 'Newest',
+          author: 'Test',
+          genre: 'Test',
+          likes: ['1'],
+          date: new Date('2024-01-01'),
+          userId: '507f1f77bcf86cd799439011',
+          origin: 'test'
+        },
+        {
+          poem: 'Older popular poem',
+          title: 'Older Popular',
+          author: 'Test',
+          genre: 'Test',
+          likes: ['1', '2', '3', '4', '5'],
+          date: new Date('2020-01-01'),
+          userId: '507f1f77bcf86cd799439011',
+          origin: 'test'
+        },
+        {
+          poem: 'Middle poem',
+          title: 'Middle',
+          author: 'Test',
+          genre: 'Test',
+          likes: ['1', '2', '3'],
+          date: new Date('2022-01-01'),
+          userId: '507f1f77bcf86cd799439011',
+          origin: 'test'
+        }
+      ]
+      await Poem.insertMany(poems)
+
+      const response = await request(app)
+        .get('/api/v1/poems')
+        .query({ page: 1, limit: 2, orderBy: 'Likes' })
+        .expect(200)
+
+      expect(response.body.poems).toHaveLength(2)
+      expect(response.body.poems[0].title).toBe('Older Popular')
+      expect(response.body.poems[1].title).toBe('Middle')
+    })
+
     test('should filter poems by userId', async () => {
       const user1Id = '507f1f77bcf86cd799439011'
       const user2Id = '507f1f77bcf86cd799439012'

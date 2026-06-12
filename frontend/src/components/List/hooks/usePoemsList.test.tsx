@@ -103,7 +103,17 @@ describe('usePoemsList', () => {
             reducer: rootReducer,
             preloadedState: {
                 poemsListQuery: {
-                    item: [{ id: '1', title: 'Test' }],
+                    item: [{
+                        id: '1',
+                        author: 'Jane Doe',
+                        date: '2024-01-01T00:00:00.000Z',
+                        genre: 'love',
+                        likes: [],
+                        picture: '',
+                        poem: 'Body',
+                        title: 'Test',
+                        userId: 'user-1'
+                    }],
                     isFetching: false,
                     isError: false,
                     hasMore: true,

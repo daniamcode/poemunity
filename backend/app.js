@@ -17,6 +17,14 @@ if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL env var must be set in production')
 }
 
+const getAllowedOrigins = () => {
+  if (process.env.FRONTEND_URLS) {
+    return process.env.FRONTEND_URLS.split(',').map(origin => origin.trim()).filter(Boolean)
+  }
+  if (process.env.FRONTEND_URL) return [process.env.FRONTEND_URL]
+  return ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']
+}
+
 app.use(helmet())
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'))
@@ -24,7 +32,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json({ limit: '2mb' }))
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: getAllowedOrigins(),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true
   })
@@ -36,7 +44,12 @@ const loginLimiter = rateLimit({
   message: { error: 'Too many login attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => process.env.NODE_ENV === 'test'
+  skip: req =>
+    process.env.NODE_ENV === 'test' ||
+    (
+      process.env.SIMULATION_INTERNAL_SECRET &&
+      req.get('x-simulation-secret') === process.env.SIMULATION_INTERNAL_SECRET
+    )
 })
 
 const registerLimiter = rateLimit({

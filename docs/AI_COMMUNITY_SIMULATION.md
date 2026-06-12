@@ -12,7 +12,109 @@ Before the implementation details, the honest framing:
 
 **The ceiling this creates:** the simulation runs on a fixed schedule regardless of what real users do. AI activity and human activity are two parallel tracks. They intersect (AI reacts to real comments, real users read AI poems) but the AI does not adapt to the community it is in. This is acceptable for v1. It is worth revisiting once real users are active.
 
-**The critical dependency:** everything below is impossible without replacing Disqus first. That is not a Phase 1 item among equals — it is the unblocking prerequisite for the entire simulation. Treat it as such.
+**Current status (as of 12 June 2026):** The infrastructure prerequisites are done. Disqus has been replaced with a custom comments system (model, API, React component all live). 50 AI author accounts exist in the DB with bios and `preferredGenres` set, and hundreds of backdated poems are seeded. The first one-shot activity run has been implemented and executed against the remote pre MongoDB database. Production has not been seeded yet.
+
+---
+
+## Implementation Checkpoint — 12 June 2026
+
+This section is the handoff point for the next session.
+
+### What shipped in pre
+
+The first iteration was executed with Codex subagents instead of Anthropic because no Anthropic key was available locally.
+
+| Run | Provider | Result |
+|---|---|---|
+| `seed-activity-v1` | `codex-subagents` | `1785` likes, `132` poem comments, `49` poem replies, `35` profile comments |
+| `seed-activity-v1.1-likes` | `codex-focused-like-booster` | `440` extra focused likes across `35` community/AI poems |
+
+Why the second run exists: the first like distribution was mathematically too diffuse for the real catalog size. The DB has roughly 16k poems, so 1,785 likes spread across the full archive left top poems with only 2-3 new likes. The focused booster corrected that by targeting community/AI poems already showing comment activity.
+
+Current good inspection URLs on local dev:
+
+- `http://localhost:3002/` — homepage now starts with the boosted poems when ordered by likes
+- `http://localhost:3002/detail/cat-fat-rayson` — `29 Likes`, `8 Comments`
+- `http://localhost:3002/detail/morning-after-moonwriter23` — `25 Likes`, `9 Comments`
+- `http://localhost:3002/detail/tonight-sarahgr` — `20 Likes`, `7 Comments`
+
+### Important code added
+
+Simulation scripts now live in `backend/scripts/simulation/`:
+
+```
+backend/scripts/simulation/
+├── README.md
+├── ai/claude.mjs
+├── auth.mjs
+├── boost-likes.mjs
+├── codex-export.mjs
+├── codex-import.mjs
+├── codex-validate.mjs
+├── inspect-run.mjs
+├── profiles.mjs
+├── seed-activity.mjs
+├── seed-comments.mjs
+├── seed-likes.mjs
+├── seed-profile-comments.mjs
+└── utils.mjs
+```
+
+Other supporting changes:
+
+- `backend/src/models/Comment.js` has `simulationRunId` and `simulationKind` for auditability.
+- `backend/app.js` accepts local frontend ports `3000`, `3001`, and `3002` in development CORS.
+- `backend/app.js` can bypass login rate limiting for internal simulation login calls via `SIMULATION_INTERNAL_SECRET`.
+- `backend/src/controllers/poems.js` supports `orderBy=Likes` and sorts by `likes.length` before pagination.
+- `frontend/pages/index.tsx`, `frontend/pages/[genre].tsx`, and `frontend/src/components/List/hooks/usePoemsList.ts` now pass `orderBy=Likes` so the homepage SSR and client pagination agree.
+
+### Commands used for verification
+
+Local ports during this pass: backend `4200`, frontend `3002` because `3000` and `3001` were already in use.
+
+```bash
+# Inspect completed runs
+cd backend
+NODE_ENV=development node scripts/simulation/inspect-run.mjs --run-id seed-activity-v1
+NODE_ENV=development node scripts/simulation/inspect-run.mjs --run-id seed-activity-v1.1-likes
+
+# Verify likes are visible to the list API
+curl 'http://localhost:4200/api/v1/poems?page=1&limit=10&orderBy=Likes'
+
+# Regression and focused checks
+cd backend
+pnpm test -- --runInBand src/__tests__/poems.pagination.test.js
+pnpm exec standard src/controllers/poems.js src/__tests__/poems.pagination.test.js scripts/simulation/boost-likes.mjs scripts/simulation/inspect-run.mjs
+
+cd ../frontend
+pnpm test -- --runInBand src/components/List/hooks/usePoemsList.test.tsx src/components/List/List.test.tsx
+pnpm exec eslint src/components/List/List.tsx src/components/List/hooks/usePoemsList.ts pages/index.tsx 'pages/[genre].tsx'
+```
+
+Latest focused verification results:
+
+- Backend pagination tests: `17 passed`
+- Frontend list tests: `28 passed`
+- Focused backend Standard lint: passed
+- Focused frontend ESLint: passed
+- Browser check on `http://localhost:3002/`: first visible like counts were `29`, `25`, `24`
+
+### Do not repeat these mistakes
+
+- Do not judge the like seed by total number of likes alone. With 16k poems, broad random distribution is invisible. For bootstrap, likes need a target-centric pass.
+- Do not rerun a completed run id. The scripts guard against this, but use a new `--run-id` for any future write.
+- Do not run the production seed until the production checklist is cleared and the exact prod command/run id is written down.
+- Do not rely on client-side sorting with paginated APIs. Any sort that users see on page 1 must happen server-side before `skip`/`limit`.
+
+### Recommended next iteration
+
+Do not generate more comments yet. First do a human QA pass on the pre site and decide whether the current density feels right.
+
+If it passes QA, the next useful iteration is:
+
+1. Decide whether production should receive the same two-run pattern (`seed-activity-v1` + focused likes) or a new production-specific run id.
+2. Run the rollback dry-run with the chosen production run ids before seeding, so the cleanup path is proven against the intended names.
+3. Add profile-page liveliness and/or comment reactions only after the main feed feels plausible.
 
 ---
 
@@ -36,7 +138,7 @@ The last metric is the most important for perceived realism. A comment that arri
 
 This is the most consequential strategic decision in the plan. The current decision is: no badge, fully transparent (AI authors look like real users). This is fine but it requires explicit answers to downstream questions:
 
-- **Terms of Service**: must state that the platform includes AI-generated content and AI author profiles. Not a badge on every comment — one clause in the ToS is enough, and honest.
+- **Terms of Service**: `/terms#ai-community-activity` now states that the platform can include AI-generated or AI-assisted authors, profile details, comments, replies, profile comments and likes. Not a badge on every comment — one clause in the ToS is enough, and honest.
 - **Direct challenge**: if a real user comments "are you a bot?" on an AI author's profile, the AI should not deny it. The prompt for profile replies should include: *If directly and sincerely asked whether you are a real person or a bot, acknowledge that you are an AI author and redirect warmly.* Denying it crosses a line; the ToS clause covers the ambiguity everywhere else.
 - **Reviewer/journalist scenario**: if Poemunity gets press attention, "secretly populated with AI users" is a bad headline. "Curated AI authors create atmosphere for a growing real community" is a fine one. The framing matters; the underlying facts are the same.
 
@@ -97,7 +199,7 @@ Assuming 20 AI authors, 2 ticks/day:
 
 The simulation script needs to POST to the backend API as specific AI authors. The approach:
 
-1. Each AI author has a real `User` document in MongoDB with `isAI: true` flag
+1. Each AI author has a real `Author` document in MongoDB with `type: 'ai'` (already created — 50 exist)
 2. At script startup, call `POST /api/login` for each AI author (credentials stored in env vars or a secure config file not committed to git)
 3. Cache the returned JWT tokens in memory for the duration of the tick
 4. Pass the token as `Authorization: Bearer <token>` on all subsequent API calls
@@ -182,7 +284,7 @@ Consider adding a minimum delay to all AI actions on poems posted by real users:
 When a real user (or another AI) posts a comment on an AI author's profile, that AI author should reply — mimicking their personality.
 
 ### Personality system
-Each AI author has a personality descriptor stored in their `Author` document (already partially built — see `personalities` field). Extend it with:
+Each AI author has a personality descriptor stored in their `Author` document (`bio` and `preferredGenres` are already set for all 50 authors). The following simulation-specific fields still need to be added to the schema:
 
 ```js
 {
@@ -259,13 +361,13 @@ Title is generated in a separate call (short, no punctuation, fits the app style
 
 ### "Famous author" definition
 
-An author is considered famous if they have `isFamous: true` on their `Author`/`User` document. This flag is set manually by an admin for seeded AI authors who are meant to be well-known within the community (e.g. the first wave of AI poets). It is not computed dynamically from like counts, to avoid feedback loops. Real users can never be marked famous automatically.
+An author is considered famous if their `Author` document has `type: 'famous'`. This is set manually for seeded AI authors who are meant to be well-known within the community. It is not computed dynamically from like counts, to avoid feedback loops. Real users (`type: 'user'`) can never be marked famous automatically.
 
 ### Like probability weights
 
 | Factor | Multiplier |
 |---|---|
-| Poem by a famous author (`isFamous: true`) | ×3.0 |
+| Poem by a famous author (`type: 'famous'`) | ×3.0 |
 | Poem genre matches AI author's interests | ×2.0 |
 | Poem is recent (< 7 days old) | ×1.5 |
 | Poem already has many likes (social proof) | ×1.3 |
@@ -294,33 +396,18 @@ function pickPoemsToLike(aiAuthor, allPoems) {
 
 ---
 
-## Disqus vs Own Comments System
+## Comments System
 
-### The problem with Disqus for this feature
-Disqus has no public write API for posting comments programmatically. The read API exists but creating comments requires a user session. **AI-driven commenting is impossible with Disqus.**
+**Status: done.** Disqus has been replaced with a custom comments system.
 
-### Options
+The implementation matches the original plan exactly:
 
-| Option | Cost | Control | AI-writable? | Effort |
-|---|---|---|---|---|
-| **Disqus Free** | Free (shows ads) | Low | No | Already integrated |
-| **Disqus Plus** | $11/month | Low | No | — |
-| **Remark42** (self-hosted) | Server cost | High | Yes (REST API) | Medium |
-| **Own solution** (MongoDB) | $0 extra | Full | Yes | Medium |
+- `Comment` model (`backend/src/models/Comment.js`): `{ targetType: 'poem' | 'profile', targetId, authorId, body, parentId?, timestamps }`
+- API (`backend/src/controllers/comments.js`): `GET`, `POST`, `PATCH`, `DELETE` — all live
+- `GET /api/v1/comments?since=<ISO>` is already implemented and annotated for simulation script use
+- React component at `frontend/src/components/Comments/`
 
-### Recommendation: build own comments system
-
-You already have MongoDB + Express. A comments system is:
-- `Comment` model: `{ targetType: 'poem' | 'profile', targetId, authorId, body, createdAt, parentId? }`
-- Using `targetType` + `targetId` instead of separate `poemId`/`profileId` fields avoids schema duplication and works for both poem and profile comments with a single collection
-- 4 API endpoints: `GET /comments?targetType=poem&targetId=:id`, `POST /comments`, `PATCH /comments/:id`, `DELETE /comments/:id`
-- Replace the Disqus widget with a React component that calls your own API
-
-Benefits:
-- AI authors can post via the existing auth flow (just needs their JWT token — see [AI Author Authentication](#ai-author-authentication))
-- Comments appear in the same style as the rest of the app
-- No ads, no external dependency, no cost
-- Comments can be indexed for SEO (Disqus is rendered client-side, invisible to bots)
+The `disqus-react` package is still listed in `package.json` but the library is unused and can be removed when convenient.
 
 ---
 
@@ -391,25 +478,32 @@ Pass `--dry-run` to `index.mjs` to run the full pipeline without writing anythin
 
 The simulation is useless on day one if the site is empty. The comment monitor has nothing to monitor; the like engine has nothing to like; proactive comments have no poems to comment on. You need a historical baseline before the live cron starts.
 
-Run a one-time bootstrap script (`seed.mjs`) that backdates all records so the site looks like it has been active for months:
+**Status: pre bootstrap done; production bootstrap not done.**
 
-- **AI author accounts**: 15–25 authors with full profiles, bios, personality fields, `isAI: true`, `isFamous` for 3–5 of them
-- **Poems**: 60–100 poems spread across genres, with `createdAt` values distributed over the past 4–6 months (not uniform — cluster around weekends and evenings)
-- **Likes**: 400–600 likes distributed using the same weighted rules as `likes.mjs`, so the historical data is consistent with the live simulation's logic
-- **Comments**: 50–80 comments across the top poems, with realistic timestamps (not all on the day of the poem, distributed over days/weeks after posting)
+- ✅ **AI author accounts**: 50 authors with full profiles, bios, `preferredGenres`, `type: 'ai'` — created via `scripts/seed-fake-users.js` + `scripts/add-ai-personalities.js`. 3–5 can be promoted to `type: 'famous'` manually.
+- ✅ **Poems**: hundreds of backdated poems seeded via `scripts/seed-fake-users.js`, distributed across genres and authors from early 2023 onward.
+- ✅ **Pre likes**: `seed-activity-v1` created `1785` broad likes; `seed-activity-v1.1-likes` added `440` focused likes across `35` community/AI poems.
+- ✅ **Pre comments**: `seed-activity-v1` created `132` top-level poem comments, `49` replies, and `35` profile comments.
+- [ ] **Production likes/comments**: not run yet. Requires production readiness review, legal copy, backup snapshot, and a rollback dry-run with the chosen production run ids.
 
-This is a write-once operation. Once bootstrap is done, only the live simulation adds new content.
+Remaining bootstrap work: decide whether production should receive the same pattern as pre or a production-specific run. Do not run production until the hard blockers in `docs/PRODUCTION_CHECKLIST.md` are cleared.
 
 ### Phase 1 — Foundation
-- [ ] **Replace Disqus with own comments system** ← unblocks everything below
-- [ ] Add `Comment` model and API endpoints
-- [ ] Add `isAI`, `isFamous`, personality fields to `User`/`Author` model
-- [ ] Build `claude.mjs` wrapper
-- [ ] Add ToS clause about AI-generated content
+- ✅ **Replace Disqus with own comments system**
+- ✅ Add `Comment` model and API endpoints (including `?since=` for simulation)
+- ✅ Add `type: 'ai'`/`type: 'famous'` and `preferredGenres` to `Author` model
+- ✅ 50 AI author accounts created with bios and preferred genres
+- [ ] Add simulation-specific fields to `Author`: `replyStyle`, `replyProbability`, `avgReplyDelayHours`, `poemsPerMonth` — not in the schema yet
+- ✅ Build `claude.mjs` wrapper
+- [x] Add ToS clause about AI-generated content
 
-### Phase 2 — Bootstrap
-- [ ] Write and run `seed.mjs` — populate historical baseline (Phase 0 above)
-- [ ] Verify the site looks plausibly alive before enabling the live cron
+### Phase 2 — Bootstrap (remaining)
+- ✅ Seed historical likes/comments in pre
+- ✅ Add focused like booster after broad likes proved too diffuse
+- ✅ Verify local homepage/detail pages show boosted activity
+- [ ] Human QA the pre site for plausibility
+- ✅ Add production cleanup/rollback script before prod seeding
+- [ ] Seed production only after the production checklist is cleared
 
 ### Phase 3 — Poems & Likes
 - [ ] `poemCreation.mjs` — AI authors publish poems on schedule
@@ -551,4 +645,388 @@ Set `AI_PROVIDER=ollama` on the server and `AI_PROVIDER=claude` in Vercel. The r
 
 - **Rate limits**: with ~20 AI authors and 2 ticks/day, peak load is ~10–15 Claude calls per tick. Haiku's rate limit is far above this. No throttling needed at this scale — revisit if authors grow beyond 100.
 
-- **Seed data**: write a one-time `scripts/simulation/seed.mjs` that creates the AI author `User` documents with `isAI: true`, `isFamous` (for designated famous authors), `preferredGenres`, and `personality` fields. Run once before Phase 2. Do not re-run; subsequent author changes go through the normal admin flow.
+- **Seed data**: the main bootstrap (AI authors + poems) is done via `scripts/seed-fake-users.js` and `scripts/add-ai-personalities.js`. What remains is a one-off script to backfill historical likes and comments. Promote 3–5 authors to `type: 'famous'` manually before enabling the live cron.
+
+---
+
+## First Iteration: One-Shot Activity Run
+
+Before building the full cron infrastructure, we run one script once. It makes all 50 AI authors do what they will eventually do on a schedule — like poems, comment, reply, and visit profiles — but as a single historical pass, not a recurring job. The goals are:
+
+1. Complete the bootstrap (likes, comments, replies, and profile comments that seed data is missing)
+2. Prove the full integration works: auth → Claude → database
+3. Produce something real we can inspect in the live site before committing to the scheduler
+
+This is not the simulation. It is a warm-up run that also validates every building block.
+
+**Actual result:** implemented and run in pre on 12 June 2026. Comments were generated by Codex subagents, imported through `codex-import.mjs`, and audited with `simulationRunId`. Likes were written with direct MongoDB `$addToSet` plus rows in `simulation_like_events`, not through the toggle endpoint by default.
+
+---
+
+### Prerequisites (manual steps before running)
+
+Before executing against production, do these once:
+
+1. **Decide the run ids**. Do not reuse the pre run ids in production unless you explicitly want production audit rows to have the same names. Recommended production examples: `prod-seed-activity-v1` and `prod-seed-activity-v1.1-likes`.
+
+2. **Do not promote AI authors to `type: 'famous'` just for weighting.** The implemented scripts support `SIMULATION_FAMOUS_USERNAMES` so weighting can happen without changing public author type. Keep `type: 'ai'` unless the product intentionally wants those authors presented as famous.
+
+3. **Choose provider path**:
+   - Anthropic path: set `ANTHROPIC_API_KEY` and run `seed-activity.mjs`.
+   - Codex subagent path: use `codex-export.mjs`, have subagents fill `generatedBody`, then run `codex-validate.mjs` and `codex-import.mjs`.
+
+4. **Preview rollback before production writes.** `rollback-run.mjs` is dry-run by default and removes only comments tagged with `simulationRunId` plus likes recorded in `simulation_like_events`. Run it once with the intended production run ids before seeding.
+
+---
+
+### Files created
+
+```
+backend/scripts/simulation/
+├── README.md
+├── auth.mjs
+├── boost-likes.mjs            ← focused like booster for community/AI poems
+├── codex-export.mjs           ← export comment tasks for Codex subagents
+├── codex-import.mjs           ← import subagent-generated comments/replies/profile comments
+├── codex-validate.mjs         ← validate generatedBody coverage and JSON shape
+├── inspect-run.mjs            ← inspect run summary, top liked/commented poems, samples
+├── profiles.mjs               ← COMMENTER / REGULAR / LURKER activity profiles
+├── rollback-run.mjs           ← dry-run-first cleanup for comments and audited likes
+├── seed-activity.mjs          ← Anthropic-backed one-shot pass
+├── seed-comments.mjs          ← generated top-level comments + replies
+├── seed-likes.mjs             ← weighted like distribution across poems
+├── seed-profile-comments.mjs  ← AI authors leave notes on each other's profiles
+├── utils.mjs
+└── ai/
+    └── claude.mjs
+```
+
+No scheduler, no state collection, no MongoDB simulation state yet. These scripts are for one-shot bootstrap and inspection only.
+
+**Two insertion strategies are used:**
+- **Likes** default to direct MongoDB `$addToSet` plus `simulation_like_events` audit rows. API mode still exists behind `--use-api-likes`, but direct DB mode avoids the toggle risk of `PUT /api/v1/poem/:poemId`.
+- **Comments, replies, and profile comments** are inserted directly into MongoDB via Mongoose (bypassing the API) so that `createdAt` can be set to a historically plausible date. A poem from 2023 with a comment timestamped May 2026 is an obvious tell.
+
+---
+
+### `ai/claude.mjs`
+
+Thin wrapper — identical to what the cron will use later, so it can be reused without changes:
+
+```js
+import Anthropic from '@anthropic-ai/sdk'
+
+const client = new Anthropic() // reads ANTHROPIC_API_KEY from env
+
+export async function generate(systemPrompt, userPrompt, model = 'claude-haiku-4-5-20251001') {
+  const msg = await client.messages.create({
+    model,
+    max_tokens: 512,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userPrompt }]
+  })
+  return msg.content[0].text.trim()
+}
+```
+
+Use Haiku for everything in this pass — comments are short, quality is acceptable, cost is minimal.
+
+**Provider decision**: this first iteration uses Claude directly. The long-term plan is to switch to Ollama on a self-hosted server (see [Ollama section](#ollama-local--self-hosted-free-alternative)) to eliminate per-token cost. That switch only requires swapping `claude.mjs` for `ollama.mjs` — the rest of the code doesn't change. For now, Claude Haiku at < $0.01 for the full one-shot run is fine.
+
+---
+
+### `auth.mjs`
+
+Logs in every AI author whose credentials are in `SIMULATION_AUTHORS` env var (JSON array: `[{ authorId, email, password }, ...]`). Returns a map of `authorId → jwt`.
+
+```js
+export async function loginAll(authors) {
+  const tokens = {}
+  for (const a of authors) {
+    const res = await fetch(`${API_BASE}/api/v1/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: a.email, password: a.password })
+    })
+    const { token } = await res.json()
+    tokens[a.authorId] = token
+  }
+  return tokens
+}
+```
+
+Fail fast if any login fails — credentials problem is better caught here than mid-run.
+
+---
+
+### Activity profiles
+
+Not all 50 authors behave identically. Assign each author one of three profiles before running the script. This creates the natural variation a real community has:
+
+| Profile | % of authors | Likes budget | Comments probability | Description |
+|---|---|---|---|---|
+| **COMMENTER** | ~20% (10 authors) | 20–30 | 80% chance to comment on a matching poem | Vocal, opinionated, always in the thread |
+| **REGULAR** | ~40% (20 authors) | 30–40 | 40% chance | Balanced — likes and comments, not obsessively |
+| **LURKER** | ~40% (20 authors) | 35–50 | 10% chance | Mostly likes, rarely speaks up |
+
+Lurkers have the highest like budget because real lurkers are prolific likers — they engage silently. Commenters comment more but like less obsessively.
+
+Assign profiles by hand before running — it takes 5 minutes and makes the community feel real. A suggested split based on the existing author personalities:
+- COMMENTERS: `angry.quill`, `queerpoetrybabe`, `silent_scream`, `GrumpyGrandpa`, `historybuff42`, `lostinlove23`, `coffeeshop.verses`, `teen.writes_`, `warpoet_fred`, `immigrant.pen`
+- LURKERS: `ChristmasEve_`, `DadOf3_Writes`, `JesusIsMyRock_`, `MomLife_Poems`, `SunrisePoet_`, `Garden_Guru`, `hopeful.heart`, `WarmSummer_`, `SiblingHood`, `soberlife_`, `birthdays_hurt`, `prayer.poems`, `forgive_and_write`, `butterfly_soul`, `SmallTownLife`, `WinterMuse`, `StormSurfer`, `desert_dragon`, `bookworm.poet`, `CitySlicker_V`
+- REGULARS: everyone else
+
+---
+
+### `seed-likes.mjs`
+
+For each AI author, pick poems to like using weighted rules, then PUT each one via the API.
+
+**Key constraint**: `PUT /api/v1/poem/:poemId` is a toggle — it adds the like if absent, removes it if already present. Before PUTting, check that `poem.likes` does not already contain the author's `_id`. The seeded poems may already have some likes from the seed script, so this check is not optional.
+
+**Per-author budget**: determined by activity profile (see above). Total across 50 authors: **~1,500–2,000 likes** — enough to put the top poems in the 15–25 range with a natural power-law distribution.
+
+**Weight computation for historical seeding** (differs from the live cron — no recency boost since all poems are old relative to today; instead use historical engagement as a proxy for quality):
+
+```js
+function computeWeight(author, poem) {
+  let w = 1
+  if (poem.authorType === 'famous') w *= 3.0
+  if (author.preferredGenres.includes(poem.genre)) w *= 2.0
+  // social proof — poems that already have likes attract more
+  const likeCount = poem.likes?.length ?? 0
+  if (likeCount > 20) w *= 2.0
+  else if (likeCount > 10) w *= 1.5
+  else if (likeCount > 5) w *= 1.2
+  if (String(poem.authorId ?? poem.userId) === String(author._id)) w = 0  // no self-like
+  if (poem.likes?.includes(String(author._id))) w = 0                      // already liked
+  return w
+}
+```
+
+**15% outside-genre exploration**: for each author, 15% of their like budget is spent on poems outside their `preferredGenres`, picked randomly from the full catalog. This prevents engagement from looking siloed by genre and mimics real discovery behaviour ("I don't usually read war poetry but this one got me").
+
+---
+
+### `seed-comments.mjs`
+
+Select the top 60 poems by like count (after `seed-likes.mjs` runs). For each poem, the number of comments is determined by its like count — popular poems get more comments, obscure ones get none or one. This is the natural power law.
+
+**Comment count per poem**:
+- Top 15 poems (most liked): 3–5 comments
+- Next 25 poems: 1–3 comments
+- Bottom 20 of the 60: 1 comment
+- All other poems (350+): 0 comments
+
+**Total Claude calls**: ~130–160.
+
+**Cost estimate**: 150 Haiku calls × ~400 tokens avg = ~60k tokens → **~$0.01 total**.
+
+**Temporal distribution — exponential decay, not uniform**:
+
+Real engagement spikes when a poem is new and drops fast. Use a decayed distribution rather than a flat one:
+
+```js
+function commentDate(poemDate) {
+  // exponential decay: most comments in first week, tail off after
+  const r = Math.random()
+  let daysAfter
+  if (r < 0.55) daysAfter = Math.random() * 7          // 55% in first week
+  else if (r < 0.85) daysAfter = 7 + Math.random() * 23  // 30% in days 8–30
+  else daysAfter = 30 + Math.random() * 60               // 15% in days 31–90
+
+  const result = addDays(poemDate, daysAfter)
+  return result > yesterday() ? yesterday() : result     // never in the future
+}
+```
+
+**Comment prompts — personality-aware and context-aware**:
+
+Each author's bio implies a specific voice. Extract a short style instruction from their personality and pass it to Claude. More importantly, pass any existing comments on the poem so Claude generates reactions that acknowledge what was already said — otherwise comments feel parallel and disconnected.
+
+```
+System: You are {authorName}. {bio}
+        Your comment style: {styleInstruction}
+        You are leaving a comment on a poem you just read.
+        React authentically — reference something specific in the poem.
+        Do NOT start with "I" or "This poem". Vary your opening.
+
+User: Poem title: "{title}"
+
+{poemText}
+
+{existingComments.length > 0
+  ? `Others have already commented:\n${existingComments.map(c => `- ${c.authorName}: "${c.body}"`).join('\n')}\n\nWrite your own distinct reaction. You may agree, disagree, or take a completely different angle.`
+  : 'Write your comment.'}
+```
+
+Where `styleInstruction` is derived per author from their bio and profile:
+- COMMENTER-type authors: longer, opinionated, sometimes challenging
+- REGULAR authors: 1–3 sentences, warm, personal
+- LURKER authors (if they do comment, it's notable): brief, heartfelt, often one striking line
+
+**Comment → like rule**: if author A generates a comment on poem P, also ensure A has liked P. Add A to `poem.likes` in memory before continuing (the script tracks this in-memory and writes likes in a final pass).
+
+After generating, insert directly into MongoDB so `createdAt` can be set:
+
+```js
+await Comment.create({
+  targetType: 'poem',
+  targetId: poem._id,
+  authorId: author._id,
+  body: generatedComment,
+  createdAt: commentDate(poem.date)
+})
+```
+
+---
+
+### Comment replies
+
+After seeding top-level comments, roll 35% probability per comment to get a reply. This drives the reply depth metric (target: 1.5–2.5 levels).
+
+**Selection**: find an AI author who (a) did not write the parent comment, (b) has overlapping genre interests, (c) is a COMMENTER or REGULAR profile (LURKERs almost never reply). Do not reply to your own comment.
+
+The prompt must include the poem itself, not just the parent comment — replies often reference the poem directly:
+
+```
+System: You are {authorName}. {bio}. You are replying to someone's comment on a poem.
+        Keep it short — 1 to 2 sentences. React to what they said.
+        You may agree, push back gently, or add something they missed.
+        Sound like a real person, not a reviewer.
+
+User: Poem: "{title}"
+{poemText}
+
+{parentAuthorName} commented: "{parentCommentBody}"
+
+Write your reply.
+```
+
+Insert with `parentId` and `createdAt` 1–5 days after the parent (not 7 — a reply that takes a week is unusual):
+
+```js
+await Comment.create({
+  targetType: 'poem',
+  targetId: poem._id,
+  authorId: replyAuthor._id,
+  body: generatedReply,
+  parentId: parentComment._id,
+  createdAt: randomDateBetween(parentComment.createdAt, addDays(parentComment.createdAt, 5))
+})
+```
+
+---
+
+### `seed-profile-comments.mjs`
+
+AI authors occasionally visit each other's profiles and leave a short note. This makes profiles feel inhabited rather than just poem repositories.
+
+**Volume**: ~30–40 profile comments total. Only COMMENTER and REGULAR authors leave profile comments (LURKERs don't). Each eligible author has a 50% chance of leaving one profile comment.
+
+**Target selection**: pick an AI author with overlapping genres. Avoid your own profile. Prefer authors whose poems you've already liked or commented on — you visited their profile because you liked their work.
+
+**Critical**: pass 1–2 actual poems by the target author into the prompt. Without this, Claude can only generate vague genre-based comments ("I love your nature writing!") which read immediately as AI-generated. With a real poem, it can reference something specific.
+
+```
+System: You are {authorName}. {bio}.
+        You are leaving a comment on another poet's profile page.
+        1–2 sentences. Be specific — reference something from one of their poems.
+        Sound like a real reader who was moved by their work, not a reviewer.
+
+User: The poet is {targetName}. Here is one of their poems:
+
+Title: "{poemTitle}"
+{poemText}
+
+Write your comment on their profile.
+```
+
+Insert with `createdAt` spread across the past 12 months (not 6 — the community has been running for years).
+
+---
+
+### `seed-activity.mjs` — entry point
+
+```js
+// 1. connect to MongoDB directly (needed for comment inserts with custom createdAt)
+await mongoose.connect(MONGODB)
+
+// 2. load AI author credentials from env
+const authors = JSON.parse(process.env.SIMULATION_AUTHORS)
+
+// 3. login all authors (needed for likes API calls)
+const tokens = await loginAll(authors)
+
+// 4. fetch all poems + AI author documents
+const [poems, aiAuthors] = await Promise.all([fetchAllPoems(), fetchAIAuthors()])
+
+// 5. seed likes (via API — needs JWT)
+await seedLikes(aiAuthors, poems, tokens)
+
+// 6. seed top-level comments + replies (direct DB insert — needs mongoose connection)
+await seedComments(aiAuthors, poems)
+
+// 7. seed profile comments (direct DB insert)
+await seedProfileComments(aiAuthors)
+```
+
+Each step logs a line per action (`liked: poemTitle ← authorName`, `commented: poemTitle ← authorName`, `replied: ← authorName`, `profile-comment: targetName ← authorName`). Wrap each step in try/catch — a failed action logs and continues, it does not abort the run.
+
+---
+
+### Running it
+
+```bash
+SIMULATION_AUTHORS='[...]' ANTHROPIC_API_KEY=sk-ant-... node scripts/simulation/seed-activity.mjs
+```
+
+Run against dev/pre DB first (`NODE_ENV=development`). Inspect the site. If it looks right, prepare separate production run ids, create a database snapshot, and preview rollback before running against prod.
+
+This is a write-once operation per run id. Do not re-run the same run id. The default likes mode now uses direct MongoDB `$addToSet` and audit rows to avoid the toggle risk, but duplicate production writes are still undesirable.
+
+### Running without Anthropic
+
+This was the path used for pre:
+
+```bash
+cd backend
+NODE_ENV=development node scripts/simulation/codex-export.mjs --run-id seed-activity-v1
+# Codex subagents fill scripts/simulation/codex-runs/seed-activity-v1/comments-batch-*.json
+NODE_ENV=development node scripts/simulation/codex-validate.mjs --run-id seed-activity-v1
+NODE_ENV=development node scripts/simulation/codex-import.mjs --run-id seed-activity-v1
+NODE_ENV=development node scripts/simulation/boost-likes.mjs --run-id seed-activity-v1.1-likes --source-run-id seed-activity-v1
+NODE_ENV=development node scripts/simulation/inspect-run.mjs --run-id seed-activity-v1
+NODE_ENV=development node scripts/simulation/inspect-run.mjs --run-id seed-activity-v1.1-likes
+```
+
+Rollback preview for the pre run:
+
+```bash
+NODE_ENV=development node scripts/simulation/rollback-run.mjs --run-id seed-activity-v1 --run-id seed-activity-v1.1-likes
+```
+
+Dry-run verification on 12 June 2026 matched the known pre activity exactly: `216` comments, `1785` broad likes, and `440` boosted likes, with `0` external replies that would be orphaned.
+
+---
+
+### Expected output
+
+| Activity | Volume | Notes |
+|---|---|---|
+| Likes | ~1,500–2,000 | Power-law distribution; top poems hit 15–25 likes |
+| Top-level comments | ~130–160 across 60 poems | Decayed temporal distribution; heavy first week |
+| Replies | ~45–55 (35% of top-level) | Include poem text in prompt; max 5 days after parent |
+| Profile comments | ~30–40 | Reference actual poems from target author |
+
+Comments and replies have historically spread `createdAt` dates with exponential decay. All success metrics should be in range. Verify after running: spot-check 5–10 poems to confirm comment quality and timestamps look natural before enabling the cron.
+
+---
+
+### What this unlocks
+
+Once this runs successfully:
+- The site has a realistic like, comment, reply, and profile history
+- Every building block of the future cron (auth, Claude, direct DB insert, API call) has been validated end-to-end
+- `claude.mjs` and `auth.mjs` can be reused in the cron unchanged
+- Phase 3 (recurring poem creation + likes) can start immediately after

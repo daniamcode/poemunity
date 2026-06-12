@@ -1,0 +1,13 @@
+{
+  "runId": "seed-activity-v1",
+  "createdAt": "2026-06-12T15:40:04.497Z",
+  "likes": 1785,
+  "tasks": 216,
+  "batches": 9,
+  "instructions": [
+    "Fill generatedBody for every task in every batch file.",
+    "Do not edit ids, dates, targetType, targetId, authorId, kind, parentLocalId, or prompts.",
+    "For seed-poem-reply tasks, use the generatedBody from parentLocalId as the parent comment.",
+    "Return only natural comment text in generatedBody, no quotes, no markdown, no explanations."
+  ]
+}

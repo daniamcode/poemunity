@@ -7,6 +7,9 @@ const userExtractor = require('../middleware/userExtractor')
 const { generatePoemSlug } = require('../utils/slugUtils')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
+const ORDER_BY_DATE = 'date'
+const ORDER_BY_LIKES = 'likes'
+const ORDER_BY_TITLE = 'title'
 
 async function buildUniqueSlug (title, authorName) {
   const base = generatePoemSlug(title, authorName)
@@ -16,6 +19,69 @@ async function buildUniqueSlug (title, authorName) {
     slug = `${base}-${counter++}`
   }
   return slug
+}
+
+function normalizeOrderBy (orderBy) {
+  return String(orderBy || ORDER_BY_DATE).trim().toLowerCase()
+}
+
+function findSortForOrder (orderBy) {
+  switch (normalizeOrderBy(orderBy)) {
+    case ORDER_BY_TITLE:
+      return { title: 1, _id: 1 }
+    case ORDER_BY_DATE:
+      return { date: -1, _id: -1 }
+    default:
+      return { date: -1, _id: -1 }
+  }
+}
+
+function serializePoem (poem) {
+  const returnedObject = typeof poem.toJSON === 'function' ? poem.toJSON() : { ...poem }
+  returnedObject.id = returnedObject._id
+  delete returnedObject._id
+  delete returnedObject.__v
+  delete returnedObject.likesCount
+
+  const rawAuthor = returnedObject.authorId
+  const author = rawAuthor && typeof rawAuthor.toJSON === 'function' ? rawAuthor.toJSON() : rawAuthor
+  if (author && (author.name || author.username)) {
+    returnedObject.author = author.username || author.name
+    returnedObject.authorName = author.name
+    returnedObject.picture = author.picture
+    returnedObject.userId = String(author._id || author.id)
+    returnedObject.authorSlug = author.slug
+    returnedObject.authorType = author.type
+    delete returnedObject.authorId
+  }
+
+  return returnedObject
+}
+
+async function findPoems (filter, { orderBy, skip, limit } = {}) {
+  if (normalizeOrderBy(orderBy) === ORDER_BY_LIKES) {
+    const pipeline = [
+      { $match: filter },
+      { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
+      { $sort: { likesCount: -1, date: -1, _id: 1 } }
+    ]
+
+    if (skip !== undefined) pipeline.push({ $skip: skip })
+    if (limit !== undefined) pipeline.push({ $limit: limit })
+
+    const poems = await Poem.aggregate(pipeline)
+    const populatedPoems = await Poem.populate(poems, { path: 'authorId', select: AUTHOR_FIELDS })
+    return populatedPoems.map(serializePoem)
+  }
+
+  let query = Poem.find(filter)
+    .populate('authorId', AUTHOR_FIELDS)
+    .sort(findSortForOrder(orderBy))
+
+  if (skip !== undefined) query = query.skip(skip)
+  if (limit !== undefined) query = query.limit(limit)
+
+  return query
 }
 
 poemsRouter.get('/', async (req, res) => {
@@ -68,20 +134,18 @@ poemsRouter.get('/', async (req, res) => {
       const skip = (page - 1) * effectiveLimit
 
       const total = await Poem.countDocuments(filter)
-      const poems = await Poem.find(filter)
-        .populate('authorId', AUTHOR_FIELDS)
-        .sort({ date: -1 })
-        .skip(skip)
-        .limit(effectiveLimit)
+      const poems = await findPoems(filter, {
+        orderBy: req.query.orderBy,
+        skip,
+        limit: effectiveLimit
+      })
 
       const totalPages = Math.ceil(total / effectiveLimit)
       const hasMore = page < totalPages
 
       res.json({ poems, total, page, limit: effectiveLimit, totalPages, hasMore })
     } else {
-      const poems = await Poem.find(filter)
-        .populate('authorId', AUTHOR_FIELDS)
-        .sort({ date: -1 })
+      const poems = await findPoems(filter, { orderBy: req.query.orderBy })
       res.json(poems)
     }
   } catch (error) {

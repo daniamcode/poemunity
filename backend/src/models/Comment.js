@@ -5,7 +5,13 @@ const commentSchema = new Schema({
   targetId: { type: Schema.Types.ObjectId, required: true, index: true },
   authorId: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
   body: { type: String, required: true, maxlength: 1000 },
-  parentId: { type: Schema.Types.ObjectId, ref: 'Comment', default: null }
+  parentId: { type: Schema.Types.ObjectId, ref: 'Comment', default: null },
+  simulationRunId: { type: String, index: true },
+  simulationKind: {
+    type: String,
+    enum: ['seed-poem-comment', 'seed-poem-reply', 'seed-profile-comment'],
+    index: true
+  }
 }, { timestamps: true })
 
 commentSchema.set('toJSON', {
@@ -20,6 +26,8 @@ commentSchema.set('toJSON', {
       ret.authorPicture = a.picture || null
       ret.authorSlug = a.slug || null
     }
+    delete ret.simulationRunId
+    delete ret.simulationKind
   }
 })
 

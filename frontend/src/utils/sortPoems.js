@@ -17,7 +17,7 @@ function sortPoems(sort, poems) {
     }
     if (sort === ORDER_BY_LIKES) {
         sortedPoems.sort(function (a, b) {
-            return b.likes.length - a.likes.length
+            return (b.likes?.length || 0) - (a.likes?.length || 0)
         })
     }
     if (sort === ORDER_BY_RANDOM) {

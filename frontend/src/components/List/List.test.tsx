@@ -384,6 +384,7 @@ describe('List', () => {
             params: {
                 page: 1,
                 limit: 10,
+                orderBy: ORDER_BY_LIKES,
                 origin: 'famous'
             },
             options: {

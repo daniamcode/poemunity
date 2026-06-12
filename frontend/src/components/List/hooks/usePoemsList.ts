@@ -5,7 +5,7 @@ import { getPoemsListAction } from '../../../redux/actions/poemsActions'
 import { getTypes } from '../../../redux/actions/commonActions'
 import { ACTIONS } from '../../../redux/reducers/poemsReducers'
 import sortPoems from '../../../utils/sortPoems'
-import { PAGINATION_LIMIT } from '../../../data/constants'
+import { ORDER_BY_LIKES, PAGINATION_LIMIT } from '../../../data/constants'
 import { Poem } from '../../../typescript/interfaces'
 
 export interface InitialPoemsData {
@@ -27,6 +27,7 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
     const dispatch = useAppDispatch()
     const poemsListQuery = useSelector((state: RootState) => state.poemsListQuery)
     const isSeeded = useRef(false)
+    const effectiveOrderBy = orderBy || ORDER_BY_LIKES
 
     // On mount: seed store with SSR data (skip reset+fetch) or do normal reset
     useEffect(() => {
@@ -51,6 +52,7 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
                     params: {
                         page: 1,
                         limit: PAGINATION_LIMIT,
+                        orderBy: effectiveOrderBy,
                         ...(origin !== 'all' && { origin }),
                         ...(genre && { genre })
                     },
@@ -58,11 +60,11 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
                 })
             )
         }
-    }, [origin, genre, dispatch])
+    }, [origin, genre, effectiveOrderBy, dispatch])
 
     const poems = (() => {
         if (!poemsListQuery?.item?.length) return []
-        return sortPoems(orderBy, [...poemsListQuery.item])
+        return sortPoems(effectiveOrderBy, [...poemsListQuery.item])
     })()
 
     const handleLoadMore = () => {
@@ -73,6 +75,7 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
                     params: {
                         page: nextPage,
                         limit: PAGINATION_LIMIT,
+                        orderBy: effectiveOrderBy,
                         ...(origin !== 'all' && { origin }),
                         ...(genre && { genre })
                     },
@@ -82,11 +85,28 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
         }
     }
 
+    const retry = () => {
+        dispatch(
+            getPoemsListAction({
+                params: {
+                    page: 1,
+                    limit: PAGINATION_LIMIT,
+                    orderBy: effectiveOrderBy,
+                    ...(origin !== 'all' && { origin }),
+                    ...(genre && { genre })
+                },
+                options: { reset: true, fetch: true }
+            })
+        )
+    }
+
     return {
         poems,
         isLoading: poemsListQuery?.isFetching,
+        isError: poemsListQuery?.isError || false,
         hasMore: poemsListQuery?.hasMore || false,
         hasItems: (poemsListQuery?.item?.length ?? 0) > 0,
-        handleLoadMore
+        handleLoadMore,
+        retry
     }
 }
