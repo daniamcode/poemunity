@@ -37,7 +37,7 @@ export function likePoemAction({ params, context, options, callbacks }: likePoem
         return putAction({
             type: ACTIONS.LIKE_POEM,
             url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
-            // context.config is basically the jwt token
+            // context.config carries auth request options, usually cookie credentials
             config: context.config,
             dispatch,
             options,
@@ -86,7 +86,7 @@ export function deletePoemAction({ params, context, options, callbacks }: delete
         return deleteAction({
             type: ACTIONS.DELETE_POEM,
             url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
-            // context.config is basically the jwt token
+            // context.config carries auth request options, usually cookie credentials
             config: context.config,
             dispatch,
             options,
@@ -110,7 +110,7 @@ export function savePoemAction({ params, context, data, options, callbacks }: sa
         return patchAction({
             type: ACTIONS.SAVE_POEM,
             url: `${API_ENDPOINTS.POEM}/${params.poemId}`,
-            // context.config is basically the jwt token
+            // context.config carries auth request options, usually cookie credentials
             config: context.config,
             data,
             dispatch,

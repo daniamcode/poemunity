@@ -392,6 +392,27 @@ exports[`Header should match without id 1`] = `
         <div
           class="separator"
         />
+        <nav
+          aria-label="Policy links"
+          class="header__legal-links"
+        >
+          <a
+            href="/privacy"
+          >
+            Privacy
+          </a>
+          <a
+            href="/terms"
+          >
+            Terms
+          </a>
+          <a
+            href="/terms#ai-community-activity"
+            title="AI activity disclosure"
+          >
+            AI
+          </a>
+        </nav>
         <button
           class="header__login"
         />
@@ -786,6 +807,27 @@ exports[`Header should match without id 1`] = `
       <div
         class="separator"
       />
+      <nav
+        aria-label="Policy links"
+        class="header__legal-links"
+      >
+        <a
+          href="/privacy"
+        >
+          Privacy
+        </a>
+        <a
+          href="/terms"
+        >
+          Terms
+        </a>
+        <a
+          href="/terms#ai-community-activity"
+          title="AI activity disclosure"
+        >
+          AI
+        </a>
+      </nav>
       <button
         class="header__login"
       />

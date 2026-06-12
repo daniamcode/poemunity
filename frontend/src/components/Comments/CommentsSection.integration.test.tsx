@@ -3,7 +3,7 @@
  * axios is mocked at module level; no other component is stubbed.
  */
 import React from 'react'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import CommentsSection from './CommentsSection'
 import { AppContext } from '../../App'
 import { Context } from '../../typescript/interfaces'

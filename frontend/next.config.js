@@ -11,8 +11,7 @@ const nextConfig = {
         ]
     },
     env: {
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        NEXT_PUBLIC_ADMIN: process.env.NEXT_PUBLIC_ADMIN
+        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
     }
 }
 

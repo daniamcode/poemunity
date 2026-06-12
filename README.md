@@ -72,16 +72,16 @@ Two separate Vercel projects, both connected to this GitHub repo:
 
 Vercel detects pushes to the connected branches and deploys automatically — no manual step needed.
 
-GitHub Actions and Vercel run **in parallel and independently**. A failing Actions run does not block the Vercel deploy (this needs improvement). The two pipelines cover different things:
+GitHub Actions and Vercel run **in parallel and independently**. Vercel now has its own repo-defined build gates, so a failing Vercel gate blocks that deployment. Branch protection is still recommended so broken branches cannot be merged before Vercel sees them.
 
 | Step | GitHub Actions | Vercel |
 |---|---|---|
-| Lint | ✅ | ✗ |
-| Typecheck | ✅ | ✗ |
-| Frontend tests | ✅ | ✗ |
-| Backend tests | ✅ | ✗ |
+| Lint | ✅ | ✅ frontend build gate |
+| Typecheck | ✅ | ✅ frontend build gate |
+| Frontend tests | ✅ | ✅ frontend build gate |
+| Backend tests | ✅ | ✅ backend build gate |
 | Build (frontend) | ✅ verification | ✅ actual deploy |
-| Build (backend) | ✗ | ✅ actual deploy |
+| Build (backend) | ✗ | ✅ test-gated serverless deploy |
 
 To make Actions gate the deploy (block bad code from reaching production), enable **branch protection rules** in GitHub → Settings → Branches → require status checks to pass before merging.
 
@@ -91,7 +91,7 @@ Express app wrapped in a single Vercel serverless function at `backend/index.js`
 
 ### Frontend
 
-Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json` only sets `buildCommand: "pnpm build"` — framework detection is automatic.
+Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json` sets `buildCommand: "pnpm lint && pnpm typecheck && pnpm test --no-coverage && pnpm build"` — framework detection is automatic.
 
 `NEXT_PUBLIC_API_URL` is baked into the bundle at build time. In local dev the axios instance falls back to `http://localhost:4200` so the env var is only required in Vercel.
 
@@ -102,6 +102,7 @@ Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json`
 |---|---|
 | `MONGODB` | MongoDB Atlas connection string |
 | `SECRET` | JWT signing secret (generate with `openssl rand -base64 32`) |
+| `REACT_APP_ADMIN` | Admin author ObjectId used by backend admin checks |
 | `FRONTEND_URL` | Frontend Vercel URL, no trailing slash (e.g. `https://poemunity-frontend.vercel.app`) |
 | `NODE_ENV` | `production` |
 
@@ -109,7 +110,12 @@ Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json`
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_API_URL` | Full backend URL with protocol (e.g. `https://poemunity-backend.vercel.app`) |
-| `NEXT_PUBLIC_ADMIN` | Admin author ID |
+
+`NEXT_PUBLIC_ADMIN` is no longer used for frontend authorization decisions. Admin status comes from the backend-issued JWT (`isAdmin`). It has been removed from repo config and CI build envs; also remove any stale value from the Vercel dashboard.
+
+### Database backup / restore
+
+Production uses MongoDB Atlas backups. Before production AI seeding or other bulk writes, create an on-demand Atlas snapshot and complete the restore drill in `docs/DATABASE_BACKUP_RESTORE.md`.
 
 ## Testing
 
@@ -153,4 +159,4 @@ cd backend && pnpm dev
 cd frontend && pnpm dev
 ```
 
-`frontend/.env.local` only needs `NEXT_PUBLIC_ADMIN` for admin features locally. `NEXT_PUBLIC_API_URL` is not needed — the axios instance defaults to `http://localhost:4200`.
+`frontend/.env.local` does not need `NEXT_PUBLIC_ADMIN` for admin features. Admin status comes from the backend JWT. `NEXT_PUBLIC_API_URL` is not needed locally either — the axios instance defaults to `http://localhost:4200`. For local admin checks, set `REACT_APP_ADMIN_PRE` in `backend/.env`.

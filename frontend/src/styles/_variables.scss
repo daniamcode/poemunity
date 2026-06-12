@@ -15,11 +15,12 @@ $color-primary-focus-shadow: rgba(52, 152, 219, 0.1);
 $color-primary-active-bg:    rgba(52, 152, 219, 0.05);
 
 // Colors — text
-$color-text-dark:        #2c3e50;   // headings, labels, main content
-$color-text-medium:      #555;      // body text, secondary content
-$color-text-secondary:   #7f8c8d;  // meta, labels, muted
-$color-text-muted:       #95a5a6;  // empty states, dates, counts
-$color-text-placeholder: #bdc3c7;  // input placeholders, disabled text
+$color-text-dark:             #2c3e50;  // headings, labels, main content
+$color-text-medium:           #555;     // body text, secondary content
+$color-text-secondary:        #7f8c8d; // meta, labels, muted
+$color-text-muted:            #95a5a6; // empty states, dates, counts
+$color-text-placeholder:      #bdc3c7; // input placeholders, disabled text
+$color-text-accessible-muted: #767676; // muted text that still meets WCAG AA (4.5:1 on white)
 
 // Colors — surfaces & borders
 $color-bg-surface:  #ffffff;
@@ -36,6 +37,7 @@ $color-warning-hover: #d35400;
 // Colors — brand / special
 $color-logo:         #4f5d73;   // brand name text in header
 $color-rank-gold:    #f1c40f;   // rank #1
+$color-rank-silver:  #7f8c8d;   // rank #2 — meets WCAG AA on white
 $color-rank-bronze:  #e67e22;   // rank #3 (same value as $color-warning)
 
 // Colors — overlays

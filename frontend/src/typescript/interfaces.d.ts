@@ -72,7 +72,7 @@ export interface ReduxCallbacks {
 }
 
 export interface Context {
-    elementToEdit: string
+    elementToEdit?: string
     user: string
     userId: string
     username: string

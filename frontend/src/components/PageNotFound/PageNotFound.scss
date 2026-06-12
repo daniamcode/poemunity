@@ -10,8 +10,9 @@
     font-size: $fs-2xl;
     display: flex;
     flex-direction: column;
-    width: 500px;
-    height: 500px;
+    max-width: 500px;
+    width: 100%;
     justify-content: center;
     align-items: center;
+    padding: $space-xl $space-5;
 }

@@ -1,0 +1,45 @@
+@use '../../styles/variables' as *;
+
+.footer {
+    border-top: 1px solid $color-border-subtle;
+    color: $color-text-secondary;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3 $space-6;
+    justify-content: space-between;
+    margin: $space-8 auto 0;
+    max-width: $max-width-wide;
+    padding: $space-5;
+}
+
+.footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-4;
+}
+
+.footer__links a {
+    color: $color-text-medium;
+    font-size: $fs-base-minus;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+        color: $color-primary-dark;
+    }
+}
+
+.footer__note {
+    color: $color-text-secondary;
+    font-size: $fs-sm-plus;
+    line-height: $lh-base;
+    max-width: 460px;
+}
+
+@media screen and (max-width: $bp-sm) {
+    .footer {
+        flex-direction: column;
+        margin-top: $space-6;
+        padding: $space-5 $space-4;
+    }
+}

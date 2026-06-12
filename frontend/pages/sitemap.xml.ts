@@ -50,7 +50,9 @@ function buildSitemap(
 ): string {
     const staticPages = [
         { path: '/', priority: '1.0', changefreq: 'daily' },
-        { path: '/authors', priority: '0.8', changefreq: 'daily' }
+        { path: '/authors', priority: '0.8', changefreq: 'daily' },
+        { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
+        { path: '/terms', priority: '0.3', changefreq: 'yearly' }
     ]
 
     const genrePages = MUST_HAVE_CATEGORIES.map(cat => ({

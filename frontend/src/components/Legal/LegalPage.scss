@@ -1,0 +1,84 @@
+@use '../../styles/variables' as *;
+
+.legal-page {
+    max-width: $max-width-narrow;
+    margin: 0 auto $space-9;
+    padding: $space-7 $space-5 $space-9;
+    color: $color-text-dark;
+}
+
+.legal-page__header {
+    margin-bottom: $space-8;
+}
+
+.legal-page__eyebrow {
+    color: $color-primary-dark;
+    font-family: $font-heading;
+    font-size: $fs-base-minus;
+    font-weight: $fw-semibold;
+    margin-bottom: $space-2;
+}
+
+.legal-page h1 {
+    font-family: $font-heading;
+    font-size: $fs-3xl;
+    line-height: $lh-tight;
+    margin-bottom: $space-3;
+}
+
+.legal-page__date {
+    color: $color-text-secondary;
+    font-size: $fs-base-minus;
+    margin-bottom: $space-5;
+}
+
+.legal-page__intro {
+    color: $color-text-medium;
+    font-size: $fs-md;
+    line-height: $lh-relaxed;
+}
+
+.legal-page__section {
+    border-top: 1px solid $color-border-subtle;
+    padding: $space-6 0;
+}
+
+.legal-page__section h2 {
+    font-family: $font-heading;
+    font-size: $fs-xl;
+    line-height: $lh-tight;
+    margin-bottom: $space-4;
+}
+
+.legal-page__section p,
+.legal-page__section li {
+    color: $color-text-medium;
+    font-size: $fs-base;
+    line-height: $lh-loose;
+}
+
+.legal-page__section p + p {
+    margin-top: $space-4;
+}
+
+.legal-page__section ul {
+    margin-left: $space-6;
+}
+
+.legal-page__section li + li {
+    margin-top: $space-2;
+}
+
+@media screen and (max-width: $bp-sm) {
+    .legal-page {
+        padding: $space-6 $space-4 $space-8;
+    }
+
+    .legal-page h1 {
+        font-size: $fs-2xl;
+    }
+
+    .legal-page__intro {
+        font-size: $fs-base;
+    }
+}

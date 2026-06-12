@@ -8,7 +8,11 @@ import React from 'react'
 jest.mock('../../../redux/actions/poemActions')
 
 describe('useDetailPoem', () => {
-    const wrapper = ({ children }: any) => React.createElement(Provider, { store }, children)
+    const wrapper = ({ children }: any) => React.createElement(
+        Provider as React.ComponentType<any>,
+        { store },
+        children
+    )
 
     beforeEach(() => {
         jest.clearAllMocks()

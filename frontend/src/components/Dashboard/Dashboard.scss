@@ -6,6 +6,12 @@
     margin-top: 10px;
 }
 
+@media screen and (max-width: $bp-sm) {
+    .dashboard {
+        margin-top: 0;
+    }
+}
+
 .dashboard__accordion {
     display: none;
 }

@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
 import Header from './Header'
 import { AppContext } from '../../App'
-import * as parseJWTModule from '../../utils/parseJWT'
 
 // Mock child components
 jest.mock('../SimpleAccordion', () => {
@@ -22,9 +21,6 @@ jest.mock('./Logout', () => {
         return <button data-testid='logout-button'>Logout</button>
     }
 })
-
-// Mock parseJWT
-jest.mock('../../utils/parseJWT')
 
 describe('Header', () => {
     const mockSetState = jest.fn()
@@ -55,13 +51,6 @@ describe('Header', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        Storage.prototype.getItem = jest.fn()
-        Storage.prototype.setItem = jest.fn()
-        ;(parseJWTModule.default as jest.Mock).mockReturnValue({
-            id: 'user-123',
-            username: 'johndoe',
-            picture: 'https://example.com/pic.jpg'
-        })
         mockRouter.setCurrentUrl('/')
         global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve(null) })
     })
@@ -80,8 +69,8 @@ describe('Header', () => {
 
     test('should render header component', () => {
         renderWithContext(mockContextLoggedOut)
-        expect(screen.getByRole('link', { name: /P/ })).toBeInTheDocument()
-        expect(screen.getByRole('link', { name: /emunity/ })).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: 'P' })).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: 'emunity' })).toBeInTheDocument()
     })
 
     test('should render Accordion component', () => {
@@ -132,45 +121,12 @@ describe('Header', () => {
         expect(screen.getByText('Your poem community!')).toBeInTheDocument()
     })
 
-    test('should initialize user from localStorage when loggedUser exists', () => {
-        const mockToken = 'mock-jwt-token'
-        ;(Storage.prototype.getItem as jest.Mock).mockReturnValue(JSON.stringify(mockToken))
-
+    test('should render legal links in the fixed header', () => {
         renderWithContext(mockContextLoggedOut)
 
-        expect(window.localStorage.getItem).toHaveBeenCalledWith('loggedUser')
-        expect(parseJWTModule.default).toHaveBeenCalledWith(mockToken)
-        expect(mockSetState).toHaveBeenCalledWith(
-            expect.objectContaining({
-                user: mockToken,
-                userId: 'user-123',
-                username: 'johndoe',
-                picture: 'https://example.com/pic.jpg',
-                config: {
-                    headers: {
-                        Authorization: `Bearer ${mockToken}`
-                    }
-                }
-            })
-        )
-    })
-
-    test('should NOT call setState when loggedUser is not in localStorage', () => {
-        ;(Storage.prototype.getItem as jest.Mock).mockReturnValue(null)
-
-        renderWithContext(mockContextLoggedOut)
-
-        expect(window.localStorage.getItem).toHaveBeenCalledWith('loggedUser')
-        expect(mockSetState).not.toHaveBeenCalled()
-    })
-
-    test('should NOT call setState when localStorage returns empty string', () => {
-        ;(Storage.prototype.getItem as jest.Mock).mockReturnValue('')
-
-        renderWithContext(mockContextLoggedOut)
-
-        expect(window.localStorage.getItem).toHaveBeenCalledWith('loggedUser')
-        expect(mockSetState).not.toHaveBeenCalled()
+        expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy')
+        expect(screen.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms')
+        expect(screen.getByRole('link', { name: 'AI' })).toHaveAttribute('href', '/terms#ai-community-activity')
     })
 
     test('should render all logo parts with correct links', () => {
@@ -193,26 +149,6 @@ describe('Header', () => {
         expect(container.querySelector('.header__text-logo-second')).toBeInTheDocument()
         expect(container.querySelector('.list__presentation')).toBeInTheDocument()
         expect(container.querySelector('.separator')).toBeInTheDocument()
-    })
-
-    test('should parse JWT and extract user data correctly', () => {
-        const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMTIzIn0.test'
-        ;(Storage.prototype.getItem as jest.Mock).mockReturnValue(JSON.stringify(mockToken))
-        ;(parseJWTModule.default as jest.Mock).mockReturnValue({
-            id: 'user-789',
-            username: 'testuser',
-            picture: 'test.jpg'
-        })
-
-        renderWithContext(mockContextLoggedOut)
-
-        expect(mockSetState).toHaveBeenCalledWith(
-            expect.objectContaining({
-                userId: 'user-789',
-                username: 'testuser',
-                picture: 'test.jpg'
-            })
-        )
     })
 
     test('should handle profile page with logged in user', () => {

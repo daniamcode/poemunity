@@ -29,7 +29,7 @@ Vercel (Next.js)          Vercel (Express)
 - [x] Update `package.json` scripts (`dev`, `build`, `start`)
 - [x] Update `vercel.json` for Next.js (or remove — Vercel auto-detects)
 - [x] Rename `REACT_APP_API_URL` → `NEXT_PUBLIC_API_URL` in axiosInstance and Vercel env vars
-- [x] Rename `REACT_APP_ADMIN` → `NEXT_PUBLIC_ADMIN` everywhere
+- [x] Remove frontend admin-ID authorization checks; admin status now comes from backend JWT `isAdmin`
 
 ---
 
@@ -43,12 +43,14 @@ Vercel (Next.js)          Vercel (Express)
 
 - [x] Add `pages/api/auth/login.ts` — Next.js proxy route that calls backend and sets `httpOnly` cookie on frontend domain
 - [x] Add `pages/api/auth/logout.ts` — clears the cookie
-- [x] No backend changes needed (cookie is set by the Next.js proxy, not Express directly)
-- [x] Update `Login.tsx` to call `/api/auth/login`; keeps `localStorage` for client-side AppContext
-- [x] Update `Logout.tsx` to call `DELETE /api/auth/logout` before clearing `localStorage`
+- [x] Add `pages/api/auth/session.ts` — returns safe user fields from the httpOnly cookie without exposing the JWT
+- [x] Add `pages/api/backend/[...path].ts` — proxies browser API calls through Next.js and forwards bearer auth server-side
+- [x] Update backend `userExtractor` to accept the `token` cookie as well as bearer auth
+- [x] Update `Login.tsx` to call `/api/auth/login`; no browser token storage
+- [x] Update `Logout.tsx` to call `DELETE /api/auth/logout` before clearing AppContext
 - [x] Add `middleware.ts` — protects `/profile` server-side using the cookie
 - [x] Remove client-side redirect from `pages/profile.tsx` (middleware replaces it)
-- [x] Fix broken relative URL in `Header.tsx` (`/api/v1/users/me` → absolute backend URL)
+- [x] Remove `Header.tsx` token refresh side effect; AppContext hydrates from SSR/session data
 
 ---
 
@@ -126,9 +128,15 @@ For each SSR page, add `getServerSideProps` that fetches data from the Express A
 
 ## Phase 8 — Vercel deployment
 
+**Status on 2026-06-12:** not production-verified yet. These are deployment tasks that must be checked in the Vercel dashboard and against the real production URLs, not inferred from local code.
+
 - [x] Update (or remove) `frontend/vercel.json` — Next.js is auto-detected by Vercel
+- [x] Frontend Vercel build gates deploys with lint, typecheck, tests, and production build
+- [x] Backend Vercel build gates deploys with `npm test`
 - [ ] Rename env var `REACT_APP_API_URL` → `NEXT_PUBLIC_API_URL` in Vercel dashboard
-- [ ] Rename env var `REACT_APP_ADMIN` → `NEXT_PUBLIC_ADMIN` in Vercel dashboard
+- [x] Remove stale `NEXT_PUBLIC_ADMIN` from frontend repo config and CI build envs
+- [ ] Remove stale `NEXT_PUBLIC_ADMIN` from the frontend Vercel dashboard if it is still defined there
+- [ ] Confirm backend Vercel env includes `REACT_APP_ADMIN` for admin checks
 - [ ] Confirm Express CORS is configured to allow the Next.js Vercel domain
 - [ ] Verify SSR pages render correct content in production (curl, not browser)
 - [ ] Verify social share previews (use opengraph.xyz or similar)
@@ -138,6 +146,6 @@ For each SSR page, add `getServerSideProps` that fetches data from the Express A
 ## Notes
 
 - **Pages Router chosen over App Router**: Redux + existing component structure maps cleanly. App Router migration can be a future step once the SSR foundation is stable.
-- **`localStorage` auth**: Phase 5 is complete — `localStorage` can now be removed in favour of cookie-only auth (also resolves the medium-severity checklist security item). Deferred to a separate cleanup step.
+- **Cookie-only auth**: Browser auth now uses the httpOnly `token` cookie plus Next.js session/proxy routes. The raw JWT is not written to `localStorage` or serialized into React page props.
 - **Infinite scroll stays client-side**: `getServerSideProps` seeds the first page; subsequent pages load via existing Redux actions (no change to `useInfiniteScroll`).
 - **MUI v7 + emotion**: already installed. SSR style extraction via emotion cache in `_document.tsx` is straightforward.

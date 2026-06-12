@@ -89,6 +89,7 @@ describe('ProfileForm', () => {
             <ProfileForm
                 context={adminUserContext}
                 poem={mockPoem}
+                isEditing={false}
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}

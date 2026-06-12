@@ -4,7 +4,12 @@ export function manageWarning(message) {
     toast(message, { icon: '⚠️' })
 }
 
-export function manageError(message) {
+export function manageError(messageOrError) {
+    const message = typeof messageOrError === 'string'
+        ? messageOrError
+        : messageOrError?.response?.data?.error
+            || messageOrError?.message
+            || 'An unexpected error occurred'
     toast.error(message)
 }
 

@@ -115,6 +115,67 @@
     cursor: pointer;
 }
 
+.poem__confirm-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: $radius-md;
+}
+
+.poem__confirm-box {
+    background: $color-bg-surface;
+    border-radius: $radius-md;
+    padding: $space-md;
+    text-align: center;
+    min-width: 200px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.poem__confirm-title {
+    font-weight: $fw-semibold;
+    margin-bottom: $space-3;
+    color: $color-text-dark;
+}
+
+.poem__confirm-message {
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    margin-bottom: $space-md;
+}
+
+.poem__confirm-actions {
+    display: flex;
+    gap: $space-3;
+    justify-content: center;
+
+    button {
+        padding: 6px 16px;
+        border: none;
+        border-radius: $radius-md;
+        cursor: pointer;
+        font-size: $fs-sm;
+        font-weight: $fw-medium;
+    }
+}
+
+.poem__confirm-cancel {
+    background: $color-bg-subtle;
+    color: $color-text-dark;
+
+    &:hover { background: $color-border; }
+}
+
+.poem__confirm-delete {
+    background: $color-error;
+    color: #fff;
+
+    &:hover { background: $color-error-hover; }
+}
+
 .poem__footer {
     display: flex;
     flex-direction: row;
@@ -125,5 +186,27 @@
 @media screen and (min-width: $bp-xl) {
     .poem__block {
         width: 40vw;
+    }
+}
+
+.detail__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $space-xl;
+    color: $color-error;
+    font-size: $fs-md;
+    gap: $space-md;
+
+    button {
+        padding: 8px 20px;
+        background: $color-primary;
+        color: #fff;
+        border: none;
+        border-radius: $radius-md;
+        cursor: pointer;
+        font-size: $fs-base;
+
+        &:hover { background: $color-primary-hover; }
     }
 }

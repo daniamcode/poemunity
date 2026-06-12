@@ -1,9 +1,11 @@
 import { useContext } from 'react'
+import Link from 'next/link'
 import { AppContext } from '../../App'
 import { useComments } from './useComments'
 import CommentItem from './components/CommentItem'
 import CommentForm from './components/CommentForm'
 import styles from './Comments.module.scss'
+import { manageError, manageSuccess } from '../../utils/notifications'
 
 interface CommentsSectionProps {
     targetType: 'poem' | 'profile'
@@ -16,6 +18,24 @@ export default function CommentsSection({ targetType, targetId }: CommentsSectio
 
     const topLevel = comments.filter(c => !c.parentId)
     const replies = comments.filter(c => !!c.parentId)
+
+    const handleAddComment = async (body: string, parentId?: string) => {
+        try {
+            await addComment(body, context.config, parentId)
+            manageSuccess(parentId ? 'Reply posted' : 'Comment posted')
+        } catch {
+            manageError(parentId ? 'Failed to post reply' : 'Failed to post comment')
+        }
+    }
+
+    const handleDeleteComment = async (id: string) => {
+        try {
+            await deleteComment(id, context.config)
+            manageSuccess('Comment deleted')
+        } catch {
+            manageError('Failed to delete comment')
+        }
+    }
 
     return (
         <section className={styles.comments}>
@@ -35,8 +55,8 @@ export default function CommentsSection({ targetType, targetId }: CommentsSectio
                             comment={comment}
                             replies={replies.filter(r => r.parentId === comment.id)}
                             context={context}
-                            onDelete={(id) => deleteComment(id, context.config)}
-                            onReply={(body) => addComment(body, context.config, comment.id)}
+                            onDelete={(id) => handleDeleteComment(id)}
+                            onReply={(body) => handleAddComment(body, comment.id)}
                             styles={styles}
                         />
                     ))}
@@ -48,13 +68,13 @@ export default function CommentsSection({ targetType, targetId }: CommentsSectio
 
             {context.user ? (
                 <CommentForm
-                    onSubmit={(body) => addComment(body, context.config)}
+                    onSubmit={(body) => handleAddComment(body)}
                     placeholder='Add a comment…'
                     styles={styles}
                 />
             ) : (
                 <p className={styles.commentsLogin}>
-                    <a href='/login'>Log in</a> to leave a comment.
+                    <Link href='/login'>Log in</Link> to leave a comment.
                 </p>
             )}
         </section>

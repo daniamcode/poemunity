@@ -46,9 +46,9 @@
     background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(8px);
     z-index: 50;
-    padding: 15px $space-5;
+    padding: $space-4 $space-5;
     border-bottom: 1px solid $color-border-subtle;
-    gap: 15px;
+    gap: $space-4;
 }
 
 .search-input__container {
@@ -144,13 +144,54 @@
     .list__intro {
         flex-direction: row;
         align-items: center;
-        gap: 25px;
-        padding: 15px 30px;
+        gap: $space-6;
+        padding: $space-4 $space-7;
     }
 
     .list__presentation {
         display: flex;
         font-size: $fs-lg;
         margin-top: 0;
+    }
+}
+
+.list__empty,
+.list__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $space-xl;
+    color: $color-text-muted;
+    font-size: $fs-md;
+    gap: $space-md;
+
+    button {
+        padding: $space-sm $space-5;
+        background: $color-primary;
+        color: #fff;
+        border: none;
+        border-radius: $radius-md;
+        cursor: pointer;
+        font-size: $fs-base;
+
+        &:hover { background: $color-primary-hover; }
+    }
+}
+
+.list__error { color: $color-error; }
+
+@media screen and (max-width: $bp-sm) {
+    .list__intro {
+        padding: $space-3;
+        gap: $space-3;
+    }
+
+    .search-input__container {
+        max-width: 100%;
+    }
+
+    .list__sort select {
+        width: 100%;
     }
 }

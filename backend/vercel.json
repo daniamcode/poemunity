@@ -1,4 +1,5 @@
 {
+  "buildCommand": "npm test",
   "builds": [
     { "src": "index.js", "use": "@vercel/node" }
   ],

@@ -13,11 +13,24 @@ interface CommentItemProps {
 }
 
 function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    return new Date(iso).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    })
 }
 
-function AuthorAvatar({ name, picture, styles }: { name: string; picture?: string | null; styles: Record<string, string> }) {
+function AuthorAvatar({
+    name,
+    picture,
+    styles
+}: {
+    name: string
+    picture?: string | null
+    styles: Record<string, string>
+}) {
     if (picture) {
+        // eslint-disable-next-line @next/next/no-img-element
         return <img className={styles.commentAvatar} src={picture} alt={name} />
     }
     const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()

@@ -8,24 +8,32 @@ import ListItem from '../ListItem/ListItem'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { ListHeader } from './components/ListHeader'
 import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
+import { ORDER_BY_LIKES } from '../../data/constants'
 
 interface ListProps {
     genre?: string
     initialData?: InitialPoemsData
+    match?: {
+        params?: {
+            genre?: string
+        }
+        [key: string]: unknown
+    }
 }
 
-function List({ genre, initialData }: ListProps) {
+function List({ genre: genreProp, initialData, match }: ListProps) {
+    const genre = genreProp ?? match?.params?.genre
     const [filter, setFilter] = useState<string>('')
 
     const [paramsData, setParamsData] = useFiltersFromQuery({
-        orderBy: '',
+        orderBy: ORDER_BY_LIKES,
         origin: 'all'
     })
 
     const context = useContext(AppContext)
 
     // Use custom hook for poems data management
-    const { poems, isLoading, hasMore, hasItems, handleLoadMore } = usePoemsList({
+    const { poems, isLoading, isError, hasMore, hasItems, handleLoadMore, retry } = usePoemsList({
         genre,
         origin: paramsData.origin,
         orderBy: paramsData.orderBy,
@@ -72,7 +80,20 @@ function List({ genre, initialData }: ListProps) {
                     onOrderChange={handleOrderChange}
                 />
 
-                {poems.map(poem => (
+                {isError && (
+                    <div className='list__error' role='alert'>
+                        <p>Something went wrong loading the poems.</p>
+                        <button onClick={retry}>Try again</button>
+                    </div>
+                )}
+
+                {!isError && !isLoading && poems.length === 0 && (
+                    <div className='list__empty'>
+                        <p>No poems found. Try adjusting your filters.</p>
+                    </div>
+                )}
+
+                {!isError && poems.map(poem => (
                     <ListItem key={poem?.id} poem={poem} filter={filter} context={context} />
                 ))}
 

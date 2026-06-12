@@ -36,8 +36,17 @@ export function useDetailPoem(poemId: string, initialPoem?: Poem) {
     // Use Redux data when available, fall back to SSR data, then empty state
     const poem: Poem = poemQuery?.item || initialPoem || initialPoemState
 
-    // Show spinner only when we have no data at all (not while refreshing with fresh data)
     const isLoading = poemQuery.isFetching && !poem.id
+    const isError = poemQuery.isError || false
 
-    return { poem, isLoading }
+    const retry = () => {
+        if (poemId) {
+            dispatch(getPoemAction({
+                params: { poemId },
+                options: { reset: true, fetch: true }
+            }))
+        }
+    }
+
+    return { poem, isLoading, isError, retry }
 }

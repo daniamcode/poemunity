@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 
 interface CommentFormProps {
     onSubmit: (body: string) => Promise<void>
@@ -12,7 +12,7 @@ export default function CommentForm({ onSubmit, placeholder = 'Write a commentâ€
     const [body, setBody] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         if (!body.trim()) return
         setIsSubmitting(true)

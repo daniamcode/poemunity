@@ -9,10 +9,11 @@ import {
     LIKE_POINTS
 } from '../../data/constants'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../redux/store'
+import { RootState, useAppDispatch } from '../../redux/store'
 import { Poem } from '../../typescript/interfaces'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
+import { getRankingAction } from '../../redux/actions/poemsActions'
 
 function Ranking() {
     interface RankingStates {
@@ -24,6 +25,7 @@ function Ranking() {
     const [rank, setRank] = useState<RankingStates['rank']>([])
 
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         if (rankingQuery?.item) {
@@ -39,6 +41,15 @@ function Ranking() {
 
     if (rankingQuery.isFetching) {
         return <CircularProgress data-test='ranking__loading' />
+    }
+
+    if (rankingQuery.isError) {
+        return (
+            <div className='ranking__error' role='alert'>
+                <p>Could not load the ranking.</p>
+                <button onClick={() => dispatch(getRankingAction({ params: { origin: 'user' } }))}>Try again</button>
+            </div>
+        )
     }
 
     return (

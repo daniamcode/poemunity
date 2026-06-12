@@ -7,11 +7,19 @@ import { InitialPoemsData } from '../List/hooks/usePoemsList'
 
 interface DashboardProps {
     initialData?: InitialPoemsData
+    match?: {
+        params?: {
+            genre?: string
+        }
+        [key: string]: unknown
+    }
+    location?: unknown
+    history?: unknown
 }
 
-function Dashboard({ initialData }: DashboardProps) {
+function Dashboard({ initialData, match }: DashboardProps) {
     const router = useRouter()
-    const genre = router.query.genre as string | undefined
+    const genre = match?.params?.genre ?? (router.query.genre as string | undefined)
 
     return (
         <main className='dashboard' data-testid='dashboard-component'>

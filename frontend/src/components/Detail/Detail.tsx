@@ -18,7 +18,7 @@ function Detail({ initialPoem }: DetailProps) {
     const router = useRouter()
     const poemId = router.query.poemId as string
     const context = useContext(AppContext)
-    const { poem, isLoading } = useDetailPoem(poemId, initialPoem)
+    const { poem, isLoading, isError, retry } = useDetailPoem(poemId, initialPoem)
     const { onLike, onDelete, onEdit } = usePoemActions({
         poem,
         context,
@@ -27,6 +27,15 @@ function Detail({ initialPoem }: DetailProps) {
 
     if (isLoading) {
         return <CircularProgress />
+    }
+
+    if (isError) {
+        return (
+            <div className='detail__error' role='alert'>
+                <p>Could not load this poem.</p>
+                <button onClick={retry}>Try again</button>
+            </div>
+        )
     }
 
     return (

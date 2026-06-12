@@ -60,13 +60,34 @@ describe('PoemActions', () => {
         expect(mockOnEdit).toHaveBeenCalledTimes(1)
     })
 
-    test('should call onDelete when clicking delete icon', () => {
+    test('should show confirmation dialog when clicking delete icon', () => {
         renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
 
-        const deleteIcon = screen.getByTestId('delete-poem')
-        fireEvent.click(deleteIcon)
+        fireEvent.click(screen.getByTestId('delete-poem'))
 
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+        expect(screen.getByText('Delete this poem?')).toBeInTheDocument()
+        expect(screen.getByText('This action cannot be undone.')).toBeInTheDocument()
+    })
+
+    test('should call onDelete only after confirming', () => {
+        renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
+
+        fireEvent.click(screen.getByTestId('delete-poem'))
+        expect(mockOnDelete).not.toHaveBeenCalled()
+
+        fireEvent.click(screen.getByTestId('confirm-delete-poem'))
         expect(mockOnDelete).toHaveBeenCalledTimes(1)
+    })
+
+    test('should dismiss confirmation on cancel without deleting', () => {
+        renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
+
+        fireEvent.click(screen.getByTestId('delete-poem'))
+        fireEvent.click(screen.getByText('Cancel'))
+
+        expect(mockOnDelete).not.toHaveBeenCalled()
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
 
     test('should link to correct detail page for comments', () => {
