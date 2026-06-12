@@ -414,6 +414,7 @@ exports[`Header should match without id 1`] = `
           </a>
         </nav>
         <button
+          aria-label="Log in"
           class="header__login"
         />
       </section>
@@ -829,6 +830,7 @@ exports[`Header should match without id 1`] = `
         </a>
       </nav>
       <button
+        aria-label="Log in"
         class="header__login"
       />
     </section>

@@ -53,12 +53,11 @@ describe('LikeButton', () => {
         expect(screen.queryByTestId('unlike-icon')).not.toBeInTheDocument()
     })
 
-    test('should have link to prevent default behavior', () => {
+    test('should render a labeled button for keyboard users', () => {
         renderWithRouter(<LikeButton isLiked={true} onLike={mockOnLike} show={true} />)
 
-        const likeIcon = screen.getByTestId('like-icon')
-        // React Router normalizes '#' to '/', which is fine for our use case
-        expect(likeIcon.tagName).toBe('A')
+        const likeButton = screen.getByRole('button', { name: 'Unlike poem' })
+        expect(likeButton).toHaveAttribute('type', 'button')
     })
 
     describe('Regression: CSS focus issue', () => {

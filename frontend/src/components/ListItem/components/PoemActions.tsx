@@ -18,13 +18,25 @@ export function PoemActions({ poemId, isOwner, onEdit, onDelete }: PoemActionsPr
         <>
             {isOwner && (
                 <>
-                    <EditIcon className='poem__edit-icon' onClick={onEdit} data-testid='edit-poem' />
-                    <HighlightOffSharpIcon
+                    <button
+                        type='button'
+                        className='poem__edit-icon'
+                        onClick={onEdit}
+                        data-testid='edit-poem'
+                        aria-label='Edit poem'
+                    >
+                        <EditIcon />
+                    </button>
+                    <button
+                        type='button'
                         className='poem__delete-icon'
                         style={{ fill: 'red' }}
                         data-testid='delete-poem'
                         onClick={() => setShowConfirm(true)}
-                    />
+                        aria-label='Delete poem'
+                    >
+                        <HighlightOffSharpIcon />
+                    </button>
                     {showConfirm && (
                         <div
                             className='poem__confirm-overlay'
@@ -58,7 +70,7 @@ export function PoemActions({ poemId, isOwner, onEdit, onDelete }: PoemActionsPr
                     )}
                 </>
             )}
-            <Link href={`/detail/${poemId}`} className='poem__comments-icon'>
+            <Link href={`/detail/${poemId}`} className='poem__comments-icon' aria-label='View comments'>
                 <SubjectSharpIcon style={{ fill: '#000' }} />
             </Link>
         </>

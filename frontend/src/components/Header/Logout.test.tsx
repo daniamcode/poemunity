@@ -31,26 +31,26 @@ describe('Logout', () => {
 
     test('should render logout button', () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         expect(button).toBeInTheDocument()
     })
 
     test('should have correct CSS class', () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         expect(button).toHaveClass('header__logout')
     })
 
     test('should call preventDefault when clicked', () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
         expect(button).toBeInTheDocument()
     })
 
     test('should clear user from context when clicked', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
         await waitFor(() => {
             expect(mockSetState).toHaveBeenCalledWith(
@@ -61,7 +61,7 @@ describe('Logout', () => {
 
     test('should call logout API when clicked', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'DELETE' })
@@ -70,7 +70,7 @@ describe('Logout', () => {
 
     test('should navigate to home page when clicked', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
         await waitFor(() => {
             expect(mockRouter.pathname).toBe('/')
@@ -79,7 +79,7 @@ describe('Logout', () => {
 
     test('should perform all logout actions', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
 
         await waitFor(() => {
@@ -91,7 +91,7 @@ describe('Logout', () => {
 
     test('should only logout once per click', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
 
         await waitFor(() => {
@@ -102,7 +102,7 @@ describe('Logout', () => {
 
     test('should clear all auth fields and preserve non-auth properties when logging out', async () => {
         render(<Logout />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log out' })
         fireEvent.click(button)
 
         await waitFor(() => {

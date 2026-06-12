@@ -56,30 +56,28 @@ function Ranking() {
         <main className='ranking'>
             <h3 className='ranking__title'>{RANKING_TITLE}</h3>
             <h5 className='ranking__subtitle'>{RANKING_SUBTITLE}</h5>
-            <div className='ranking__list'>
+            <ol className='ranking__list'>
                 {rank.slice(0, 10).map((item: RankItem, index) => {
                     const authorSlug = item.authorSlug || slugify(item.author)
                     const rankPos = index + 1
                     return (
-                        <Link 
-                            key={index} 
-                            href={`/authors/${authorSlug}`} 
-                            className='ranking__item'
-                        >
-                            <span className={`ranking__rank-number ranking__rank-number--${rankPos}`}>
-                                {rankPos}
-                            </span>
-                            <div className='ranking__avatar' title={item.author}>
-                                <AuthorAvatar name={item.author} picture={item.picture} />
-                            </div>
-                            <span className='ranking__author-name' title={item.author}>{item.author}</span>
-                            <span className='ranking__points'>
-                                {item.points} pts
-                            </span>
-                        </Link>
+                        <li key={item.author} className='ranking__list-item'>
+                            <Link href={`/authors/${authorSlug}`} className='ranking__item'>
+                                <span className={`ranking__rank-number ranking__rank-number--${rankPos}`}>
+                                    {rankPos}
+                                </span>
+                                <div className='ranking__avatar' title={item.author}>
+                                    <AuthorAvatar name={item.author} picture={item.picture} />
+                                </div>
+                                <span className='ranking__author-name' title={item.author}>{item.author}</span>
+                                <span className='ranking__points'>
+                                    {item.points} pts
+                                </span>
+                            </Link>
+                        </li>
                     )
                 })}
-            </div>
+            </ol>
         </main>
     )
 }

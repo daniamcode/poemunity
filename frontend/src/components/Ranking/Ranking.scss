@@ -23,6 +23,14 @@
     font-weight: $fw-regular;
 }
 
+.ranking__list {
+    list-style: none;
+}
+
+.ranking__list-item {
+    display: block;
+}
+
 .ranking__item {
     display: grid;
     grid-template-columns: 28px 44px 1fr auto;

@@ -74,6 +74,8 @@
 }
 
 .poem__likes-icon {
+    border: none;
+    background-color: transparent;
     background-image: url(../../icons/red-heart.svg);
     background-position: center;
     background-repeat: no-repeat;
@@ -85,6 +87,8 @@
 }
 
 .poem__unlikes-icon {
+    border: none;
+    background-color: transparent;
     background-image: url(../../icons/white-heart.svg);
     background-position: center;
     background-repeat: no-repeat;
@@ -96,23 +100,49 @@
 }
 
 .poem__comments-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
     height: 24px;
     margin-right: 5%;
 }
 
 .poem__edit-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
     height: 24px;
     margin-right: 5%;
     cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
 }
 
 .poem__delete-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
     height: 24px;
     margin-right: 5%;
     cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
+.poem__edit-icon svg,
+.poem__delete-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.poem__comments-sentinel {
+    width: 1px;
+    height: 1px;
 }
 
 .poem__confirm-overlay {

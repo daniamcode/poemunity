@@ -9,7 +9,7 @@ interface PoemFooterProps {
     isLiked: boolean
     showLikeButton: boolean
     isOwner: boolean
-    onLike: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+    onLike: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
     onEdit: () => void
     onDelete: (event: React.SyntheticEvent) => void
 }

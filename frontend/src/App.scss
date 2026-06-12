@@ -7,6 +7,35 @@
     font-family: $font-body;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+}
+
+.skip-link {
+    position: fixed;
+    top: $space-3;
+    left: $space-3;
+    z-index: 1000;
+    transform: translateY(-150%);
+    padding: $space-2 $space-4;
+    background: $color-primary;
+    color: #fff;
+    border-radius: $radius-sm;
+    font-weight: $fw-semibold;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+
+    &:focus {
+        transform: translateY(0);
+    }
+}
+
 .margin-body {
     padding-top: 90px;
     min-height: calc(100vh - 140px - 0px);

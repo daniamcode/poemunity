@@ -33,8 +33,9 @@ export default function MyApp({ Component, pageProps, emotionCache = clientSideE
             <Provider store={store}>
                 <AppProvider initialUser={pageProps.initialUser}>
                     <div className='container'>
+                        <a className='skip-link' href='#main-content'>Skip to main content</a>
                         <Header />
-                        <div className='margin-body'>
+                        <div className='margin-body' id='main-content' tabIndex={-1}>
                             <Component {...pageProps} />
                         </div>
                         <Footer />

@@ -34,29 +34,53 @@ export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFoot
             <div className='separator' />
 
             {canLike && isUserLiked && (
-                <div className='poem__likes-icon' onClick={onLike} data-testid='like-icon'></div>
+                <button
+                    type='button'
+                    className='poem__likes-icon'
+                    onClick={onLike}
+                    data-testid='like-icon'
+                    aria-label='Unlike poem'
+                />
             )}
 
             {canLike && !isUserLiked && (
-                <div className='poem__unlikes-icon' onClick={onLike} data-testid='unlike-icon'></div>
+                <button
+                    type='button'
+                    className='poem__unlikes-icon'
+                    onClick={onLike}
+                    data-testid='unlike-icon'
+                    aria-label='Like poem'
+                />
             )}
 
             {context.user && isOwner && (
-                <EditIcon className='poem__edit-icon' onClick={onEdit} data-testid='edit-icon' />
+                <button
+                    type='button'
+                    className='poem__edit-icon'
+                    onClick={onEdit}
+                    data-testid='edit-icon'
+                    aria-label='Edit poem'
+                >
+                    <EditIcon />
+                </button>
             )}
 
             {context.user && isOwner && (
-                <HighlightOffSharpIcon
+                <button
+                    type='button'
                     className='poem__delete-icon'
                     style={{
                         fill: 'red'
                     }}
                     onClick={onDelete}
                     data-testid='delete-icon'
-                />
+                    aria-label='Delete poem'
+                >
+                    <HighlightOffSharpIcon />
+                </button>
             )}
 
-            <Link href={`/detail/${poem.id}`} className='poem__comments-icon'>
+            <Link href={`/detail/${poem.id}`} className='poem__comments-icon' aria-label='View comments'>
                 <SubjectSharpIcon
                     style={{
                         fill: '#000'

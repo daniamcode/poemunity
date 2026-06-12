@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import mockRouter from 'next-router-mock'
 import Detail from './Detail'
@@ -36,6 +36,9 @@ const renderWithProviders = (component: React.ReactElement) => {
 }
 
 describe('Detail', () => {
+    let originalIntersectionObserver: typeof global.IntersectionObserver
+    let intersectionObserverCallback: IntersectionObserverCallback
+
     const mockPoem: Poem = {
         id: 'poem-123',
         author: 'John Doe',
@@ -56,12 +59,18 @@ describe('Detail', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        originalIntersectionObserver = global.IntersectionObserver
+        global.IntersectionObserver = undefined as any
         mockRouter.setCurrentUrl({ pathname: '/detail/[poemId]', query: { poemId: 'poem-123' } })
         ;(useDetailPoemHook.useDetailPoem as jest.Mock).mockReturnValue({
             poem: mockPoem,
             isLoading: false
         })
         ;(usePoemActionsHook.usePoemActions as jest.Mock).mockReturnValue(mockHandlers)
+    })
+
+    afterEach(() => {
+        global.IntersectionObserver = originalIntersectionObserver
     })
 
     test('should render CircularProgress when loading', () => {
@@ -135,9 +144,42 @@ describe('Detail', () => {
         expect(screen.getByText('2 Likes')).toBeInTheDocument()
     })
 
-    test('should render CommentsSection', () => {
+    test('should render CommentsSection immediately when IntersectionObserver is unavailable', async () => {
         renderWithProviders(<Detail />)
-        expect(screen.getByText(/comment/i)).toBeInTheDocument()
+        expect(await screen.findByTestId('comments-section')).toBeInTheDocument()
+    })
+
+    test('should defer CommentsSection until the sentinel is near the viewport', () => {
+        const observe = jest.fn()
+        const disconnect = jest.fn()
+
+        global.IntersectionObserver = jest.fn(callback => {
+            intersectionObserverCallback = callback
+            return {
+                observe,
+                unobserve: jest.fn(),
+                disconnect,
+                root: null,
+                rootMargin: '',
+                thresholds: [],
+                takeRecords: jest.fn()
+            }
+        }) as any
+
+        renderWithProviders(<Detail />)
+
+        expect(observe).toHaveBeenCalled()
+        expect(screen.queryByTestId('comments-section')).not.toBeInTheDocument()
+
+        act(() => {
+            intersectionObserverCallback(
+                [{ isIntersecting: true } as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            )
+        })
+
+        expect(screen.getByTestId('comments-section')).toBeInTheDocument()
+        expect(disconnect).toHaveBeenCalled()
     })
 
     test('should apply correct CSS classes to main container', () => {

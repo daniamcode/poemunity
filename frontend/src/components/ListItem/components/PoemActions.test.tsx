@@ -38,7 +38,7 @@ describe('PoemActions', () => {
     test('should render edit icon when user is owner', () => {
         renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
 
-        const editIcon = screen.getByTestId('edit-poem')
+        const editIcon = screen.getByRole('button', { name: 'Edit poem' })
         expect(editIcon).toBeInTheDocument()
         expect(editIcon).toHaveClass('poem__edit-icon')
     })
@@ -46,7 +46,7 @@ describe('PoemActions', () => {
     test('should render delete icon when user is owner', () => {
         renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
 
-        const deleteIcon = screen.getByTestId('delete-poem')
+        const deleteIcon = screen.getByRole('button', { name: 'Delete poem' })
         expect(deleteIcon).toBeInTheDocument()
         expect(deleteIcon).toHaveClass('poem__delete-icon')
     })
@@ -54,7 +54,7 @@ describe('PoemActions', () => {
     test('should call onEdit when clicking edit icon', () => {
         renderWithRouter(<PoemActions {...defaultProps} isOwner={true} />)
 
-        const editIcon = screen.getByTestId('edit-poem')
+        const editIcon = screen.getByRole('button', { name: 'Edit poem' })
         fireEvent.click(editIcon)
 
         expect(mockOnEdit).toHaveBeenCalledTimes(1)
@@ -91,9 +91,9 @@ describe('PoemActions', () => {
     })
 
     test('should link to correct detail page for comments', () => {
-        const { container } = renderWithRouter(<PoemActions {...defaultProps} poemId='different-poem-123' />)
+        renderWithRouter(<PoemActions {...defaultProps} poemId='different-poem-123' />)
 
-        const commentsLink = container.querySelector('.poem__comments-icon')
+        const commentsLink = screen.getByRole('link', { name: 'View comments' })
         expect(commentsLink).toHaveAttribute('href', '/detail/different-poem-123')
     })
 

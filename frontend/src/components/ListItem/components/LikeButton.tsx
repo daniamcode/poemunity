@@ -2,7 +2,7 @@ import React from 'react'
 
 interface LikeButtonProps {
     isLiked: boolean
-    onLike: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+    onLike: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
     show: boolean
 }
 
@@ -12,10 +12,11 @@ export function LikeButton({ isLiked, onLike, show }: LikeButtonProps) {
     }
 
     return (
-        <a
+        <button
+            type='button'
             className={isLiked ? 'poem__likes-icon' : 'poem__unlikes-icon'}
             onClick={onLike}
-            href='#'
+            aria-label={isLiked ? 'Unlike poem' : 'Like poem'}
             data-testid={isLiked ? 'like-icon' : 'unlike-icon'}
         />
     )

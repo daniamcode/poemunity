@@ -93,6 +93,8 @@ describe('Ranking Component - Top 10', () => {
 
         const rankingItems = screen.getAllByRole('link')
         expect(rankingItems.length).toBeLessThanOrEqual(10)
+        expect(screen.getByRole('list')).toBeInTheDocument()
+        expect(screen.getAllByRole('listitem')).toHaveLength(rankingItems.length)
     })
 
     test('should render author name in ranking list', () => {

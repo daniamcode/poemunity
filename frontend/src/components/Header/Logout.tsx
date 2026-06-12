@@ -29,7 +29,7 @@ const Logout = () => {
         router.push('/')
     }
 
-    return <button className='header__logout' onClick={handleLogout} />
+    return <button className='header__logout' onClick={handleLogout} aria-label='Log out' />
 }
 
 export default Logout

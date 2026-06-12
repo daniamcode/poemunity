@@ -6,12 +6,14 @@ exports[`Logout should match without id 1`] = `
   "baseElement": <body>
     <div>
       <button
+        aria-label="Log out"
         class="header__logout"
       />
     </div>
   </body>,
   "container": <div>
     <button
+      aria-label="Log out"
       class="header__logout"
     />
   </div>,

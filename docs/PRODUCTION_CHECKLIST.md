@@ -267,12 +267,11 @@ Do these in order. Do not seed production AI activity until the deployment and b
   - Wrap with `useCallback`
 
 - [x] **No route-based code splitting**
-  - `frontend/src/App.tsx:4-12` — all pages imported statically in one bundle
-  - Use `React.lazy()` + `<Suspense>` for Dashboard, Detail, Profile, Register
+  - The old SPA concern is no longer applicable after the Next.js migration. Route modules are split through `pages/*`; `App.tsx` now provides shared app context only.
 
-- [ ] **Comments fetch fires on mount even if user never scrolls to comments**
+- [x] **Comments fetch fires on mount even if user never scrolls to comments**
   - Disqus removed; no third-party script concern. But `CommentsSection` is still mounted eagerly — `useComments` calls `fetchComments()` immediately via `useEffect`, making an API request on every poem detail load regardless of scroll position.
-  - Use `IntersectionObserver` (or a `useIntersection` hook) in `Detail.tsx` to defer mounting `<CommentsSection>` until the user scrolls near the bottom of the poem. The sentinel ref pattern already used for infinite scroll (`useInfiniteScroll`) is a good model.
+  - `Detail.tsx` now mounts `<CommentsSection>` only when a bottom sentinel approaches the viewport. It falls back to immediate mounting when `IntersectionObserver` is unavailable.
 
 - [x] **Profile/avatar images not lazy-loaded**
   - `frontend/src/components/Header/Header.tsx:98`, `ListItem/components/AuthorAvatar.tsx`
@@ -289,29 +288,28 @@ Do these in order. Do not seed production AI activity until the deployment and b
 - [x] **Email fields use `type="text"` instead of `type="email"`**
   - `Register.tsx` fixed. `Login.tsx` — login uses username, not email, so no change needed there.
 
-- [ ] **Like/unlike icons are divs — not keyboard accessible**
-  - `frontend/src/components/ListItem/components/PoemFooter.tsx:36-42`
-  - Replace `<div onClick>` with `<button>` elements so they're reachable by Tab and activatable with Enter/Space
+- [x] **Like/unlike icons are divs — not keyboard accessible**
+  - List and detail like controls now render as labeled `<button type="button">` elements, reachable by Tab and activatable with Enter/Space.
 
-- [ ] **Login, logout, profile icon buttons have no accessible label**
+- [x] **Login, logout, profile icon buttons have no accessible label**
   - `frontend/src/components/Header/Header.tsx`
-  - Add `aria-label="Log in"`, `aria-label="Log out"`, `aria-label="Your profile"` respectively
+  - Added `aria-label="Log in"`, `aria-label="Log out"`, and `aria-label="Your profile"`.
 
-- [ ] **No visible focus indicators on interactive elements**
+- [x] **No visible focus indicators on interactive elements**
   - Multiple SCSS files — `:hover` states defined but no `:focus-visible` styles
-  - Add `outline: 2px solid #3498db; outline-offset: 2px` to all interactive elements
+  - Added global `:focus-visible` outlines for links, buttons, form fields, and tabbable elements.
 
-- [ ] **Delete and edit icons not keyboard reachable**
+- [x] **Delete and edit icons not keyboard reachable**
   - `frontend/src/components/ListItem/components/PoemActions.tsx:19-27`
-  - Wrap MUI icon components in `<button>` elements
+  - List and detail edit/delete controls now wrap icon components in labeled `<button>` elements.
 
-- [ ] **No skip-navigation link**
+- [x] **No skip-navigation link**
   - Keyboard users must tab through the entire header on every page
-  - Add a visually hidden "Skip to main content" link as the first focusable element
+  - Added a visually hidden "Skip to main content" link before the fixed header.
 
-- [ ] **Ranking list not semantically marked up**
+- [x] **Ranking list not semantically marked up**
   - `frontend/src/components/Ranking/Ranking.tsx:49-72`
-  - Wrap rank items in `<ol>` + `<li>` so screen readers announce position
+  - Ranking links are now inside an `<ol>` with one `<li>` per ranked author.
 
 ---
 

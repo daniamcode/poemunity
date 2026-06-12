@@ -10,33 +10,33 @@ describe('LoginButton', () => {
 
     test('should render login button', () => {
         render(<LoginButton />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log in' })
         expect(button).toBeInTheDocument()
     })
 
     test('should have correct CSS class', () => {
         render(<LoginButton />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log in' })
         expect(button).toHaveClass('header__login')
     })
 
     test('should navigate to /login when clicked', () => {
         render(<LoginButton />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log in' })
         fireEvent.click(button)
         expect(mockRouter.pathname).toBe('/login')
     })
 
     test('should navigate to /login only once per click', () => {
         render(<LoginButton />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log in' })
         fireEvent.click(button)
         expect(mockRouter.pathname).toBe('/login')
     })
 
     test('should handle multiple clicks', () => {
         render(<LoginButton />)
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: 'Log in' })
         fireEvent.click(button)
         fireEvent.click(button)
         fireEvent.click(button)

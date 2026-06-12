@@ -52,7 +52,7 @@ function Header() {
                 <Link href='/terms#ai-community-activity' title='AI activity disclosure'>AI</Link>
             </nav>
             {context?.user ? (
-                <Link href='/profile' className='header__profile-picture'>
+                <Link href='/profile' className='header__profile-picture' aria-label='Your profile'>
                     {context?.picture ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
