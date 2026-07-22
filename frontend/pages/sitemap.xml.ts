@@ -62,7 +62,7 @@ function buildSitemap(
     }))
 
     const poemPages = poems.map(p => ({
-        path: `/detail/${p.id}`,
+        path: `/detail/${p.slug || p.id}`,
         priority: '0.6',
         changefreq: 'monthly'
     }))
