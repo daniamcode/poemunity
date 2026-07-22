@@ -116,7 +116,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <div
         class="poem__date"
       >
-        01/01/2024 01:00h
+        01/01/2024 00:00h
       </div>
     </section>
     <section>
@@ -247,7 +247,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <div
         class="poem__date"
       >
-        01/01/2024 01:00h
+        01/01/2024 00:00h
       </div>
     </section>
     <section>
