@@ -18,7 +18,7 @@ const nextConfig = {
             {
                 source: '/:path*',
                 has: [{ type: 'host', value: 'poemunity-frontend.vercel.app' }],
-                destination: 'https://www.poemunity.com/:path*',
+                destination: 'https://poemunity.com/:path*',
                 permanent: true
             }
         ]
