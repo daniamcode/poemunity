@@ -3,4 +3,4 @@ Allow: /
 Disallow: /profile
 Disallow: /api/
 
-Sitemap: https://poemunity.vercel.app/sitemap.xml
+Sitemap: https://poemunity.com/sitemap.xml
