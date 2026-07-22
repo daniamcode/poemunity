@@ -35,7 +35,10 @@ export default class MyDocument extends Document {
     render() {
         return (
             <Html lang='en'>
-                <Head />
+                <Head>
+                    <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+                    <link rel='apple-touch-icon' href='/favicon.svg' />
+                </Head>
                 <body>
                     <Main />
                     <NextScript />
