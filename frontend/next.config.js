@@ -12,6 +12,16 @@ const nextConfig = {
     },
     env: {
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
+    },
+    async redirects() {
+        return [
+            {
+                source: '/:path*',
+                has: [{ type: 'host', value: 'poemunity-frontend.vercel.app' }],
+                destination: 'https://www.poemunity.com/:path*',
+                permanent: true
+            }
+        ]
     }
 }
 
