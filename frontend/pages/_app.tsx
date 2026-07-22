@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app'
+import Script from 'next/script'
 import { Provider } from 'react-redux'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import { Toaster } from 'react-hot-toast'
@@ -23,6 +24,8 @@ import '../src/components/Register/Register.scss'
 
 const clientSideEmotionCache = createEmotionCache()
 
+const GA_MEASUREMENT_ID = 'G-0L5GRL29BS'
+
 interface MyAppProps extends AppProps {
     emotionCache?: EmotionCache
 }
@@ -30,6 +33,22 @@ interface MyAppProps extends AppProps {
 export default function MyApp({ Component, pageProps, emotionCache = clientSideEmotionCache }: MyAppProps) {
     return (
         <CacheProvider value={emotionCache}>
+            {process.env.NODE_ENV === 'production' && (
+                <>
+                    <Script
+                        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+                        strategy='afterInteractive'
+                    />
+                    <Script id='google-analytics' strategy='afterInteractive'>
+                        {`
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', '${GA_MEASUREMENT_ID}');
+                        `}
+                    </Script>
+                </>
+            )}
             <Provider store={store}>
                 <AppProvider initialUser={pageProps.initialUser}>
                     <div className='container'>
