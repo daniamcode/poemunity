@@ -23,6 +23,13 @@
     height: 40px;
 }
 
+// On mobile the header is a 3-zone bar (Categories | logo | login); the
+// grow-separator (used on desktop to push legal links right) would distort
+// that, so disable it until the wider layout kicks in.
+.header .separator {
+    display: none;
+}
+
 .header__login,
 .header__logout,
 .header__profile {
@@ -148,6 +155,28 @@
     }
 }
 
+// Categories dropdown in the (fixed) header: render the expanded list as a
+// floating, opaque panel instead of an in-flow transparent block that bleeds
+// over the page content.
+.header__dropdown .accordion {
+    position: relative;
+    width: auto;
+}
+
+.header__dropdown .MuiCollapse-root {
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    z-index: 20;
+    width: 260px;
+    max-width: calc(100vw - 32px);
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+}
+
 .MuiAccordionSummary-root {
     padding: 0 10px !important;
     min-height: 48px !important;
@@ -161,6 +190,8 @@
     margin: 10px 0 !important;
     display: flex;
     align-items: center;
+    flex-grow: 0 !important;
+    gap: $space-2;
 
     &.Mui-expanded {
         margin: 10px 0 !important;
@@ -231,13 +262,13 @@
 
 .header__brand {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     text-decoration: none;
 }
 
 .header__logo {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     text-decoration: none;
 }
 
@@ -319,6 +350,10 @@
 
     .header__legal-links {
         display: flex;
+    }
+
+    .header .separator {
+        display: block;
     }
 
     .header__text-logo-first,
