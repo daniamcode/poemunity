@@ -283,6 +283,24 @@
         padding-right: $space-4;
     }
 
+    .header__text-logo-first,
+    .header__text-logo-second {
+        font-size: 15px;
+    }
+
+    .header__logo-icon {
+        width: 13px;
+        height: 13px;
+    }
+
+    .header__text-logo-first {
+        margin-right: -1px;
+    }
+
+    .header__text-logo-second {
+        margin-left: -1px;
+    }
+
     .header__legal-links {
         gap: $space-2;
         margin-right: $space-3;
