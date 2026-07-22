@@ -106,7 +106,7 @@
 }
 
 .header__legal-links {
-    display: flex;
+    display: none;
     align-items: center;
     gap: $space-3;
     margin-right: $space-4;
@@ -250,13 +250,14 @@
 }
 
 .header__logo-icon {
-    display: none;
+    display: inline-block;
+    flex-shrink: 0;
     background-image: url(../../img/poemunity.svg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    width: 40px;
-    height: 40px;
+    width: 22px;
+    height: 22px;
 }
 
 .header__text-logo-first,
@@ -269,11 +270,11 @@
 
 .header__text-logo-first {
     margin-left: 0;
-    margin-right: 0;
+    margin-right: -2px;
 }
 
 .header__text-logo-second {
-    margin-left: 0;
+    margin-left: -2px;
 }
 
 @media screen and (max-width: $bp-sm) {
@@ -294,7 +295,12 @@
 
 @media screen and (min-width: $bp-lg) {
     .header__logo-icon {
-        display: inline-block;
+        width: 40px;
+        height: 40px;
+    }
+
+    .header__legal-links {
+        display: flex;
     }
 
     .header__text-logo-first,
