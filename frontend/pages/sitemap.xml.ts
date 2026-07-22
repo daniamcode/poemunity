@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next'
-import { MUST_HAVE_CATEGORIES, categoryToSlug } from '../src/data/constants'
+import { CATEGORIES, categoryToSlug } from '../src/data/constants'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
 
@@ -55,7 +55,7 @@ function buildSitemap(
         { path: '/terms', priority: '0.3', changefreq: 'yearly' }
     ]
 
-    const genrePages = MUST_HAVE_CATEGORIES.map(cat => ({
+    const genrePages = CATEGORIES.map(cat => ({
         path: `/${categoryToSlug(cat)}`,
         priority: '0.7',
         changefreq: 'weekly'
