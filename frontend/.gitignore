@@ -42,6 +42,14 @@ yarn-error.log*
 *.WebP
 *.bmp
 *.ai
+
+# Site icons (must be committed despite the image ignores above)
+!public/favicon.ico
+!public/favicon-48x48.png
+!public/favicon-96x96.png
+!public/apple-touch-icon.png
+!public/icon-192.png
+!public/icon-512.png
 *.mpg
 *.mpeg
 *.wav

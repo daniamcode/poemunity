@@ -22,13 +22,6 @@ const nextConfig = {
                 permanent: true
             }
         ]
-    },
-    async rewrites() {
-        // Serve the SVG favicon for legacy /favicon.ico requests so they don't
-        // fall through to the [genre] dynamic route and return an HTML page.
-        return [
-            { source: '/favicon.ico', destination: '/favicon.svg' }
-        ]
     }
 }
 
