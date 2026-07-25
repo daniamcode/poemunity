@@ -446,6 +446,13 @@
     transition: border-color 0.2s;
     box-sizing: border-box;
 
+    // Make placeholder (example) text clearly distinct from real saved values
+    &::placeholder {
+        color: $color-text-placeholder;
+        font-style: italic;
+        opacity: 1; // Firefox dims placeholders by default
+    }
+
     &:focus {
         outline: none;
         border-color: $color-primary;
