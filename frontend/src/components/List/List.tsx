@@ -40,10 +40,14 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
         initialData
     })
 
-    // Setup infinite scroll
+    // Setup infinite scroll.
+    // While a client-side search filter is active, freeze pagination: filtered
+    // items collapse to null, which would otherwise keep the sentinel on screen
+    // and make infinite scroll fetch the entire dataset (a self-inflicted DoS).
+    const isFiltering = filter.length > 0
     const sentinelRef = useInfiniteScroll({
         onLoadMore: handleLoadMore,
-        hasMore,
+        hasMore: hasMore && !isFiltering,
         isLoading
     })
 
