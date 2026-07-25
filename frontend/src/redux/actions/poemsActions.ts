@@ -645,22 +645,23 @@ export function updateAuthorPoemsCacheAfterDeletePoemAction({ poemId }: UpdateAu
     }
 }
 
-interface UpdateCachesAfterPictureChangeActionProps {
+interface UpdateCachesAfterAuthorChangeActionProps {
     userId: string
-    picture: string
+    changes: Partial<Poem>
 }
 
-// Propagate a profile-picture change into every cached poem list and the
-// ranking so avatars update live, without a page refresh. Poems denormalize
-// the author's picture at fetch time, so we patch every poem authored by the
-// current user across all caches (the ranking recomputes from those poems).
-export function updateCachesAfterPictureChangeAction({ userId, picture }: UpdateCachesAfterPictureChangeActionProps) {
+// Propagate an author profile change (picture and/or display name) into every
+// cached poem list and the ranking so they update live, without a refresh.
+// Poems denormalize the author's display fields at fetch time, so we merge the
+// changes into every poem authored by the current user across all caches (the
+// ranking recomputes from those poems).
+export function updateCachesAfterAuthorChangeAction({ userId, changes }: UpdateCachesAfterAuthorChangeActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         if (!userId) return
         const state: any = store.getState()
 
         const patch = (poems: Poem[]) =>
-            poems.map((poem: Poem) => (poem.userId === userId ? { ...poem, picture } : poem))
+            poems.map((poem: Poem) => (poem.userId === userId ? { ...poem, ...changes } : poem))
 
         // Caches whose fulfilled payload is a plain Poem[] array
         const arrayCaches = [

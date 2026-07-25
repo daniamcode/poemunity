@@ -5,6 +5,8 @@ import API from '../../../redux/actions/axiosInstance'
 import { CATEGORIES, categoryToSlug } from '../../../data/constants'
 import { Context } from '../../../typescript/interfaces'
 import { slugify } from '../../../utils/urlUtils'
+import { useAppDispatch } from '../../../redux/store'
+import { updateCachesAfterAuthorChangeAction } from '../../../redux/actions/poemsActions'
 
 interface Props {
     context: Context
@@ -49,6 +51,7 @@ export default function UserInfo({ context }: Props) {
     })
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
+    const dispatch = useAppDispatch()
 
     const handleEdit = () => {
         setForm({
@@ -117,6 +120,12 @@ export default function UserInfo({ context }: Props) {
                 gender: a.gender || '',
                 privateFields: a.privateFields || []
             })
+            // Display name is denormalized onto poem cards + ranking — propagate
+            // the change so they update live without a refresh.
+            dispatch(updateCachesAfterAuthorChangeAction({
+                userId: context.userId,
+                changes: { author: a.name || context.username, authorName: a.name || '' }
+            }))
             setEditing(false)
         } catch {
             setError('Failed to save. Please try again.')

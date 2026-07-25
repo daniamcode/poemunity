@@ -4,7 +4,7 @@ import { resizeImageToBase64 } from '../../../utils/imageUtils'
 import { Context } from '../../../typescript/interfaces'
 import { getAvatarColor, getInitials } from '../../ListItem/components/AuthorAvatar'
 import { useAppDispatch } from '../../../redux/store'
-import { updateCachesAfterPictureChangeAction } from '../../../redux/actions/poemsActions'
+import { updateCachesAfterAuthorChangeAction } from '../../../redux/actions/poemsActions'
 
 interface Props {
     context: Context
@@ -35,7 +35,7 @@ export default function ProfilePicture({ context }: Props) {
 
             context.setState({ ...context, picture: data.picture })
             // Update cached poem lists + ranking so avatars refresh live
-            dispatch(updateCachesAfterPictureChangeAction({ userId: context.userId, picture: data.picture }))
+            dispatch(updateCachesAfterAuthorChangeAction({ userId: context.userId, changes: { picture: data.picture } }))
         } catch {
             setError('Upload failed. Please try again.')
         } finally {
