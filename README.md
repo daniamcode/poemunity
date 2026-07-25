@@ -34,6 +34,24 @@ Then, I created the Poemunity-React-Query folder and continued from there, manag
 ## Redux
 Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
 
+### Planned: server state → RTK Query
+
+**Problem.** Server data (poems, ranking, authors, my-poems, favourites) is cached in Redux and kept in sync by hand-written `updateXCacheAfterY` thunks — one per mutation × per cache. This matrix is fragile: it's easy to miss a cache (a deleted poem lingering on the author page, a changed name/picture not propagating), and every new field or mutation multiplies the boilerplate.
+
+**Decision.** Move **server state** to **RTK Query** (stays inside the existing Redux Toolkit store), keeping **client/auth state** in `AppContext`. Mutations then just invalidate tags and the affected queries refetch automatically — deleting the entire `updateXCacheAfterY` family and the whole class of staleness bugs. This returns server-state management to the React Query idiom the project used earlier (the deprecated `React-Query` folder), now integrated with Redux Toolkit.
+
+**Approach (incremental).**
+1. Add a `createApi` with the axios/proxy base query and tag types (`Poems`, `Poem`, `Ranking`, `Authors`, `Profile`).
+2. Migrate one vertical slice first (e.g. ranking or poem detail) to establish the pattern; keep tests green.
+3. Convert the remaining lists + mutations; delete the corresponding thunks and query reducers.
+4. Remove the now-dead Redux slices once no consumer reads them.
+
+**Status:** planned (not started). The manual cache-sync stays in place until then.
+
+### Auth & session (identity-only JWT)
+
+The session cookie holds a **JWT with identity only** (`id`, `username`, `isAdmin`). Profile/display data (picture, bio, birthYear, …) is **never** in the token — it is fetched from the DB via `GET /api/v1/users/profile` (see `fetchServerUser` in `frontend/src/lib/serverApi.ts`), used by both `/api/auth/session` and `getServerSideProps`. This keeps the cookie well under the ~4KB limit (a base64 profile picture would blow past it) and means context always reflects the database. Client API calls go through the Next proxy `/api/backend/[...path]`, which attaches the httpOnly cookie and refreshes it when a response carries a (now-slim) token.
+
 ### Next.js migration
 With the introduction of agentic AI, the frontend was migrated from a custom esbuild SPA to Next.js (Pages Router) for SSR and SEO. See `docs/NEXTJS_MIGRATION.md` for the full migration log. The `old` branch still has the three deprecated folders (flux, React-Query, Redux+esbuild) for reference.
 
@@ -103,7 +121,8 @@ Next.js (Pages Router) with SSR via `getServerSideProps`. `frontend/vercel.json`
 | `MONGODB` | MongoDB Atlas connection string |
 | `SECRET` | JWT signing secret (generate with `openssl rand -base64 32`) |
 | `REACT_APP_ADMIN` | Admin author ObjectId used by backend admin checks |
-| `FRONTEND_URL` | Frontend Vercel URL, no trailing slash (e.g. `https://poemunity-frontend.vercel.app`) |
+| `FRONTEND_URL` | Frontend URL, no trailing slash. Required in production (a startup guard throws without it) |
+| `FRONTEND_URLS` | Optional, preferred: comma-separated CORS allowlist (e.g. `https://poemunity.com,https://www.poemunity.com,https://poemunity-frontend.vercel.app`). When set it is used exclusively; otherwise `FRONTEND_URL` is used |
 | `NODE_ENV` | `production` |
 
 **Frontend Vercel project:**
