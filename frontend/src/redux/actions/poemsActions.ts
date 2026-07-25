@@ -616,6 +616,35 @@ export function updateMyPoemsCacheAfterDeletePoemAction({ poemId }: UpdateMyPoem
     }
 }
 
+interface UpdateAuthorPoemsCacheAfterDeletePoemActionProps {
+    poemId: string
+}
+
+export function updateAuthorPoemsCacheAfterDeletePoemAction({ poemId }: UpdateAuthorPoemsCacheAfterDeletePoemActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { authorPoemsQuery } = store.getState()
+
+        if (!authorPoemsQuery.item) {
+            return
+        }
+
+        const authorPoemsQueryUpdated = cloneDeep(authorPoemsQuery.item as Poem[])
+            .filter((poem: Poem) => poem.id !== poemId)
+
+        const { fulfilledAction } = getTypes(ACTIONS.AUTHOR_POEMS)
+        dispatch({
+            type: fulfilledAction,
+            payload: {
+                poems: authorPoemsQueryUpdated,
+                page: authorPoemsQuery.page,
+                hasMore: authorPoemsQuery.hasMore,
+                total: Math.max(0, (authorPoemsQuery.total || 0) - 1), // Decrease total count
+                totalPages: authorPoemsQuery.totalPages
+            }
+        })
+    }
+}
+
 interface updateAllPoemsCacheAfterSavePoemActionProps {
     poem: Poem
     poemId: string

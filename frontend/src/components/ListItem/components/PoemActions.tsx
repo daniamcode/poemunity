@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
@@ -37,7 +38,7 @@ export function PoemActions({ poemId, isOwner, onEdit, onDelete }: PoemActionsPr
                     >
                         <HighlightOffSharpIcon />
                     </button>
-                    {showConfirm && (
+                    {showConfirm && typeof document !== 'undefined' && createPortal(
                         <div
                             className='poem__confirm-overlay'
                             role='dialog'
@@ -66,7 +67,8 @@ export function PoemActions({ poemId, isOwner, onEdit, onDelete }: PoemActionsPr
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div>,
+                        document.body
                     )}
                 </>
             )}

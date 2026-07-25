@@ -6,6 +6,7 @@ import {
     updateAllPoemsCacheAfterLikePoemAction,
     updateAuthorPoemsCacheAfterLikePoemAction,
     updateMyFavouritePoemsCacheAfterLikePoemAction,
+    updateAuthorPoemsCacheAfterDeletePoemAction,
     updateMyPoemsCacheAfterDeletePoemAction,
     updatePoemsListCacheAfterDeletePoemAction,
     updatePoemsListCacheAfterLikePoemAction,
@@ -104,6 +105,11 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         )
                         dispatch(
                             updateMyPoemsCacheAfterDeletePoemAction({
+                                poemId: poem.id
+                            })
+                        )
+                        dispatch(
+                            updateAuthorPoemsCacheAfterDeletePoemAction({
                                 poemId: poem.id
                             })
                         )
