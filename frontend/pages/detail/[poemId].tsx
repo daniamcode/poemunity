@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import Detail from '../../src/components/Detail/Detail'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, buildServerUser, ServerUser } from '../../src/lib/serverApi'
+import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { Poem } from '../../src/typescript/interfaces'
 
 interface PageProps {
@@ -38,5 +38,5 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req }) =>
     const protocol = (req.headers['x-forwarded-proto'] as string)?.split(',')[0] || 'http'
     const baseUrl = `${protocol}://${req.headers.host}`
     const poem = await serverFetch<Poem>(`/api/v1/poem/${poemId}`, undefined, token)
-    return { props: { initialPoem: poem, initialUser: token ? buildServerUser(token) : null, baseUrl, poemId } }
+    return { props: { initialPoem: poem, initialUser: await fetchServerUser(token), baseUrl, poemId } }
 }

@@ -8,7 +8,20 @@ function getAdminId () {
     : process.env.REACT_APP_ADMIN
 }
 
+// The JWT (stored in the session cookie) must stay small — cookies cap at
+// ~4KB, so it carries IDENTITY ONLY. Profile/display data (picture, bio,
+// birthYear, …) is served from the DB via GET /users/profile, never the token.
 function buildAuthorTokenPayload (author) {
+  return {
+    id: author._id,
+    username: author.username,
+    isAdmin: String(author._id) === getAdminId()
+  }
+}
+
+// Full profile shape used by GET /users/profile (and PATCH responses) to
+// hydrate the client's AppContext from the database.
+function buildAuthorProfile (author) {
   return {
     id: author._id,
     username: author.username,
@@ -36,5 +49,6 @@ function signAuthorToken (author) {
 }
 
 module.exports = {
-  signAuthorToken
+  signAuthorToken,
+  buildAuthorProfile
 }

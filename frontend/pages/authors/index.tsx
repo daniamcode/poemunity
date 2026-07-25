@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import AuthorsIndex from '../../src/components/Authors/AuthorsIndex'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, buildServerUser, ServerUser } from '../../src/lib/serverApi'
+import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { Author } from '../../src/typescript/interfaces'
 
 interface PageProps {
@@ -35,5 +35,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
         serverFetch<string[]>('/api/v1/authors/letters', undefined, token),
         serverFetch<Author[]>('/api/v1/authors', { letter: 'A' }, token)
     ])
-    return { props: { initialLetters, initialAuthors, initialUser: token ? buildServerUser(token) : null, baseUrl } }
+    return { props: { initialLetters, initialAuthors, initialUser: await fetchServerUser(token), baseUrl } }
 }

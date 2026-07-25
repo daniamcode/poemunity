@@ -188,7 +188,7 @@ describe('Migration verification', () => {
       expect(updated.picture).toBe(newPic)
     })
 
-    test('returns a new JWT token with updated picture', async () => {
+    test('returns the picture in the body but keeps it OUT of the JWT (cookie stays small)', async () => {
       const newPic = 'data:image/jpeg;base64,/9j/fakepicture'
       const res = await request(app)
         .patch('/api/v1/users/picture')
@@ -199,8 +199,11 @@ describe('Migration verification', () => {
       expect(res.body.token).toBeDefined()
       expect(res.body.picture).toBe(newPic)
 
+      // The token carries identity only — the base64 picture must not be
+      // embedded, or the session cookie would blow past the ~4KB limit.
       const decoded = jwt.verify(res.body.token, process.env.SECRET)
-      expect(decoded.picture).toBe(newPic)
+      expect(decoded.picture).toBeUndefined()
+      expect(decoded.username).toBeDefined()
     })
 
     test('poems automatically reflect the new picture via populate — no separate sync', async () => {
@@ -236,6 +239,29 @@ describe('Migration verification', () => {
       await request(app)
         .patch('/api/v1/users/picture')
         .send({ picture: 'data:image/jpeg;base64,abc' })
+        .expect(401)
+    })
+  })
+
+  describe('GET /api/v1/users/profile — DB-fresh profile (source of truth for context)', () => {
+    test('returns the full profile including fields no longer in the JWT', async () => {
+      const pic = 'data:image/jpeg;base64,/9j/profilepic'
+      await Author.findByIdAndUpdate(author._id, { picture: pic, birthYear: 1991, city: 'London' })
+
+      const res = await request(app)
+        .get('/api/v1/users/profile')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200)
+
+      expect(res.body.picture).toBe(pic)
+      expect(res.body.birthYear).toBe(1991)
+      expect(res.body.city).toBe('London')
+      expect(res.body.username).toBeDefined()
+    })
+
+    test('returns 401 without a token', async () => {
+      await request(app)
+        .get('/api/v1/users/profile')
         .expect(401)
     })
   })

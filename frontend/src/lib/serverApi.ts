@@ -50,6 +50,33 @@ export function buildServerUser(token: string): ServerUser | null {
     }
 }
 
+// Fetch the authenticated user's full profile from the DB (source of truth).
+// The JWT carries identity only, so display fields (picture, birthYear, …)
+// must come from here — never from the token — to avoid stale/oversized-cookie
+// problems. Falls back to token identity if the profile fetch fails.
+export async function fetchServerUser(token?: string): Promise<ServerUser | null> {
+    if (!token) return null
+    const profile = await serverFetch<Record<string, any>>('/api/v1/users/profile', undefined, token)
+    if (!profile) return buildServerUser(token)
+    return {
+        user: 'authenticated',
+        userId: profile.id ?? '',
+        username: profile.username ?? '',
+        picture: profile.picture ?? '',
+        bio: profile.bio ?? '',
+        preferredGenres: profile.preferredGenres ?? [],
+        name: profile.name ?? '',
+        surname: profile.surname ?? '',
+        city: profile.city ?? '',
+        country: profile.country ?? '',
+        birthYear: profile.birthYear ?? null,
+        gender: profile.gender ?? '',
+        privateFields: profile.privateFields ?? [],
+        isAdmin: profile.isAdmin ?? false,
+        config: { withCredentials: true }
+    }
+}
+
 export async function serverFetch<T>(
     path: string,
     params?: Record<string, string | number>,

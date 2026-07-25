@@ -3,7 +3,7 @@ const usersRouter = require('express').Router()
 const Author = require('../models/Author')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
-const { signAuthorToken } = require('../utils/authToken')
+const { signAuthorToken, buildAuthorProfile } = require('../utils/authToken')
 
 const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
 
@@ -47,6 +47,21 @@ usersRouter.get('/me', userExtractor, async (req, res) => {
   } catch (error) {
     console.error('Token refresh error:', error)
     res.status(500).json({ error: 'Failed to refresh token' })
+  }
+})
+
+// Full, DB-fresh profile for the authenticated user. This is the source of
+// truth for the client's AppContext (picture, birthYear, …) — the JWT no
+// longer carries these fields, so display data never goes stale.
+usersRouter.get('/profile', userExtractor, async (req, res) => {
+  try {
+    const author = await Author.findById(req.userId)
+    if (!author) return res.status(404).json({ error: 'User not found' })
+
+    res.json(buildAuthorProfile(author))
+  } catch (error) {
+    console.error('Get profile error:', error)
+    res.status(500).json({ error: 'Failed to load profile' })
   }
 })
 

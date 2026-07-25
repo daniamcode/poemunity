@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import Dashboard from '../src/components/Dashboard/Dashboard'
 import { SeoHead } from '../src/components/SeoHead'
-import { serverFetch, buildServerUser, ServerUser } from '../src/lib/serverApi'
+import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import { ORDER_BY_LIKES } from '../src/data/constants'
 
@@ -36,5 +36,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
         limit: 10,
         orderBy: ORDER_BY_LIKES
     }, token)
-    return { props: { initialData: data, initialUser: token ? buildServerUser(token) : null, baseUrl } }
+    return { props: { initialData: data, initialUser: await fetchServerUser(token), baseUrl } }
 }

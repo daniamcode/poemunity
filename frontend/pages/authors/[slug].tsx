@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import AuthorDetail, { AuthorProfile } from '../../src/components/Authors/AuthorDetail'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, buildServerUser, ServerUser } from '../../src/lib/serverApi'
+import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { InitialAuthorPoemsData } from '../../src/components/Authors/useAuthorPoems'
 
 interface PageProps {
@@ -45,5 +45,5 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req }) =>
         serverFetch<InitialAuthorPoemsData>('/api/v1/poems', { page: 1, limit: 10, author: slug }, token),
         serverFetch<AuthorProfile>(`/api/v1/authors/${slug}`, undefined, token)
     ])
-    return { props: { initialPoems, initialAuthor, initialUser: token ? buildServerUser(token) : null, slug, baseUrl } }
+    return { props: { initialPoems, initialAuthor, initialUser: await fetchServerUser(token), slug, baseUrl } }
 }
