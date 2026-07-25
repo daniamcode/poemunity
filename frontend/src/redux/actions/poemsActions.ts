@@ -645,6 +645,58 @@ export function updateAuthorPoemsCacheAfterDeletePoemAction({ poemId }: UpdateAu
     }
 }
 
+interface UpdateCachesAfterPictureChangeActionProps {
+    userId: string
+    picture: string
+}
+
+// Propagate a profile-picture change into every cached poem list and the
+// ranking so avatars update live, without a page refresh. Poems denormalize
+// the author's picture at fetch time, so we patch every poem authored by the
+// current user across all caches (the ranking recomputes from those poems).
+export function updateCachesAfterPictureChangeAction({ userId, picture }: UpdateCachesAfterPictureChangeActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        if (!userId) return
+        const state: any = store.getState()
+
+        const patch = (poems: Poem[]) =>
+            poems.map((poem: Poem) => (poem.userId === userId ? { ...poem, picture } : poem))
+
+        // Caches whose fulfilled payload is a plain Poem[] array
+        const arrayCaches = [
+            { action: ACTIONS.ALL_POEMS, query: state.allPoemsQuery },
+            { action: ACTIONS.RANKING, query: state.rankingQuery }
+        ]
+        arrayCaches.forEach(({ action, query }) => {
+            if (!query?.item) return
+            const { fulfilledAction } = getTypes(action)
+            dispatch({ type: fulfilledAction, payload: patch(query.item as Poem[]) })
+        })
+
+        // Caches whose fulfilled payload is { poems, page, hasMore, total, totalPages }
+        const paginatedCaches = [
+            { action: ACTIONS.POEMS_LIST, query: state.poemsListQuery },
+            { action: ACTIONS.MY_POEMS, query: state.myPoemsQuery },
+            { action: ACTIONS.MY_FAVOURITE_POEMS, query: state.myFavouritePoemsQuery },
+            { action: ACTIONS.AUTHOR_POEMS, query: state.authorPoemsQuery }
+        ]
+        paginatedCaches.forEach(({ action, query }) => {
+            if (!query?.item) return
+            const { fulfilledAction } = getTypes(action)
+            dispatch({
+                type: fulfilledAction,
+                payload: {
+                    poems: patch(query.item as Poem[]),
+                    page: query.page,
+                    hasMore: query.hasMore,
+                    total: query.total,
+                    totalPages: query.totalPages
+                }
+            })
+        })
+    }
+}
+
 interface updateAllPoemsCacheAfterSavePoemActionProps {
     poem: Poem
     poemId: string

@@ -3,6 +3,8 @@ import API from '../../../redux/actions/axiosInstance'
 import { resizeImageToBase64 } from '../../../utils/imageUtils'
 import { Context } from '../../../typescript/interfaces'
 import { getAvatarColor, getInitials } from '../../ListItem/components/AuthorAvatar'
+import { useAppDispatch } from '../../../redux/store'
+import { updateCachesAfterPictureChangeAction } from '../../../redux/actions/poemsActions'
 
 interface Props {
     context: Context
@@ -12,6 +14,7 @@ export default function ProfilePicture({ context }: Props) {
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState('')
     const inputRef = useRef<HTMLInputElement>(null)
+    const dispatch = useAppDispatch()
 
     const handleClick = () => {
         if (!uploading) inputRef.current?.click()
@@ -31,6 +34,8 @@ export default function ProfilePicture({ context }: Props) {
             const { data } = await api.patch('/api/v1/users/picture', { picture: base64 })
 
             context.setState({ ...context, picture: data.picture })
+            // Update cached poem lists + ranking so avatars refresh live
+            dispatch(updateCachesAfterPictureChangeAction({ userId: context.userId, picture: data.picture }))
         } catch {
             setError('Upload failed. Please try again.')
         } finally {
