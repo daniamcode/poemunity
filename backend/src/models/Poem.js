@@ -19,7 +19,7 @@ poemSchema.set('toJSON', {
     // Flatten populated author — keeps API shape identical, adds authorSlug
     const a = returnedObject.authorId
     if (a && a.name) {
-      returnedObject.author = a.username || a.name
+      returnedObject.author = a.name || a.username
       returnedObject.authorName = a.name
       returnedObject.picture = a.picture
       returnedObject.userId = String(a._id || a.id)

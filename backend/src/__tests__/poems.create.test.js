@@ -57,7 +57,7 @@ describe('Poems API - Create and Update', () => {
       expect(response.body.title).toBe('New Poem')
       expect(response.body.poem).toBe('This is a beautiful poem about nature')
       expect(response.body.genre).toBe('love')
-      expect(response.body.author).toBe('testuser')
+      expect(response.body.author).toBe('Test User')
       expect(response.body.userId).toBe(testUser._id.toString())
       expect(response.body.picture).toBe('https://example.com/pic.jpg')
     })
@@ -99,7 +99,7 @@ describe('Poems API - Create and Update', () => {
       expect(poemInDb.title).toBe('Database Poem')
     })
 
-    test('should set author as username of authenticated user', async () => {
+    test('should set author as display name of authenticated user', async () => {
       const newPoem = {
         title: 'Author Test',
         poem: 'Content',
@@ -113,7 +113,7 @@ describe('Poems API - Create and Update', () => {
         .send(newPoem)
         .expect(201)
 
-      expect(response.body.author).toBe(testUser.username)
+      expect(response.body.author).toBe(testUser.name)
     })
 
     test('should set picture from authenticated user', async () => {
@@ -328,8 +328,8 @@ describe('Poems API - Create and Update', () => {
         })
         .expect(201)
 
-      expect(response1.body.author).toBe('testuser')
-      expect(response2.body.author).toBe('user2')
+      expect(response1.body.author).toBe('Test User')
+      expect(response2.body.author).toBe('User Two')
       expect(response1.body.userId).not.toBe(response2.body.userId)
     })
 

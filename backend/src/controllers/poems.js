@@ -46,7 +46,7 @@ function serializePoem (poem) {
   const rawAuthor = returnedObject.authorId
   const author = rawAuthor && typeof rawAuthor.toJSON === 'function' ? rawAuthor.toJSON() : rawAuthor
   if (author && (author.name || author.username)) {
-    returnedObject.author = author.username || author.name
+    returnedObject.author = author.name || author.username
     returnedObject.authorName = author.name
     returnedObject.picture = author.picture
     returnedObject.userId = String(author._id || author.id)
@@ -195,7 +195,7 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
     if (isLegacyUser) {
       // populate won't cross collections; build response manually
       const poemObj = savedPoem.toJSON()
-      poemObj.author = author.username || author.name
+      poemObj.author = author.name || author.username
       poemObj.authorName = author.name
       poemObj.picture = author.picture
       poemObj.userId = String(author._id)

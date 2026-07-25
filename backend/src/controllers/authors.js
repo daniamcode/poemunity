@@ -51,7 +51,7 @@ authorsRouter.get('/', async (req, res) => {
         { $project: countProject },
         { $sort: { name: 1 } }
       ])
-      return res.json(authors.map(a => ({ id: String(a._id), name: a.username || a.name, slug: a.slug, picture: a.picture, count: a.count })))
+      return res.json(authors.map(a => ({ id: String(a._id), name: a.name || a.username, slug: a.slug, picture: a.picture, count: a.count })))
     }
 
     const limit = Math.min(parseInt(req.query.limit) || 15, 100)
@@ -62,7 +62,7 @@ authorsRouter.get('/', async (req, res) => {
       { $sort: { count: -1 } },
       { $limit: limit }
     ])
-    res.json(authors.map(a => ({ id: String(a._id), name: a.username || a.name, slug: a.slug, picture: a.picture, count: a.count })))
+    res.json(authors.map(a => ({ id: String(a._id), name: a.name || a.username, slug: a.slug, picture: a.picture, count: a.count })))
   } catch {
     res.status(500).json({ error: 'Internal server error' })
   }

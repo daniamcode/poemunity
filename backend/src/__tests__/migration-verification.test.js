@@ -52,7 +52,7 @@ describe('Migration verification', () => {
         .send({ title: 'My Poem', poem: 'some verse', genre: 'love', date: new Date() })
         .expect(201)
 
-      expect(res.body.author).toBe('janedoe')
+      expect(res.body.author).toBe('Jane Doe')
       expect(res.body.authorName).toBe('Jane Doe')
       expect(res.body.authorSlug).toBe('jane-doe')
       expect(res.body.picture).toBe('https://example.com/jane.jpg')
