@@ -138,6 +138,15 @@
 .poem__delete-icon svg {
     width: 24px;
     height: 24px;
+    transition: fill 0.15s ease;
+}
+
+// Delete is destructive: keep it neutral at rest, turn it red on hover/focus so
+// the intent reads clearly. (The inline fill on the button doesn't reach the MUI
+// SVG, which uses currentColor — this rule targets the svg itself.)
+.poem__delete-icon:hover svg,
+.poem__delete-icon:focus-visible svg {
+    fill: red;
 }
 
 .poem__comments-sentinel {

@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
 import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
 import { LIKE, LIKES } from '../../../data/constants'
 import { Poem, Context } from '../../../typescript/interfaces'
+import { ConfirmDialog } from '../../common/ConfirmDialog'
 
 interface PoemFooterProps {
     poem: Poem
@@ -82,38 +82,16 @@ export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFoot
                 </button>
             )}
 
-            {showConfirm && typeof document !== 'undefined' && createPortal(
-                <div
-                    className='poem__confirm-overlay'
-                    role='dialog'
-                    aria-modal='true'
-                    aria-labelledby='poem-confirm-title'
-                >
-                    <div className='poem__confirm-box'>
-                        <p className='poem__confirm-title' id='poem-confirm-title'>Delete this poem?</p>
-                        <p className='poem__confirm-message'>This action cannot be undone.</p>
-                        <div className='poem__confirm-actions'>
-                            <button
-                                className='poem__confirm-cancel'
-                                onClick={() => setShowConfirm(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className='poem__confirm-delete'
-                                onClick={e => {
-                                    setShowConfirm(false)
-                                    onDelete(e)
-                                }}
-                                data-testid='confirm-delete-poem'
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+            <ConfirmDialog
+                open={showConfirm}
+                title='Delete this poem?'
+                message='This action cannot be undone.'
+                onCancel={() => setShowConfirm(false)}
+                onConfirm={e => {
+                    setShowConfirm(false)
+                    onDelete(e)
+                }}
+            />
 
             <Link href={`/detail/${poem.id}`} className='poem__comments-icon' aria-label='View comments'>
                 <SubjectSharpIcon
