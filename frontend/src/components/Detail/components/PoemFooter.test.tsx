@@ -125,11 +125,36 @@ describe('PoemFooter', () => {
         expect(mockHandlers.onEdit).toHaveBeenCalledTimes(1)
     })
 
-    test('should call onDelete when delete icon is clicked', () => {
+    test('clicking delete opens a confirmation dialog and does NOT delete immediately', () => {
         const contextOwner = { ...mockContext, userId: mockPoem.userId }
         renderWithRouter(<PoemFooter poem={mockPoem} context={contextOwner} {...mockHandlers} />)
+
         fireEvent.click(screen.getByTestId('delete-icon'))
+
+        // The poem is not deleted on the first click — a confirm dialog appears.
+        expect(mockHandlers.onDelete).not.toHaveBeenCalled()
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    test('confirming the dialog calls onDelete once', () => {
+        const contextOwner = { ...mockContext, userId: mockPoem.userId }
+        renderWithRouter(<PoemFooter poem={mockPoem} context={contextOwner} {...mockHandlers} />)
+
+        fireEvent.click(screen.getByTestId('delete-icon'))
+        fireEvent.click(screen.getByTestId('confirm-delete-poem'))
+
         expect(mockHandlers.onDelete).toHaveBeenCalledTimes(1)
+    })
+
+    test('cancelling the dialog dismisses it without deleting', () => {
+        const contextOwner = { ...mockContext, userId: mockPoem.userId }
+        renderWithRouter(<PoemFooter poem={mockPoem} context={contextOwner} {...mockHandlers} />)
+
+        fireEvent.click(screen.getByTestId('delete-icon'))
+        fireEvent.click(screen.getByText('Cancel'))
+
+        expect(mockHandlers.onDelete).not.toHaveBeenCalled()
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
 
     test('should render comments link with correct href', () => {
