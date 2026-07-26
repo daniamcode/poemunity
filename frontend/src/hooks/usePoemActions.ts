@@ -1,7 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../redux/store'
-import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
+import { deletePoemAction, likePoemAction } from '../redux/actions/poemActions'
 import { dropPoemFromCaches, dropPoemFromFavouritesCache } from '../redux/actions/poemsActions'
 import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
 import { Context, Poem } from '../typescript/interfaces'
@@ -46,13 +46,6 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         if (isLiked) {
                             dispatch(dropPoemFromFavouritesCache({ poemId: poem.id }))
                         }
-
-                        // The Detail page keeps its own single-poem cache in sync.
-                        dispatch(
-                            updatePoemCacheAfterLikePoemAction({
-                                context
-                            })
-                        )
                     }
                 }
             })

@@ -1,7 +1,6 @@
 import {
     getPoemAction,
     likePoemAction,
-    updatePoemCacheAfterLikePoemAction,
     deletePoemAction,
     savePoemAction
 } from './poemActions'
@@ -9,17 +8,9 @@ import * as commonActions from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import { ACTIONS } from '../reducers/poemReducers'
 import { AppDispatch } from '../store'
-import store from '../store/index'
 import { Poem, Context } from '../../typescript/interfaces'
 
 jest.mock('../store/index')
-
-// Polyfill for structuredClone if not available
-if (typeof structuredClone === 'undefined') {
-    global.structuredClone = function (obj: any) {
-        return JSON.parse(JSON.stringify(obj))
-    }
-}
 
 describe('poemActions', () => {
     let dispatch: AppDispatch
@@ -202,103 +193,6 @@ describe('poemActions', () => {
                 context: mockContext,
                 callbacks: mockCallbacks
             })
-
-            expect(typeof result).toBe('function')
-        })
-    })
-
-    describe('updatePoemCacheAfterLikePoemAction', () => {
-        test('should add userId to likes when user has not liked the poem', () => {
-            const mockPoem: Poem = {
-                id: 'poem-123',
-                title: 'Test Poem',
-                author: 'Test Author',
-                poem: 'Test content',
-                likes: ['user-456', 'user-789'],
-                userId: 'author-123',
-                genre: 'love',
-                picture: 'pic.jpg',
-                date: '2024-01-01'
-            }
-
-            ;(store.getState as jest.Mock).mockReturnValue({
-                poemQuery: {
-                    item: mockPoem
-                }
-            })
-
-            const spy = jest.spyOn(commonActions, 'getTypes')
-
-            updatePoemCacheAfterLikePoemAction({ context: mockContext })(dispatch)
-
-            expect(spy).toHaveBeenCalledWith(ACTIONS.POEM)
-            expect(dispatch).toHaveBeenCalledWith({
-                type: `${ACTIONS.POEM}_fulfilled`,
-                payload: expect.objectContaining({
-                    likes: expect.arrayContaining(['user-456', 'user-789', 'user-123'])
-                })
-            })
-
-            spy.mockRestore()
-        })
-
-        test('should remove userId from likes when user has already liked the poem', () => {
-            const mockPoem: Poem = {
-                id: 'poem-123',
-                title: 'Test Poem',
-                author: 'Test Author',
-                poem: 'Test content',
-                likes: ['user-456', 'user-123', 'user-789'],
-                userId: 'author-123',
-                genre: 'love',
-                picture: 'pic.jpg',
-                date: '2024-01-01'
-            }
-
-            ;(store.getState as jest.Mock).mockReturnValue({
-                poemQuery: {
-                    item: mockPoem
-                }
-            })
-
-            updatePoemCacheAfterLikePoemAction({ context: mockContext })(dispatch)
-
-            expect(dispatch).toHaveBeenCalledWith({
-                type: `${ACTIONS.POEM}_fulfilled`,
-                payload: expect.objectContaining({
-                    likes: ['user-456', 'user-789']
-                })
-            })
-        })
-
-        test('should not mutate original poem state', () => {
-            const mockPoem: Poem = {
-                id: 'poem-123',
-                title: 'Test Poem',
-                author: 'Test Author',
-                poem: 'Test content',
-                likes: ['user-456'],
-                userId: 'author-123',
-                genre: 'love',
-                picture: 'pic.jpg',
-                date: '2024-01-01'
-            }
-
-            const originalLikes = [...mockPoem.likes]
-
-            ;(store.getState as jest.Mock).mockReturnValue({
-                poemQuery: {
-                    item: mockPoem
-                }
-            })
-
-            updatePoemCacheAfterLikePoemAction({ context: mockContext })(dispatch)
-
-            expect(mockPoem.likes).toEqual(originalLikes)
-        })
-
-        test('should return a function', () => {
-            const result = updatePoemCacheAfterLikePoemAction({ context: mockContext })
 
             expect(typeof result).toBe('function')
         })

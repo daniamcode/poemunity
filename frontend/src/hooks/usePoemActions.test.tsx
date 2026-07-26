@@ -50,9 +50,6 @@ describe('usePoemActions', () => {
         ;(poemsActions.dropPoemFromFavouritesCache as jest.Mock).mockReturnValue({
             type: 'DROP_POEM_FROM_FAVOURITES'
         })
-        ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEM_LIKE'
-        })
     })
 
     test('should return onDelete, onLike, and onEdit functions', () => {
@@ -144,7 +141,7 @@ describe('usePoemActions', () => {
         })
     })
 
-    test('onLike success callback updates the single entity and syncs favourites/detail', () => {
+    test('onLike success callback updates the single entity and syncs favourites', () => {
         const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
 
         const mockEvent = { preventDefault: jest.fn() } as any
@@ -155,14 +152,11 @@ describe('usePoemActions', () => {
         likePoemCall.callbacks.success()
 
         // mockPoem is already liked by user-1, so this like toggles to an UNLIKE:
-        // one poemUpdated with user-1 removed from the likes array.
+        // one poemUpdated with user-1 removed from the likes array. Every view
+        // (including Detail) re-reads that entity — no separate cache patch.
         expect(mockDispatch).toHaveBeenCalledWith(poemUpdated({ id: 'poem-123', changes: { likes: [] } }))
         // Unliking removes the poem from the filtered "my favourites" view.
         expect(poemsActions.dropPoemFromFavouritesCache).toHaveBeenCalledWith({ poemId: 'poem-123' })
-        // The Detail single-poem cache is kept in sync.
-        expect(poemActions.updatePoemCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            context: mockContext
-        })
     })
 
     test('onEdit should navigate to profile with edit query param', () => {

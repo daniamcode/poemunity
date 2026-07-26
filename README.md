@@ -36,7 +36,7 @@ The current app uses Redux (Redux Toolkit). The earlier `Flux` and `React-Query`
 
 Historically this project was a learning exercise — the three folders (Flux → React Query → Redux) exist because the original goal was to explore as many approaches as possible. **That is no longer the goal: Poemunity is now a production product, and architectural decisions prioritize robustness, correctness, and maintainability over breadth of technologies explored.** Where a past choice was made "to learn X," it is re-evaluated on product merit (see "Planned: server state → RTK Query" below).
 
-### Planned: single source of truth (normalized Redux store)
+### Done: single source of truth (normalized Redux store)
 
 **Problem.** Server data is **denormalized** in the Redux store: each poem is cached as a *full copy* across six separate list caches (`ALL_POEMS`, `POEMS_LIST`, `MY_POEMS`, `MY_FAVOURITE_POEMS`, `RANKING`, `AUTHOR_POEMS`), and each author's name/picture is *copied onto every poem* (`poem.author`, `poem.picture`, `poem.authorSlug`, …). The same mutable fact is therefore stored in many places, so the copies **drift** — a deleted poem lingers on the author page, a changed username/picture doesn't propagate. These copies are kept in sync by hand-written `updateXCacheAfterY` thunks (one per mutation × per cache) — a fragile matrix that grows with every field and mutation.
 
@@ -55,7 +55,9 @@ Historically this project was a learning exercise — the three folders (Flux �
 6. Convert the six list caches from arrays of full poems to **arrays of poem ids** + their pagination meta.
 7. Delete/like become `poemsAdapter.removeOne` / `updateOne`; **delete** the delete-cache and like thunks.
 
-**Status:** in progress (Phase 1 first, then Phase 2). Until a phase lands, its manual cache-sync stays in place.
+**Status:** done. Both phases shipped — authors and poems are each stored once and read by id, the Detail page reads the poem entity, and the entire `updateXCacheAfterY` family (author, create, save, like, delete variants, plus the Detail like-cache thunk) is deleted. A like/delete/rename now mutates one record and every view re-reads it.
+
+**Remaining follow-ups (out of the original scope, low-risk):** the `authorsReducers` list caches (top-authors, authors-by-letter) still hold denormalized author copies; Ranking still fetches all poems client-side; `allPoemsQuery` currently has no consumer. None cause drift for the mutation paths above.
 
 ### Auth & session (identity-only JWT)
 

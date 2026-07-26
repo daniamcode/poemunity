@@ -59,11 +59,6 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         // Mock the action creators to return actions with callbacks
         likePoemActionSpy = jest.spyOn(poemActions, 'likePoemAction')
-
-        // The Detail single-poem cache updater is still dispatched on like.
-        ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEM_LIKE'
-        })
     })
 
     const renderWithProviders = (component: React.ReactElement) => {
@@ -159,10 +154,6 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         expect(actions).toContainEqual(
             poemUpdated({ id: 'poem-123', changes: { likes: ['user-1', 'user-2', 'user-456'] } })
         )
-        // The Detail single-poem cache is still kept in sync.
-        expect(poemActions.updatePoemCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            context: mockContext
-        })
     })
 
     test('should update UI when poem prop changes from not liked to liked', () => {

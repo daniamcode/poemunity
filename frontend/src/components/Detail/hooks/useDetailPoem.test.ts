@@ -1,8 +1,10 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { useDetailPoem } from './useDetailPoem'
 import store from '../../../redux/store'
 import * as poemActions from '../../../redux/actions/poemActions'
+import { poemUpserted, poemUpdated, poemRemoved } from '../../../redux/reducers/poemEntitiesReducers'
+import { Poem } from '../../../typescript/interfaces'
 import React from 'react'
 
 jest.mock('../../../redux/actions/poemActions')
@@ -84,5 +86,54 @@ describe('useDetailPoem', () => {
         const { result } = renderHook(() => useDetailPoem('poem-123'), { wrapper })
 
         expect(result.current.isLoading).toBe(false)
+    })
+
+    // Regression: Detail now derives its poem from the normalized poemEntities
+    // store (the single source of truth) rather than a bespoke single-poem cache.
+    describe('reads from the normalized entity store', () => {
+        const entityPoem: Poem = {
+            id: 'poem-detail-entity',
+            author: 'Ada Lovelace',
+            date: '2024-01-01',
+            genre: 'love',
+            likes: [],
+            picture: 'ada.jpg',
+            poem: 'Analytical verses',
+            title: 'The Engine',
+            userId: 'author-ada'
+        }
+
+        afterEach(() => {
+            act(() => {
+                store.dispatch(poemRemoved(entityPoem.id))
+            })
+        })
+
+        test('returns the poem held in poemEntities', () => {
+            act(() => {
+                store.dispatch(poemUpserted(entityPoem))
+            })
+
+            const { result } = renderHook(() => useDetailPoem(entityPoem.id), { wrapper })
+
+            expect(result.current.poem).toEqual(entityPoem)
+        })
+
+        test('reflects a like applied to the entity without a separate cache patch', () => {
+            act(() => {
+                store.dispatch(poemUpserted(entityPoem))
+            })
+
+            const { result } = renderHook(() => useDetailPoem(entityPoem.id), { wrapper })
+            expect(result.current.poem.likes).toEqual([])
+
+            // A like updates the ONE entity; the Detail view re-reads it live —
+            // this is exactly what the deleted updatePoemCacheAfterLikePoemAction did.
+            act(() => {
+                store.dispatch(poemUpdated({ id: entityPoem.id, changes: { likes: ['user-99'] } }))
+            })
+
+            expect(result.current.poem.likes).toEqual(['user-99'])
+        })
     })
 })

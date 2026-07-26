@@ -1,5 +1,4 @@
-import store from '../store'
-import { getAction, getTypes, putAction, patchAction, deleteAction } from './commonActions'
+import { getAction, putAction, patchAction, deleteAction } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import { ACTIONS } from '../reducers/poemReducers'
 import { ReduxOptions, ReduxCallbacks, Context, Poem } from '../../typescript/interfaces'
@@ -73,32 +72,6 @@ export function likePoemAction({ params, context, options, callbacks }: likePoem
             dispatch,
             options,
             callbacks
-        })
-    }
-}
-
-interface updatePoemCacheAfterLikePoemActionProps {
-    context: Context
-}
-
-export function updatePoemCacheAfterLikePoemAction({ context }: updatePoemCacheAfterLikePoemActionProps) {
-    return function dispatcher(dispatch: AppDispatch) {
-        const {
-            poemQuery: { item: poemQuery }
-        } = store.getState()
-        const newPoemQuery = structuredClone(poemQuery as Poem)
-
-        const index = newPoemQuery?.likes?.indexOf(context.userId)
-        if (index !== -1) {
-            newPoemQuery?.likes.splice(index, 1)
-        } else {
-            newPoemQuery?.likes.push(context.userId)
-        }
-
-        const { fulfilledAction } = getTypes(ACTIONS.POEM)
-        dispatch({
-            type: fulfilledAction,
-            payload: newPoemQuery
         })
     }
 }
