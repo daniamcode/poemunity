@@ -42,7 +42,8 @@ describe('MyFavouritePoems - Integration Tests', () => {
                 page: 1,
                 error: null,
                 ...myFavouritePoemsState
-            }
+            },
+            authorEntities: { ids: [], entities: {} }
         })
     }
 

@@ -126,7 +126,8 @@ describe('List Component - Infinite Scrolling', () => {
         ]
 
         const mockState = {
-            poemsListQuery: { isFetching: false, item: [...page1Poems, ...page2Poems], page: 2, hasMore: true }
+            poemsListQuery: { isFetching: false, item: [...page1Poems, ...page2Poems], page: 2, hasMore: true },
+            authorEntities: { ids: [], entities: {} }
         }
         ;(useSelector as jest.Mock).mockImplementation(selector => selector(mockState))
 

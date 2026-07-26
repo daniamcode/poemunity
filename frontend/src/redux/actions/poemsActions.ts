@@ -7,6 +7,45 @@ import cloneDeep from 'lodash/cloneDeep'
 import { ACTIONS } from '../reducers/poemsReducers'
 import { AppDispatch } from '../store'
 import { ReduxOptions, ReduxCallbacks, Context, Poem } from '../../typescript/interfaces'
+import { authorsUpserted, AuthorEntity } from '../reducers/authorEntitiesReducers'
+
+// Extract the denormalized author of every fetched poem and upsert it into the
+// normalized authors entity store, which is the single source of truth for
+// author display fields. Handles both fulfilled payload shapes: a plain Poem[]
+// (ALL_POEMS, RANKING) and a paginated { poems, ... } object (the rest).
+function seedAuthorsFromPoemsPayload(dispatch: AppDispatch, responseData: unknown): void {
+    const payload = responseData as Poem[] | { poems?: Poem[] } | null | undefined
+    const poems: Poem[] | undefined = Array.isArray(payload) ? payload : payload?.poems
+    if (!Array.isArray(poems) || poems.length === 0) {
+        return
+    }
+
+    const authors: AuthorEntity[] = poems
+        .filter((poem: Poem) => poem && poem.userId)
+        .map((poem: Poem) => ({
+            id: poem.userId,
+            name: poem.author,
+            picture: poem.picture,
+            slug: poem.authorSlug,
+            type: poem.authorType
+        }))
+
+    if (authors.length > 0) {
+        dispatch(authorsUpserted(authors))
+    }
+}
+
+// Wrap a caller's callbacks so that, on a successful poem fetch, we also seed
+// the authors entity store before invoking the caller's own success handler.
+function withAuthorSeeding(dispatch: AppDispatch, callbacks?: ReduxCallbacks): ReduxCallbacks {
+    return {
+        ...callbacks,
+        success: (responseData: unknown) => {
+            seedAuthorsFromPoemsPayload(dispatch, responseData)
+            callbacks?.success?.(responseData)
+        }
+    }
+}
 
 interface GetAllPoemsActionProps {
     params?: object
@@ -22,7 +61,7 @@ export function getAllPoemsAction({ params, options, callbacks }: GetAllPoemsAct
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -41,7 +80,7 @@ export function getPoemsListAction({ params, options, callbacks }: GetPoemsListA
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -60,7 +99,7 @@ export function getRankingAction({ params, options, callbacks }: GetRankingActio
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -79,7 +118,7 @@ export function getMyPoemsAction({ params, options, callbacks }: GetMyPoemsActio
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -98,7 +137,7 @@ export function getMyFavouritePoemsAction({ params, options, callbacks }: GetMyF
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -361,7 +400,7 @@ export function getAuthorPoemsAction({ params, options, callbacks }: GetAuthorPo
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
 }
@@ -641,59 +680,6 @@ export function updateAuthorPoemsCacheAfterDeletePoemAction({ poemId }: UpdateAu
                 total: Math.max(0, (authorPoemsQuery.total || 0) - 1), // Decrease total count
                 totalPages: authorPoemsQuery.totalPages
             }
-        })
-    }
-}
-
-interface UpdateCachesAfterAuthorChangeActionProps {
-    userId: string
-    changes: Partial<Poem>
-}
-
-// Propagate an author profile change (picture and/or display name) into every
-// cached poem list and the ranking so they update live, without a refresh.
-// Poems denormalize the author's display fields at fetch time, so we merge the
-// changes into every poem authored by the current user across all caches (the
-// ranking recomputes from those poems).
-export function updateCachesAfterAuthorChangeAction({ userId, changes }: UpdateCachesAfterAuthorChangeActionProps) {
-    return function dispatcher(dispatch: AppDispatch) {
-        if (!userId) return
-        const state: any = store.getState()
-
-        const patch = (poems: Poem[]) =>
-            poems.map((poem: Poem) => (poem.userId === userId ? { ...poem, ...changes } : poem))
-
-        // Caches whose fulfilled payload is a plain Poem[] array
-        const arrayCaches = [
-            { action: ACTIONS.ALL_POEMS, query: state.allPoemsQuery },
-            { action: ACTIONS.RANKING, query: state.rankingQuery }
-        ]
-        arrayCaches.forEach(({ action, query }) => {
-            if (!query?.item) return
-            const { fulfilledAction } = getTypes(action)
-            dispatch({ type: fulfilledAction, payload: patch(query.item as Poem[]) })
-        })
-
-        // Caches whose fulfilled payload is { poems, page, hasMore, total, totalPages }
-        const paginatedCaches = [
-            { action: ACTIONS.POEMS_LIST, query: state.poemsListQuery },
-            { action: ACTIONS.MY_POEMS, query: state.myPoemsQuery },
-            { action: ACTIONS.MY_FAVOURITE_POEMS, query: state.myFavouritePoemsQuery },
-            { action: ACTIONS.AUTHOR_POEMS, query: state.authorPoemsQuery }
-        ]
-        paginatedCaches.forEach(({ action, query }) => {
-            if (!query?.item) return
-            const { fulfilledAction } = getTypes(action)
-            dispatch({
-                type: fulfilledAction,
-                payload: {
-                    poems: patch(query.item as Poem[]),
-                    page: query.page,
-                    hasMore: query.hasMore,
-                    total: query.total,
-                    totalPages: query.totalPages
-                }
-            })
         })
     }
 }

@@ -4,7 +4,7 @@ import { resizeImageToBase64 } from '../../../utils/imageUtils'
 import { Context } from '../../../typescript/interfaces'
 import { getAvatarColor, getInitials } from '../../ListItem/components/AuthorAvatar'
 import { useAppDispatch } from '../../../redux/store'
-import { updateCachesAfterAuthorChangeAction } from '../../../redux/actions/poemsActions'
+import { authorUpdated } from '../../../redux/reducers/authorEntitiesReducers'
 
 interface Props {
     context: Context
@@ -34,8 +34,8 @@ export default function ProfilePicture({ context }: Props) {
             const { data } = await api.patch('/api/v1/users/picture', { picture: base64 })
 
             context.setState({ ...context, picture: data.picture })
-            // Update cached poem lists + ranking so avatars refresh live
-            dispatch(updateCachesAfterAuthorChangeAction({ userId: context.userId, changes: { picture: data.picture } }))
+            // Update the single source of truth so every author avatar refreshes live
+            dispatch(authorUpdated({ id: context.userId, changes: { picture: data.picture } }))
         } catch {
             setError('Upload failed. Please try again.')
         } finally {

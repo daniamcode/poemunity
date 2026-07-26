@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react'
+import { Provider } from 'react-redux'
 import ListItem from './ListItem'
+import store from '../../redux/store'
 import { Poem, Context } from '../../typescript/interfaces'
 import * as usePoemActionsModule from '../../hooks/usePoemActions'
 
@@ -58,7 +60,7 @@ describe('ListItem (Refactored)', () => {
     })
 
     const renderWithRouter = (component: React.ReactElement) => {
-        return render(component)
+        return render(<Provider store={store}>{component}</Provider>)
     }
 
     test('should render all child components when filter matches', () => {

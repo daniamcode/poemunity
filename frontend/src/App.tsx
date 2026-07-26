@@ -3,6 +3,8 @@ import { Context } from './typescript/interfaces'
 import { useAppDispatch } from './redux/store'
 import store from './redux/store'
 import { getRankingAction } from './redux/actions/poemsActions'
+import { authorUpserted } from './redux/reducers/authorEntitiesReducers'
+import { slugify } from './utils/urlUtils'
 import type { ServerUser } from './lib/serverApi'
 
 export const AppContext = React.createContext<Context>({
@@ -65,6 +67,19 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
             }))
         }
     })
+
+    // Seed the logged-in user into the authors store so their own card shows the
+    // correct name/avatar immediately (before any poem fetch populates it).
+    useEffect(() => {
+        if (!contextState.userId) return
+        dispatch(authorUpserted({
+            id: contextState.userId,
+            name: contextState.name || contextState.username,
+            picture: contextState.picture || undefined,
+            slug: slugify(contextState.username || ''),
+            type: 'user'
+        }))
+    }, [dispatch, contextState.userId, contextState.username, contextState.name, contextState.picture])
 
     useEffect(() => {
         if (initialUser !== undefined) {

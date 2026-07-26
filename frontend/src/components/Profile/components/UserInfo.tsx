@@ -6,7 +6,7 @@ import { CATEGORIES, categoryToSlug } from '../../../data/constants'
 import { Context } from '../../../typescript/interfaces'
 import { slugify } from '../../../utils/urlUtils'
 import { useAppDispatch } from '../../../redux/store'
-import { updateCachesAfterAuthorChangeAction } from '../../../redux/actions/poemsActions'
+import { authorUpdated } from '../../../redux/reducers/authorEntitiesReducers'
 
 interface Props {
     context: Context
@@ -120,11 +120,11 @@ export default function UserInfo({ context }: Props) {
                 gender: a.gender || '',
                 privateFields: a.privateFields || []
             })
-            // Display name is denormalized onto poem cards + ranking — propagate
-            // the change so they update live without a refresh.
-            dispatch(updateCachesAfterAuthorChangeAction({
-                userId: context.userId,
-                changes: { author: a.name || context.username, authorName: a.name || '' }
+            // Update the single source of truth for author display name so every
+            // poem card + ranking entry refreshes live without a refresh.
+            dispatch(authorUpdated({
+                id: context.userId,
+                changes: { name: a.name || context.username }
             }))
             setEditing(false)
         } catch {

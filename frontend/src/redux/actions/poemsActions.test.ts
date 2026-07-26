@@ -93,7 +93,12 @@ describe('getAllPoemsAction', () => {
             dispatch,
             options,
             params: {},
-            callbacks
+            // callbacks are wrapped so a successful fetch also seeds the authors store
+            callbacks: {
+                error: callbacks.error,
+                reset: callbacks.reset,
+                success: expect.any(Function)
+            }
         })
         spy.mockRestore()
     })
@@ -825,7 +830,8 @@ describe('getPoemsListAction - Pagination', () => {
             dispatch,
             params,
             options,
-            callbacks: undefined
+            // callbacks are wrapped so a successful fetch also seeds the authors store
+            callbacks: { success: expect.any(Function) }
         })
 
         spy.mockRestore()
@@ -1025,7 +1031,8 @@ describe('getMyPoemsAction', () => {
             dispatch,
             params,
             options,
-            callbacks: undefined
+            // callbacks are wrapped so a successful fetch also seeds the authors store
+            callbacks: { success: expect.any(Function) }
         })
         spy.mockRestore()
     })
@@ -1110,7 +1117,8 @@ describe('getMyFavouritePoemsAction', () => {
             dispatch,
             params,
             options,
-            callbacks: undefined
+            // callbacks are wrapped so a successful fetch also seeds the authors store
+            callbacks: { success: expect.any(Function) }
         })
         spy.mockRestore()
     })

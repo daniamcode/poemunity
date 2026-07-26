@@ -54,7 +54,8 @@ describe('ListItem - Like Functionality Integration Tests', () => {
             poemsListQuery: {
                 item: [mockPoem, mockPoemLikedByUser],
                 isFetching: false
-            }
+            },
+            authorEntities: { ids: [], entities: {} }
         })
 
         // Mock the action creators to return actions with callbacks
