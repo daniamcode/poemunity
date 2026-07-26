@@ -7,6 +7,42 @@ const { signAuthorToken, buildAuthorProfile } = require('../utils/authToken')
 
 const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
 
+// Maps common image mime types to file extensions for the blob pathname.
+const MIME_EXTENSIONS = {
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+  'image/svg+xml': 'svg'
+}
+
+// Persists a profile picture supplied as a base64 data URL.
+// When BLOB_READ_WRITE_TOKEN is configured, the image is decoded and uploaded
+// to Vercel Blob and a public CDN URL is returned. Otherwise (tests / local dev
+// without blob configured) the original base64 data URL is stored as-is.
+async function storePicture (dataUrl, userId) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return dataUrl
+  }
+
+  const match = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(dataUrl)
+  if (!match) {
+    return dataUrl
+  }
+
+  const contentType = match[1]
+  const buffer = Buffer.from(match[2], 'base64')
+  const ext = MIME_EXTENSIONS[contentType] || 'jpg'
+  const pathname = `avatars/${userId}-${Date.now()}.${ext}`
+
+  // Lazy-require so environments without blob configured (tests / local dev)
+  // never load @vercel/blob's undici dependency at module load time.
+  const { put } = require('@vercel/blob')
+  const blob = await put(pathname, buffer, { access: 'public', contentType })
+  return blob.url
+}
+
 usersRouter.get('/', async (req, res) => {
   try {
     const users = await User.find({}).populate('poems', 'poem date')
@@ -94,16 +130,18 @@ usersRouter.patch('/picture', userExtractor, async (req, res) => {
       return res.status(400).json({ error: 'Invalid image data' })
     }
 
+    const storedPicture = await storePicture(picture, req.userId)
+
     const author = await Author.findByIdAndUpdate(
       req.userId,
-      { picture },
+      { picture: storedPicture },
       { new: true }
     )
 
     // No need to update poems — picture comes from Author via populate
     const newToken = signAuthorToken(author)
 
-    res.json({ token: newToken, picture })
+    res.json({ token: newToken, picture: storedPicture })
   } catch (error) {
     console.error('Picture update error:', error)
     res.status(500).json({ error: 'Failed to update profile picture' })
