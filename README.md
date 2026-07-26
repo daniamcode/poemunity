@@ -57,7 +57,7 @@ Historically this project was a learning exercise — the three folders (Flux �
 
 **Status:** done. Both phases shipped — authors and poems are each stored once and read by id, the Detail page reads the poem entity, and the entire `updateXCacheAfterY` family (author, create, save, like, delete variants, plus the Detail like-cache thunk) is deleted. A like/delete/rename now mutates one record and every view re-reads it.
 
-**Remaining follow-ups (out of the original scope, low-risk):** the `authorsReducers` list caches (top-authors, authors-by-letter) still hold denormalized author copies; Ranking still fetches all poems client-side; `allPoemsQuery` currently has no consumer. None cause drift for the mutation paths above.
+**Follow-ups (now also done):** the `authorsReducers` list caches (top-authors, authors-by-letter) resolve name/picture/slug through `authorEntities` (memoized selectors in `redux/selectors/authorCacheSelectors.ts`), so a rename propagates without a refetch; **ranking is computed server-side** (`GET /api/v1/poems/ranking` aggregation) instead of shipping every poem to the browser; and the unused `allPoemsQuery` cache was removed.
 
 ### Auth & session (identity-only JWT)
 
