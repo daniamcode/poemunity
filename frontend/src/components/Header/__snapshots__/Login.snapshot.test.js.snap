@@ -26,7 +26,7 @@ exports[`Login should match without id 1`] = `
             >
               <input
                 name="Username"
-                placeholder="Username"
+                placeholder="Username or email"
                 type="text"
                 value=""
               />
@@ -78,7 +78,7 @@ exports[`Login should match without id 1`] = `
           >
             <input
               name="Username"
-              placeholder="Username"
+              placeholder="Username or email"
               type="text"
               value=""
             />

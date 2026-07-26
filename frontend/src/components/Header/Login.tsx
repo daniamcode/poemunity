@@ -49,7 +49,7 @@ const Login = (): React.JSX.Element => {
                             type='text'
                             value={username}
                             name='Username'
-                            placeholder='Username'
+                            placeholder='Username or email'
                             onChange={event => setUsername(event.target.value)}
                         />
                     </div>

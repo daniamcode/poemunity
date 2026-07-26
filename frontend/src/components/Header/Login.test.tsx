@@ -34,7 +34,7 @@ describe('Login', () => {
 
     test('should render username input', () => {
         renderLogin()
-        const usernameInput = screen.getByPlaceholderText('Username')
+        const usernameInput = screen.getByPlaceholderText('Username or email')
         expect(usernameInput).toBeInTheDocument()
         expect(usernameInput).toHaveAttribute('type', 'text')
     })
@@ -67,7 +67,7 @@ describe('Login', () => {
 
     test('should update username input value when typing', () => {
         renderLogin()
-        const usernameInput = screen.getByPlaceholderText('Username') as HTMLInputElement
+        const usernameInput = screen.getByPlaceholderText('Username or email') as HTMLInputElement
         fireEvent.change(usernameInput, { target: { value: 'testuser' } })
         expect(usernameInput.value).toBe('testuser')
     })
@@ -85,7 +85,7 @@ describe('Login', () => {
         })
 
         renderLogin()
-        const usernameInput = screen.getByPlaceholderText('Username')
+        const usernameInput = screen.getByPlaceholderText('Username or email')
         const passwordInput = screen.getByPlaceholderText('Password')
         const form = screen.getByTestId('login')
 
@@ -104,7 +104,7 @@ describe('Login', () => {
         mockRouter.setCurrentUrl('/login?from=/profile')
 
         renderLogin()
-        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'john' } })
+        fireEvent.change(screen.getByPlaceholderText('Username or email'), { target: { value: 'john' } })
         fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'secret' } })
         fireEvent.submit(screen.getByTestId('login'))
 
@@ -118,7 +118,7 @@ describe('Login', () => {
         mockRouter.setCurrentUrl('/login?from=https://example.com')
 
         renderLogin()
-        fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'john' } })
+        fireEvent.change(screen.getByPlaceholderText('Username or email'), { target: { value: 'john' } })
         fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'secret' } })
         fireEvent.submit(screen.getByTestId('login'))
 
@@ -132,7 +132,7 @@ describe('Login', () => {
         })
 
         renderLogin()
-        const usernameInput = screen.getByPlaceholderText('Username')
+        const usernameInput = screen.getByPlaceholderText('Username or email')
         const passwordInput = screen.getByPlaceholderText('Password')
         const form = screen.getByTestId('login')
 

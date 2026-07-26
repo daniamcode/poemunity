@@ -75,6 +75,26 @@
             text-align: left;
         }
 
+        .register__hint {
+            width: 100%;
+            font-size: $fs-sm;
+            color: $color-error;
+            margin: $space-2 0 0;
+            text-align: left;
+        }
+
+        .register__help {
+            width: 100%;
+            font-size: $fs-sm;
+            color: $color-text-placeholder;
+            margin: $space-2 0 0;
+            text-align: left;
+
+            &--error {
+                color: $color-error;
+            }
+        }
+
         button {
             width: 100%;
             padding: 14px;
