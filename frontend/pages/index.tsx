@@ -15,9 +15,9 @@ export default function IndexPage({ initialData, baseUrl }: PageProps) {
     return (
         <>
             <SeoHead
-                title='Poemunity'
+                title='Your poem community'
                 description={
-                    'Discover, read and share poems. ' +
+                    'Poemunity is a poem community — discover, read and share poems. ' +
                     'Browse by genre, explore famous and community poets, and publish your own work.'
                 }
                 url={baseUrl}

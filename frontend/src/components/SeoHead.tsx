@@ -25,7 +25,7 @@ export function SeoHead({
     type = 'website',
     noIndex = false
 }: SeoHeadProps) {
-    const fullTitle = `${title} | ${SITE_NAME}`
+    const fullTitle = title.startsWith(SITE_NAME) ? title : `${title} | ${SITE_NAME}`
     const safeDesc = truncate(description)
 
     return (
