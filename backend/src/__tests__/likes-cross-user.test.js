@@ -163,7 +163,7 @@ describe('Like interactions — cross-user', () => {
     await request(app)
       .delete(`/api/v1/poem/${poem._id}`)
       .set('Authorization', `Bearer ${tokenA}`)
-      .expect(204)
+      .expect(200)
 
     expect(await Poem.findById(poem._id)).toBeNull()
   })

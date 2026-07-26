@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from '../store'
 import { ReduxOptions, ReduxCallbacks, Poem } from '../../typescript/interfaces'
 import { authorsUpserted, AuthorEntity } from '../reducers/authorEntitiesReducers'
 import { poemsUpserted, poemUpserted } from '../reducers/poemEntitiesReducers'
+import { RankItem } from '../../utils/getRanking'
 
 // Extract the poems array from either fulfilled payload shape: a plain Poem[]
 // (RANKING) or a paginated { poems, ... } object (the rest).
@@ -261,8 +262,8 @@ interface InsertPoemIntoCachesProps {
 }
 
 // Create: register the new poem as an entity and insert its id at the front of
-// the user-facing paginated lists, bumping their totals. (Ranking is computed
-// server-side now, so it refreshes on its next fetch rather than being patched.)
+// the user-facing paginated lists, bumping their totals. (Ranking/top-authors are
+// server-computed aggregates — the caller refreshes them via refreshAggregates.)
 export function insertPoemIntoCaches({ response }: InsertPoemIntoCachesProps) {
     return function dispatcher(dispatch: AppDispatch) {
         if (!response?.id) {
@@ -283,5 +284,45 @@ export function insertPoemIntoCaches({ response }: InsertPoemIntoCachesProps) {
 
         insertFront(ACTIONS.POEMS_LIST, (state as any).poemsListQuery)
         insertFront(ACTIONS.MY_POEMS, (state as any).myPoemsQuery)
+    }
+}
+
+interface AddPoemToFavouritesCacheProps {
+    poemId: string
+}
+
+// Liking adds the poem to the "my favourites" filtered view — symmetric to the
+// unlike drop (dropPoemFromFavouritesCache). Pure membership maintenance (no
+// entity data duplicated): only touch a populated cache, and never duplicate an
+// id that is already present.
+export function addPoemToFavouritesCache({ poemId }: AddPoemToFavouritesCacheProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const { myFavouritePoemsQuery } = store.getState() as RootState
+        const cache = myFavouritePoemsQuery as any
+        if (!Array.isArray(cache?.item)) {
+            return
+        }
+        const ids = (cache.item as (Poem | string)[]).map(idOf)
+        if (ids.includes(poemId)) {
+            return
+        }
+        emitPaginated(dispatch, ACTIONS.MY_FAVOURITE_POEMS, cache, [poemId, ...ids], (cache.total || 0) + 1)
+    }
+}
+
+// Keep the server-computed ranking cache fresh after a mutation WITHOUT an extra
+// round-trip: the like/create/delete responses already carry the freshly
+// recomputed top-N (the backend computes it in the same request), so we just
+// replace the cache with that authoritative list. No client-side scoring formula
+// and no re-sorting — ordering, tie-breaks and boundary crossings are all the
+// server's (the single source of truth). A response without a `ranking` field
+// (older backend / unrelated call) is a safe no-op.
+export function setRanking(ranking: RankItem[] | undefined | null) {
+    return function dispatcher(dispatch: AppDispatch) {
+        if (!Array.isArray(ranking)) {
+            return
+        }
+        const { fulfilledAction } = getTypes(ACTIONS.RANKING)
+        dispatch({ type: fulfilledAction, payload: ranking })
     }
 }

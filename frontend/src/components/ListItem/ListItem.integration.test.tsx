@@ -5,6 +5,7 @@ import thunk from 'redux-thunk'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
 import * as poemActions from '../../redux/actions/poemActions'
+import * as poemsActions from '../../redux/actions/poemsActions'
 import { poemUpdated } from '../../redux/reducers/poemEntitiesReducers'
 
 // Mock the actions
@@ -59,6 +60,13 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         // Mock the action creators to return actions with callbacks
         likePoemActionSpy = jest.spyOn(poemActions, 'likePoemAction')
+
+        // The like success path also refreshes the ranking (from the response) and
+        // keeps the favourites cache in sync — mock these thunks to plain actions so
+        // the mock store can dispatch them.
+        ;(poemsActions.setRanking as jest.Mock).mockReturnValue({ type: 'SET_RANKING' })
+        ;(poemsActions.addPoemToFavouritesCache as jest.Mock).mockReturnValue({ type: 'ADD_FAVOURITE' })
+        ;(poemsActions.dropPoemFromFavouritesCache as jest.Mock).mockReturnValue({ type: 'DROP_FAVOURITE' })
     })
 
     const renderWithProviders = (component: React.ReactElement) => {
@@ -145,8 +153,8 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         const callArgs = likePoemActionSpy.mock.calls[0][0]
         const successCallback = callArgs.callbacks.success
 
-        // Call the success callback
-        successCallback()
+        // Call the success callback with the server response (carries the ranking).
+        successCallback({ ranking: [] })
 
         // Single source of truth: exactly one poemUpdated with the user added to
         // the likes array — every view re-reads that entity, no per-cache patching.
@@ -154,6 +162,8 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         expect(actions).toContainEqual(
             poemUpdated({ id: 'poem-123', changes: { likes: ['user-1', 'user-2', 'user-456'] } })
         )
+        // The ranking is refreshed from the response (server is the source of truth).
+        expect(poemsActions.setRanking).toHaveBeenCalledWith([])
     })
 
     test('should update UI when poem prop changes from not liked to liked', () => {

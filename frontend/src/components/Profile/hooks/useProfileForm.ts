@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../../../redux/store'
 import { getPoemAction, savePoemAction } from '../../../redux/actions/poemActions'
-import { createPoemAction, insertPoemIntoCaches } from '../../../redux/actions/poemsActions'
+import { createPoemAction, insertPoemIntoCaches, setRanking } from '../../../redux/actions/poemsActions'
 import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
 import { manageError, manageSuccess } from '../../../utils/notifications'
 import { buildPoemData } from '../../../utils/poemUtils'
@@ -171,9 +171,17 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 context,
                 callbacks: {
                     success: response => {
+                        // The create response is the new poem with a `ranking` sibling
+                        // (freshly recomputed server-side). Split them: the poem goes
+                        // into the entity/list caches, the ranking into its own cache.
+                        // Stripping `ranking` keeps it off the poem entity.
+                        const { ranking, ...created } = response || {}
                         // Register the new poem entity and insert its id into the
                         // relevant list caches (single source of truth).
-                        dispatch(insertPoemIntoCaches({ response }))
+                        dispatch(insertPoemIntoCaches({ response: created }))
+                        // Adopt the server's authoritative ranking (author gained this
+                        // poem's points) — no client-side scoring.
+                        dispatch(setRanking(ranking))
                         manageSuccess('Poem created successfully')
                     },
                     error: () => {

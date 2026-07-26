@@ -5,7 +5,9 @@ import {
     getPoemsListAction,
     dropPoemFromCaches,
     dropPoemFromFavouritesCache,
-    insertPoemIntoCaches
+    insertPoemIntoCaches,
+    addPoemToFavouritesCache,
+    setRanking
 } from './poemsActions'
 import * as commonActions from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
@@ -795,7 +797,8 @@ describe('dropPoemFromCaches', () => {
         expect(byType['my-poems_fulfilled'].total).toBe(1)
         // authorPoems: id dropped
         expect(byType['author-poems_fulfilled'].poems).toEqual([])
-        // ranking is computed server-side now — the delete thunk does not touch it
+        // dropPoemFromCaches only maintains list membership; the ranking refresh is
+        // a separate concern dispatched by the delete flow (setRanking from the response).
         expect(byType['ranking_fulfilled']).toBeUndefined()
         // favourites did not contain the id -> not re-emitted
         expect(byType['my-favourite-poems_fulfilled']).toBeUndefined()
@@ -896,7 +899,90 @@ describe('insertPoemIntoCaches', () => {
         expect(byType['poems-list_fulfilled'].total).toBe(3)
         expect(byType['my-poems_fulfilled'].poems).toEqual(['new-1', '1'])
         expect(byType['my-poems_fulfilled'].total).toBe(2)
-        // ranking is server-computed now — create does not patch it
+        // insertPoemIntoCaches only maintains list membership; the ranking refresh is
+        // a separate concern dispatched by the create flow (setRanking from the response).
         expect(byType['ranking_fulfilled']).toBeUndefined()
+    })
+})
+
+describe('addPoemToFavouritesCache', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('inserts the id at the front of the favourites cache and bumps its total', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            myFavouritePoemsQuery: { item: ['1', '2'], page: 1, hasMore: false, total: 2, totalPages: 1 }
+        })
+
+        addPoemToFavouritesCache({ poemId: '9' })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.type).toBe('my-favourite-poems_fulfilled')
+        expect(action.payload.poems).toEqual(['9', '1', '2'])
+        expect(action.payload.total).toBe(3)
+    })
+
+    test('does nothing when the poem is already in the favourites cache', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            myFavouritePoemsQuery: { item: ['1', '9', '2'], page: 1, hasMore: false, total: 3, totalPages: 1 }
+        })
+
+        addPoemToFavouritesCache({ poemId: '9' })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+    })
+
+    test('does nothing when the favourites cache is not populated', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            myFavouritePoemsQuery: { item: undefined }
+        })
+
+        addPoemToFavouritesCache({ poemId: '9' })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+    })
+})
+
+describe('setRanking', () => {
+    let dispatch: AppDispatch
+
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('replaces the ranking cache with the server-provided list verbatim', () => {
+        // The backend recomputes and returns the fresh top-N; we adopt it as-is,
+        // preserving the server's exact order/tie-breaks (no client re-sort).
+        const serverRanking = [
+            { userId: 'u2', author: 'Bea', picture: 'b.jpg', points: 12 },
+            { userId: 'u1', author: 'Ana', picture: 'a.jpg', points: 10 }
+        ]
+
+        setRanking(serverRanking)(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.type).toBe('ranking_fulfilled')
+        expect(action.payload).toBe(serverRanking)
+    })
+
+    test('is a no-op when the response carries no ranking array', () => {
+        setRanking(undefined)(dispatch)
+        setRanking(null)(dispatch)
+        setRanking('nope' as any)(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
     })
 })

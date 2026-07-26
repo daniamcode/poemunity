@@ -60,6 +60,10 @@ describe('Poems API - Create and Update', () => {
       expect(response.body.author).toBe('Test User')
       expect(response.body.userId).toBe(testUser._id.toString())
       expect(response.body.picture).toBe('https://example.com/pic.jpg')
+      // The create response also carries the freshly recomputed ranking (the new
+      // poem credited its author) so the client refreshes the sidebar in the same
+      // round-trip — the poem fields stay top-level, ranking is a sibling.
+      expect(Array.isArray(response.body.ranking)).toBe(true)
     })
 
     test('should add poem to user poems array', async () => {

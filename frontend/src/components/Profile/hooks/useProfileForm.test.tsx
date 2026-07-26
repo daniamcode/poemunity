@@ -53,6 +53,9 @@ describe('useProfileForm', () => {
         ;(poemsActions.insertPoemIntoCaches as jest.Mock).mockReturnValue({
             type: 'INSERT_POEM_INTO_CACHES'
         })
+        ;(poemsActions.setRanking as jest.Mock).mockReturnValue({
+            type: 'SET_RANKING'
+        })
     })
 
     test('should initialize with empty poem data', () => {
@@ -528,7 +531,10 @@ describe('useProfileForm', () => {
     })
 
     test('should update cache after creating a poem successfully', () => {
-        const mockResponse = { id: 'new-poem-456', title: 'Created Poem' }
+        // The create response is the new poem with a `ranking` sibling.
+        const createdPoem = { id: 'new-poem-456', title: 'Created Poem', userId: 'author-1' }
+        const createdRanking = [{ userId: 'author-1', author: 'Ana', picture: 'a.jpg', points: 3 }]
+        const mockResponse = { ...createdPoem, ranking: createdRanking }
 
         ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
             return () => {
@@ -560,9 +566,12 @@ describe('useProfileForm', () => {
 
         // The new poem is registered as an entity and its id is inserted into the
         // relevant list caches by a single thunk (replaces the create-cache family).
+        // The poem is unwrapped from the { poem, ranking } envelope.
         expect(poemsActions.insertPoemIntoCaches).toHaveBeenCalledWith({
-            response: mockResponse
+            response: createdPoem
         })
+        // The server-recomputed ranking from the response is adopted verbatim.
+        expect(poemsActions.setRanking).toHaveBeenCalledWith(createdRanking)
     })
 
     test('should reset form after creating a poem', () => {

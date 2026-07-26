@@ -3,6 +3,7 @@ const poemRouter = require('express').Router()
 const Poem = require('../models/Poem')
 const findPoemById = require('../middleware/findPoemById')
 const userExtractor = require('../middleware/userExtractor')
+const { computeRanking } = require('../utils/ranking')
 
 const AUTHOR_FIELDS = 'name slug picture username'
 
@@ -37,13 +38,16 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
     poem.likes.push(req.userId)
   }
 
-  poem.save((error) => {
-    if (error) {
-      res.status(500).json({ error: 'Failed to update poem' })
-    } else {
-      res.json(poem)
-    }
-  })
+  try {
+    await poem.save()
+    // Embed the recomputed ranking so the client refreshes the sidebar in the same
+    // request — a like changes the poem author's points. Matches the sidebar's
+    // origin:'user' view (see GET /ranking).
+    const ranking = await computeRanking({ origin: 'user' })
+    res.json({ ...poem.toJSON(), ranking })
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update poem' })
+  }
 })
 
 const isOwnerOrAdmin = (req, res, next) => {
@@ -92,7 +96,11 @@ poemRouter.delete('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async
       })
     }
 
-    res.status(204).end()
+    // Return the recomputed ranking (the author lost this poem's points) so the
+    // client refreshes the sidebar without a second call. This replaces the old
+    // 204 No Content. Matches the sidebar's origin:'user' view (see GET /ranking).
+    const ranking = await computeRanking({ origin: 'user' })
+    res.json({ ranking })
   } catch (error) {
     return res.status(404).json({
       error: 'poem not found or not deleted'

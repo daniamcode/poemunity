@@ -5,6 +5,7 @@ const Author = require('../models/Author')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 const { generatePoemSlug } = require('../utils/slugUtils')
+const { computeRanking } = require('../utils/ranking')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
 const ORDER_BY_DATE = 'date'
@@ -97,54 +98,7 @@ poemsRouter.get('/ranking', async (req, res) => {
     if (Number.isNaN(poemPoints) || Number.isNaN(likePoints) || Number.isNaN(limit) || limit < 1) {
       return res.status(400).json({ error: 'Invalid ranking parameters' })
     }
-    const effectiveLimit = Math.min(limit, 100)
-
-    const match = {}
-    if (req.query.origin) {
-      match.origin = req.query.origin
-    }
-
-    const ranking = await Poem.aggregate([
-      { $match: match },
-      {
-        $group: {
-          _id: '$authorId',
-          poemsCount: { $sum: 1 },
-          totalLikes: { $sum: { $size: { $ifNull: ['$likes', []] } } }
-        }
-      },
-      {
-        $addFields: {
-          points: {
-            $add: [
-              { $multiply: ['$poemsCount', poemPoints] },
-              { $multiply: ['$totalLikes', likePoints] }
-            ]
-          }
-        }
-      },
-      { $sort: { points: -1 } },
-      { $limit: effectiveLimit },
-      {
-        $lookup: {
-          from: 'authors',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'author'
-        }
-      },
-      { $unwind: '$author' },
-      {
-        $project: {
-          _id: 0,
-          userId: { $toString: '$_id' },
-          author: { $ifNull: ['$author.name', '$author.username'] },
-          picture: '$author.picture',
-          authorSlug: '$author.slug',
-          points: 1
-        }
-      }
-    ])
+    const ranking = await computeRanking({ poemPoints, likePoints, limit, origin: req.query.origin })
 
     res.json(ranking)
   } catch (error) {
@@ -261,6 +215,11 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
     author.poems = author.poems.concat(savedPoem._id)
     await author.save()
 
+    // Embed the freshly recomputed ranking so the client updates the sidebar in
+    // the same round-trip (the new poem added POEM_POINTS to its author). Matches
+    // the sidebar's origin:'user' view — see GET /ranking.
+    const ranking = await computeRanking({ origin: 'user' })
+
     if (isLegacyUser) {
       // populate won't cross collections; build response manually
       const poemObj = savedPoem.toJSON()
@@ -270,11 +229,11 @@ poemsRouter.post('/', userExtractor, async (req, res) => {
       poemObj.userId = String(author._id)
       poemObj.authorSlug = author.slug
       delete poemObj.authorId
-      return res.status(201).json(poemObj)
+      return res.status(201).json({ ...poemObj, ranking })
     }
 
     const populated = await savedPoem.populate('authorId', AUTHOR_FIELDS)
-    res.status(201).json(populated)
+    res.status(201).json({ ...populated.toJSON(), ranking })
   } catch (error) {
     console.error('Error saving poem:', error)
     res.status(500).json({ error: 'Failed to save poem' })

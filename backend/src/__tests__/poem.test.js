@@ -153,6 +153,9 @@ describe('Poem API', () => {
 
       expect(response.body.likes).toContain(testUser._id.toString())
       expect(response.body.likes).toHaveLength(1)
+      // The like response now also carries the freshly recomputed ranking so the
+      // client refreshes the sidebar in the same round-trip (no second call).
+      expect(Array.isArray(response.body.ranking)).toBe(true)
     })
 
     test('should unlike a poem when user has already liked it', async () => {
@@ -582,10 +585,14 @@ describe('Poem API', () => {
         date: new Date()
       })
 
-      await request(app)
+      const response = await request(app)
         .delete(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(204)
+        .expect(200)
+
+      // Delete now returns the recomputed ranking (replaces the old 204) so the
+      // client can refresh the sidebar without a second request.
+      expect(Array.isArray(response.body.ranking)).toBe(true)
     })
 
     test('should not find poem after deletion', async () => {
@@ -603,7 +610,7 @@ describe('Poem API', () => {
       await request(app)
         .delete(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(204)
+        .expect(200)
 
       const deletedPoem = await Poem.findById(poem._id)
       expect(deletedPoem).toBeNull()
@@ -674,7 +681,7 @@ describe('Poem API', () => {
       await request(app)
         .delete(`/api/v1/poem/${poem1._id}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(204)
+        .expect(200)
 
       const remainingPoem = await Poem.findById(poem2._id)
       expect(remainingPoem).toBeDefined()
@@ -698,7 +705,7 @@ describe('Poem API', () => {
       await request(app)
         .delete(`/api/v1/poem/${poemId}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(204)
+        .expect(200)
 
       const poemCount = await Poem.countDocuments({ _id: poemId })
       expect(poemCount).toBe(0)
@@ -766,7 +773,7 @@ describe('Poem API', () => {
       await request(app)
         .delete(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .expect(204)
+        .expect(200)
 
       delete process.env[adminEnvKey]
       const deleted = await Poem.findById(poem._id)
