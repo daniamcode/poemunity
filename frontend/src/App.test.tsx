@@ -30,7 +30,10 @@ describe('App', () => {
                 </Provider>
             )
             expect(poemsActions.getRankingAction).toHaveBeenCalledTimes(1)
-            expect(poemsActions.getRankingAction).toHaveBeenCalledWith({ params: { origin: 'user' } })
+            // Scoring weights travel to the server-side aggregation as params.
+            expect(poemsActions.getRankingAction).toHaveBeenCalledWith({
+                params: { origin: 'user', poemPoints: 3, likePoints: 1, limit: 10 }
+            })
         })
     })
 

@@ -4,6 +4,7 @@ import { useAppDispatch } from './redux/store'
 import store from './redux/store'
 import { getRankingAction } from './redux/actions/poemsActions'
 import { authorUpserted } from './redux/reducers/authorEntitiesReducers'
+import { POEM_POINTS, LIKE_POINTS } from './data/constants'
 import { slugify } from './utils/urlUtils'
 import type { ServerUser } from './lib/serverApi'
 
@@ -51,7 +52,11 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
     useEffect(() => {
         const rankingState = store.getState().rankingQuery
         if (!rankingState.item && !rankingState.isFetching) {
-            dispatch(getRankingAction({ params: { origin: 'user' } }))
+            // Weights stay defined on the frontend and travel to the server-side
+            // aggregation as params, so tuning them needs no backend deploy.
+            dispatch(getRankingAction({
+                params: { origin: 'user', poemPoints: POEM_POINTS, likePoints: LIKE_POINTS, limit: 10 }
+            }))
         }
     }, [dispatch])
 

@@ -8,6 +8,19 @@ jest.mock('../../redux/actions/poemsActions')
 
 const mockStore = configureStore([])
 
+// The backend now returns a ready-to-render ranking (RankItem[]); the component
+// no longer computes anything from poems, it just renders these in order.
+const rankItem = (n: number, points: number) => ({
+    author: `Author ${n}`,
+    picture: `pic-${n}.jpg`,
+    authorSlug: `author-${n}`,
+    points
+})
+
+const rankingState = (item: any[], overrides: object = {}) => ({
+    rankingQuery: { isFetching: false, isError: false, item, ...overrides }
+})
+
 const renderRanking = (store: ReturnType<typeof mockStore>) =>
     render(
         <Provider store={store}>
@@ -64,30 +77,10 @@ describe('Ranking Component - Top 10', () => {
         expect(store.getActions()).toHaveLength(0)
     })
 
-    test('should display only top 10 users in ranking', () => {
-        const mockPoems = Array.from({ length: 15 }, (_, i) => ({
-            id: `${i + 1}`,
-            title: `Poem ${i + 1}`,
-            author: `Author ${i + 1}`,
-            userId: `user-${i + 1}`,
-            picture: `pic-${i + 1}.jpg`,
-            likes: Array(i).fill('like'),
-            poem: 'Content',
-            date: new Date().toISOString(),
-            genre: 'test',
-            origin: 'user'
-        }))
+    test('should display only top 10 entries from the ranking', () => {
+        const ranking = Array.from({ length: 15 }, (_, i) => rankItem(i + 1, 100 - i))
 
-        store = mockStore({
-            rankingQuery: {
-                isFetching: false,
-                isError: false,
-                item: mockPoems,
-                page: 1,
-                hasMore: false,
-                total: 15
-            }
-        })
+        store = mockStore(rankingState(ranking))
 
         renderRanking(store)
 
@@ -97,66 +90,37 @@ describe('Ranking Component - Top 10', () => {
         expect(screen.getAllByRole('listitem')).toHaveLength(rankingItems.length)
     })
 
-    test('should render author name in ranking list', () => {
-        const mockPoems = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                author: 'Author 1',
-                userId: 'user-1',
-                picture: 'pic.jpg',
-                likes: ['user-2', 'user-3'],
-                poem: 'Content',
-                date: new Date().toISOString(),
-                genre: 'test',
-                origin: 'user'
-            }
-        ]
-
-        store = mockStore({
-            rankingQuery: {
-                isFetching: false,
-                isError: false,
-                item: mockPoems,
-                page: 1,
-                hasMore: false,
-                total: 1
-            }
-        })
+    test('renders the server-computed author name and points', () => {
+        store = mockStore(rankingState([rankItem(1, 42)]))
 
         renderRanking(store)
 
         expect(screen.getByText('Author 1')).toBeInTheDocument()
+        // Points come straight from the backend — the component does not recompute.
+        expect(screen.getByText('42 pts')).toBeInTheDocument()
     })
 
-    test('should display only top 10 even with 100 poems', () => {
-        const mockPoems = Array.from({ length: 100 }, (_, i) => ({
-            id: `${i + 1}`,
-            title: `Poem ${i + 1}`,
-            author: `Author ${i + 1}`,
-            userId: `user-${i + 1}`,
-            picture: `pic-${i + 1}.jpg`,
-            likes: Array(i % 10).fill('like'),
-            poem: 'Content',
-            date: new Date().toISOString(),
-            genre: 'test',
-            origin: 'user'
-        }))
+    test('preserves the backend ordering (does not re-sort)', () => {
+        // Deliberately NOT in points order: the component must render as given.
+        const ranking = [rankItem(1, 10), rankItem(2, 99), rankItem(3, 50)]
 
-        store = mockStore({
-            rankingQuery: {
-                isFetching: false,
-                isError: false,
-                item: mockPoems,
-                page: undefined,
-                hasMore: undefined,
-                total: undefined
-            }
-        })
+        store = mockStore(rankingState(ranking))
 
         renderRanking(store)
 
-        const rankingItems = screen.getAllByRole('link')
-        expect(rankingItems.length).toBeLessThanOrEqual(10)
+        const names = screen.getAllByText(/^Author \d+$/).map(el => el.textContent)
+        expect(names).toEqual(['Author 1', 'Author 2', 'Author 3'])
+    })
+
+    test('renders the retry button and refetches on error', () => {
+        store = mockStore(rankingState([], { isError: true }))
+
+        renderRanking(store)
+
+        const retry = screen.getByRole('button', { name: /try again/i })
+        retry.click()
+        expect(poemsActions.getRankingAction).toHaveBeenCalledWith({
+            params: { origin: 'user', poemPoints: 3, likePoints: 1, limit: 10 }
+        })
     })
 })

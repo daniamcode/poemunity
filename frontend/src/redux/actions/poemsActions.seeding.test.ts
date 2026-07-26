@@ -1,4 +1,4 @@
-import { getRankingAction, getPoemsListAction } from './poemsActions'
+import { getPoemsListAction } from './poemsActions'
 import * as commonActions from './commonActions'
 import { authorsUpserted } from '../reducers/authorEntitiesReducers'
 import { poemsUpserted } from '../reducers/poemEntitiesReducers'
@@ -59,7 +59,7 @@ describe('poem fetches seed the authorEntities store', () => {
     })
 
     test('plain array payload (Poem[]) also seeds authors', () => {
-        const dispatch = seedFrom(getRankingAction({ params: {}, options: { fetch: true } }), [poemA])
+        const dispatch = seedFrom(getPoemsListAction({ params: {}, options: { fetch: true } }), [poemA])
 
         expect(dispatch).toHaveBeenCalledWith(
             authorsUpserted([{ id: 'author-1', name: 'Jane Doe', picture: 'jane.jpg', slug: 'jane-doe', type: 'user' }])
@@ -67,13 +67,13 @@ describe('poem fetches seed the authorEntities store', () => {
     })
 
     test('empty / missing poems does not dispatch a seed', () => {
-        const dispatchEmpty = seedFrom(getRankingAction({ params: {}, options: { fetch: true } }), [])
+        const dispatchEmpty = seedFrom(getPoemsListAction({ params: {}, options: { fetch: true } }), [])
         const seededEmpty = dispatchEmpty.mock.calls.some(
             (c: any[]) => c[0]?.type === authorsUpserted([]).type
         )
         expect(seededEmpty).toBe(false)
 
-        const dispatchNull = seedFrom(getRankingAction({ params: {}, options: { fetch: true } }), null)
+        const dispatchNull = seedFrom(getPoemsListAction({ params: {}, options: { fetch: true } }), null)
         const seededNull = dispatchNull.mock.calls.some(
             (c: any[]) => c[0]?.type === authorsUpserted([]).type
         )
@@ -90,7 +90,7 @@ describe('poem fetches seed the authorEntities store', () => {
     })
 
     test('plain array payload also upserts the full poems into poemEntities', () => {
-        const dispatch = seedFrom(getRankingAction({ params: {}, options: { fetch: true } }), [poemA])
+        const dispatch = seedFrom(getPoemsListAction({ params: {}, options: { fetch: true } }), [poemA])
 
         expect(dispatch).toHaveBeenCalledWith(poemsUpserted([poemA]))
     })
@@ -109,7 +109,7 @@ describe('poem fetches seed the authorEntities store', () => {
         const userSuccess = jest.fn()
         const spy = jest.spyOn(commonActions, 'getAction').mockImplementation(() => undefined as any)
 
-        getRankingAction({ params: {}, options: { fetch: true }, callbacks: { success: userSuccess } })(dispatch)
+        getPoemsListAction({ params: {}, options: { fetch: true }, callbacks: { success: userSuccess } })(dispatch)
         const wrapped = spy.mock.calls[0][0].callbacks!
         wrapped.success!([poemA])
 

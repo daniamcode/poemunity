@@ -423,42 +423,32 @@ describe('myFavouritePoemsQuery - Pagination', () => {
     })
 })
 
-describe('rankingQuery - Non-Paginated', () => {
+describe('rankingQuery - Non-Paginated (server-computed RankItem[])', () => {
     const initialState = {
         isFetching: false,
         isError: false,
         item: undefined
     }
 
-    test('should handle RANKING_fulfilled with all poems array', () => {
-        const poems = [
-            createMockPoem('1', 'Ranked Poem 1'),
-            createMockPoem('2', 'Ranked Poem 2'),
-            createMockPoem('3', 'Ranked Poem 3')
-        ]
-        const action = {
-            type: `${ACTIONS.RANKING}_fulfilled`,
-            payload: poems
-        }
-
-        const newState = rankingQuery(initialState, action)
-
-        expect(newState.item).toEqual(poems.map(p => p.id))
-        expect(newState.isFetching).toBe(false)
-        expect(newState.item).toHaveLength(3)
+    const rankItem = (author: string, points: number) => ({
+        author,
+        picture: `${author}.jpg`,
+        authorSlug: author.toLowerCase(),
+        points
     })
 
-    test('should handle large array of poems for ranking calculation', () => {
-        const poems = Array.from({ length: 100 }, (_, i) => createMockPoem(`${i}`, `Poem ${i}`))
+    test('stores the server-computed ranking array verbatim (no id conversion)', () => {
+        const ranking = [rankItem('Ada', 30), rankItem('Grace', 22), rankItem('Alan', 10)]
         const action = {
             type: `${ACTIONS.RANKING}_fulfilled`,
-            payload: poems
+            payload: ranking
         }
 
         const newState = rankingQuery(initialState, action)
 
-        // Should store all poems for accurate ranking calculation
-        expect(newState.item).toHaveLength(100)
+        // The backend already ranked and ordered these — the cache keeps them as-is.
+        expect(newState.item).toEqual(ranking)
+        expect(newState.item).toHaveLength(3)
         expect(newState.isFetching).toBe(false)
     })
 

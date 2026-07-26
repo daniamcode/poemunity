@@ -2,6 +2,7 @@ import { Poem } from '../../typescript/interfaces'
 import { commonReducer, INITIAL } from './commonReducers'
 import { StateItem } from '../../typescript/interfaces'
 import { getTypes } from '../actions/commonActions'
+import { RankItem } from '../../utils/getRanking'
 
 export const ACTIONS = {
     POEMS_LIST: 'poems-list',
@@ -207,19 +208,14 @@ export function myFavouritePoemsQuery(state: PaginatedStateItem = INITIAL, actio
     }
 }
 
-// Ranking query receives all poems (no pagination) for accurate calculation
-// TODO: In the future, move ranking calculation to backend to avoid fetching all poems
-export function rankingQuery(state: StateItem<string[]> = INITIAL, action: Action): StateItem<string[]> {
-    const result = commonReducer({
+// Ranking is now computed server-side: the backend returns a ready-to-render
+// array of ranked authors (RankItem[]), so the cache stores it verbatim.
+export function rankingQuery(state: StateItem<RankItem[]> = INITIAL, action: Action): StateItem<RankItem[]> {
+    return commonReducer({
         state,
         action,
         actionType: ACTIONS?.RANKING
-    }) as StateItem<string[]>
-
-    if (result.item !== state.item && Array.isArray(result.item)) {
-        return Object.assign({}, result, { item: toIds(result.item as (Poem | string)[]) })
-    }
-    return result
+    }) as StateItem<RankItem[]>
 }
 
 export function createPoemQuery(state: StateItem<Poem> = INITIAL, action: Action): StateItem<Poem> {

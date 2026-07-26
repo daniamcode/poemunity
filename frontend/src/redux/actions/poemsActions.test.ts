@@ -777,8 +777,7 @@ describe('dropPoemFromCaches', () => {
             poemsListQuery: { item: ['1', '2', '3'], page: 1, hasMore: false, total: 3, totalPages: 1 },
             myPoemsQuery: { item: ['2', '5'], page: 1, hasMore: false, total: 2, totalPages: 1 },
             myFavouritePoemsQuery: { item: ['9'], page: 1, hasMore: false, total: 1, totalPages: 1 },
-            authorPoemsQuery: { item: ['2'], page: 1, hasMore: false, total: 1, totalPages: 1 },
-            rankingQuery: { item: ['2', '3'] }
+            authorPoemsQuery: { item: ['2'], page: 1, hasMore: false, total: 1, totalPages: 1 }
         })
 
         dropPoemFromCaches({ poemId: '2' })(dispatch)
@@ -796,8 +795,8 @@ describe('dropPoemFromCaches', () => {
         expect(byType['my-poems_fulfilled'].total).toBe(1)
         // authorPoems: id dropped
         expect(byType['author-poems_fulfilled'].poems).toEqual([])
-        // plain cache (ranking): id dropped, payload is a bare id-array
-        expect(byType['ranking_fulfilled']).toEqual(['3'])
+        // ranking is computed server-side now — the delete thunk does not touch it
+        expect(byType['ranking_fulfilled']).toBeUndefined()
         // favourites did not contain the id -> not re-emitted
         expect(byType['my-favourite-poems_fulfilled']).toBeUndefined()
     })
@@ -807,8 +806,7 @@ describe('dropPoemFromCaches', () => {
             poemsListQuery: { item: ['1', '3'], page: 1, hasMore: false, total: 2, totalPages: 1 },
             myPoemsQuery: { item: undefined },
             myFavouritePoemsQuery: { item: undefined },
-            authorPoemsQuery: { item: undefined },
-            rankingQuery: { item: undefined }
+            authorPoemsQuery: { item: undefined }
         })
 
         dropPoemFromCaches({ poemId: '2' })(dispatch)
@@ -876,11 +874,10 @@ describe('insertPoemIntoCaches', () => {
         jest.restoreAllMocks()
     })
 
-    test('upserts the entity and inserts the id at the front of user lists / end of aggregate lists', () => {
+    test('upserts the entity and inserts the id at the front of the user lists', () => {
         ;(store.getState as jest.Mock).mockReturnValue({
             poemsListQuery: { item: ['1', '2'], page: 1, hasMore: false, total: 2, totalPages: 1 },
-            myPoemsQuery: { item: ['1'], page: 1, hasMore: false, total: 1, totalPages: 1 },
-            rankingQuery: { item: ['1'] }
+            myPoemsQuery: { item: ['1'], page: 1, hasMore: false, total: 1, totalPages: 1 }
         })
 
         insertPoemIntoCaches({ response: newPoem as any })(dispatch)
@@ -899,7 +896,7 @@ describe('insertPoemIntoCaches', () => {
         expect(byType['poems-list_fulfilled'].total).toBe(3)
         expect(byType['my-poems_fulfilled'].poems).toEqual(['new-1', '1'])
         expect(byType['my-poems_fulfilled'].total).toBe(2)
-        // aggregate list (ranking): new id appended
-        expect(byType['ranking_fulfilled']).toEqual(['1', 'new-1'])
+        // ranking is server-computed now — create does not patch it
+        expect(byType['ranking_fulfilled']).toBeUndefined()
     })
 })

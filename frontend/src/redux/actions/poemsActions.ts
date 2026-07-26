@@ -78,15 +78,17 @@ interface GetRankingActionProps {
     callbacks?: ReduxCallbacks
 }
 
+// Ranking is computed server-side (see backend GET /poems/ranking): the response
+// is a ready-to-render RankItem[], so there is no poem/author seeding to do here.
 export function getRankingAction({ params, options, callbacks }: GetRankingActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.RANKING,
-            url: API_ENDPOINTS.POEMS,
+            url: API_ENDPOINTS.POEMS_RANKING,
             dispatch,
             params,
             options,
-            callbacks: withAuthorSeeding(dispatch, callbacks)
+            callbacks
         })
     }
 }
@@ -193,10 +195,6 @@ const PAGINATED_CACHES: { actionType: string; key: keyof RootState }[] = [
     { actionType: ACTIONS.AUTHOR_POEMS, key: 'authorPoemsQuery' }
 ]
 
-const PLAIN_CACHES: { actionType: string; key: keyof RootState }[] = [
-    { actionType: ACTIONS.RANKING, key: 'rankingQuery' }
-]
-
 // Re-emit a paginated cache's fulfilled action with an explicit id-array so the
 // reducer's cache-update path (same page, length <=) replaces in place.
 function emitPaginated(dispatch: AppDispatch, actionType: string, cache: any, ids: string[], total?: number) {
@@ -211,11 +209,6 @@ function emitPaginated(dispatch: AppDispatch, actionType: string, cache: any, id
             totalPages: cache.totalPages
         }
     })
-}
-
-function emitPlain(dispatch: AppDispatch, actionType: string, ids: string[]) {
-    const { fulfilledAction } = getTypes(actionType)
-    dispatch({ type: fulfilledAction, payload: ids })
 }
 
 interface DropPoemFromCachesProps {
@@ -238,18 +231,6 @@ export function dropPoemFromCaches({ poemId }: DropPoemFromCachesProps) {
                 return
             }
             emitPaginated(dispatch, actionType, cache, kept, Math.max(0, (cache.total || 0) - 1))
-        })
-
-        PLAIN_CACHES.forEach(({ actionType, key }) => {
-            const cache = state[key] as any
-            if (!Array.isArray(cache?.item)) {
-                return
-            }
-            const kept = (cache.item as (Poem | string)[]).map(idOf).filter(id => id !== poemId)
-            if (kept.length === cache.item.length) {
-                return
-            }
-            emitPlain(dispatch, actionType, kept)
         })
     }
 }
@@ -279,9 +260,9 @@ interface InsertPoemIntoCachesProps {
     response: Poem
 }
 
-// Create: register the new poem as an entity and insert its id into the caches
-// that should surface it (front of the user-facing lists, appended to the
-// aggregate ranking/all lists), bumping paginated totals.
+// Create: register the new poem as an entity and insert its id at the front of
+// the user-facing paginated lists, bumping their totals. (Ranking is computed
+// server-side now, so it refreshes on its next fetch rather than being patched.)
 export function insertPoemIntoCaches({ response }: InsertPoemIntoCachesProps) {
     return function dispatcher(dispatch: AppDispatch) {
         if (!response?.id) {
@@ -302,15 +283,5 @@ export function insertPoemIntoCaches({ response }: InsertPoemIntoCachesProps) {
 
         insertFront(ACTIONS.POEMS_LIST, (state as any).poemsListQuery)
         insertFront(ACTIONS.MY_POEMS, (state as any).myPoemsQuery)
-
-        // Ranking / all-poems are plain aggregate lists (no pagination window).
-        PLAIN_CACHES.forEach(({ actionType, key }) => {
-            const cache = (state as any)[key]
-            if (!Array.isArray(cache?.item)) {
-                return
-            }
-            const ids = (cache.item as (Poem | string)[]).map(idOf).filter(id => id !== poemId)
-            emitPlain(dispatch, actionType, [...ids, poemId])
-        })
     }
 }

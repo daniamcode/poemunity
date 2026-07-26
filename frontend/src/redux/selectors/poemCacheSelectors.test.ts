@@ -1,6 +1,5 @@
 import {
     selectPoemsListPoems,
-    selectRankingPoems,
     selectMyFavouritePoemsPoems,
     selectAuthorPoemsPoems
 } from './poemCacheSelectors'
@@ -32,13 +31,11 @@ describe('poem cache selectors — resolve id-arrays through poemEntities', () =
             { p1: liked, p2 },
             {
                 poemsListQuery: { item: ['p1', 'p2'] },
-                rankingQuery: { item: ['p1'] },
                 authorPoemsQuery: { item: ['p1'] }
             }
         )
         // Same updated entity surfaces everywhere — no per-cache patching.
         expect(selectPoemsListPoems(state)[0].likes).toEqual(['u1', 'u2'])
-        expect(selectRankingPoems(state)[0].likes).toEqual(['u1', 'u2'])
         expect(selectAuthorPoemsPoems(state)[0].likes).toEqual(['u1', 'u2'])
     })
 

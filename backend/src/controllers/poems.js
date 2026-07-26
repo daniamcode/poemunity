@@ -84,6 +84,75 @@ async function findPoems (filter, { orderBy, skip, limit } = {}) {
   return query
 }
 
+// Author ranking, computed in the database instead of shipping every poem to the
+// client. Points per author = poemsCount * poemPoints + totalLikes * likePoints.
+// The weights are passed by the client (defaults 3 / 1) so tuning them needs no
+// backend deploy. Declared before '/' so the literal path wins the route match.
+poemsRouter.get('/ranking', async (req, res) => {
+  try {
+    const poemPoints = req.query.poemPoints !== undefined ? Number(req.query.poemPoints) : 3
+    const likePoints = req.query.likePoints !== undefined ? Number(req.query.likePoints) : 1
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : 10
+
+    if (Number.isNaN(poemPoints) || Number.isNaN(likePoints) || Number.isNaN(limit) || limit < 1) {
+      return res.status(400).json({ error: 'Invalid ranking parameters' })
+    }
+    const effectiveLimit = Math.min(limit, 100)
+
+    const match = {}
+    if (req.query.origin) {
+      match.origin = req.query.origin
+    }
+
+    const ranking = await Poem.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: '$authorId',
+          poemsCount: { $sum: 1 },
+          totalLikes: { $sum: { $size: { $ifNull: ['$likes', []] } } }
+        }
+      },
+      {
+        $addFields: {
+          points: {
+            $add: [
+              { $multiply: ['$poemsCount', poemPoints] },
+              { $multiply: ['$totalLikes', likePoints] }
+            ]
+          }
+        }
+      },
+      { $sort: { points: -1 } },
+      { $limit: effectiveLimit },
+      {
+        $lookup: {
+          from: 'authors',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'author'
+        }
+      },
+      { $unwind: '$author' },
+      {
+        $project: {
+          _id: 0,
+          userId: { $toString: '$_id' },
+          author: { $ifNull: ['$author.name', '$author.username'] },
+          picture: '$author.picture',
+          authorSlug: '$author.slug',
+          points: 1
+        }
+      }
+    ])
+
+    res.json(ranking)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 poemsRouter.get('/', async (req, res) => {
   try {
     const filter = {}

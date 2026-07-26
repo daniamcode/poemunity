@@ -1,6 +1,6 @@
-import { useState, useEffect, memo } from 'react'
+import { memo } from 'react'
 import Link from 'next/link'
-import { getRanking, RankItem } from '../../utils/getRanking'
+import { RankItem } from '../../utils/getRanking'
 import CircularProgress from '../CircularIndeterminate'
 import {
     RANKING_TITLE,
@@ -10,35 +10,21 @@ import {
 } from '../../data/constants'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { Poem } from '../../typescript/interfaces'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
 import { getRankingAction } from '../../redux/actions/poemsActions'
-import { selectRankingPoems } from '../../redux/selectors/poemCacheSelectors'
+
+const EMPTY_RANK: RankItem[] = []
 
 function Ranking() {
-    interface RankingStates {
-        poems: Poem[]
-        rank: RankItem[]
-    }
-
-    const [poems, setPoems] = useState<RankingStates['poems']>([])
-    const [rank, setRank] = useState<RankingStates['rank']>([])
-
+    // Ranking is computed server-side; the cache holds a ready-to-render RankItem[].
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
-    // Ranking cache stores poem ids; resolve them to Poem[] via the entity store.
-    const rankingPoems = useSelector(selectRankingPoems)
+    const rank = (rankingQuery.item as RankItem[]) || EMPTY_RANK
     const dispatch = useAppDispatch()
 
-    useEffect(() => {
-        setPoems(rankingPoems)
-    }, [JSON.stringify(rankingPoems)])
-
-    useEffect(() => {
-        if (poems) {
-            setRank(getRanking(poems, POEM_POINTS, LIKE_POINTS))
-        }
-    }, [JSON.stringify([poems, POEM_POINTS, LIKE_POINTS])])
+    const retry = () => dispatch(getRankingAction({
+        params: { origin: 'user', poemPoints: POEM_POINTS, likePoints: LIKE_POINTS, limit: 10 }
+    }))
 
     if (rankingQuery.isFetching) {
         return <CircularProgress data-test='ranking__loading' />
@@ -48,7 +34,7 @@ function Ranking() {
         return (
             <div className='ranking__error' role='alert'>
                 <p>Could not load the ranking.</p>
-                <button onClick={() => dispatch(getRankingAction({ params: { origin: 'user' } }))}>Try again</button>
+                <button onClick={retry}>Try again</button>
             </div>
         )
     }
