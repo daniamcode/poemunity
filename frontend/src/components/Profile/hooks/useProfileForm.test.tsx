@@ -5,6 +5,7 @@ import { useProfileForm } from './useProfileForm'
 import store from '../../../redux/store'
 import * as poemActions from '../../../redux/actions/poemActions'
 import * as poemsActions from '../../../redux/actions/poemsActions'
+import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
 import { manageSuccess, manageError } from '../../../utils/notifications'
 import React from 'react'
 import mockRouter from 'next-router-mock'
@@ -49,26 +50,8 @@ describe('useProfileForm', () => {
         ;(poemActions.getPoemAction as jest.Mock).mockReturnValue({ type: 'GET_POEM' })
         ;(poemActions.savePoemAction as jest.Mock).mockReturnValue({ type: 'SAVE_POEM' })
         ;(poemsActions.createPoemAction as jest.Mock).mockReturnValue({ type: 'CREATE_POEM' })
-        ;(poemsActions.updateAllPoemsCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_CACHE_AFTER_CREATE'
-        })
-        ;(poemsActions.updateMyPoemsCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_POEMS_CACHE_AFTER_CREATE'
-        })
-        ;(poemsActions.updatePoemsListCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEMS_LIST_CACHE_AFTER_CREATE'
-        })
-        ;(poemsActions.updateRankingCacheAfterCreatePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_RANKING_CACHE_AFTER_CREATE'
-        })
-        ;(poemsActions.updateAllPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_CACHE'
-        })
-        ;(poemsActions.updateMyPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_POEMS_CACHE'
-        })
-        ;(poemsActions.updatePoemsListCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEMS_LIST_CACHE'
+        ;(poemsActions.insertPoemIntoCaches as jest.Mock).mockReturnValue({
+            type: 'INSERT_POEM_INTO_CACHES'
         })
     })
 
@@ -277,7 +260,7 @@ describe('useProfileForm', () => {
         })
     })
 
-    test('should call all cache update actions when saving a poem', () => {
+    test('should merge edits into the single poem entity when saving', () => {
         const mockPoemQueryWithItem = {
             item: {
                 id: 'poem-123',
@@ -303,16 +286,7 @@ describe('useProfileForm', () => {
             }
         })
 
-        // Mock all cache update actions
-        ;(poemsActions.updateAllPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_CACHE'
-        })
-        ;(poemsActions.updateMyPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_POEMS_CACHE'
-        })
-        ;(poemsActions.updatePoemsListCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEMS_LIST_CACHE'
-        })
+        const dispatchSpy = jest.spyOn(store, 'dispatch')
 
         const { result } = renderHook(
             () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery),
@@ -335,30 +309,19 @@ describe('useProfileForm', () => {
             result.current.handleSend(mockEvent)
         })
 
-        // Verify all three cache update actions were called
-        expect(poemsActions.updateAllPoemsCacheAfterSavePoemAction).toHaveBeenCalledWith({
-            poem: expect.objectContaining({
-                title: 'Updated Poem',
-                poem: 'Updated content'
-            }),
-            poemId: 'poem-123'
-        })
+        // Single source of truth: one poemUpdated merges the edited fields into
+        // the entity; every view re-reads it (no per-cache patching).
+        expect(dispatchSpy).toHaveBeenCalledWith(
+            poemUpdated({
+                id: 'poem-123',
+                changes: expect.objectContaining({
+                    title: 'Updated Poem',
+                    poem: 'Updated content'
+                })
+            })
+        )
 
-        expect(poemsActions.updateMyPoemsCacheAfterSavePoemAction).toHaveBeenCalledWith({
-            poem: expect.objectContaining({
-                title: 'Updated Poem',
-                poem: 'Updated content'
-            }),
-            poemId: 'poem-123'
-        })
-
-        expect(poemsActions.updatePoemsListCacheAfterSavePoemAction).toHaveBeenCalledWith({
-            poem: expect.objectContaining({
-                title: 'Updated Poem',
-                poem: 'Updated content'
-            }),
-            poemId: 'poem-123'
-        })
+        dispatchSpy.mockRestore()
     })
 
     test('should call savePoemAction with correct parameters when editing', () => {
@@ -434,15 +397,7 @@ describe('useProfileForm', () => {
                 return Promise.resolve() // Return resolved promise to avoid unhandled rejection
             }
         })
-        ;(poemsActions.updateAllPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_CACHE'
-        })
-        ;(poemsActions.updateMyPoemsCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_POEMS_CACHE'
-        })
-        ;(poemsActions.updatePoemsListCacheAfterSavePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_POEMS_LIST_CACHE'
-        })
+        const dispatchSpy = jest.spyOn(store, 'dispatch')
 
         const { result } = renderHook(
             () => useProfileForm(mockContext, mockPoemQueryWithItem, mockPoemsListQuery),
@@ -462,10 +417,13 @@ describe('useProfileForm', () => {
             result.current.handleSend(mockEvent)
         })
 
-        // Cache updates should NOT have been called because save failed
-        expect(poemsActions.updateAllPoemsCacheAfterSavePoemAction).not.toHaveBeenCalled()
-        expect(poemsActions.updateMyPoemsCacheAfterSavePoemAction).not.toHaveBeenCalled()
-        expect(poemsActions.updatePoemsListCacheAfterSavePoemAction).not.toHaveBeenCalled()
+        // The entity must NOT be mutated because the save failed.
+        const dispatchedPoemUpdated = dispatchSpy.mock.calls.some(
+            ([action]: any[]) => action?.type === poemUpdated({ id: 'x', changes: {} }).type
+        )
+        expect(dispatchedPoemUpdated).toBe(false)
+
+        dispatchSpy.mockRestore()
     })
 
     test('should initialize from poemsListQuery cache when poemQuery is empty', () => {
@@ -600,7 +558,9 @@ describe('useProfileForm', () => {
             result.current.handleSend(mockEvent)
         })
 
-        expect(poemsActions.updateAllPoemsCacheAfterCreatePoemAction).toHaveBeenCalledWith({
+        // The new poem is registered as an entity and its id is inserted into the
+        // relevant list caches by a single thunk (replaces the create-cache family).
+        expect(poemsActions.insertPoemIntoCaches).toHaveBeenCalledWith({
             response: mockResponse
         })
     })

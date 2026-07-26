@@ -37,7 +37,8 @@ describe('poemsReducers - Pagination', () => {
 
         const newState = poemsListQuery(initialState, action)
 
-        expect(newState.item).toEqual(action.payload.poems)
+        // The cache stores poem ids; the full poems live in poemEntities.
+        expect(newState.item).toEqual(action.payload.poems.map((p: Poem) => p.id))
         expect(newState.isFetching).toBe(false)
         expect(newState).toHaveProperty('page', 1)
         expect(newState).toHaveProperty('hasMore', true)
@@ -48,7 +49,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1'), createMockPoem('2', 'Poem 2')],
+            item: ['1', '2'],
             page: 1,
             hasMore: true,
             total: 50
@@ -69,8 +70,8 @@ describe('poemsReducers - Pagination', () => {
         const newState = poemsListQuery(currentState, action)
 
         expect(newState.item).toHaveLength(4)
-        expect(newState.item?.[0].id).toBe('1')
-        expect(newState.item?.[2].id).toBe('3')
+        expect(newState.item?.[0]).toBe('1')
+        expect(newState.item?.[2]).toBe('3')
         expect(newState.page).toBe(2)
         expect(newState.hasMore).toBe(true)
     })
@@ -79,7 +80,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1')],
+            item: ['1'],
             page: 2,
             hasMore: true,
             total: 21
@@ -107,7 +108,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1'), createMockPoem('2', 'Poem 2')],
+            item: ['1', '2'],
             page: 2,
             hasMore: true,
             total: 50
@@ -155,7 +156,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1')],
+            item: ['1'],
             page: 1,
             hasMore: true
         }
@@ -182,7 +183,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1'), createMockPoem('2', 'Poem 2')],
+            item: ['1', '2'],
             page: 1,
             hasMore: true
         }
@@ -209,7 +210,7 @@ describe('poemsReducers - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Poem 1'), createMockPoem('2', 'Poem 2'), createMockPoem('3', 'Poem 3')],
+            item: ['1', '2', '3'],
             page: 1,
             hasMore: false,
             total: 3,
@@ -233,23 +234,18 @@ describe('poemsReducers - Pagination', () => {
 
         // Should replace with updated array (poem deleted)
         expect(newState.item).toHaveLength(2)
-        expect(newState.item?.[0].id).toBe('1')
-        expect(newState.item?.[1].id).toBe('3')
+        expect(newState.item?.[0]).toBe('1')
+        expect(newState.item?.[1]).toBe('3')
         expect(newState.total).toBe(2)
         // Should not have poem with id '2'
-        expect(newState.item?.find(p => p.id === '2')).toBeUndefined()
+        expect(newState.item?.find(id => id === '2')).toBeUndefined()
     })
 
     test('should handle cache update after deleting a poem on page 2', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [
-                createMockPoem('1', 'Poem 1'),
-                createMockPoem('2', 'Poem 2'),
-                createMockPoem('3', 'Poem 3'),
-                createMockPoem('4', 'Poem 4')
-            ],
+            item: ['1', '2', '3', '4'],
             page: 2,
             hasMore: false,
             total: 4,
@@ -274,7 +270,7 @@ describe('poemsReducers - Pagination', () => {
         // Should replace with updated array (not append because it's a cache update on same page)
         expect(newState.item).toHaveLength(3)
         expect(newState.total).toBe(3)
-        expect(newState.item?.find(p => p.id === '3')).toBeUndefined()
+        expect(newState.item?.find(id => id === '3')).toBeUndefined()
     })
 })
 
@@ -300,7 +296,8 @@ describe('myPoemsQuery - Pagination', () => {
 
         const newState = myPoemsQuery(initialState, action)
 
-        expect(newState.item).toEqual(action.payload.poems)
+        // The cache stores poem ids; the full poems live in poemEntities.
+        expect(newState.item).toEqual(action.payload.poems.map((p: Poem) => p.id))
         expect(newState.isFetching).toBe(false)
         expect(newState).toHaveProperty('page', 1)
         expect(newState).toHaveProperty('hasMore', true)
@@ -311,7 +308,7 @@ describe('myPoemsQuery - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'My Poem 1')],
+            item: ['1'],
             page: 1,
             hasMore: true,
             total: 15
@@ -340,7 +337,7 @@ describe('myPoemsQuery - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'My Poem 1')],
+            item: ['1'],
             page: 1,
             hasMore: true
         }
@@ -378,7 +375,8 @@ describe('myFavouritePoemsQuery - Pagination', () => {
 
         const newState = myFavouritePoemsQuery(initialState, action)
 
-        expect(newState.item).toEqual(action.payload.poems)
+        // The cache stores poem ids; the full poems live in poemEntities.
+        expect(newState.item).toEqual(action.payload.poems.map((p: Poem) => p.id))
         expect(newState.isFetching).toBe(false)
         expect(newState).toHaveProperty('page', 1)
         expect(newState).toHaveProperty('hasMore', false)
@@ -389,7 +387,7 @@ describe('myFavouritePoemsQuery - Pagination', () => {
         const currentState = {
             isFetching: false,
             isError: false,
-            item: [createMockPoem('1', 'Favorite 1')],
+            item: ['1'],
             page: 1,
             hasMore: true,
             total: 20
@@ -445,7 +443,7 @@ describe('rankingQuery - Non-Paginated', () => {
 
         const newState = rankingQuery(initialState, action)
 
-        expect(newState.item).toEqual(poems)
+        expect(newState.item).toEqual(poems.map(p => p.id))
         expect(newState.isFetching).toBe(false)
         expect(newState.item).toHaveLength(3)
     })

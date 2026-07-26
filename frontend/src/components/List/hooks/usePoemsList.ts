@@ -4,6 +4,8 @@ import { useAppDispatch, RootState } from '../../../redux/store'
 import { getPoemsListAction } from '../../../redux/actions/poemsActions'
 import { getTypes } from '../../../redux/actions/commonActions'
 import { ACTIONS } from '../../../redux/reducers/poemsReducers'
+import { poemsUpserted } from '../../../redux/reducers/poemEntitiesReducers'
+import { selectPoemsListPoems } from '../../../redux/selectors/poemCacheSelectors'
 import sortPoems from '../../../utils/sortPoems'
 import { ORDER_BY_LIKES, PAGINATION_LIMIT } from '../../../data/constants'
 import { Poem } from '../../../typescript/interfaces'
@@ -26,12 +28,16 @@ export interface UsePoemsListParams {
 export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsListParams) {
     const dispatch = useAppDispatch()
     const poemsListQuery = useSelector((state: RootState) => state.poemsListQuery)
+    // Cache stores poem ids; resolve them back to Poem[] via the entity store.
+    const resolvedPoems = useSelector(selectPoemsListPoems)
     const isSeeded = useRef(false)
     const effectiveOrderBy = orderBy || ORDER_BY_LIKES
 
     // On mount: seed store with SSR data (skip reset+fetch) or do normal reset
     useEffect(() => {
         if (initialData) {
+            // Seed the entity store first so the id-array resolves to full poems.
+            dispatch(poemsUpserted(initialData.poems))
             const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
             dispatch({ type: fulfilledAction, payload: initialData })
             isSeeded.current = true
@@ -63,8 +69,8 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
     }, [origin, genre, effectiveOrderBy, dispatch])
 
     const poems = (() => {
-        if (!poemsListQuery?.item?.length) return []
-        return sortPoems(effectiveOrderBy, [...poemsListQuery.item])
+        if (!resolvedPoems.length) return []
+        return sortPoems(effectiveOrderBy, [...resolvedPoems])
     })()
 
     const handleLoadMore = () => {
@@ -105,7 +111,7 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
         isLoading: poemsListQuery?.isFetching,
         isError: poemsListQuery?.isError || false,
         hasMore: poemsListQuery?.hasMore || false,
-        hasItems: (poemsListQuery?.item?.length ?? 0) > 0,
+        hasItems: resolvedPoems.length > 0,
         handleLoadMore,
         retry
     }

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { AppContext } from '../../App'
 import { useSelector } from 'react-redux'
 import { useProfileForm } from './hooks/useProfileForm'
+import { selectPoemsListPoems } from '../../redux/selectors/poemCacheSelectors'
 import ProfileForm from './components/ProfileForm'
 import ProfilePicture from './components/ProfilePicture'
 import ProfileTabs from './components/ProfileTabs'
@@ -11,7 +12,11 @@ export default function Profile() {
     const [value, setValue] = useState(0)
     const context = useContext(AppContext)
     const poemQuery = useSelector(state => state.poemQuery)
-    const poemsListQuery = useSelector(state => state.poemsListQuery)
+    const poemsListQueryRaw = useSelector(state => state.poemsListQuery)
+    // The cache stores poem ids; the form's edit-prefill logic expects full poems
+    // in `item`, so resolve them through the entity store (memoized selector).
+    const poemsListPoems = useSelector(selectPoemsListPoems)
+    const poemsListQuery = { ...poemsListQueryRaw, item: poemsListPoems }
 
     const { poem, isEditing, updatePoemField, handleSend, handleReset, handleCancel } = useProfileForm(
         context,

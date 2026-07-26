@@ -14,6 +14,7 @@ import { Poem } from '../../typescript/interfaces'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
 import { getRankingAction } from '../../redux/actions/poemsActions'
+import { selectRankingPoems } from '../../redux/selectors/poemCacheSelectors'
 
 function Ranking() {
     interface RankingStates {
@@ -25,13 +26,13 @@ function Ranking() {
     const [rank, setRank] = useState<RankingStates['rank']>([])
 
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
+    // Ranking cache stores poem ids; resolve them to Poem[] via the entity store.
+    const rankingPoems = useSelector(selectRankingPoems)
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if (rankingQuery?.item) {
-            setPoems(rankingQuery?.item)
-        }
-    }, [JSON.stringify(rankingQuery?.item)])
+        setPoems(rankingPoems)
+    }, [JSON.stringify(rankingPoems)])
 
     useEffect(() => {
         if (poems) {

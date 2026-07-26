@@ -63,7 +63,11 @@ describe('poemActions', () => {
                 type: ACTIONS.POEM,
                 url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 dispatch,
-                options: undefined
+                options: undefined,
+                // callbacks are wrapped so a successful fetch seeds the poem entity
+                callbacks: {
+                    success: expect.any(Function)
+                }
             })
             expect(spy).toHaveBeenCalledTimes(1)
 
@@ -84,7 +88,11 @@ describe('poemActions', () => {
                 type: ACTIONS.POEM,
                 url: `${API_ENDPOINTS.POEM}/${poemId}`,
                 dispatch,
-                options
+                options,
+                // callbacks are wrapped so a successful fetch seeds the poem entity
+                callbacks: {
+                    success: expect.any(Function)
+                }
             })
 
             spy.mockRestore()

@@ -2,16 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../../../redux/store'
 import { getPoemAction, savePoemAction } from '../../../redux/actions/poemActions'
-import {
-    createPoemAction,
-    updateAllPoemsCacheAfterCreatePoemAction,
-    updateMyPoemsCacheAfterCreatePoemAction,
-    updatePoemsListCacheAfterCreatePoemAction,
-    updateRankingCacheAfterCreatePoemAction,
-    updateAllPoemsCacheAfterSavePoemAction,
-    updateMyPoemsCacheAfterSavePoemAction,
-    updatePoemsListCacheAfterSavePoemAction
-} from '../../../redux/actions/poemsActions'
+import { createPoemAction, insertPoemIntoCaches } from '../../../redux/actions/poemsActions'
+import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
 import { manageError, manageSuccess } from '../../../utils/notifications'
 import { buildPoemData } from '../../../utils/poemUtils'
 
@@ -179,11 +171,9 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 context,
                 callbacks: {
                     success: response => {
-                        // Update all relevant caches after creating
-                        dispatch(updateAllPoemsCacheAfterCreatePoemAction({ response }))
-                        dispatch(updateMyPoemsCacheAfterCreatePoemAction({ response }))
-                        dispatch(updatePoemsListCacheAfterCreatePoemAction({ response }))
-                        dispatch(updateRankingCacheAfterCreatePoemAction({ response }))
+                        // Register the new poem entity and insert its id into the
+                        // relevant list caches (single source of truth).
+                        dispatch(insertPoemIntoCaches({ response }))
                         manageSuccess('Poem created successfully')
                     },
                     error: () => {
@@ -203,11 +193,9 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 data: poemData,
                 callbacks: {
                     success: () => {
-                        const updatePayload = { poem: poemData, poemId: elementToEdit }
-                        // Update all relevant caches after saving
-                        dispatch(updateAllPoemsCacheAfterSavePoemAction(updatePayload))
-                        dispatch(updateMyPoemsCacheAfterSavePoemAction(updatePayload))
-                        dispatch(updatePoemsListCacheAfterSavePoemAction(updatePayload))
+                        // Merge the edited fields into the ONE poem entity; every
+                        // view re-reads it, so no per-cache patching is needed.
+                        dispatch(poemUpdated({ id: elementToEdit, changes: poemData }))
                         manageSuccess('Poem saved')
                         // Clear edit state by navigating to profile without query params
                         router.push('/profile')

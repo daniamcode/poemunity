@@ -102,18 +102,9 @@ describe('usePoemsList', () => {
         store = configureStore({
             reducer: rootReducer,
             preloadedState: {
+                // Cache stores poem ids now.
                 poemsListQuery: {
-                    item: [{
-                        id: '1',
-                        author: 'Jane Doe',
-                        date: '2024-01-01T00:00:00.000Z',
-                        genre: 'love',
-                        likes: [],
-                        picture: '',
-                        poem: 'Body',
-                        title: 'Test',
-                        userId: 'user-1'
-                    }],
+                    item: ['1'],
                     isFetching: false,
                     isError: false,
                     hasMore: true,

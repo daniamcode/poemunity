@@ -4,6 +4,7 @@ import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
 import { getMyFavouritePoemsAction } from '../../redux/actions/poemsActions'
+import { selectMyFavouritePoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { PAGINATION_LIMIT } from '../../data/constants'
 import ListItem from '../ListItem/ListItem'
@@ -12,13 +13,14 @@ import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 function MyFavouritePoems() {
     const context = useContext(AppContext)
 
-    const [poems, setPoems] = useState([])
     const [filter, setFilter] = useState('')
 
     // Redux
     const dispatch = useAppDispatch()
 
     const myFavouritePoemsQuery = useSelector(state => state.myFavouritePoemsQuery)
+    // Cache stores poem ids; resolve them to full poems via the entity store.
+    const poems = useSelector(selectMyFavouritePoemsPoems)
 
     // Initial load
     useEffect(() => {
@@ -39,13 +41,6 @@ function MyFavouritePoems() {
             )
         }
     }, [context?.userId, dispatch])
-
-    // Update local state when data changes
-    useEffect(() => {
-        if (myFavouritePoemsQuery?.item) {
-            setPoems(myFavouritePoemsQuery.item)
-        }
-    }, [myFavouritePoemsQuery?.item])
 
     // Infinite scroll handler
     const handleLoadMore = () => {

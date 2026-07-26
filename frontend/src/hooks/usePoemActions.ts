@@ -2,17 +2,8 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../redux/store'
 import { deletePoemAction, likePoemAction, updatePoemCacheAfterLikePoemAction } from '../redux/actions/poemActions'
-import {
-    updateAllPoemsCacheAfterLikePoemAction,
-    updateAuthorPoemsCacheAfterLikePoemAction,
-    updateMyFavouritePoemsCacheAfterLikePoemAction,
-    updateAuthorPoemsCacheAfterDeletePoemAction,
-    updateMyPoemsCacheAfterDeletePoemAction,
-    updatePoemsListCacheAfterDeletePoemAction,
-    updatePoemsListCacheAfterLikePoemAction,
-    updateRankingCacheAfterDeletePoemAction,
-    updateRankingCacheAfterLikePoemAction
-} from '../redux/actions/poemsActions'
+import { dropPoemFromCaches, dropPoemFromFavouritesCache } from '../redux/actions/poemsActions'
+import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
 import { Context, Poem } from '../typescript/interfaces'
 import { manageError, manageSuccess } from '../utils/notifications'
 
@@ -41,36 +32,22 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                 context,
                 callbacks: {
                     success: () => {
-                        dispatch(
-                            updatePoemsListCacheAfterLikePoemAction({
-                                poemId: poem.id,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateRankingCacheAfterLikePoemAction({
-                                poemId: poem.id,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateAllPoemsCacheAfterLikePoemAction({
-                                poemId: poem.id,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateMyFavouritePoemsCacheAfterLikePoemAction({
-                                poemId: poem.id,
-                                context
-                            })
-                        )
-                        dispatch(
-                            updateAuthorPoemsCacheAfterLikePoemAction({
-                                poemId: poem.id,
-                                context
-                            })
-                        )
+                        // Single source of truth: toggle the like on the ONE poem
+                        // entity; every list view re-reads it, no per-cache patching.
+                        const isLiked = poem.likes?.includes(context.userId)
+                        const newLikes = isLiked
+                            ? poem.likes.filter((id: string) => id !== context.userId)
+                            : [...(poem.likes || []), context.userId]
+
+                        dispatch(poemUpdated({ id: poem.id, changes: { likes: newLikes } }))
+
+                        // The "my favourites" list is a filtered view (poems the
+                        // user liked): unliking must remove the poem from it.
+                        if (isLiked) {
+                            dispatch(dropPoemFromFavouritesCache({ poemId: poem.id }))
+                        }
+
+                        // The Detail page keeps its own single-poem cache in sync.
                         dispatch(
                             updatePoemCacheAfterLikePoemAction({
                                 context
@@ -92,27 +69,10 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                 context,
                 callbacks: {
                     success: () => {
-                        // Update caches
-                        dispatch(
-                            updatePoemsListCacheAfterDeletePoemAction({
-                                poemId: poem.id
-                            })
-                        )
-                        dispatch(
-                            updateRankingCacheAfterDeletePoemAction({
-                                poemId: poem.id
-                            })
-                        )
-                        dispatch(
-                            updateMyPoemsCacheAfterDeletePoemAction({
-                                poemId: poem.id
-                            })
-                        )
-                        dispatch(
-                            updateAuthorPoemsCacheAfterDeletePoemAction({
-                                poemId: poem.id
-                            })
-                        )
+                        // Remove the ONE entity, then drop its id from every list
+                        // cache — replaces the old per-cache delete thunk family.
+                        dispatch(poemRemoved(poem.id))
+                        dispatch(dropPoemFromCaches({ poemId: poem.id }))
 
                         // Show success notification
                         manageSuccess('Poem deleted')

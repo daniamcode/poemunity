@@ -4,6 +4,7 @@ import { usePoemActions } from './usePoemActions'
 import * as poemActions from '../redux/actions/poemActions'
 import * as poemsActions from '../redux/actions/poemsActions'
 import * as notifications from '../utils/notifications'
+import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
 import { Poem, Context } from '../typescript/interfaces'
 
 // Mock dependencies
@@ -45,26 +46,9 @@ describe('usePoemActions', () => {
         jest.clearAllMocks()
         ;(poemActions.deletePoemAction as jest.Mock).mockReturnValue({ type: 'DELETE_POEM' })
         ;(poemActions.likePoemAction as jest.Mock).mockReturnValue({ type: 'LIKE_POEM' })
-        ;(poemsActions.updatePoemsListCacheAfterDeletePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_CACHE_DELETE'
-        })
-        ;(poemsActions.updateRankingCacheAfterDeletePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_RANKING_DELETE'
-        })
-        ;(poemsActions.updateMyPoemsCacheAfterDeletePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_POEMS_DELETE'
-        })
-        ;(poemsActions.updatePoemsListCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_CACHE_LIKE'
-        })
-        ;(poemsActions.updateRankingCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_RANKING_LIKE'
-        })
-        ;(poemsActions.updateAllPoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_LIKE'
-        })
-        ;(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_FAVOURITE_POEMS_LIKE'
+        ;(poemsActions.dropPoemFromCaches as jest.Mock).mockReturnValue({ type: 'DROP_POEM_FROM_CACHES' })
+        ;(poemsActions.dropPoemFromFavouritesCache as jest.Mock).mockReturnValue({
+            type: 'DROP_POEM_FROM_FAVOURITES'
         })
         ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_POEM_LIKE'
@@ -109,15 +93,9 @@ describe('usePoemActions', () => {
         const deletePoemCall = (poemActions.deletePoemAction as jest.Mock).mock.calls[0][0]
         deletePoemCall.callbacks.success()
 
-        expect(poemsActions.updatePoemsListCacheAfterDeletePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123'
-        })
-        expect(poemsActions.updateRankingCacheAfterDeletePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123'
-        })
-        expect(poemsActions.updateMyPoemsCacheAfterDeletePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123'
-        })
+        // Remove the ONE entity, then drop its id from every list cache.
+        expect(mockDispatch).toHaveBeenCalledWith(poemRemoved('poem-123'))
+        expect(poemsActions.dropPoemFromCaches).toHaveBeenCalledWith({ poemId: 'poem-123' })
         expect(notifications.manageSuccess).toHaveBeenCalledWith('Poem deleted')
     })
 
@@ -166,7 +144,7 @@ describe('usePoemActions', () => {
         })
     })
 
-    test('onLike success callback should update all caches', () => {
+    test('onLike success callback updates the single entity and syncs favourites/detail', () => {
         const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
 
         const mockEvent = { preventDefault: jest.fn() } as any
@@ -176,22 +154,12 @@ describe('usePoemActions', () => {
         const likePoemCall = (poemActions.likePoemAction as jest.Mock).mock.calls[0][0]
         likePoemCall.callbacks.success()
 
-        expect(poemsActions.updatePoemsListCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateRankingCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateAllPoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
+        // mockPoem is already liked by user-1, so this like toggles to an UNLIKE:
+        // one poemUpdated with user-1 removed from the likes array.
+        expect(mockDispatch).toHaveBeenCalledWith(poemUpdated({ id: 'poem-123', changes: { likes: [] } }))
+        // Unliking removes the poem from the filtered "my favourites" view.
+        expect(poemsActions.dropPoemFromFavouritesCache).toHaveBeenCalledWith({ poemId: 'poem-123' })
+        // The Detail single-poem cache is kept in sync.
         expect(poemActions.updatePoemCacheAfterLikePoemAction).toHaveBeenCalledWith({
             context: mockContext
         })

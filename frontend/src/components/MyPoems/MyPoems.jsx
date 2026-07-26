@@ -4,13 +4,13 @@ import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../redux/store'
 import { getMyPoemsAction } from '../../redux/actions/poemsActions'
+import { selectMyPoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { PAGINATION_LIMIT } from '../../data/constants'
 import ListItem from '../ListItem/ListItem'
 import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 
 function MyPoems() {
-    const [poems, setPoems] = useState([])
     const [filter, setFilter] = useState('')
 
     const context = useContext(AppContext)
@@ -19,6 +19,8 @@ function MyPoems() {
     const dispatch = useAppDispatch()
 
     const myPoemsQuery = useSelector(state => state.myPoemsQuery)
+    // Cache stores poem ids; resolve them to full poems via the entity store.
+    const poems = useSelector(selectMyPoemsPoems)
 
     // Initial load
     // todo: check if i have to dispatch getAllPoemsAction as i used to do, or if this ia approach is correct
@@ -40,13 +42,6 @@ function MyPoems() {
             )
         }
     }, [context?.userId, dispatch])
-
-    // Update local state when data changes
-    useEffect(() => {
-        if (myPoemsQuery?.item) {
-            setPoems(myPoemsQuery.item)
-        }
-    }, [myPoemsQuery?.item])
 
     // Infinite scroll handler
     const handleLoadMore = () => {

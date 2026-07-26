@@ -3,9 +3,9 @@ import axios from 'axios'
 import {
     createPoemAction,
     getAllPoemsAction,
-    updateAllPoemsCacheAfterLikePoemAction,
-    updatePoemsListCacheAfterLikePoemAction,
-    updateRankingCacheAfterLikePoemAction
+    dropPoemFromCaches,
+    dropPoemFromFavouritesCache,
+    insertPoemIntoCaches
 } from './poemsActions'
 import * as commonActions from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
@@ -211,411 +211,6 @@ describe('getAllPoemsAction', () => {
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
     })
 })
-
-describe('updatePoemsListCacheAfterLikePoemAction', () => {
-    let dispatch: AppDispatch
-    beforeEach(() => {
-        dispatch = jest.fn()
-        jest.clearAllMocks()
-    })
-    afterEach(() => {
-        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-        // tests could fail
-        ;(dispatch as jest.Mock).mockClear()
-        jest.clearAllMocks()
-    })
-
-    test('Should update cache when disliking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '1',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1', '4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalPoems = [
-            {
-                id: '1',
-                likes: ['4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 2,
-                hasMore: true,
-                total: 25,
-                totalPages: 3
-            }
-        })
-
-        updatePoemsListCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
-            poems: finalPoems,
-            page: 2,
-            hasMore: true,
-            total: 25,
-            totalPages: 3
-        })
-    })
-    test('Should update cache when liking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '2',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalPoems = [
-            {
-                id: '1',
-                likes: ['1', '2']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 2,
-                totalPages: 1
-            }
-        })
-
-        updatePoemsListCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
-            poems: finalPoems,
-            page: 1,
-            hasMore: false,
-            total: 2,
-            totalPages: 1
-        })
-    })
-    test('Should do nothing when liking a poem that does not exist', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '1',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalPoems = [
-            {
-                id: '1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: true,
-                total: 15,
-                totalPages: 2
-            }
-        })
-
-        updatePoemsListCacheAfterLikePoemAction({
-            poemId: '3',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual({
-            poems: finalPoems,
-            page: 1,
-            hasMore: true,
-            total: 15,
-            totalPages: 2
-        })
-    })
-})
-
-describe('updateRankingCacheAfterLikePoemAction', () => {
-    let dispatch: AppDispatch
-    beforeEach(() => {
-        dispatch = jest.fn()
-        jest.clearAllMocks()
-    })
-    afterEach(() => {
-        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-        // tests could fail
-        ;(dispatch as jest.Mock).mockClear()
-        jest.clearAllMocks()
-    })
-
-    test('Should update cache when disliking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '1',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1', '4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalState = [
-            {
-                id: '1',
-                likes: ['4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            rankingQuery: {
-                item: initialState
-            }
-        })
-
-        updateRankingCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.RANKING}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
-    })
-    test('Should update cache when liking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '2',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalState = [
-            {
-                id: '1',
-                likes: ['1', '2']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            rankingQuery: {
-                item: initialState
-            }
-        })
-
-        updateRankingCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.RANKING}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
-    })
-})
-
-describe('updateAllPoemsCacheAfterLikePoemAction', () => {
-    let dispatch: AppDispatch
-    beforeEach(() => {
-        dispatch = jest.fn()
-        jest.clearAllMocks()
-    })
-    afterEach(() => {
-        // doing this in an afterAll could lead to not reset dispatch calls number so the latter
-        // tests could fail
-        ;(dispatch as jest.Mock).mockClear()
-        jest.clearAllMocks()
-    })
-
-    test('Should update cache when disliking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '1',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1', '4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalState = [
-            {
-                id: '1',
-                likes: ['4']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        updateAllPoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
-    })
-    test('Should update cache when liking a poem', () => {
-        const context = {
-            elementToEdit: '1',
-            user: 'whatever',
-            userId: '2',
-            username: 'username',
-            picture: '1.jpg',
-            config: {},
-            isAdmin: false,
-            setState: () => {}
-        }
-
-        const initialState = [
-            {
-                id: '1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-        const finalState = [
-            {
-                id: '1',
-                likes: ['1', '2']
-            },
-            {
-                id: '2',
-                likes: ['12', '14']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        updateAllPoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context
-        })(dispatch)
-
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(finalState)
-    })
-})
-
 describe('createPoemAction', () => {
     let dispatch: AppDispatch
 
@@ -871,7 +466,7 @@ describe('getPoemsListAction - Pagination', () => {
         })
 
         expect(mockGet).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
+        expect((dispatch as jest.Mock).mock.calls.length).toBe(3)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_fulfilled`)
     })
 
@@ -906,7 +501,7 @@ describe('getPoemsListAction - Pagination', () => {
         })
 
         expect(mockGet).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
+        expect((dispatch as jest.Mock).mock.calls.length).toBe(3)
         expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_fulfilled`)
     })
 
@@ -1160,1314 +755,156 @@ describe('getMyFavouritePoemsAction', () => {
     })
 })
 
-describe('updateAllPoemsCacheAfterSavePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
 
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
+// ---------------------------------------------------------------------------
+// Normalized cache maintenance (Phase 2). Caches now hold poem IDS; these
+// thunks re-emit id-arrays. They replace the old updateXCacheAfterY family.
+// ---------------------------------------------------------------------------
 
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should update poem in cache when allPoemsQuery exists', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Original Title',
-                author: 'Author 1',
-                poem: 'Original poem text',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                author: 'Author 2',
-                poem: 'Poem 2 text',
-                likes: ['2']
-            }
-        ]
-
-        const updatedPoemData = {
-            title: 'Updated Title',
-            poem: 'Updated poem text'
-        }
-
-        const expectedState = [
-            {
-                id: '2',
-                title: 'Poem 2',
-                author: 'Author 2',
-                poem: 'Poem 2 text',
-                likes: ['2']
-            },
-            {
-                id: '1',
-                title: 'Updated Title',
-                author: 'Author 1',
-                poem: 'Updated poem text',
-                likes: ['1']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterSavePoemAction({
-            poem: updatedPoemData,
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toEqual(expectedState)
-    })
-
-    test('Should not crash when allPoemsQuery is undefined (cache not loaded)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: undefined
-            }
-        })
-
-        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Title' },
-            poemId: '1'
-        })(dispatch)
-
-        // Should not dispatch anything
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should not crash when allPoemsQuery is null', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: null
-            }
-        })
-
-        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Title' },
-            poemId: '1'
-        })(dispatch)
-
-        // Should not dispatch anything
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve all other poems when updating one poem', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                author: 'Author 1',
-                likes: ['1']
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                author: 'Author 2',
-                likes: ['2', '3']
-            },
-            {
-                id: '3',
-                title: 'Poem 3',
-                author: 'Author 3',
-                likes: []
-            }
-        ]
-
-        const updatedPoemData = {
-            title: 'Updated Poem 2 Title'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterSavePoemAction({
-            poem: updatedPoemData,
-            poemId: '2'
-        })(dispatch)
-
-        const dispatchedPayload = (dispatch as jest.Mock).mock.calls[0][0].payload
-
-        // Should have all 3 poems
-        expect(dispatchedPayload).toHaveLength(3)
-        // Should have updated poem 2
-        const updatedPoem = dispatchedPayload.find((p: any) => p.id === '2')
-        expect(updatedPoem.title).toBe('Updated Poem 2 Title')
-        expect(updatedPoem.author).toBe('Author 2')
-        expect(updatedPoem.likes).toEqual(['2', '3'])
-        // Should preserve other poems
-        expect(dispatchedPayload.find((p: any) => p.id === '1')).toBeDefined()
-        expect(dispatchedPayload.find((p: any) => p.id === '3')).toBeDefined()
-    })
-
-    test('Should handle updating a poem that does not exist in cache', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                author: 'Author 1'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        const { updateAllPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Title' },
-            poemId: '999'
-        })(dispatch)
-
-        const dispatchedPayload = (dispatch as jest.Mock).mock.calls[0][0].payload
-
-        // Current behavior: adds a partial poem object when poem doesn't exist
-        // Note: This is not ideal behavior but tests the actual implementation
-        expect(dispatchedPayload).toHaveLength(2)
-        expect(dispatchedPayload[0].id).toBe('1')
-        // Second item will be the "updated" poem with undefined merged with update data
-        expect(dispatchedPayload[1].title).toBe('Updated Title')
-    })
-})
-
-describe('updateMyPoemsCacheAfterSavePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
-
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should update poem in myPoems cache when cache exists', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'My Original Poem',
-                author: 'Author 1',
-                poem: 'Original content',
-                userId: 'user-123',
-                likes: []
-            },
-            {
-                id: '2',
-                title: 'Another Poem',
-                author: 'Author 1',
-                poem: 'Another content',
-                userId: 'user-123',
-                likes: ['user-456']
-            }
-        ]
-
-        const updatedPoemData = {
-            title: 'My Updated Poem',
-            poem: 'Updated content'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 2,
-                totalPages: 1
-            }
-        })
-
-        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterSavePoemAction({
-            poem: updatedPoemData,
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.MY_POEMS}_fulfilled`)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.poems).toHaveLength(2)
-        expect(payload.poems[0].id).toBe('1')
-        expect(payload.poems[0].title).toBe('My Updated Poem')
-        expect(payload.poems[0].poem).toBe('Updated content')
-        expect(payload.poems[0].author).toBe('Author 1')
-        expect(payload.poems[1].id).toBe('2')
-        expect(payload.page).toBe(1)
-        expect(payload.total).toBe(2)
-    })
-
-    test('Should not crash when myPoemsQuery is undefined (cache not loaded)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: undefined
-            }
-        })
-
-        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Title' },
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve pagination metadata when updating', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-123'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 2,
-                hasMore: true,
-                total: 15,
-                totalPages: 2
-            }
-        })
-
-        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Poem 1' },
-            poemId: '1'
-        })(dispatch)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.page).toBe(2)
-        expect(payload.hasMore).toBe(true)
-        expect(payload.total).toBe(15)
-        expect(payload.totalPages).toBe(2)
-    })
-
-    test('Should only update the specific poem, not others', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                likes: ['user-1']
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                likes: ['user-2', 'user-3']
-            },
-            {
-                id: '3',
-                title: 'Poem 3',
-                likes: []
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 3,
-                totalPages: 1
-            }
-        })
-
-        const { updateMyPoemsCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterSavePoemAction({
-            poem: { title: 'Updated Poem 2' },
-            poemId: '2'
-        })(dispatch)
-
-        const poems = (dispatch as jest.Mock).mock.calls[0][0].payload.poems
-        expect(poems[0].title).toBe('Poem 1')
-        expect(poems[1].title).toBe('Updated Poem 2')
-        expect(poems[1].likes).toEqual(['user-2', 'user-3'])
-        expect(poems[2].title).toBe('Poem 3')
-    })
-})
-
-describe('updateAllPoemsCacheAfterCreatePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
-
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should add new poem to cache when allPoemsQuery exists', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Existing Poem',
-                author: 'Author 1',
-                likes: []
-            }
-        ]
-
-        const newPoem = {
-            id: '2',
-            title: 'New Poem',
-            author: 'Author 2',
-            poem: 'New poem content',
-            userId: 'user-123',
-            likes: [],
-            genre: 'love',
-            picture: 'pic.jpg',
-            date: '2024-01-01'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: initialState
-            }
-        })
-
-        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterCreatePoemAction({
-            response: newPoem
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload).toHaveLength(2)
-        expect((dispatch as jest.Mock).mock.calls[0][0].payload[1]).toEqual(newPoem)
-    })
-
-    test('Should not crash when allPoemsQuery is null (CRITICAL BUG FIX)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: null
-            }
-        })
-
-        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        const newPoem = {
-            id: '1',
-            title: 'New Poem',
-            author: 'Author 1'
-        }
-
-        // This used to crash with "Cannot read properties of undefined reading push"
-        updateAllPoemsCacheAfterCreatePoemAction({
-            response: newPoem
-        })(dispatch)
-
-        // Should not dispatch anything
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should not crash when allPoemsQuery is undefined', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            allPoemsQuery: {
-                item: undefined
-            }
-        })
-
-        const { updateAllPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updateAllPoemsCacheAfterCreatePoemAction({
-            response: { id: '1', title: 'New Poem' }
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-})
-
-describe('updateMyPoemsCacheAfterCreatePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
-
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should add new poem to beginning of myPoems cache (CRITICAL BUG FIX)', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Older Poem',
-                author: 'Author 1',
-                userId: 'user-123',
-                likes: []
-            }
-        ]
-
-        const newPoem = {
-            id: '2',
-            title: 'Brand New Poem',
-            author: 'Author 1',
-            poem: 'New content',
-            userId: 'user-123',
-            likes: [],
-            genre: 'love',
-            picture: 'pic.jpg',
-            date: '2024-01-02'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 1,
-                totalPages: 1
-            }
-        })
-
-        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterCreatePoemAction({
-            response: newPoem
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-
-        expect(payload.poems).toHaveLength(2)
-        // New poem should be at the beginning (most recent first)
-        expect(payload.poems[0]).toEqual(newPoem)
-        expect(payload.poems[1].id).toBe('1')
-        // Total should be incremented
-        expect(payload.total).toBe(2)
-    })
-
-    test('Should not crash when myPoemsQuery is null (CRITICAL BUG FIX)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: null
-            }
-        })
-
-        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterCreatePoemAction({
-            response: { id: '1', title: 'New Poem' }
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should increment total count correctly', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: [],
-                page: 1,
-                hasMore: false,
-                total: 0,
-                totalPages: 1
-            }
-        })
-
-        const { updateMyPoemsCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterCreatePoemAction({
-            response: { id: '1', title: 'First Poem' }
-        })(dispatch)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.total).toBe(1)
-    })
-})
-
-describe('updatePoemsListCacheAfterCreatePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
-
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should add new poem to beginning of poemsList cache', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Existing Poem',
-                author: 'Author 1',
-                likes: []
-            }
-        ]
-
-        const newPoem = {
-            id: '2',
-            title: 'New Poem',
-            author: 'Author 2',
-            poem: 'Content',
-            userId: 'user-456',
-            likes: [],
-            genre: 'nature',
-            picture: 'pic2.jpg',
-            date: '2024-01-02'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 1,
-                totalPages: 1
-            }
-        })
-
-        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterCreatePoemAction({
-            response: newPoem
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-
-        expect(payload.poems).toHaveLength(2)
-        // New poem should be at the beginning
-        expect(payload.poems[0]).toEqual(newPoem)
-        expect(payload.poems[1].id).toBe('1')
-        // Total should be incremented
-        expect(payload.total).toBe(2)
-    })
-
-    test('Should not crash when poemsListQuery is null', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: null
-            }
-        })
-
-        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterCreatePoemAction({
-            response: { id: '1', title: 'New Poem' }
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve pagination metadata', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: [],
-                page: 2,
-                hasMore: true,
-                total: 20,
-                totalPages: 3
-            }
-        })
-
-        const { updatePoemsListCacheAfterCreatePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterCreatePoemAction({
-            response: { id: '21', title: 'New Poem' }
-        })(dispatch)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.page).toBe(2)
-        expect(payload.hasMore).toBe(true)
-        expect(payload.total).toBe(21) // Incremented
-        expect(payload.totalPages).toBe(3)
-    })
-})
-
-describe('updatePoemsListCacheAfterSavePoemAction', () => {
-    let dispatch: AppDispatch
-    let consoleLogSpy: jest.SpyInstance
-
-    beforeEach(() => {
-        dispatch = jest.fn()
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        ;(dispatch as jest.Mock).mockClear()
-        consoleLogSpy.mockRestore()
-        jest.clearAllMocks()
-    })
-
-    test('Should update poem in poemsList cache when cache exists', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'List Poem 1',
-                author: 'Author 1',
-                poem: 'Content 1',
-                likes: []
-            },
-            {
-                id: '2',
-                title: 'List Poem 2',
-                author: 'Author 2',
-                poem: 'Content 2',
-                likes: ['user-1']
-            }
-        ]
-
-        const updatedPoemData = {
-            title: 'Updated List Poem 1',
-            poem: 'Updated content 1'
-        }
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: true,
-                total: 50,
-                totalPages: 3
-            }
-        })
-
-        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterSavePoemAction({
-            poem: updatedPoemData,
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.poems).toHaveLength(2)
-        expect(payload.poems[0].id).toBe('1')
-        expect(payload.poems[0].title).toBe('Updated List Poem 1')
-        expect(payload.poems[0].poem).toBe('Updated content 1')
-        expect(payload.poems[1].id).toBe('2')
-        expect(payload.page).toBe(1)
-        expect(payload.hasMore).toBe(true)
-        expect(payload.total).toBe(50)
-    })
-
-    test('Should not crash when poemsListQuery is undefined (cache not loaded)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: undefined
-            }
-        })
-
-        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterSavePoemAction({
-            poem: { title: 'Updated Title' },
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve pagination metadata when updating', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 3,
-                hasMore: false,
-                total: 45,
-                totalPages: 3
-            }
-        })
-
-        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterSavePoemAction({
-            poem: { title: 'Updated Poem 1' },
-            poemId: '1'
-        })(dispatch)
-
-        const payload = (dispatch as jest.Mock).mock.calls[0][0].payload
-        expect(payload.page).toBe(3)
-        expect(payload.hasMore).toBe(false)
-        expect(payload.total).toBe(45)
-        expect(payload.totalPages).toBe(3)
-    })
-
-    test('Should handle updating poem across multiple pages', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Page 1 Poem 1'
-            },
-            {
-                id: '2',
-                title: 'Page 1 Poem 2'
-            },
-            {
-                id: '21',
-                title: 'Page 2 Poem 1'
-            },
-            {
-                id: '22',
-                title: 'Page 2 Poem 2'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            poemsListQuery: {
-                item: initialState,
-                page: 2,
-                hasMore: false,
-                total: 4,
-                totalPages: 2
-            }
-        })
-
-        const { updatePoemsListCacheAfterSavePoemAction } = require('./poemsActions')
-
-        updatePoemsListCacheAfterSavePoemAction({
-            poem: { title: 'Updated Page 2 Poem 1' },
-            poemId: '21'
-        })(dispatch)
-
-        const poems = (dispatch as jest.Mock).mock.calls[0][0].payload.poems
-        expect(poems).toHaveLength(4)
-        expect(poems[2].id).toBe('21')
-        expect(poems[2].title).toBe('Updated Page 2 Poem 1')
-        expect(poems[0].title).toBe('Page 1 Poem 1')
-        expect(poems[1].title).toBe('Page 1 Poem 2')
-    })
-})
-
-describe('updateMyPoemsCacheAfterDeletePoemAction', () => {
+describe('dropPoemFromCaches', () => {
     let dispatch: AppDispatch
 
     beforeEach(() => {
         dispatch = jest.fn()
         jest.clearAllMocks()
     })
-
     afterEach(() => {
         jest.restoreAllMocks()
     })
 
-    test('Should remove poem from myPoems cache', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-123'
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-123'
-            },
-            {
-                id: '3',
-                title: 'Poem 3',
-                userId: 'user-123'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 3,
-                totalPages: 1
-            }
+    test('drops the poem id from every list cache and decrements paginated totals', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            poemsListQuery: { item: ['1', '2', '3'], page: 1, hasMore: false, total: 3, totalPages: 1 },
+            myPoemsQuery: { item: ['2', '5'], page: 1, hasMore: false, total: 2, totalPages: 1 },
+            myFavouritePoemsQuery: { item: ['9'], page: 1, hasMore: false, total: 1, totalPages: 1 },
+            authorPoemsQuery: { item: ['2'], page: 1, hasMore: false, total: 1, totalPages: 1 },
+            allPoemsQuery: { item: ['1', '2', '3'] },
+            rankingQuery: { item: ['2', '3'] }
         })
 
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
+        dropPoemFromCaches({ poemId: '2' })(dispatch)
 
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '2'
-        })(dispatch)
+        const byType: Record<string, any> = {}
+        ;(dispatch as jest.Mock).mock.calls.forEach(([action]) => {
+            byType[action.type] = action.payload
+        })
 
-        expect(dispatch).toHaveBeenCalledTimes(1)
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.type).toBe('my-poems_fulfilled')
-        expect(action.payload.poems).toHaveLength(2)
-        expect(action.payload.poems.find((p: any) => p.id === '2')).toBeUndefined()
-        expect(action.payload.poems[0].id).toBe('1')
-        expect(action.payload.poems[1].id).toBe('3')
+        // poemsList: paginated, id dropped, total decremented
+        expect(byType['poems-list_fulfilled'].poems).toEqual(['1', '3'])
+        expect(byType['poems-list_fulfilled'].total).toBe(2)
+        // myPoems: id dropped
+        expect(byType['my-poems_fulfilled'].poems).toEqual(['5'])
+        expect(byType['my-poems_fulfilled'].total).toBe(1)
+        // authorPoems: id dropped
+        expect(byType['author-poems_fulfilled'].poems).toEqual([])
+        // plain caches: id dropped, payload is a bare id-array
+        expect(byType['all-poems_fulfilled']).toEqual(['1', '3'])
+        expect(byType['ranking_fulfilled']).toEqual(['3'])
+        // favourites did not contain the id -> not re-emitted
+        expect(byType['my-favourite-poems_fulfilled']).toBeUndefined()
     })
 
-    test('Should decrease total count when deleting poem', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-123'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 5,
-                totalPages: 1
-            }
+    test('is a no-op for a cache that does not contain the poem', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            poemsListQuery: { item: ['1', '3'], page: 1, hasMore: false, total: 2, totalPages: 1 },
+            myPoemsQuery: { item: undefined },
+            myFavouritePoemsQuery: { item: undefined },
+            authorPoemsQuery: { item: undefined },
+            allPoemsQuery: { item: undefined },
+            rankingQuery: { item: undefined }
         })
 
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '1'
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.total).toBe(4) // 5 - 1
-    })
-
-    test('Should not crash when myPoemsQuery is undefined (cache not loaded)', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: undefined
-            }
-        })
-
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '1'
-        })(dispatch)
+        dropPoemFromCaches({ poemId: '2' })(dispatch)
 
         expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should not crash when myPoemsQuery is null', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: null
-            }
-        })
-
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '1'
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve pagination metadata when deleting', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-123'
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-123'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 2,
-                hasMore: true,
-                total: 15,
-                totalPages: 3
-            }
-        })
-
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '1'
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.page).toBe(2)
-        expect(action.payload.hasMore).toBe(true)
-        expect(action.payload.total).toBe(14) // Decreased by 1
-        expect(action.payload.totalPages).toBe(3)
-    })
-
-    test('Should handle deleting the last poem (total should not go below 0)', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Last Poem',
-                userId: 'user-123'
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myPoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 0, // Edge case: total is already 0
-                totalPages: 1
-            }
-        })
-
-        const { updateMyPoemsCacheAfterDeletePoemAction } = require('./poemsActions')
-
-        updateMyPoemsCacheAfterDeletePoemAction({
-            poemId: '1'
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.total).toBe(0) // Should not be negative
-        expect(action.payload.poems).toHaveLength(0)
     })
 })
 
-describe('updateMyFavouritePoemsCacheAfterLikePoemAction', () => {
-    let dispatch: jest.Mock
+describe('dropPoemFromFavouritesCache', () => {
+    let dispatch: AppDispatch
 
-    const mockContext = {
-        user: 'user-token',
-        userId: 'user-123',
-        username: 'testuser',
-        picture: 'avatar.jpg',
-        isAdmin: false,
-        elementToEdit: '',
-        setState: jest.fn(),
-        config: { headers: { Authorization: 'Bearer token' } }
+    beforeEach(() => {
+        dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('removes the id from the favourites cache and decrements its total', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            myFavouritePoemsQuery: { item: ['1', '2', '3'], page: 1, hasMore: false, total: 3, totalPages: 1 }
+        })
+
+        dropPoemFromFavouritesCache({ poemId: '2' })(dispatch)
+
+        expect(dispatch).toHaveBeenCalledTimes(1)
+        const action = (dispatch as jest.Mock).mock.calls[0][0]
+        expect(action.type).toBe('my-favourite-poems_fulfilled')
+        expect(action.payload.poems).toEqual(['1', '3'])
+        expect(action.payload.total).toBe(2)
+    })
+
+    test('does nothing when the poem is not in the favourites cache', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            myFavouritePoemsQuery: { item: ['1', '3'], page: 1, hasMore: false, total: 2, totalPages: 1 }
+        })
+
+        dropPoemFromFavouritesCache({ poemId: '2' })(dispatch)
+
+        expect(dispatch).not.toHaveBeenCalled()
+    })
+})
+
+describe('insertPoemIntoCaches', () => {
+    let dispatch: AppDispatch
+
+    const newPoem = {
+        id: 'new-1',
+        author: 'author',
+        date: 'd',
+        genre: 'love',
+        likes: [],
+        picture: 'p.jpg',
+        poem: 'body',
+        title: 'title',
+        userId: 'u1'
     }
 
     beforeEach(() => {
         dispatch = jest.fn()
+        jest.clearAllMocks()
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
     })
 
-    test('Should remove poem from cache when unliking', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-456',
-                likes: ['user-123', 'user-789'] // User has liked this poem
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-456',
-                likes: ['user-123'] // User has liked this poem
-            },
-            {
-                id: '3',
-                title: 'Poem 3',
-                userId: 'user-456',
-                likes: ['user-123', 'user-999'] // User has liked this poem
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: true,
-                total: 3,
-                totalPages: 1
-            }
+    test('upserts the entity and inserts the id at the front of user lists / end of aggregate lists', () => {
+        ;(store.getState as jest.Mock).mockReturnValue({
+            poemsListQuery: { item: ['1', '2'], page: 1, hasMore: false, total: 2, totalPages: 1 },
+            myPoemsQuery: { item: ['1'], page: 1, hasMore: false, total: 1, totalPages: 1 },
+            allPoemsQuery: { item: ['1', '2'] },
+            rankingQuery: { item: ['1'] }
         })
 
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
+        insertPoemIntoCaches({ response: newPoem as any })(dispatch)
 
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '2',
-            context: mockContext
-        })(dispatch)
+        const calls = (dispatch as jest.Mock).mock.calls.map(([a]) => a)
+        // first dispatch upserts the poem entity
+        expect(calls[0].type).toBe('poemEntities/poemUpserted')
+        expect(calls[0].payload).toEqual(newPoem)
 
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.poems).toHaveLength(2)
-        expect(action.payload.poems.find((p: any) => p.id === '2')).toBeUndefined()
-        expect(action.payload.poems.find((p: any) => p.id === '1')).toBeDefined()
-        expect(action.payload.poems.find((p: any) => p.id === '3')).toBeDefined()
-    })
-
-    test('Should update likes when liking a poem (rare case)', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-456',
-                likes: ['user-789'] // User has NOT liked this poem
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-456',
-                likes: ['user-123'] // User has liked this poem
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 2,
-                totalPages: 1
-            }
+        const byType: Record<string, any> = {}
+        calls.forEach(a => {
+            byType[a.type] = a.payload
         })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.poems).toHaveLength(2)
-        const updatedPoem = action.payload.poems.find((p: any) => p.id === '1')
-        expect(updatedPoem.likes).toContain('user-123')
-        expect(updatedPoem.likes).toHaveLength(2)
-    })
-
-    test('Should NOT dispatch if myFavouritePoemsQuery.item is null', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: null,
-                page: 1,
-                hasMore: false,
-                total: 0,
-                totalPages: 0
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should NOT dispatch if myFavouritePoemsQuery.item is undefined', () => {
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: undefined,
-                page: 1,
-                hasMore: false,
-                total: 0,
-                totalPages: 0
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        expect(dispatch).not.toHaveBeenCalled()
-    })
-
-    test('Should preserve pagination metadata and decrease total when unliking', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-456',
-                likes: ['user-123', 'user-789']
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-456',
-                likes: ['user-123']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 2,
-                hasMore: true,
-                total: 15,
-                totalPages: 3
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.page).toBe(2)
-        expect(action.payload.hasMore).toBe(true)
-        expect(action.payload.total).toBe(14) // Decreased by 1
-        expect(action.payload.totalPages).toBe(3)
-    })
-
-    test('Should preserve pagination metadata and keep same total when liking', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-456',
-                likes: ['user-789'] // User has NOT liked this
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 10,
-                totalPages: 2
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.page).toBe(1)
-        expect(action.payload.hasMore).toBe(false)
-        expect(action.payload.total).toBe(10) // Unchanged
-        expect(action.payload.totalPages).toBe(2)
-    })
-
-    test('Should handle unliking the last poem (total should not go below 0)', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Last Poem',
-                userId: 'user-456',
-                likes: ['user-123']
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 0, // Edge case: total is already 0
-                totalPages: 1
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        expect(action.payload.total).toBe(0) // Should not be negative
-        expect(action.payload.poems).toHaveLength(0)
-    })
-
-    test('Should correctly identify unliking vs liking based on current likes array', () => {
-        const initialState = [
-            {
-                id: '1',
-                title: 'Poem 1',
-                userId: 'user-456',
-                likes: ['user-123'] // User HAS liked
-            },
-            {
-                id: '2',
-                title: 'Poem 2',
-                userId: 'user-456',
-                likes: [] // User has NOT liked
-            }
-        ]
-
-        ;(store.getState as jest.Mock).mockReturnValueOnce({
-            myFavouritePoemsQuery: {
-                item: initialState,
-                page: 1,
-                hasMore: false,
-                total: 2,
-                totalPages: 1
-            }
-        })
-
-        const { updateMyFavouritePoemsCacheAfterLikePoemAction } = require('./poemsActions')
-
-        // Unliking poem 1 (user had liked it)
-        updateMyFavouritePoemsCacheAfterLikePoemAction({
-            poemId: '1',
-            context: mockContext
-        })(dispatch)
-
-        const action = (dispatch as jest.Mock).mock.calls[0][0]
-        // Should remove poem from cache
-        expect(action.payload.poems).toHaveLength(1)
-        expect(action.payload.poems.find((p: any) => p.id === '1')).toBeUndefined()
+        // user-facing lists: new id at the front, total bumped
+        expect(byType['poems-list_fulfilled'].poems).toEqual(['new-1', '1', '2'])
+        expect(byType['poems-list_fulfilled'].total).toBe(3)
+        expect(byType['my-poems_fulfilled'].poems).toEqual(['new-1', '1'])
+        expect(byType['my-poems_fulfilled'].total).toBe(2)
+        // aggregate lists: new id appended
+        expect(byType['all-poems_fulfilled']).toEqual(['1', '2', 'new-1'])
+        expect(byType['ranking_fulfilled']).toEqual(['1', 'new-1'])
     })
 })

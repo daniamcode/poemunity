@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 import ListItem from './ListItem'
 import { Poem, Context } from '../../typescript/interfaces'
 import * as poemActions from '../../redux/actions/poemActions'
-import * as poemsActions from '../../redux/actions/poemsActions'
+import { poemUpdated } from '../../redux/reducers/poemEntitiesReducers'
 
 // Mock the actions
 jest.mock('../../redux/actions/poemActions')
@@ -17,7 +17,6 @@ const mockStore = configureStore([thunk])
 describe('ListItem - Like Functionality Integration Tests', () => {
     let store: ReturnType<typeof mockStore>
     let likePoemActionSpy: jest.SpyInstance
-    let _updateCacheSpy: jest.SpyInstance
 
     const mockPoem: Poem = {
         id: 'poem-123',
@@ -60,26 +59,10 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         // Mock the action creators to return actions with callbacks
         likePoemActionSpy = jest.spyOn(poemActions, 'likePoemAction')
-        _updateCacheSpy = jest.spyOn(poemsActions, 'updatePoemsListCacheAfterLikePoemAction')
 
-        // Make sure the mocked actions return objects
-        ;(poemsActions.updatePoemsListCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_CACHE_LIKE'
-        })
-        ;(poemsActions.updateRankingCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_RANKING_LIKE'
-        })
-        ;(poemsActions.updateAllPoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_ALL_POEMS_LIKE'
-        })
-        ;(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_MY_FAVOURITE_POEMS_LIKE'
-        })
+        // The Detail single-poem cache updater is still dispatched on like.
         ;(poemActions.updatePoemCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
             type: 'UPDATE_POEM_LIKE'
-        })
-        ;(poemsActions.updateAuthorPoemsCacheAfterLikePoemAction as jest.Mock).mockReturnValue({
-            type: 'UPDATE_AUTHOR_POEMS_LIKE'
         })
     })
 
@@ -155,7 +138,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         })
     })
 
-    test('should update all caches in success callback when liking', () => {
+    test('should update the single poem entity (not per-cache) in success callback when liking', () => {
         likePoemActionSpy.mockReturnValue({ type: 'LIKE_POEM' })
 
         renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
@@ -170,23 +153,13 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Call the success callback
         successCallback()
 
-        // Verify all cache updates were called
-        expect(poemsActions.updatePoemsListCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateRankingCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateAllPoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
-        expect(poemsActions.updateMyFavouritePoemsCacheAfterLikePoemAction).toHaveBeenCalledWith({
-            poemId: 'poem-123',
-            context: mockContext
-        })
+        // Single source of truth: exactly one poemUpdated with the user added to
+        // the likes array — every view re-reads that entity, no per-cache patching.
+        const actions = store.getActions()
+        expect(actions).toContainEqual(
+            poemUpdated({ id: 'poem-123', changes: { likes: ['user-1', 'user-2', 'user-456'] } })
+        )
+        // The Detail single-poem cache is still kept in sync.
         expect(poemActions.updatePoemCacheAfterLikePoemAction).toHaveBeenCalledWith({
             context: mockContext
         })

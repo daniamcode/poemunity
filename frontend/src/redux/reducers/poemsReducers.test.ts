@@ -121,24 +121,25 @@ describe('Poems reducer - allPoemsQuery', () => {
             type: `${ACTIONS.ALL_POEMS}_fulfilled`,
             payload: [poem1, poem2]
         })
+        // The cache stores poem ids; the full poems live in poemEntities.
         expect(result).toEqual({
             isFetching: false,
             isError: false,
-            item: [poem1, poem2]
+            item: ['1', '2']
         })
         expect(result).toStrictEqual({
             err: undefined,
             abortController: undefined,
             isFetching: false,
             isError: false,
-            item: [poem1, poem2]
+            item: ['1', '2']
         })
     })
     test('should return correct state with fulfilledAction - with previous state', () => {
         const prevState = {
             isFetching: false,
             isError: false,
-            item: [poem1]
+            item: [poem1.id]
         }
         const result = allPoemsQuery(prevState, {
             type: `${ACTIONS.ALL_POEMS}_fulfilled`,
@@ -148,7 +149,7 @@ describe('Poems reducer - allPoemsQuery', () => {
         expect(result).toEqual({
             isFetching: false,
             isError: false,
-            item: [poem2, poem3]
+            item: ['2', '3']
         })
     })
     test('should return correct state with rejectedAction', () => {
@@ -227,9 +228,10 @@ describe('Poems reducer - poemsListQuery cache update bug', () => {
             }
         })
 
-        // Should replace, not append (no duplicates)
+        // Should replace, not append (no duplicates). The cache holds ids now;
+        // the updated likes live on the poem entity, not in this cache.
         expect(stateAfterCacheUpdate.item).toHaveLength(2)
-        expect(stateAfterCacheUpdate.item[0].likes).toEqual(['user123'])
+        expect(stateAfterCacheUpdate.item).toEqual(['poem1', 'poem2'])
     })
 
     test('should not duplicate poems when updating cache on page 2+', () => {
@@ -284,10 +286,10 @@ describe('Poems reducer - poemsListQuery cache update bug', () => {
         // Should replace, not append (no duplicates)
         // This is the fix: detect cache update by checking if state.page === page && poems.length <= state.item.length
         expect(stateAfterCacheUpdate.item).toHaveLength(4)
-        expect(stateAfterCacheUpdate.item[0].likes).toEqual(['user123'])
+        expect(stateAfterCacheUpdate.item[0]).toBe('poem1')
 
-        // Verify no duplicates
-        const ids = stateAfterCacheUpdate.item.map((p: any) => p.id)
+        // Verify no duplicates (item is an array of poem ids)
+        const ids = stateAfterCacheUpdate.item
         const uniqueIds = new Set(ids)
         expect(uniqueIds.size).toBe(4)
     })

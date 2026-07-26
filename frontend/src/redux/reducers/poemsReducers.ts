@@ -13,12 +13,24 @@ export const ACTIONS = {
     AUTHOR_POEMS: 'author-poems'
 }
 
+// A list cache stores only poem ids; the full poems live in the normalized
+// poemEntities store. An entry may already be an id (the normal fetch path) or
+// still be a full Poem (e.g. a hand-built test payload), so normalize to ids.
+function idOf(entry: Poem | string): string {
+    return typeof entry === 'string' ? entry : entry?.id
+}
+
+function toIds(poems: (Poem | string)[]): string[] {
+    return poems.map(idOf)
+}
+
 interface Action {
     type: string
     payload?: any
 }
 
-interface PaginatedStateItem<T> extends StateItem<T> {
+// After normalization the caches hold string[] (poem ids) plus pagination meta.
+interface PaginatedStateItem extends StateItem<string[]> {
     page?: number
     hasMore?: boolean
     total?: number
@@ -26,22 +38,25 @@ interface PaginatedStateItem<T> extends StateItem<T> {
 }
 
 // used for MyFavouritePoems and for MyPoems
-export function allPoemsQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
-    return commonReducer({
+export function allPoemsQuery(state: StateItem<string[]> = INITIAL, action: Action): StateItem<string[]> {
+    const result = commonReducer({
         state,
         action,
         actionType: ACTIONS?.ALL_POEMS,
         ...(state?.abortRequests !== undefined && {
             abortRequests: state?.abortRequests
         })
-    })
+    }) as StateItem<string[]>
+
+    // Store only ids in the cache; the fulfilled payload is a plain Poem[].
+    if (result.item !== state.item && Array.isArray(result.item)) {
+        return Object.assign({}, result, { item: toIds(result.item as (Poem | string)[]) })
+    }
+    return result
 }
 
 // todo: check why do i need requestAction, rejectedAction etc because i have commonActions.ts
-export function poemsListQuery(
-    state: PaginatedStateItem<Poem[]> = INITIAL,
-    action: Action
-): PaginatedStateItem<Poem[]> {
+export function poemsListQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {
     const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.POEMS_LIST)
 
     switch (action.type) {
@@ -63,8 +78,9 @@ export function poemsListQuery(
             // - Both cases: we're on the same page and length is same or shorter
             const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
 
+            const incomingIds = toIds(poems)
             // Replace on first page or cache update, append on subsequent pages (pagination)
-            const newPoems = isFirstPage || isCacheUpdate ? poems : [...(state.item || []), ...poems]
+            const newPoems = isFirstPage || isCacheUpdate ? incomingIds : [...(state.item || []), ...incomingIds]
 
             return Object.assign({}, state, {
                 isFetching: false,
@@ -97,7 +113,7 @@ export function poemsListQuery(
 }
 
 // todo: check why do i need requestAction, rejectedAction etc because i have commonActions.ts
-export function myPoemsQuery(state: PaginatedStateItem<Poem[]> = INITIAL, action: Action): PaginatedStateItem<Poem[]> {
+export function myPoemsQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {
     const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.MY_POEMS)
 
     switch (action.type) {
@@ -119,8 +135,9 @@ export function myPoemsQuery(state: PaginatedStateItem<Poem[]> = INITIAL, action
             // - Both cases: we're on the same page and length is same or shorter
             const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
 
+            const incomingIds = toIds(poems)
             // Replace on first page or cache update, append on subsequent pages (pagination)
-            const newPoems = isFirstPage || isCacheUpdate ? poems : [...(state.item || []), ...poems]
+            const newPoems = isFirstPage || isCacheUpdate ? incomingIds : [...(state.item || []), ...incomingIds]
 
             return Object.assign({}, state, {
                 isFetching: false,
@@ -153,10 +170,7 @@ export function myPoemsQuery(state: PaginatedStateItem<Poem[]> = INITIAL, action
 }
 
 // todo: check why do i need requestAction, rejectedAction etc because i have commonActions.ts
-export function myFavouritePoemsQuery(
-    state: PaginatedStateItem<Poem[]> = INITIAL,
-    action: Action
-): PaginatedStateItem<Poem[]> {
+export function myFavouritePoemsQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {
     const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.MY_FAVOURITE_POEMS)
 
     switch (action.type) {
@@ -178,8 +192,9 @@ export function myFavouritePoemsQuery(
             // - Both cases: we're on the same page and length is same or shorter
             const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
 
+            const incomingIds = toIds(poems)
             // Replace on first page or cache update, append on subsequent pages (pagination)
-            const newPoems = isFirstPage || isCacheUpdate ? poems : [...(state.item || []), ...poems]
+            const newPoems = isFirstPage || isCacheUpdate ? incomingIds : [...(state.item || []), ...incomingIds]
 
             return Object.assign({}, state, {
                 isFetching: false,
@@ -213,15 +228,20 @@ export function myFavouritePoemsQuery(
 
 // Ranking query receives all poems (no pagination) for accurate calculation
 // TODO: In the future, move ranking calculation to backend to avoid fetching all poems
-export function rankingQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
-    return commonReducer({
+export function rankingQuery(state: StateItem<string[]> = INITIAL, action: Action): StateItem<string[]> {
+    const result = commonReducer({
         state,
         action,
         actionType: ACTIONS?.RANKING
-    })
+    }) as StateItem<string[]>
+
+    if (result.item !== state.item && Array.isArray(result.item)) {
+        return Object.assign({}, result, { item: toIds(result.item as (Poem | string)[]) })
+    }
+    return result
 }
 
-export function createPoemQuery(state: StateItem<Poem[]> = INITIAL, action: Action): StateItem<Poem[]> {
+export function createPoemQuery(state: StateItem<Poem> = INITIAL, action: Action): StateItem<Poem> {
     return commonReducer({
         state,
         action,
@@ -229,10 +249,7 @@ export function createPoemQuery(state: StateItem<Poem[]> = INITIAL, action: Acti
     })
 }
 
-export function authorPoemsQuery(
-    state: PaginatedStateItem<Poem[]> = INITIAL,
-    action: Action
-): PaginatedStateItem<Poem[]> {
+export function authorPoemsQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {
     const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.AUTHOR_POEMS)
 
     switch (action.type) {
@@ -246,7 +263,8 @@ export function authorPoemsQuery(
             const { poems, page, hasMore, total, totalPages } = action.payload
             const isFirstPage = page === 1
             const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
-            const newPoems = isFirstPage || isCacheUpdate ? poems : [...(state.item || []), ...poems]
+            const incomingIds = toIds(poems)
+            const newPoems = isFirstPage || isCacheUpdate ? incomingIds : [...(state.item || []), ...incomingIds]
             return Object.assign({}, state, {
                 isFetching: false,
                 isError: false,

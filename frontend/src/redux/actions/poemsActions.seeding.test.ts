@@ -1,6 +1,8 @@
 import { getAllPoemsAction, getPoemsListAction } from './poemsActions'
 import * as commonActions from './commonActions'
 import { authorsUpserted } from '../reducers/authorEntitiesReducers'
+import { poemsUpserted } from '../reducers/poemEntitiesReducers'
+import { poemsListQuery } from '../reducers/poemsReducers'
 import { Poem } from '../../typescript/interfaces'
 
 // poemsActions imports the axios instance and the store singleton at module load;
@@ -76,6 +78,30 @@ describe('poem fetches seed the authorEntities store', () => {
             (c: any[]) => c[0]?.type === authorsUpserted([]).type
         )
         expect(seededNull).toBe(false)
+    })
+
+    test('paginated payload upserts the full poems into poemEntities', () => {
+        const dispatch = seedFrom(getPoemsListAction({ params: {}, options: { fetch: true } }), {
+            poems: [poemA, poemB],
+            page: 1
+        })
+
+        expect(dispatch).toHaveBeenCalledWith(poemsUpserted([poemA, poemB]))
+    })
+
+    test('plain array payload also upserts the full poems into poemEntities', () => {
+        const dispatch = seedFrom(getAllPoemsAction({ params: {}, options: { fetch: true } }), [poemA])
+
+        expect(dispatch).toHaveBeenCalledWith(poemsUpserted([poemA]))
+    })
+
+    test('the fulfilled cache reducer stores only ids (not full poems)', () => {
+        const state = poemsListQuery(undefined, {
+            type: 'poems-list_fulfilled',
+            payload: { poems: [poemA, poemB], page: 1, hasMore: false, total: 2, totalPages: 1 }
+        })
+        // Single source of truth: the cache holds ids; full poems live in poemEntities.
+        expect(state.item).toEqual(['p1', 'p2'])
     })
 
     test('the caller\'s own success callback still runs after seeding', () => {

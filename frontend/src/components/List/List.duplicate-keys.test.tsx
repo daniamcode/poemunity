@@ -3,8 +3,6 @@ import { Provider } from 'react-redux'
 import store from '../../redux/store'
 import List from './List'
 import { AppContext } from '../../App'
-import * as poemActions from '../../redux/actions/poemActions'
-import * as poemsActions from '../../redux/actions/poemsActions'
 
 jest.mock('axios', () => {
     const mockPutFn = jest.fn()
@@ -93,40 +91,9 @@ describe('List component - Duplicate keys bug', () => {
             config: {}
         })
 
-        // Mock the cache update actions
-        const mockUpdatePoemsList = jest.spyOn(poemsActions, 'updatePoemsListCacheAfterLikePoemAction')
-        const mockUpdateRanking = jest.spyOn(poemsActions, 'updateRankingCacheAfterLikePoemAction')
-        const mockUpdateAllPoems = jest.spyOn(poemsActions, 'updateAllPoemsCacheAfterLikePoemAction')
-        const mockUpdatePoem = jest.spyOn(poemActions, 'updatePoemCacheAfterLikePoemAction')
-
-        mockUpdatePoemsList.mockImplementation(({ poemId, context }) => {
-            return (dispatch: any) => {
-                // This should update the cache properly without duplicating
-                dispatch({
-                    type: 'poems-list_fulfilled',
-                    payload: {
-                        poems: mockPoems.map(p =>
-                            p.id === poemId
-                                ? {
-                                      ...p,
-                                      likes: p.likes.includes(context.userId)
-                                          ? p.likes.filter((id: string) => id !== context.userId)
-                                          : [...p.likes, context.userId]
-                                  }
-                                : p
-                        ),
-                        page: 1,
-                        hasMore: false,
-                        total: 2,
-                        totalPages: 1
-                    }
-                })
-            }
-        })
-
-        mockUpdateRanking.mockReturnValue({ type: 'MOCK_UPDATE_RANKING' } as any)
-        mockUpdateAllPoems.mockReturnValue({ type: 'MOCK_UPDATE_ALL_POEMS' } as any)
-        mockUpdatePoem.mockReturnValue({ type: 'MOCK_UPDATE_POEM' } as any)
+        // No per-cache patching is mocked: the real like flow toggles the ONE
+        // poem entity (poemUpdated) and every view re-reads it. This test proves
+        // that liking/unliking never duplicates a poem in the id-backed list.
 
         // Render the List component
         const { container } = render(

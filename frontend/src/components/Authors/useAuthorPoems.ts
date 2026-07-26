@@ -4,6 +4,8 @@ import { useAppDispatch, RootState } from '../../redux/store'
 import { getAuthorPoemsAction } from '../../redux/actions/poemsActions'
 import { getTypes } from '../../redux/actions/commonActions'
 import { ACTIONS } from '../../redux/reducers/poemsReducers'
+import { poemsUpserted } from '../../redux/reducers/poemEntitiesReducers'
+import { selectAuthorPoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { PAGINATION_LIMIT } from '../../data/constants'
 import { Poem } from '../../typescript/interfaces'
 
@@ -17,10 +19,12 @@ export interface InitialAuthorPoemsData {
 export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsData) {
     const dispatch = useAppDispatch()
     const authorPoemsQuery = useSelector((state: RootState) => state.authorPoemsQuery)
+    const poems = useSelector(selectAuthorPoemsPoems)
     const isSeeded = useRef(false)
 
     useEffect(() => {
         if (initialData) {
+            dispatch(poemsUpserted(initialData.poems))
             const { fulfilledAction } = getTypes(ACTIONS.AUTHOR_POEMS)
             dispatch({ type: fulfilledAction, payload: initialData })
             isSeeded.current = true
@@ -56,7 +60,7 @@ export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsDat
     }
 
     return {
-        poems: (authorPoemsQuery.item as Poem[]) || [],
+        poems,
         isLoading: authorPoemsQuery.isFetching,
         hasMore: authorPoemsQuery.hasMore || false,
         total: authorPoemsQuery.total || 0,
