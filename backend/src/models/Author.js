@@ -29,6 +29,11 @@ const authorSchema = new Schema({
   username: { type: String, trim: true },
   email: { type: String, trim: true, lowercase: true },
   passwordHash: String,
+  // password reset — store only the sha256 HASH of the token, never the raw
+  // token itself (the raw token lives only in the emailed link). A DB leak must
+  // not hand out working reset links. Cleared on successful reset (single-use).
+  resetTokenHash: String,
+  resetTokenExpiry: Date,
   poems: [{ type: Schema.Types.ObjectId, ref: 'Poem' }]
 })
 
@@ -45,6 +50,9 @@ authorSchema.set('toJSON', {
     delete returnedObject._id
     delete returnedObject.__v
     delete returnedObject.passwordHash
+    // Never serialize password-reset secrets to any client.
+    delete returnedObject.resetTokenHash
+    delete returnedObject.resetTokenExpiry
   }
 })
 

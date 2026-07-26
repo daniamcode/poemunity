@@ -64,6 +64,7 @@ const Login = (): React.JSX.Element => {
                     </div>
                     {error && <p className='login__error'>{error}</p>}
                     <button disabled={username.length === 0 || password.length === 0}>Login</button>
+                    <Link href='/forgot-password'>Forgot your password?</Link>
                     <Link href='/register'>Register</Link>
                 </form>
             </div>

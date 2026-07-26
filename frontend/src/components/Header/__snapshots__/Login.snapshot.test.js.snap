@@ -47,6 +47,11 @@ exports[`Login should match without id 1`] = `
               Login
             </button>
             <a
+              href="/forgot-password"
+            >
+              Forgot your password?
+            </a>
+            <a
               href="/register"
             >
               Register
@@ -98,6 +103,11 @@ exports[`Login should match without id 1`] = `
           >
             Login
           </button>
+          <a
+            href="/forgot-password"
+          >
+            Forgot your password?
+          </a>
           <a
             href="/register"
           >

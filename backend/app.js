@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit')
 
 const loginRouter = require('./src/controllers/login')
 const registerRouter = require('./src/controllers/register')
+const passwordRouter = require('./src/controllers/password')
 const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
@@ -67,6 +68,17 @@ const registerLimiter = rateLimit({
   skip: req => process.env.NODE_ENV === 'test' || req.method !== 'POST'
 })
 
+// Hard rate-limit on password-reset requests so /forgot cannot be used to spray
+// reset emails or probe for accounts. Mirrors registerLimiter (per-IP/hour).
+const passwordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many password reset attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: req => process.env.NODE_ENV === 'test'
+})
+
 const availabilityLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 30,
@@ -79,6 +91,7 @@ const availabilityLimiter = rateLimit({
 app.use('/api/v1/login', loginLimiter, loginRouter)
 app.use('/api/v1/register/availability', availabilityLimiter)
 app.use('/api/v1/register', registerLimiter, registerRouter)
+app.use('/api/v1/password', passwordLimiter, passwordRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)
 app.use('/api/v1/poem', poemRouter)

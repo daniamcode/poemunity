@@ -99,9 +99,31 @@
             text-decoration: none;
             font-weight: $fw-medium;
             font-size: $fs-base-minus;
+            margin-bottom: 8px;
 
             &:hover {
                 text-decoration: underline;
+            }
+        }
+
+        // Generic confirmation message on the forgot-password flow.
+        .login__message {
+            font-size: $fs-base-minus;
+            color: $color-text-dark;
+            text-align: center;
+            line-height: $lh-base;
+            margin: $space-5 0;
+        }
+
+        // Password-policy helper on the reset-password flow.
+        .login__help {
+            width: 100%;
+            font-size: $fs-base-minus;
+            color: $color-text-placeholder;
+            margin-top: 6px;
+
+            &--error {
+                color: $color-error;
             }
         }
     }
