@@ -63,6 +63,19 @@ Historically this project was a learning exercise — the three folders (Flux �
 
 The session cookie holds a **JWT with identity only** (`id`, `username`, `isAdmin`). Profile/display data (picture, bio, birthYear, …) is **never** in the token — it is fetched from the DB via `GET /api/v1/users/profile` (see `fetchServerUser` in `frontend/src/lib/serverApi.ts`), used by both `/api/auth/session` and `getServerSideProps`. This keeps the cookie well under the ~4KB limit (a base64 profile picture would blow past it) and means context always reflects the database. Client API calls go through the Next proxy `/api/backend/[...path]`, which attaches the httpOnly cookie and refreshes it when a response carries a (now-slim) token.
 
+### Planned: transactional email (Resend) → password reset + email verification
+
+Auth today is username/password only — **no email sending, password reset, or email verification** yet. The next auth phase adds all three on top of one new capability: sending a trusted transactional email.
+
+- **Provider: [Resend](https://resend.com) (decided).** The backend is a single Vercel serverless function, so email must be sent over an HTTP API within the request (not persistent SMTP). Resend fits that, has a serverless-first API, and a free tier well above this app's volume. It sits behind a single `sendEmail()` util so it stays swappable, and no-ops when unconfigured (keeps tests hermetic).
+- **Prerequisite (owner action, not code):** production deliverability needs the **`poemunity.com` sending domain verified** — add Resend's SPF/DKIM DNS records, then set `EMAIL_FROM=no-reply@poemunity.com`. Until then, only Resend's sandbox sender works.
+- **Order:** (1) email infrastructure, (2) password reset — fixes a real lockout (a user who forgets their password is currently stuck), (3) email verification — abuse/quality gate. Three separate PRs.
+- **New backend env vars (added when built):** `RESEND_API_KEY` (absent → email features safely no-op) and `EMAIL_FROM`. No new frontend env vars.
+- **Free-tier limits (Resend, at time of writing):** **3,000 emails/month** and **100 emails/day**, **1 custom domain**, **30-day** log/data retention. Comfortably above this app's transactional volume (reset/verify are low-frequency), but the **100/day cap** is the one to watch if verification emails ever go out in bulk (e.g. a backfill). Also note the pre-verification restriction below: without a verified domain, Resend only sends from its `onboarding@resend.dev` sandbox sender **to the account owner's own email** — fine for local/dev testing, not for real users.
+- **Already shipped groundwork:** registration is now case-insensitive-unique on username **and** email (collation indexes), race-safe (`E11000`→409), trimmed/lowercased, with email-or-username non-enumerating login and a public availability endpoint — so email lookups for reset/verify build on an already-unique, normalized email column.
+
+Full design (endpoints, token model, gating, security caveats) lives in `docs/EMAIL_AUTH_PLAN.md` (gitignored — it contains real addresses). Social login (OAuth) is scoped there too, as a later phase after reset + verification.
+
 ### Next.js migration
 With the introduction of agentic AI, the frontend was migrated from a custom esbuild SPA to Next.js (Pages Router) for SSR and SEO. See `docs/NEXTJS_MIGRATION.md` for the full migration log. The `old` branch still has the three deprecated folders (flux, React-Query, Redux+esbuild) for reference.
 
