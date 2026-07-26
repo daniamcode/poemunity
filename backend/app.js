@@ -17,6 +17,10 @@ if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL env var must be set in production')
 }
 
+if (process.env.NODE_ENV === 'production' && !process.env.RESEND_API_KEY) {
+  console.warn('RESEND_API_KEY not set — email features are disabled')
+}
+
 const getAllowedOrigins = () => {
   if (process.env.FRONTEND_URLS) {
     return process.env.FRONTEND_URLS.split(',').map(origin => origin.trim()).filter(Boolean)

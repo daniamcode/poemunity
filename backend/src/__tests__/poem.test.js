@@ -557,8 +557,8 @@ describe('Poem API', () => {
         .send({
           title: 'Updated Title',
           authorId: '000000000000000000000000', // should be ignored
-          slug: 'injected-slug',               // should be ignored
-          __v: 99                               // should be ignored
+          slug: 'injected-slug', // should be ignored
+          __v: 99 // should be ignored
         })
         .expect(200)
 
