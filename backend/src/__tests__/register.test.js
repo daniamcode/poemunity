@@ -88,18 +88,20 @@ describe('POST /api/v1/register', () => {
     const res = await request(app)
       .post('/api/v1/register')
       .send({ ...VALID, email: 'other@example.com' })
-      .expect(401)
+      .expect(409)
     expect(res.body.code).toBe('1')
     expect(res.body.error).toMatch(/username already exists/i)
   })
 
-  test('rejects a duplicate email with code 2', async () => {
+  test('rejects a duplicate email with code 2 and a neutral message', async () => {
     await request(app).post('/api/v1/register').send(VALID).expect(200)
     const res = await request(app)
       .post('/api/v1/register')
       .send({ ...VALID, username: 'otheruser' })
-      .expect(401)
+      .expect(409)
     expect(res.body.code).toBe('2')
-    expect(res.body.error).toMatch(/email already exists/i)
+    // Neutral message: must NOT confirm the email is already registered.
+    expect(res.body.error).not.toMatch(/already exists/i)
+    expect(res.body.error).not.toMatch(/already registered/i)
   })
 })

@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 
 const authorSchema = new Schema({
   name: String,
@@ -21,12 +20,24 @@ const authorSchema = new Schema({
   website: String,
   // fields the user has chosen to hide from their public profile page
   privateFields: [String],
-  // auth fields — only populated for registered users, null for famous authors
-  username: { type: String, unique: true, sparse: true },
-  email: { type: String, sparse: true },
+  // auth fields — only populated for registered users, null for famous authors.
+  // Uniqueness is enforced by the case-insensitive collation indexes declared
+  // below (NOT inline `unique: true`), so 'Dani' and 'dani' collide and a race
+  // surfaces as a Mongo E11000 the controller can map to a friendly 409.
+  // Note: sparse/uniqueness live only on the explicit indexes below — declaring
+  // `sparse`/`unique` here too would auto-create a second, colliding index.
+  username: { type: String, trim: true },
+  email: { type: String, trim: true, lowercase: true },
   passwordHash: String,
   poems: [{ type: Schema.Types.ObjectId, ref: 'Poem' }]
 })
+
+// Case-insensitive uniqueness. strength: 2 makes the comparison ignore case
+// (and other tertiary differences) so usernames/emails are unique regardless of
+// casing. Sparse so the many famous/ai authors without auth fields are exempt.
+const CI_COLLATION = { locale: 'en', strength: 2 }
+authorSchema.index({ username: 1 }, { unique: true, sparse: true, collation: CI_COLLATION })
+authorSchema.index({ email: 1 }, { unique: true, sparse: true, collation: CI_COLLATION })
 
 authorSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -36,8 +47,6 @@ authorSchema.set('toJSON', {
     delete returnedObject.passwordHash
   }
 })
-
-authorSchema.plugin(uniqueValidator)
 
 const Author = model('Author', authorSchema)
 
