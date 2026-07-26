@@ -2,7 +2,7 @@
 import axios from 'axios'
 import {
     createPoemAction,
-    getAllPoemsAction,
+    getPoemsListAction,
     dropPoemFromCaches,
     dropPoemFromFavouritesCache,
     insertPoemIntoCaches
@@ -49,7 +49,7 @@ jest.mock('../store/index')
 const mockGet = (axios as any).__mockGet
 const mockPost = (axios as any).__mockPost
 
-describe('getAllPoemsAction', () => {
+describe('getPoemsListAction - fetch flow', () => {
     let dispatch: AppDispatch
 
     const callbacks = {
@@ -79,7 +79,7 @@ describe('getAllPoemsAction', () => {
         const spy = jest.spyOn(commonActions, 'getAction')
         const options = { fetch: false }
 
-        getAllPoemsAction({
+        getPoemsListAction({
             params: {},
             options,
             callbacks
@@ -88,7 +88,7 @@ describe('getAllPoemsAction', () => {
         expect(spy).toHaveBeenCalled()
         expect(spy).toBeCalledTimes(1)
         expect(spy).toHaveBeenCalledWith({
-            type: ACTIONS.ALL_POEMS,
+            type: ACTIONS.POEMS_LIST,
             url: API_ENDPOINTS.POEMS,
             dispatch,
             options,
@@ -109,7 +109,7 @@ describe('getAllPoemsAction', () => {
             reset: true
         }
 
-        getAllPoemsAction({
+        getPoemsListAction({
             params: {},
             options,
             callbacks
@@ -124,12 +124,12 @@ describe('getAllPoemsAction', () => {
             reset: true
         }
 
-        getAllPoemsAction({
+        getPoemsListAction({
             params: {},
             options
         })(dispatch)
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.ALL_POEMS}_reset`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toBe(`${ACTIONS.POEMS_LIST}_reset`)
     })
 
     test('Should dispatch error when axios throws a generic error', async () => {
@@ -141,7 +141,7 @@ describe('getAllPoemsAction', () => {
 
         // this is done to give time to the test to wait until the second dispatch occurs. We can also use "act"
         await waitFor(() =>
-            getAllPoemsAction({
+            getPoemsListAction({
                 params: {},
                 options
             })(dispatch)
@@ -157,7 +157,7 @@ describe('getAllPoemsAction', () => {
         // and then "expect(spy).toHaveBeenCalledTimes(1)"
         expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_rejected`)
         // Error is serialized: response.data is undefined so falls back to { message, status, statusText }
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toMatchObject({
             message: expect.any(String)
@@ -172,7 +172,7 @@ describe('getAllPoemsAction', () => {
 
         // this is done to give time to the test to wait until the second dispatch occurs. We can also use "act"
         await waitFor(() =>
-            getAllPoemsAction({
+            getPoemsListAction({
                 params: {},
                 options
             })(dispatch)
@@ -180,7 +180,7 @@ describe('getAllPoemsAction', () => {
 
         expect(mockGet).toHaveBeenCalledTimes(1)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.ALL_POEMS}_rejected`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toBe(`${ACTIONS.POEMS_LIST}_rejected`)
         // String errors are serialized to { message, status, statusText }
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toMatchObject({
             message: expect.any(String)
@@ -199,15 +199,15 @@ describe('getAllPoemsAction', () => {
 
         const options = { fetch: true }
         await waitFor(() =>
-            getAllPoemsAction({
+            getPoemsListAction({
                 params: {},
                 options
             })(dispatch)
         )
 
-        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_request`)
+        expect((dispatch as jest.Mock).mock.calls[0][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_request`)
         expect((dispatch as jest.Mock).mock.calls.length).toBe(2)
-        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.ALL_POEMS}_fulfilled`)
+        expect((dispatch as jest.Mock).mock.calls[1][0].type).toStrictEqual(`${ACTIONS.POEMS_LIST}_fulfilled`)
         expect((dispatch as jest.Mock).mock.calls[1][0].payload).toEqual('poem1')
     })
 })
@@ -778,7 +778,6 @@ describe('dropPoemFromCaches', () => {
             myPoemsQuery: { item: ['2', '5'], page: 1, hasMore: false, total: 2, totalPages: 1 },
             myFavouritePoemsQuery: { item: ['9'], page: 1, hasMore: false, total: 1, totalPages: 1 },
             authorPoemsQuery: { item: ['2'], page: 1, hasMore: false, total: 1, totalPages: 1 },
-            allPoemsQuery: { item: ['1', '2', '3'] },
             rankingQuery: { item: ['2', '3'] }
         })
 
@@ -797,8 +796,7 @@ describe('dropPoemFromCaches', () => {
         expect(byType['my-poems_fulfilled'].total).toBe(1)
         // authorPoems: id dropped
         expect(byType['author-poems_fulfilled'].poems).toEqual([])
-        // plain caches: id dropped, payload is a bare id-array
-        expect(byType['all-poems_fulfilled']).toEqual(['1', '3'])
+        // plain cache (ranking): id dropped, payload is a bare id-array
         expect(byType['ranking_fulfilled']).toEqual(['3'])
         // favourites did not contain the id -> not re-emitted
         expect(byType['my-favourite-poems_fulfilled']).toBeUndefined()
@@ -810,7 +808,6 @@ describe('dropPoemFromCaches', () => {
             myPoemsQuery: { item: undefined },
             myFavouritePoemsQuery: { item: undefined },
             authorPoemsQuery: { item: undefined },
-            allPoemsQuery: { item: undefined },
             rankingQuery: { item: undefined }
         })
 
@@ -883,7 +880,6 @@ describe('insertPoemIntoCaches', () => {
         ;(store.getState as jest.Mock).mockReturnValue({
             poemsListQuery: { item: ['1', '2'], page: 1, hasMore: false, total: 2, totalPages: 1 },
             myPoemsQuery: { item: ['1'], page: 1, hasMore: false, total: 1, totalPages: 1 },
-            allPoemsQuery: { item: ['1', '2'] },
             rankingQuery: { item: ['1'] }
         })
 
@@ -903,8 +899,7 @@ describe('insertPoemIntoCaches', () => {
         expect(byType['poems-list_fulfilled'].total).toBe(3)
         expect(byType['my-poems_fulfilled'].poems).toEqual(['new-1', '1'])
         expect(byType['my-poems_fulfilled'].total).toBe(2)
-        // aggregate lists: new id appended
-        expect(byType['all-poems_fulfilled']).toEqual(['1', '2', 'new-1'])
+        // aggregate list (ranking): new id appended
         expect(byType['ranking_fulfilled']).toEqual(['1', 'new-1'])
     })
 })

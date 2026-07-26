@@ -23,7 +23,6 @@ function MyPoems() {
     const poems = useSelector(selectMyPoemsPoems)
 
     // Initial load
-    // todo: check if i have to dispatch getAllPoemsAction as i used to do, or if this ia approach is correct
     useEffect(() => {
         if (context?.userId) {
             const queryOptions = {

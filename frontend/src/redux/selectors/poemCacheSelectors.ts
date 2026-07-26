@@ -47,6 +47,3 @@ export const selectRankingPoems = makeCachePoemsSelector(
 export const selectAuthorPoemsPoems = makeCachePoemsSelector(
     state => state.authorPoemsQuery?.item as CacheEntry[] | undefined
 )
-export const selectAllPoemsPoems = makeCachePoemsSelector(
-    state => state.allPoemsQuery?.item as CacheEntry[] | undefined
-)

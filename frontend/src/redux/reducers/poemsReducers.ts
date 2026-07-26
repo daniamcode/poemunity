@@ -4,7 +4,6 @@ import { StateItem } from '../../typescript/interfaces'
 import { getTypes } from '../actions/commonActions'
 
 export const ACTIONS = {
-    ALL_POEMS: 'all-poems',
     POEMS_LIST: 'poems-list',
     MY_POEMS: 'my-poems',
     MY_FAVOURITE_POEMS: 'my-favourite-poems',
@@ -35,24 +34,6 @@ interface PaginatedStateItem extends StateItem<string[]> {
     hasMore?: boolean
     total?: number
     totalPages?: number
-}
-
-// used for MyFavouritePoems and for MyPoems
-export function allPoemsQuery(state: StateItem<string[]> = INITIAL, action: Action): StateItem<string[]> {
-    const result = commonReducer({
-        state,
-        action,
-        actionType: ACTIONS?.ALL_POEMS,
-        ...(state?.abortRequests !== undefined && {
-            abortRequests: state?.abortRequests
-        })
-    }) as StateItem<string[]>
-
-    // Store only ids in the cache; the fulfilled payload is a plain Poem[].
-    if (result.item !== state.item && Array.isArray(result.item)) {
-        return Object.assign({}, result, { item: toIds(result.item as (Poem | string)[]) })
-    }
-    return result
 }
 
 // todo: check why do i need requestAction, rejectedAction etc because i have commonActions.ts

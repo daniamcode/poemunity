@@ -9,7 +9,7 @@ import { authorsUpserted, AuthorEntity } from '../reducers/authorEntitiesReducer
 import { poemsUpserted, poemUpserted } from '../reducers/poemEntitiesReducers'
 
 // Extract the poems array from either fulfilled payload shape: a plain Poem[]
-// (ALL_POEMS, RANKING) or a paginated { poems, ... } object (the rest).
+// (RANKING) or a paginated { poems, ... } object (the rest).
 function extractPoems(responseData: unknown): Poem[] {
     const payload = responseData as Poem[] | { poems?: Poem[] } | null | undefined
     const poems: Poem[] | undefined = Array.isArray(payload) ? payload : payload?.poems
@@ -50,25 +50,6 @@ function withAuthorSeeding(dispatch: AppDispatch, callbacks?: ReduxCallbacks): R
             seedStoresFromPoemsPayload(dispatch, responseData)
             callbacks?.success?.(responseData)
         }
-    }
-}
-
-interface GetAllPoemsActionProps {
-    params?: object
-    options?: ReduxOptions
-    callbacks?: ReduxCallbacks
-}
-
-export function getAllPoemsAction({ params, options, callbacks }: GetAllPoemsActionProps) {
-    return function dispatcher(dispatch: AppDispatch) {
-        return getAction({
-            type: ACTIONS.ALL_POEMS,
-            url: API_ENDPOINTS.POEMS,
-            dispatch,
-            params,
-            options,
-            callbacks: withAuthorSeeding(dispatch, callbacks)
-        })
     }
 }
 
@@ -213,7 +194,6 @@ const PAGINATED_CACHES: { actionType: string; key: keyof RootState }[] = [
 ]
 
 const PLAIN_CACHES: { actionType: string; key: keyof RootState }[] = [
-    { actionType: ACTIONS.ALL_POEMS, key: 'allPoemsQuery' },
     { actionType: ACTIONS.RANKING, key: 'rankingQuery' }
 ]
 
