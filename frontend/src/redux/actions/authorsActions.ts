@@ -2,7 +2,38 @@ import { getAction } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import { ACTIONS } from '../reducers/authorsReducers'
 import { AppDispatch } from '../store'
-import { ReduxOptions, ReduxCallbacks } from '../../typescript/interfaces'
+import { ReduxOptions, ReduxCallbacks, Author } from '../../typescript/interfaces'
+import { authorsUpserted, AuthorEntity } from '../reducers/authorEntitiesReducers'
+
+// Seed the normalized authorEntities store from an /authors list fetch, so that
+// name/picture/slug have a single source of truth. Later renames (authorUpdated)
+// then propagate to every list that resolves through the entity store.
+function seedAuthorEntities(dispatch: AppDispatch, responseData: unknown): void {
+    const authors = (Array.isArray(responseData) ? responseData : []) as Author[]
+    const entities: AuthorEntity[] = authors
+        .filter(author => author && author.id)
+        .map(author => ({
+            id: author.id as string,
+            name: author.name,
+            picture: author.picture,
+            slug: author.slug,
+            type: author.type
+        }))
+
+    if (entities.length > 0) {
+        dispatch(authorsUpserted(entities))
+    }
+}
+
+function withAuthorEntitySeeding(dispatch: AppDispatch, callbacks?: ReduxCallbacks): ReduxCallbacks {
+    return {
+        ...callbacks,
+        success: (responseData: unknown) => {
+            seedAuthorEntities(dispatch, responseData)
+            callbacks?.success?.(responseData)
+        }
+    }
+}
 
 interface GetTopAuthorsActionProps {
     params?: object
@@ -18,7 +49,7 @@ export function getTopAuthorsAction({ params, options, callbacks }: GetTopAuthor
             dispatch,
             params,
             options,
-            callbacks
+            callbacks: withAuthorEntitySeeding(dispatch, callbacks)
         })
     }
 }
@@ -38,7 +69,7 @@ export function getAuthorsByLetterAction({ letter, origin, options, callbacks }:
             dispatch,
             params: { letter, ...(origin && origin !== 'all' ? { type: origin } : {}) },
             options,
-            callbacks
+            callbacks: withAuthorEntitySeeding(dispatch, callbacks)
         })
     }
 }

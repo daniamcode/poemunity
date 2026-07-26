@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getAuthorsByLetterAction, getAuthorsLettersAction } from '../../redux/actions/authorsActions'
 import { getTypes } from '../../redux/actions/commonActions'
 import { ACTIONS } from '../../redux/reducers/authorsReducers'
+import { selectAuthorsByLetter } from '../../redux/selectors/authorCacheSelectors'
 import { RootState, useAppDispatch } from '../../redux/store'
 import { Author } from '../../typescript/interfaces'
 
@@ -28,7 +29,10 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
     const authorsSeeded = useRef(false)
 
     const { item: letters } = useSelector((state: RootState) => state.authorsLettersQuery)
-    const { item: authors, isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
+    const { isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
+    // Resolve name/slug through the normalized authorEntities store so renames
+    // propagate without a refetch; count and ordering stay from the list cache.
+    const authors = useSelector(selectAuthorsByLetter)
 
     useEffect(() => {
         if (initialLetters) {
@@ -106,7 +110,7 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
 
             <section className='authors-index__list'>
                 {isFetching && <p className='authors-index__loading'>Loading...</p>}
-                {!isFetching && (authors as Author[])?.map(author => (
+                {!isFetching && authors?.map(author => (
                     <Link
                         key={author.slug}
                         className='authors-index__author'
@@ -116,7 +120,7 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
                         <span className='authors-index__author-count'>{author.count} poems</span>
                     </Link>
                 ))}
-                {!isFetching && !(authors as Author[])?.length && (
+                {!isFetching && !authors?.length && (
                     <p className='authors-index__empty'>No authors found for this letter.</p>
                 )}
             </section>
