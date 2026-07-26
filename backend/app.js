@@ -58,10 +58,22 @@ const registerLimiter = rateLimit({
   message: { error: 'Too many registration attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  // Only gate account creation (POST). The public availability check (GET) has
+  // its own, looser limiter below so debounced typing does not burn the quota.
+  skip: req => process.env.NODE_ENV === 'test' || req.method !== 'POST'
+})
+
+const availabilityLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: { error: 'Too many availability checks, please slow down' },
+  standardHeaders: true,
+  legacyHeaders: false,
   skip: () => process.env.NODE_ENV === 'test'
 })
 
 app.use('/api/v1/login', loginLimiter, loginRouter)
+app.use('/api/v1/register/availability', availabilityLimiter)
 app.use('/api/v1/register', registerLimiter, registerRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)

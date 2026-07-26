@@ -115,20 +115,20 @@ describe('Migration verification', () => {
       expect(new Set(slugs).size).toBe(slugs.length)
     })
 
-    test('returns 401 when username is already taken', async () => {
+    test('returns 409 when username is already taken', async () => {
       const res = await request(app)
         .post('/api/v1/register')
         .send({ username: 'janedoe', email: 'other@example.com', password: 'password123' })
-        .expect(401)
+        .expect(409)
 
       expect(res.body.code).toBe('1')
     })
 
-    test('returns 401 when email is already taken', async () => {
+    test('returns 409 when email is already taken', async () => {
       const res = await request(app)
         .post('/api/v1/register')
         .send({ username: 'someoneelse', email: 'jane@example.com', password: 'password123' })
-        .expect(401)
+        .expect(409)
 
       expect(res.body.code).toBe('2')
     })
