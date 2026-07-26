@@ -1,4 +1,4 @@
-import { selectTopAuthors, selectAuthorsByLetter } from './authorCacheSelectors'
+import { selectTopAuthors, selectAuthorsByLetter, selectRanking } from './authorCacheSelectors'
 import type { RootState } from '../store'
 
 // Build a minimal RootState slice for the selectors under test.
@@ -66,5 +66,43 @@ describe('author cache selectors resolve through authorEntities', () => {
         const state = makeState('topAuthorsQuery', undefined, {})
 
         expect(selectTopAuthors(state)).toEqual([])
+    })
+})
+
+describe('selectRanking resolves ranking rows through authorEntities', () => {
+    function makeRankingState(list: any, entities: any): RootState {
+        return {
+            rankingQuery: { item: list, isFetching: false, isError: false },
+            authorEntities: { ids: Object.keys(entities), entities }
+        } as unknown as RootState
+    }
+
+    const row = { userId: 'u1', author: 'Old Name', picture: 'old.jpg', authorSlug: 'old-name', points: 42 }
+
+    test('entity avatar/name/slug win over the baked-in copy (picture change propagates)', () => {
+        const state = makeRankingState([row], {
+            u1: { id: 'u1', name: 'New Name', picture: 'new.jpg', slug: 'new-name' }
+        })
+
+        const [resolved] = selectRanking(state)
+
+        expect(resolved.picture).toBe('new.jpg')
+        expect(resolved.author).toBe('New Name')
+        expect(resolved.authorSlug).toBe('new-name')
+        // Server-computed points/order are untouched by the overlay.
+        expect(resolved.points).toBe(42)
+    })
+
+    test('falls back to the baked-in row when no matching entity exists', () => {
+        const state = makeRankingState([row], {})
+
+        const [resolved] = selectRanking(state)
+
+        expect(resolved.picture).toBe('old.jpg')
+        expect(resolved.author).toBe('Old Name')
+    })
+
+    test('returns an empty array when the ranking cache is empty', () => {
+        expect(selectRanking(makeRankingState(undefined, {}))).toEqual([])
     })
 })

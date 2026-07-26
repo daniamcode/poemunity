@@ -14,6 +14,7 @@ const rankItem = (n: number, points: number) => ({
     author: `Author ${n}`,
     picture: `pic-${n}.jpg`,
     authorSlug: `author-${n}`,
+    userId: `user-${n}`,
     points
 })
 
@@ -98,6 +99,29 @@ describe('Ranking Component - Top 10', () => {
         expect(screen.getByText('Author 1')).toBeInTheDocument()
         // Points come straight from the backend — the component does not recompute.
         expect(screen.getByText('42 pts')).toBeInTheDocument()
+    })
+
+    test('resolves an updated avatar/name from authorEntities (no refetch, no stale copy)', () => {
+        // The cached ranking row carries the OLD picture/name the server baked in.
+        store = mockStore({
+            ...rankingState([rankItem(1, 42)]),
+            // The user has since changed their avatar and display name; the entity
+            // store is the single source of truth and must win over the baked copy.
+            authorEntities: {
+                ids: ['user-1'],
+                entities: {
+                    'user-1': { id: 'user-1', name: 'Renamed Poet', picture: 'new-avatar.jpg', slug: 'renamed-poet' }
+                }
+            }
+        })
+
+        renderRanking(store)
+
+        const avatar = screen.getByAltText('Renamed Poet') as HTMLImageElement
+        expect(avatar.src).toContain('new-avatar.jpg')
+        expect(avatar.src).not.toContain('pic-1.jpg')
+        expect(screen.getByText('Renamed Poet')).toBeInTheDocument()
+        expect(screen.queryByText('Author 1')).not.toBeInTheDocument()
     })
 
     test('preserves the backend ordering (does not re-sort)', () => {

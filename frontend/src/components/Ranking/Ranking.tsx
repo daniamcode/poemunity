@@ -13,13 +13,15 @@ import { RootState, useAppDispatch } from '../../redux/store'
 import { AuthorAvatar } from '../ListItem/components/AuthorAvatar'
 import { slugify } from '../../utils/urlUtils'
 import { getRankingAction } from '../../redux/actions/poemsActions'
-
-const EMPTY_RANK: RankItem[] = []
+import { selectRanking } from '../../redux/selectors/authorCacheSelectors'
 
 function Ranking() {
     // Ranking is computed server-side; the cache holds a ready-to-render RankItem[].
+    // We read it through selectRanking so each row's name/picture/slug resolves
+    // against the authorEntities store — an avatar or rename change propagates
+    // here without a refetch, instead of showing the stale baked-in copy.
     const rankingQuery = useSelector((state: RootState) => state.rankingQuery)
-    const rank = (rankingQuery.item as RankItem[]) || EMPTY_RANK
+    const rank = useSelector(selectRanking)
     const dispatch = useAppDispatch()
 
     const retry = () => dispatch(getRankingAction({

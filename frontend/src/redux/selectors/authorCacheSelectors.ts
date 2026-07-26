@@ -1,6 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 import { Author } from '../../typescript/interfaces'
+import { RankItem } from '../../utils/getRanking'
 import { AuthorEntity } from '../reducers/authorEntitiesReducers'
 
 // The author list caches (topAuthorsQuery, authorsByLetterQuery) hold full Author
@@ -45,4 +46,33 @@ export const selectTopAuthors = createSelector(
 export const selectAuthorsByLetter = createSelector(
     [(state: RootState) => state.authorsByLetterQuery?.item as Author[] | undefined, selectAuthorEntities],
     resolve
+)
+
+// The ranking is computed server-side and cached as RankItem[] with the author's
+// name/picture/slug baked in at fetch time. Those baked copies drift when an
+// author renames or changes their avatar, so overlay the authorEntities store
+// (keyed by userId) here too — points/order stay from the server-computed row.
+const EMPTY_RANK: RankItem[] = []
+
+function resolveRanking(list: RankItem[] | undefined, entities: Record<string, AuthorEntity>): RankItem[] {
+    if (!Array.isArray(list)) {
+        return EMPTY_RANK
+    }
+    return list.map(item => {
+        const entity = item.userId ? entities[item.userId] : undefined
+        if (!entity) {
+            return item
+        }
+        return {
+            ...item,
+            author: entity.name ?? item.author,
+            picture: entity.picture ?? item.picture,
+            authorSlug: entity.slug ?? item.authorSlug
+        }
+    })
+}
+
+export const selectRanking = createSelector(
+    [(state: RootState) => state.rankingQuery?.item as RankItem[] | undefined, selectAuthorEntities],
+    resolveRanking
 )

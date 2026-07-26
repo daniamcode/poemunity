@@ -5,6 +5,9 @@ export interface RankItem {
     picture: string
     points: number
     authorSlug?: string
+    // Author id — present on server-computed ranking rows; lets views resolve the
+    // author's live name/picture/slug through the authorEntities store.
+    userId?: string
 }
 
 interface RankAccumulator {
