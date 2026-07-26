@@ -32,21 +32,30 @@ Presentation: https://www.youtube.com/watch?v=WAyod6lGboE&t=4s
 Then, I created the Poemunity-React-Query folder and continued from there, managing Server State (cache) with React-Query and Client State with useContext (a Global State Manager like Flux or Redux is not needed anymore with this approach since we divide it into these two differenciated parts (Server State (asynchronous) and Client State)). By the way, a middleware like Thunk manages asynchrony for Redux, and all that becomes transparent to me with React Query.
 
 ## Redux
-Finally, I implemented Redux, because the goal of this project is to learn as much as possible. The other two folders (Flux and React-Query) are now deprecated.
+The current app uses Redux (Redux Toolkit). The earlier `Flux` and `React-Query` folders are deprecated and kept only for reference.
 
-### Planned: server state → RTK Query
+Historically this project was a learning exercise — the three folders (Flux → React Query → Redux) exist because the original goal was to explore as many approaches as possible. **That is no longer the goal: Poemunity is now a production product, and architectural decisions prioritize robustness, correctness, and maintainability over breadth of technologies explored.** Where a past choice was made "to learn X," it is re-evaluated on product merit (see "Planned: server state → RTK Query" below).
 
-**Problem.** Server data (poems, ranking, authors, my-poems, favourites) is cached in Redux and kept in sync by hand-written `updateXCacheAfterY` thunks — one per mutation × per cache. This matrix is fragile: it's easy to miss a cache (a deleted poem lingering on the author page, a changed name/picture not propagating), and every new field or mutation multiplies the boilerplate.
+### Planned: single source of truth (normalized Redux store)
 
-**Decision.** Move **server state** to **RTK Query** (stays inside the existing Redux Toolkit store), keeping **client/auth state** in `AppContext`. Mutations then just invalidate tags and the affected queries refetch automatically — deleting the entire `updateXCacheAfterY` family and the whole class of staleness bugs. This returns server-state management to the React Query idiom the project used earlier (the deprecated `React-Query` folder), now integrated with Redux Toolkit.
+**Problem.** Server data is **denormalized** in the Redux store: each poem is cached as a *full copy* across six separate list caches (`ALL_POEMS`, `POEMS_LIST`, `MY_POEMS`, `MY_FAVOURITE_POEMS`, `RANKING`, `AUTHOR_POEMS`), and each author's name/picture is *copied onto every poem* (`poem.author`, `poem.picture`, `poem.authorSlug`, …). The same mutable fact is therefore stored in many places, so the copies **drift** — a deleted poem lingers on the author page, a changed username/picture doesn't propagate. These copies are kept in sync by hand-written `updateXCacheAfterY` thunks (one per mutation × per cache) — a fragile matrix that grows with every field and mutation.
 
-**Approach (incremental).**
-1. Add a `createApi` with the axios/proxy base query and tag types (`Poems`, `Poem`, `Ranking`, `Authors`, `Profile`).
-2. Migrate one vertical slice first (e.g. ranking or poem detail) to establish the pattern; keep tests green.
-3. Convert the remaining lists + mutations; delete the corresponding thunks and query reducers.
-4. Remove the now-dead Redux slices once no consumer reads them.
+**Decision.** Normalize the store into a **single source of truth** using **`createEntityAdapter`** (plain Redux Toolkit — *not* RTK Query). RTK Query was considered and rejected: its query-cache / refetch-on-invalidation model is the React Query idiom the project deliberately moved away from, and the project prefers explicit REST + Redux control. Instead, store each author **once** and each poem **once**, keyed by id; list caches hold **arrays of ids**; components read author/poem **by id**. Change a record once → every view re-reads it, no propagation code. The entire `updateXCacheAfterY` family is deleted.
 
-**Status:** planned (not started). The manual cache-sync stays in place until then.
+**Approach (two phases, sequential — both touch the same reducers/actions).**
+
+*Phase 1 — Authors as the single source of truth (fixes the name/picture drift):*
+1. Add an `authorsAdapter` (`createEntityAdapter`) → an `authors` slice keyed by author id (`{ id, name, picture, slug, type }`).
+2. On every poems fetch, split the author fields off each poem into `authorsAdapter.upsertMany` (keyed by `poem.userId`).
+3. `ListItem` / `AuthorAvatar` look the author up via `selectAuthorById(state, poem.userId)` instead of reading `poem.picture` / `poem.author`.
+4. Profile edits dispatch `authorsAdapter.updateOne({ id, changes })`; **delete** `updateCachesAfterAuthorChangeAction`.
+
+*Phase 2 — Poems as the single source of truth (fixes deleted-poem-lingers, like drift):*
+5. Add a `poemsAdapter` → a `poems` entity store (each poem once, by id).
+6. Convert the six list caches from arrays of full poems to **arrays of poem ids** + their pagination meta.
+7. Delete/like become `poemsAdapter.removeOne` / `updateOne`; **delete** the delete-cache and like thunks.
+
+**Status:** in progress (Phase 1 first, then Phase 2). Until a phase lands, its manual cache-sync stays in place.
 
 ### Auth & session (identity-only JWT)
 

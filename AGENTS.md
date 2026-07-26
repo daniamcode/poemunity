@@ -11,7 +11,7 @@ Monorepo with two independently-deployed apps:
 
 Both deploy on Vercel (two separate projects) against MongoDB Atlas; CI via GitHub Actions (lint, typecheck, tests — no deploy step, Vercel deploys on push). Custom domain: `poemunity.com` (apex is canonical; `www` and the `.vercel.app` URL redirect to it).
 
-State is split: **server state** in Redux Toolkit caches, **client/auth state** in `AppContext`. See "Planned: RTK Query" below — the manual server-cache syncing is slated for replacement.
+State is split: **server state** in Redux Toolkit caches, **client/auth state** in `AppContext`. See "Planned: single source of truth" below — the manual server-cache syncing is slated for replacement by a normalized store.
 
 ## Common Commands
 
@@ -59,7 +59,7 @@ npm run stg | prod  # forever (legacy long-running host; prod on Vercel is serve
 
 **State management**
 - **Redux Toolkit** for server-state caches: query slices in `src/redux/reducers/` (`poemsReducers`, `poemReducers`, `authorsReducers`, `loginReducers`) combined in `rootReducer`. Store at `src/redux/store/index.ts` (`RootState`, `AppDispatch`, `useAppDispatch`).
-- Async thunks + cache updaters in `src/redux/actions/` (`poemsActions`, `poemActions`, `loginActions`, `commonActions`). Cache consistency after mutations is currently hand-maintained via `updateXCacheAfterY` thunks (fragile — see "Planned: RTK Query").
+- Async thunks + cache updaters in `src/redux/actions/` (`poemsActions`, `poemActions`, `loginActions`, `commonActions`). Cache consistency after mutations is currently hand-maintained via `updateXCacheAfterY` thunks (fragile — see "Planned: single source of truth").
 - **`AppContext`** (`src/App.tsx`) holds client/auth state (current user, picture, isAdmin, …), hydrated from the DB (not the token — see Auth).
 
 **API integration**
@@ -102,16 +102,14 @@ npm run stg | prod  # forever (legacy long-running host; prod on Vercel is serve
 
 **Backend Vercel project**: `MONGODB` (prod) / `MONGODB_PRE` (dev), `SECRET` (JWT), `REACT_APP_ADMIN` (prod) / `REACT_APP_ADMIN_PRE` (dev) admin ObjectId, `FRONTEND_URL` (required in prod) and/or `FRONTEND_URLS`, `NODE_ENV`, `DEBUG`.
 
-## Planned: RTK Query migration (server state)
+## Planned: single source of truth (normalized Redux store)
 
-**Problem.** Server data (poems, ranking, authors, my-poems, favourites) is cached in Redux and kept in sync by hand-written `updateXCacheAfterY` thunks — one per mutation × per cache. This matrix is fragile: it's easy to miss a cache (a deleted poem lingering on the author page; a changed name/picture not propagating), and each new field or mutation multiplies the boilerplate.
+**Problem.** Server data is **denormalized** in Redux: each poem is cached as a full copy across six list caches (`ALL_POEMS`, `POEMS_LIST`, `MY_POEMS`, `MY_FAVOURITE_POEMS`, `RANKING`, `AUTHOR_POEMS`), and each author's name/picture is copied onto every poem (`poem.author`, `poem.picture`, `poem.authorSlug`). The same mutable fact lives in many places, so copies drift (deleted poem lingers; changed username/picture doesn't propagate). They're kept in sync by hand-written `updateXCacheAfterY` thunks — a fragile matrix (mutation × cache) that grows with every field.
 
-**Decision.** Move **server state** to **RTK Query** (inside the existing Redux Toolkit store), keeping **client/auth state** in `AppContext`. Mutations then invalidate tags and affected queries refetch automatically — removing the entire `updateXCacheAfterY` family and the whole class of staleness bugs.
+**Decision.** Normalize into a **single source of truth** using **`createEntityAdapter`** (plain Redux Toolkit — **not** RTK Query). RTK Query was evaluated and rejected: its query-cache/refetch model is the React Query idiom the project deliberately left, and the project prefers explicit REST + Redux control. Store each author once and each poem once, keyed by id; list caches hold arrays of ids; components read by id. One update propagates to every view; the whole `updateXCacheAfterY` family is deleted.
 
-**Incremental approach.**
-1. Add a `createApi` with the axios/proxy base query and tag types (`Poems`, `Poem`, `Ranking`, `Authors`, `Profile`).
-2. Migrate one vertical slice first (e.g. ranking or poem detail) to establish the pattern; keep tests green.
-3. Convert the remaining lists + mutations; delete the corresponding thunks and query reducers.
-4. Remove now-dead Redux slices once nothing reads them.
+**Two phases (sequential — both touch the same reducers/actions):**
+- **Phase 1 — Authors SSoT:** `authorsAdapter` slice keyed by author id; split author fields off poems into `upsertMany` (by `poem.userId`) on fetch; `ListItem`/`AuthorAvatar` use `selectAuthorById(state, poem.userId)`; profile edits `updateOne`; delete `updateCachesAfterAuthorChangeAction`.
+- **Phase 2 — Poems SSoT:** `poemsAdapter` entity store; the six list caches become arrays of ids + pagination meta; delete/like become `removeOne`/`updateOne`; delete the delete-cache and like thunks.
 
-**Status:** planned (not started). Until then, when adding a mutation, remember to update **every** relevant cache (all/list/my/author/favourite poems + ranking) or data will look stale until refresh.
+**Status:** in progress (Phase 1 first, then Phase 2). Until a phase lands, when adding a mutation still update **every** relevant cache or data will look stale until refresh.
