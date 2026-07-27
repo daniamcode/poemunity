@@ -17,6 +17,12 @@ actionable list.
   (from `backend/`). Marks existing users verified, backfills `testAccount:false`,
   and rebuilds the email index. **This also activates the multi-account-per-email
   exemption** — until it runs, prod still enforces one account per email.
+  ⚠️ **Also a correctness gap until it runs:** prod's email index is currently a
+  plain **non-unique** `email_1` (confirmed live), so real-account email
+  uniqueness rests *only* on register.js's `findOne({ email })` pre-check — the
+  `E11000` race fallback can never fire, so two concurrent signups on the same
+  email could both succeed. The migration rebuilds it as the partial **unique**
+  index that closes this.
 - 👤 **Production deployment verification** (the one remaining hard blocker in the
   checklist — see `docs/PRODUCTION_CHECKLIST.md` → "Final Manual Steps" and
   `docs/NEXTJS_MIGRATION.md` Phase 8):
@@ -47,6 +53,14 @@ actionable list.
 - 👤 **Toast QA in the browser** — comment post/reply/delete, poem like-failure,
   delete, create/save. (A regression test already guards `manageError` against
   `[object Object]`.)
+- 🤖 **Authenticated "change password" endpoint + UI** — today the only way to
+  change a password is Forgot → emailed reset link, and that resolves the account
+  by `findOne({ email })` (`password.js`). With accounts sharing an inbox (admin
+  test accounts) this is ambiguous — it only ever hits the oldest doc for that
+  email, so any other account on the same email can't reset via the UI. Add a
+  logged-in change-password route that targets `req.userId` (verify current
+  password, set new hash, bump `passwordChangedAt`) plus a Profile UI, so
+  password changes don't depend on email uniqueness/ordering.
 
 ## 🟢 P3 — Frontend quality & refactors (code)
 
@@ -105,6 +119,13 @@ actionable list.
 - Branch protection on `master`: force-push + deletion blocked (no PRs required).
 - `ListItem` context memoization, responsive display typography via `clamp()`,
   `manageError` toast guard.
+- Brand refresh: header now uses the `lg-1` wordmark image (`public/poemunity-logo.png`);
+  favicon/PWA icon set + `og-image.png` recolored to the wordmark red `#e90913`.
+  Also fixed a latent bug — `og-image.png` was caught by the blanket `*.png`
+  gitignore and had never actually deployed (social card 404'd); now whitelisted.
+- `backend/scripts/set-account-password.js` — securely set an account's password
+  from a hidden terminal prompt (for accounts unreachable via the email reset flow,
+  e.g. test accounts sharing an inbox).
 
 ## 📚 Reference docs
 
