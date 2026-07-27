@@ -59,9 +59,12 @@ $fs-md:        1.1rem;   // ~18px  slightly prominent text, buttons
 $fs-lg:        1.3rem;   // ~21px  sub-section titles
 $fs-xl:        1.5rem;   // 24px   section titles
 $fs-2xl:       2rem;     // 32px   page titles
-$fs-display:   2.2rem;   // ~35px  form page headings (login, register)
-$fs-3xl:       2.5rem;   // 40px   large display headings
-$fs-4xl:       2.8rem;   // ~45px  hero / author name headings
+// Display headings scale fluidly with the viewport: they hit the max (the
+// original desktop size) on wide screens and shrink on small ones, so large
+// hero/title text no longer overflows on mobile. min ≈ mobile, max = desktop.
+$fs-display:   clamp(1.75rem, 5vw, 2.2rem);  // ~28→35px  form page headings (login, register)
+$fs-3xl:       clamp(1.9rem, 5.5vw, 2.5rem); // ~30→40px  large display headings
+$fs-4xl:       clamp(2rem, 6vw, 2.8rem);     // ~32→45px  hero / author name headings
 
 // Typography — weights
 $fw-regular:  400;
