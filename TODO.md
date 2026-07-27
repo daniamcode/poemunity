@@ -10,12 +10,12 @@ actionable list.
 
 ## 🔴 P0 — Production go-live (blocks a real launch)
 
-- 👤 **Database safety — restore drill** — a fresh `mongodump` snapshot was taken
-  2026-07-27 (`~/poemunity-backups/`), so the on-demand-snapshot box is ticked.
-  What remains: prove it *restores* — `mongorestore` that archive to a **throwaway**
-  Atlas cluster and check doc counts (`docs/DATABASE_BACKUP_RESTORE.md`). Also
-  enable Atlas Cloud Backup if your tier supports it (free/shared tiers don't —
-  `mongodump` is the fallback). Always snapshot before any bulk production write.
+_All P0 launch blockers are complete._ 🎉 (email on, prod migration, deploy
+verification, database backup + restore drill — see Recently shipped.)
+
+Ongoing operational practice (not a blocker): **always take a `mongodump` snapshot
+before any bulk production write** (e.g. the P1 AI seed), and enable Atlas Cloud
+Backup if/when you move to a tier that supports it.
 
 ## 🟠 P1 — AI community production seed (after P0)
 
@@ -113,6 +113,9 @@ actionable list.
 - **Prod deployment verified** (2026-07-27): SSR pages, static assets (new logo +
   og-image), backend API, CORS (allows apex, rejects others), Vercel env vars, and
   login all confirmed live. og:image made absolute so social cards render.
+- **Database backup + restore drill** (2026-07-27): full prod `mongodump` archived
+  off-repo; verified it restores cleanly into an ephemeral MongoDB with all six
+  collection counts matching prod. Backup is proven restorable.
 - **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
   11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
   `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
