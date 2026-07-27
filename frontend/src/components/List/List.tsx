@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useContext, useCallback } from 'react'
+import { useState, useContext, useCallback, useMemo } from 'react'
 import { AppContext } from '../../App'
 import CircularProgress from '../CircularIndeterminate'
 import normalizeString from '../../utils/normalizeString'
@@ -31,6 +31,20 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
     })
 
     const context = useContext(AppContext)
+
+    // ListItem is memoized on its `context` prop by reference. The provider hands
+    // back a brand-new context object on every auth/profile change, which would
+    // otherwise re-render every poem card. ListItem and its like/delete actions
+    // only read user, userId, isAdmin and config, so keep the same reference until
+    // one of those changes — unrelated updates (e.g. editing a profile picture or
+    // bio) no longer re-render the whole list. username/picture are included for
+    // Context type-completeness but are intentionally left out of the deps, since
+    // ListItem reads author display data from the store, not from context.
+    const { user, userId, username, picture, config, isAdmin, setState } = context
+    const listItemContext = useMemo(
+        () => ({ user, userId, username, picture, config, isAdmin, setState }),
+        [user, userId, isAdmin, config, setState]
+    )
 
     // Use custom hook for poems data management
     const { poems, isLoading, isError, hasMore, hasItems, handleLoadMore, retry } = usePoemsList({
@@ -98,7 +112,7 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
                 )}
 
                 {!isError && poems.map(poem => (
-                    <ListItem key={poem?.id} poem={poem} filter={filter} context={context} />
+                    <ListItem key={poem?.id} poem={poem} filter={filter} context={listItemContext} />
                 ))}
 
                 {isLoading && hasItems && (
