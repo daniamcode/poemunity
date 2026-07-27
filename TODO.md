@@ -33,6 +33,8 @@ Backup if/when you move to a tier that supports it.
   at a throwaway DB). Until then, treat all seed/migration scripts as prod writes:
   dry-run + `mongodump` snapshot first. (Seed logic is now validated via ephemeral
   in-memory Mongo in tests instead — see `aiSeed.test.js`.)
+  **Plan (deferred, not now):** create a copy of prod and point `MONGODB_PRE` at it
+  so `pre` becomes a real separate environment.
 
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
@@ -92,6 +94,10 @@ Backup if/when you move to a tier that supports it.
   set new hash, bump `passwordChangedAt`) + Profile UI would remove the ambiguity.
 - 🤖 **(Optional) Admin UI for test accounts** — a small screen for
   `POST /api/v1/admin/test-users` instead of calling the API by hand.
+- 👤 **Adopt a `develop` branch workflow (deferred)** — plan is to work from a
+  `develop` branch and merge to `master` for releases, instead of committing to
+  `master` directly. **Not now** — while shipping fast toward stability, direct-to-
+  `master` is the intentional tradeoff. Revisit once the app is stable.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
   (guarded by CI-on-push instead). A true gate needs migrating the backend off the
   legacy `builds` config in `backend/vercel.json`; deferred as risky, low value.
