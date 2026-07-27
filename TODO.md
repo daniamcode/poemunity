@@ -10,21 +10,12 @@ actionable list.
 
 ## 🔴 P0 — Production go-live (blocks a real launch)
 
-- 👤 **Turn email on** — verify `poemunity.com` in Resend (SPF/DKIM), then set
-  `RESEND_API_KEY` + `EMAIL_FROM` in the backend Vercel project. Until then all
-  sends safely no-op.
-- 👤 **Production deployment verification** (the one remaining hard blocker in the
-  checklist — see `docs/PRODUCTION_CHECKLIST.md` → "Final Manual Steps" and
-  `docs/NEXTJS_MIGRATION.md` Phase 8):
-  - Verify Vercel env vars — frontend `NEXT_PUBLIC_API_URL` → prod backend, remove
-    stale `NEXT_PUBLIC_ADMIN`; backend `MONGODB`, `SECRET`, `REACT_APP_ADMIN`,
-    `FRONTEND_URL` (exact prod origin, no trailing slash), `NODE_ENV=production`.
-  - Confirm backend CORS allows the prod frontend origin (and rejects others).
-  - `curl` the homepage, a genre page, a poem detail, `/privacy`, `/terms` to
-    confirm real SSR HTML; check `/sitemap.xml`; check one Open Graph preview.
-- 👤 **Database safety** — enable MongoDB Atlas Cloud Backup, run the restore drill
-  in `docs/DATABASE_BACKUP_RESTORE.md`, and take an on-demand snapshot before any
-  bulk production write.
+- 👤 **Database safety — restore drill** — a fresh `mongodump` snapshot was taken
+  2026-07-27 (`~/poemunity-backups/`), so the on-demand-snapshot box is ticked.
+  What remains: prove it *restores* — `mongorestore` that archive to a **throwaway**
+  Atlas cluster and check doc counts (`docs/DATABASE_BACKUP_RESTORE.md`). Also
+  enable Atlas Cloud Backup if your tier supports it (free/shared tiers don't —
+  `mongodump` is the fallback). Always snapshot before any bulk production write.
 
 ## 🟠 P1 — AI community production seed (after P0)
 
@@ -117,6 +108,11 @@ actionable list.
 - Email/auth: transactional email infra (Resend), password reset (forgot + reset),
   email verification + admin test accounts (`POST /api/v1/admin/test-users`),
   `passwordChangedAt` session revocation on reset.
+- **Email turned on in prod** (2026-07-27): Resend domain verified + keys set;
+  confirmed by receiving a live send. Sending pipeline is active.
+- **Prod deployment verified** (2026-07-27): SSR pages, static assets (new logo +
+  og-image), backend API, CORS (allows apex, rejects others), Vercel env vars, and
+  login all confirmed live. og:image made absolute so social cards render.
 - **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
   11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
   `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
