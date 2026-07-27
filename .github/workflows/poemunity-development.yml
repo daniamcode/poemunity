@@ -58,8 +58,15 @@ jobs:
         with:
           node-version: 20
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Match Vercel's install (pnpm + pnpm-lock.yaml). --frozen-lockfile fails
+      # the build if pnpm-lock.yaml drifts from package.json, so lockfile
+      # mismatches are caught here instead of at deploy time.
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Test
-        run: npm test
+        run: pnpm test
