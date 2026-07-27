@@ -4,6 +4,7 @@ jest.mock('../utils/email', () => ({ sendEmail: jest.fn().mockResolvedValue(unde
 
 const request = require('supertest')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const { app } = require('../../app')
 const Author = require('../models/Author')
 const { sendEmail } = require('../utils/email')
@@ -185,5 +186,63 @@ describe('POST /api/v1/password/reset', () => {
       .post('/api/v1/login')
       .send({ username: USER.username, password: USER.password })
       .expect(200)
+  })
+})
+
+describe('session invalidation after reset (passwordChangedAt)', () => {
+  // An authenticated route (userExtractor) to probe token validity.
+  const getProfile = token =>
+    request(app).get('/api/v1/users/profile').set('Authorization', `Bearer ${token}`)
+
+  function signWithIat (author, iatSeconds) {
+    return jwt.sign(
+      { id: author._id, username: author.username, iat: iatSeconds },
+      process.env.SECRET,
+      { expiresIn: '7d' }
+    )
+  }
+
+  test('a successful reset stamps passwordChangedAt', async () => {
+    await createUser()
+    const before = Date.now()
+
+    await request(app).post('/api/v1/password/forgot').send({ email: USER.email }).expect(200)
+    const token = tokenFromLastEmail()
+    await request(app).post('/api/v1/password/reset').send({ token, password: 'newpass456' }).expect(200)
+
+    const author = await Author.findOne({ email: USER.email })
+    expect(author.passwordChangedAt).toBeTruthy()
+    expect(author.passwordChangedAt.getTime()).toBeGreaterThanOrEqual(before)
+  })
+
+  test('a session issued BEFORE the reset is rejected; one issued AFTER still works', async () => {
+    const author = await createUser()
+
+    // A session that existed well before the reset.
+    const nowSec = Math.floor(Date.now() / 1000)
+    const oldToken = signWithIat(author, nowSec - 30)
+
+    // Before any reset, the old token is accepted (no passwordChangedAt yet).
+    await getProfile(oldToken).expect(200)
+
+    // Reset the password (stamps passwordChangedAt ~ now).
+    await request(app).post('/api/v1/password/forgot').send({ email: USER.email }).expect(200)
+    const resetToken = tokenFromLastEmail()
+    await request(app).post('/api/v1/password/reset').send({ token: resetToken, password: 'newpass456' }).expect(200)
+
+    // The pre-reset session is now revoked.
+    await getProfile(oldToken).expect(401)
+
+    // A session obtained after the reset (e.g. a fresh login) is honoured.
+    const updated = await Author.findOne({ email: USER.email })
+    const changedSec = Math.floor(updated.passwordChangedAt.getTime() / 1000)
+    const newToken = signWithIat(author, changedSec + 5)
+    await getProfile(newToken).expect(200)
+  })
+
+  test('accounts that never reset keep working (no passwordChangedAt, no regression)', async () => {
+    const author = await createUser()
+    const token = signWithIat(author, Math.floor(Date.now() / 1000))
+    await getProfile(token).expect(200)
   })
 })

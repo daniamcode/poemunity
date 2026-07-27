@@ -71,12 +71,11 @@ passwordRouter.post('/forgot', async (req, res) => {
 })
 
 // POST /api/v1/password/reset — body { token, password }
-// Deferred (known, accepted limitation): the app's JWTs are stateless and
-// unrevocable, so any already-issued auth cookie stays valid until its natural
-// expiry after a reset. Session invalidation (a passwordChangedAt check in the
-// auth middleware) is intentionally NOT implemented here — see EMAIL_AUTH_PLAN
-// §4. We also do NOT auto-login on reset: no token is issued, and the frontend
-// redirects the user to /login with a success message.
+// Session invalidation: we stamp passwordChangedAt on the account, and the auth
+// middleware (userExtractor) rejects any JWT issued before that instant. So a
+// reset revokes every pre-existing session/cookie even though the JWTs are
+// otherwise stateless. We also do NOT auto-login on reset: no token is issued,
+// and the frontend redirects the user to /login with a success message.
 passwordRouter.post('/reset', async (req, res) => {
   try {
     const { token, password } = req.body
@@ -100,6 +99,8 @@ passwordRouter.post('/reset', async (req, res) => {
     }
 
     author.passwordHash = await bcrypt.hash(password, 10)
+    // Revoke every session issued before now (see userExtractor).
+    author.passwordChangedAt = new Date()
     // Single-use: clear the reset fields so the same link cannot be reused.
     author.resetTokenHash = undefined
     author.resetTokenExpiry = undefined

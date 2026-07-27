@@ -34,6 +34,11 @@ const authorSchema = new Schema({
   // not hand out working reset links. Cleared on successful reset (single-use).
   resetTokenHash: String,
   resetTokenExpiry: Date,
+  // When the password was last changed (currently: on a successful reset). The
+  // auth middleware rejects any JWT whose issued-at (iat) predates this, so a
+  // reset revokes every session that existed before it. Unset until the first
+  // password change.
+  passwordChangedAt: Date,
   // email verification — same rule as password reset: store only the sha256
   // HASH of the token, never the raw token (that lives only in the emailed
   // link). Cleared on successful verification (single-use).
@@ -87,6 +92,8 @@ authorSchema.set('toJSON', {
     delete returnedObject.verifyTokenExpiry
     // Internal-only flag; never surface it on public author payloads.
     delete returnedObject.testAccount
+    // Internal session-revocation timestamp; not for clients.
+    delete returnedObject.passwordChangedAt
   }
 })
 

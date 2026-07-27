@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const Author = require('../models/Author')
 
 function parseCookies (cookieHeader = '') {
   return cookieHeader
@@ -20,7 +21,7 @@ function parseCookies (cookieHeader = '') {
     }, {})
 }
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const authorization = req.get('authorization') // express method to get this header
   const cookies = parseCookies(req.get('cookie'))
   let token = ''
@@ -41,6 +42,20 @@ module.exports = (req, res, next) => {
     }
 
     const { id: userId } = decodedToken
+
+    // Session revocation: reject tokens issued before the account's last
+    // password change (set on password reset). iat is in seconds; compare on the
+    // same granularity, so a token issued in the same second as the change is
+    // treated as still valid (sub-second tolerance — reset does not auto-login,
+    // so a fresh login always comes seconds later). Legacy User accounts are not
+    // in the Author collection and never carry passwordChangedAt, so they pass.
+    const author = await Author.findById(userId).select('passwordChangedAt')
+    if (author && author.passwordChangedAt) {
+      const changedAtSec = Math.floor(author.passwordChangedAt.getTime() / 1000)
+      if (typeof decodedToken.iat === 'number' && decodedToken.iat < changedAtSec) {
+        return res.status(401).json({ error: 'token missing or invalid' })
+      }
+    }
 
     req.userId = userId
 
