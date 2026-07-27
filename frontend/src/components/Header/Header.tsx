@@ -34,15 +34,14 @@ function Header() {
                 </div>
             )}
             <div className='header__brand'>
-                <div className='header__logo'>
-                    <Link href='/' className='header__text-logo-first'>
-                        P
-                    </Link>
-                    <Link href='/' className='header__logo-icon' />
-                    <Link href='/' className='header__text-logo-second'>
-                        emunity
-                    </Link>
-                </div>
+                <Link href='/' className='header__logo' aria-label='Poemunity home'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src='/poemunity-logo.png'
+                        alt='Poemunity'
+                        className='header__logo-img'
+                    />
+                </Link>
                 <p className='list__presentation'>{getSubtitle()}</p>
             </div>
             <div className='separator' />

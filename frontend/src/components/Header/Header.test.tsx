@@ -69,8 +69,10 @@ describe('Header', () => {
 
     test('should render header component', () => {
         renderWithContext(mockContextLoggedOut)
-        expect(screen.getByRole('link', { name: 'P' })).toBeInTheDocument()
-        expect(screen.getByRole('link', { name: 'emunity' })).toBeInTheDocument()
+        // The brand is a single logo image linking home
+        const logoLink = screen.getByRole('link', { name: 'Poemunity home' })
+        expect(logoLink).toHaveAttribute('href', '/')
+        expect(screen.getByRole('img', { name: 'Poemunity' })).toBeInTheDocument()
     })
 
     test('should render Accordion component', () => {
@@ -129,13 +131,16 @@ describe('Header', () => {
         expect(screen.getByRole('link', { name: 'AI' })).toHaveAttribute('href', '/terms#ai-community-activity')
     })
 
-    test('should render all logo parts with correct links', () => {
+    test('should render the logo as a single home link wrapping the wordmark image', () => {
         renderWithContext(mockContextLoggedOut)
-        const links = screen.getAllByRole('link')
-        const homeLinks = links.filter(link => link.getAttribute('href') === '/')
+        const logoLink = screen.getByRole('link', { name: 'Poemunity home' })
+        expect(logoLink).toHaveAttribute('href', '/')
 
-        // Should have 3 links to home: P, logo icon, and "emunity"
-        expect(homeLinks.length).toBeGreaterThanOrEqual(3)
+        const logoImg = screen.getByRole('img', { name: 'Poemunity' })
+        expect(logoImg).toHaveAttribute('src', '/poemunity-logo.png')
+        expect(logoImg).toHaveClass('header__logo-img')
+        // The image lives inside the single home link
+        expect(logoLink).toContainElement(logoImg)
     })
 
     test('should have correct CSS classes', () => {
@@ -144,9 +149,7 @@ describe('Header', () => {
         expect(container.querySelector('.header')).toBeInTheDocument()
         expect(container.querySelector('.header__dropdown')).toBeInTheDocument()
         expect(container.querySelector('.header__logo')).toBeInTheDocument()
-        expect(container.querySelector('.header__text-logo-first')).toBeInTheDocument()
-        expect(container.querySelector('.header__logo-icon')).toBeInTheDocument()
-        expect(container.querySelector('.header__text-logo-second')).toBeInTheDocument()
+        expect(container.querySelector('.header__logo-img')).toBeInTheDocument()
         expect(container.querySelector('.list__presentation')).toBeInTheDocument()
         expect(container.querySelector('.separator')).toBeInTheDocument()
     })

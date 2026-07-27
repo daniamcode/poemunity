@@ -363,26 +363,17 @@ exports[`Header should match without id 1`] = `
         <div
           class="header__brand"
         >
-          <div
+          <a
+            aria-label="Poemunity home"
             class="header__logo"
+            href="/"
           >
-            <a
-              class="header__text-logo-first"
-              href="/"
-            >
-              P
-            </a>
-            <a
-              class="header__logo-icon"
-              href="/"
+            <img
+              alt="Poemunity"
+              class="header__logo-img"
+              src="/poemunity-logo.png"
             />
-            <a
-              class="header__text-logo-second"
-              href="/"
-            >
-              emunity
-            </a>
-          </div>
+          </a>
           <p
             class="list__presentation"
           >
@@ -779,26 +770,17 @@ exports[`Header should match without id 1`] = `
       <div
         class="header__brand"
       >
-        <div
+        <a
+          aria-label="Poemunity home"
           class="header__logo"
+          href="/"
         >
-          <a
-            class="header__text-logo-first"
-            href="/"
-          >
-            P
-          </a>
-          <a
-            class="header__logo-icon"
-            href="/"
+          <img
+            alt="Poemunity"
+            class="header__logo-img"
+            src="/poemunity-logo.png"
           />
-          <a
-            class="header__text-logo-second"
-            href="/"
-          >
-            emunity
-          </a>
-        </div>
+        </a>
         <p
           class="list__presentation"
         >
