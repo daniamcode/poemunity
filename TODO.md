@@ -93,6 +93,11 @@ actionable list.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
   (guarded by CI-on-push instead). A true gate needs migrating the backend off the
   legacy `builds` config in `backend/vercel.json`; deferred as risky, low value.
+- 👤 **Skip unaffected Vercel builds (monorepo)** — verify each Vercel project's
+  **Root Directory** is set to its subfolder (`frontend/`, `backend/`) so a commit
+  touching only one side redeploys only that project, and root-only changes (e.g.
+  `TODO.md`) skip both. If both projects still rebuild on every push, set the Root
+  Directory (or an "Ignored Build Step" `git diff` guard) to skip the unchanged side.
 
 ---
 
