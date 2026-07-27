@@ -195,6 +195,22 @@ describe('requireVerified gate on publishing (flag-controlled)', () => {
       .send(NEW_POEM)
       .expect(201)
   })
+
+  test('flag ON: the admin can publish even while their own account is unverified', async () => {
+    process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+    const admin = await registerUser() // registers unverified by default
+    expect(admin.emailVerified).toBe(false)
+    process.env.REACT_APP_ADMIN = admin._id.toString()
+    try {
+      await request(app)
+        .post('/api/v1/poems')
+        .set('Authorization', `Bearer ${tokenFor(admin)}`)
+        .send(NEW_POEM)
+        .expect(201)
+    } finally {
+      delete process.env.REACT_APP_ADMIN
+    }
+  })
 })
 
 describe('POST /api/v1/admin/test-users (admin test-account exemption)', () => {

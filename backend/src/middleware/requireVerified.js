@@ -1,4 +1,5 @@
 const Author = require('../models/Author')
+const { getAdminId } = require('../utils/authToken')
 
 // Write-action email-verification gate. Runs AFTER userExtractor (needs
 // req.userId).
@@ -12,6 +13,11 @@ const Author = require('../models/Author')
 // shows a soft "verify your email" banner instead.
 module.exports = async (req, res, next) => {
   if (process.env.REQUIRE_EMAIL_VERIFICATION !== 'true') {
+    return next()
+  }
+  // Admin bypass: the admin can always publish, regardless of the verification
+  // state of their own account (admin should be able to do anything).
+  if (req.userId && String(req.userId) === getAdminId()) {
     return next()
   }
   try {
