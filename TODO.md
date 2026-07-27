@@ -26,6 +26,14 @@ Backup if/when you move to a tier that supports it.
 
 ## 🟡 P2 — Launch hardening (recommended)
 
+- 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
+  to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script
+  writes straight to **production**, and there's nowhere safe to rehearse a seed or
+  migration. Stand up a real pre/staging cluster (or at least repoint `MONGODB_PRE`
+  at a throwaway DB). Until then, treat all seed/migration scripts as prod writes:
+  dry-run + `mongodump` snapshot first. (Seed logic is now validated via ephemeral
+  in-memory Mongo in tests instead — see `aiSeed.test.js`.)
+
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
   so visual diffs fail the run (🤖).
@@ -82,14 +90,6 @@ Backup if/when you move to a tier that supports it.
   doc, so the others aren't reachable via the UI (use `set-account-password.js`
   meanwhile). A logged-in route keyed on `req.userId` (verify current password,
   set new hash, bump `passwordChangedAt`) + Profile UI would remove the ambiguity.
-- 🤖 **Modernize AI-user generation** — new AI users are still made via a legacy
-  multi-step pipeline: `seed-fake-users.js` creates **legacy `User`** docs (no
-  `type`/`emailVerified`/`testAccount`), then `migrate-to-authors.js` →
-  `migrate-author-types.js` → `add-ai-personalities.js` convert + flag them.
-  Schema-correctness now depends on running `add-ai-personalities.js` last (it
-  stamps `type:'ai'`, `emailVerified:true`, `testAccount:false`). Consider a single
-  script that creates AI `Author` docs directly (unique `@fakemail.com` email — now
-  enforced by the partial-unique index) instead of the User→migrate dance.
 - 🤖 **(Optional) Admin UI for test accounts** — a small screen for
   `POST /api/v1/admin/test-users` instead of calling the API by hand.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
@@ -120,6 +120,14 @@ Backup if/when you move to a tier that supports it.
   now require a verified email. Verified end-to-end — an unverified account is
   blocked from `POST /poems` with `403 EMAIL_UNVERIFIED`. AI seed is unaffected
   (it writes via direct DB, not the gated routes).
+- **Admin bypasses the publish gate** (2026-07-27): `requireVerified` now exempts
+  the admin (`REACT_APP_ADMIN`), and the admin account `daniamcode` was marked
+  `emailVerified:true` in prod (it was the lone unverified real user). Code + test.
+- **Single-step AI generator** (2026-07-27): `scripts/lib/aiSeed.js` +
+  `scripts/seed-ai-community.js` create schema-correct AI authors/poems in one
+  place (idempotent, email-uniqueness-safe, dry-run by default); 7 regression
+  tests. `add-ai-personalities.js` now also stamps `emailVerified`/`testAccount`,
+  and all 50 existing AI authors were backfilled `emailVerified:true`.
 - **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
   11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
   `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
