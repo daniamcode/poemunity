@@ -82,6 +82,14 @@ Backup if/when you move to a tier that supports it.
   doc, so the others aren't reachable via the UI (use `set-account-password.js`
   meanwhile). A logged-in route keyed on `req.userId` (verify current password,
   set new hash, bump `passwordChangedAt`) + Profile UI would remove the ambiguity.
+- 🤖 **Modernize AI-user generation** — new AI users are still made via a legacy
+  multi-step pipeline: `seed-fake-users.js` creates **legacy `User`** docs (no
+  `type`/`emailVerified`/`testAccount`), then `migrate-to-authors.js` →
+  `migrate-author-types.js` → `add-ai-personalities.js` convert + flag them.
+  Schema-correctness now depends on running `add-ai-personalities.js` last (it
+  stamps `type:'ai'`, `emailVerified:true`, `testAccount:false`). Consider a single
+  script that creates AI `Author` docs directly (unique `@fakemail.com` email — now
+  enforced by the partial-unique index) instead of the User→migrate dance.
 - 🤖 **(Optional) Admin UI for test accounts** — a small screen for
   `POST /api/v1/admin/test-users` instead of calling the API by hand.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
