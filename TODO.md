@@ -13,16 +13,6 @@ actionable list.
 - 👤 **Turn email on** — verify `poemunity.com` in Resend (SPF/DKIM), then set
   `RESEND_API_KEY` + `EMAIL_FROM` in the backend Vercel project. Until then all
   sends safely no-op.
-- 👤 **Run the prod migration** — `NODE_ENV=production node scripts/verify-existing-users.js`
-  (from `backend/`). Marks existing users verified, backfills `testAccount:false`,
-  and rebuilds the email index. **This also activates the multi-account-per-email
-  exemption** — until it runs, prod still enforces one account per email.
-  ⚠️ **Also a correctness gap until it runs:** prod's email index is currently a
-  plain **non-unique** `email_1` (confirmed live), so real-account email
-  uniqueness rests *only* on register.js's `findOne({ email })` pre-check — the
-  `E11000` race fallback can never fire, so two concurrent signups on the same
-  email could both succeed. The migration rebuilds it as the partial **unique**
-  index that closes this.
 - 👤 **Production deployment verification** (the one remaining hard blocker in the
   checklist — see `docs/PRODUCTION_CHECKLIST.md` → "Final Manual Steps" and
   `docs/NEXTJS_MIGRATION.md` Phase 8):
@@ -111,6 +101,12 @@ actionable list.
 - Email/auth: transactional email infra (Resend), password reset (forgot + reset),
   email verification + admin test accounts (`POST /api/v1/admin/test-users`),
   `passwordChangedAt` session revocation on reset.
+- **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
+  11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
+  `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
+  Real-account email uniqueness is now enforced at the DB level (closing the
+  concurrent-signup race) and the multi-account-per-email exemption is live.
+  Pre-migration backup archived off-repo via `mongodump`.
 - Ranking sidebar drift fix (server returns fresh ranking in mutation responses).
 - E2E registration flow test (`frontend/cypress/e2e/register.cy.ts`).
 - CI: backend installs with `pnpm --frozen-lockfile` (dropped `package-lock.json`),
