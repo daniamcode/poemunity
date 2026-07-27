@@ -26,14 +26,6 @@ Backup if/when you move to a tier that supports it.
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 👤 **Flip `REQUIRE_EMAIL_VERIFICATION=true`** — **ready now** (email confirmed
-  working 2026-07-27). Set `REQUIRE_EMAIL_VERIFICATION=true` in the backend Vercel
-  env (Production) + redeploy — no code change, the `requireVerified` middleware
-  reads it at runtime. Gates `POST /poems` and `POST /comments` for unverified
-  users (403 `EMAIL_UNVERIFIED`; fail-open on lookup errors). Safe: existing users
-  were backfilled `emailVerified:true` by the migration and new signups get a
-  verification link. Verify by registering a fresh account and confirming it's
-  blocked from publishing until it clicks the link.
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
   so visual diffs fail the run (🤖).
@@ -116,6 +108,10 @@ Backup if/when you move to a tier that supports it.
 - **Database backup + restore drill** (2026-07-27): full prod `mongodump` archived
   off-repo; verified it restores cleanly into an ephemeral MongoDB with all six
   collection counts matching prod. Backup is proven restorable.
+- **`REQUIRE_EMAIL_VERIFICATION=true` in prod** (2026-07-27): publishing/commenting
+  now require a verified email. Verified end-to-end — an unverified account is
+  blocked from `POST /poems` with `403 EMAIL_UNVERIFIED`. AI seed is unaffected
+  (it writes via direct DB, not the gated routes).
 - **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
   11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
   `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
