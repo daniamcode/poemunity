@@ -86,8 +86,12 @@ actionable list.
   (e.g. `src/controllers/poem.js` `==`→`===`, unused vars in
   `src/middleware/findPoemById.js` and seed scripts). Blocks adding a backend
   lint step to CI.
-- 🤖 **Stop tracking `frontend/tsconfig.tsbuildinfo`** — it's a build artifact that
-  churns on every build; add it to `.gitignore` and `git rm --cached` it.
+- 🤖 **Speed up the sitemap** — `pages/sitemap.xml.ts` pages the poems API 100 at
+  a time (~160 sequential calls for 16k poems → ~25 s cold generation, risking the
+  serverless timeout). It's already CDN-cached (`s-maxage=86400`), so this only
+  bites on a cold cache. To fix, raise the poems endpoint's `limit` cap (currently
+  `Math.min(limit, 100)` in `poems.js`) so the sitemap can fetch bigger pages, or
+  split into a sitemap index + per-section child sitemaps. Backend change, deferred.
 - 🤖 **(Optional) Admin UI for test accounts** — a small screen for
   `POST /api/v1/admin/test-users` instead of calling the API by hand.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
@@ -127,6 +131,9 @@ actionable list.
 - `backend/scripts/set-account-password.js` — securely set an account's password
   from a hidden terminal prompt (for accounts unreachable via the email reset flow,
   e.g. test accounts sharing an inbox).
+- Absolute `og:image`/`twitter:image` in `SeoHead.tsx` (relative paths are ignored
+  by social scrapers, so the card rendered blank) + regression test. Stopped
+  tracking `frontend/tsconfig.tsbuildinfo` (incremental-build cache; now gitignored).
 
 ## 📚 Reference docs
 

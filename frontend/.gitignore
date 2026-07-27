@@ -64,3 +64,4 @@ yarn-error.log*
 *.flac
 *.adts
 *.3gp
+*.tsbuildinfo
