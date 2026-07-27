@@ -226,7 +226,21 @@ async function run () {
   for (const [username, personality] of Object.entries(PERSONALITIES)) {
     const result = await Author.updateOne(
       { username },
-      { $set: { type: 'ai', bio: personality.bio, preferredGenres: personality.preferredGenres } }
+      {
+        $set: {
+          type: 'ai',
+          bio: personality.bio,
+          preferredGenres: personality.preferredGenres,
+          // Schema-correctness for AI authors (added with email verification):
+          //  - emailVerified:true so they're never caught by the publish gate if
+          //    the seed is ever run in API mode (direct-DB seeding bypasses it,
+          //    but this future-proofs and keeps the flag consistent).
+          //  - testAccount:false so they stay visible in public rankings/listings
+          //    (they are community content, not hidden QA accounts).
+          emailVerified: true,
+          testAccount: false
+        }
+      }
     )
     if (result.matchedCount === 0) {
       console.warn(`  NOT FOUND: ${username}`)
