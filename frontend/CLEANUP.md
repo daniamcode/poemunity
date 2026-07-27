@@ -1,5 +1,8 @@
 # Frontend Code Cleanup Plan
 
+> ➡️ **The active, prioritized backlog now lives in [`/TODO.md`](../TODO.md).** This
+> file is kept as the detailed reference for the frontend cleanup effort.
+
 This document outlines potential code cleanups and improvements for the Poemunity frontend codebase.
 
 ## Current State Analysis

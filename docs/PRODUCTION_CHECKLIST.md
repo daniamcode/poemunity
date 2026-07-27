@@ -1,5 +1,9 @@
 # Production Readiness Checklist
 
+> ➡️ **The active, prioritized backlog now lives in [`/TODO.md`](../TODO.md).** This
+> checklist is kept as the detailed launch reference; its still-open items are
+> tracked in `/TODO.md`.
+
 Audit performed on 2026-05-16. Issues ordered by severity.
 
 ---
