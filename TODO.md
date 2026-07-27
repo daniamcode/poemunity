@@ -43,14 +43,6 @@ actionable list.
 - 👤 **Toast QA in the browser** — comment post/reply/delete, poem like-failure,
   delete, create/save. (A regression test already guards `manageError` against
   `[object Object]`.)
-- 🤖 **Authenticated "change password" endpoint + UI** — today the only way to
-  change a password is Forgot → emailed reset link, and that resolves the account
-  by `findOne({ email })` (`password.js`). With accounts sharing an inbox (admin
-  test accounts) this is ambiguous — it only ever hits the oldest doc for that
-  email, so any other account on the same email can't reset via the UI. Add a
-  logged-in change-password route that targets `req.userId` (verify current
-  password, set new hash, bump `passwordChangedAt`) plus a Profile UI, so
-  password changes don't depend on email uniqueness/ordering.
 
 ## 🟢 P3 — Frontend quality & refactors (code)
 
@@ -92,6 +84,15 @@ actionable list.
   bites on a cold cache. To fix, raise the poems endpoint's `limit` cap (currently
   `Math.min(limit, 100)` in `poems.js`) so the sitemap can fetch bigger pages, or
   split into a sitemap index + per-section child sitemaps. Backend change, deferred.
+- 🤖 **(Low) Authenticated "change password" endpoint + UI** — there's no logged-in
+  "change password" today; the only path is Forgot → emailed reset link, which
+  resolves the account by `findOne({ email })` (`password.js`). **Low priority
+  because this only bites shared-inbox accounts** — i.e. the `testAccount:true`
+  accounts you create on one email (real users are one-per-email, so their reset
+  is unambiguous). For those shared accounts the reset only ever hits the oldest
+  doc, so the others aren't reachable via the UI (use `set-account-password.js`
+  meanwhile). A logged-in route keyed on `req.userId` (verify current password,
+  set new hash, bump `passwordChangedAt`) + Profile UI would remove the ambiguity.
 - 🤖 **(Optional) Admin UI for test accounts** — a small screen for
   `POST /api/v1/admin/test-users` instead of calling the API by hand.
 - 🤝 **(Optional) Hard backend deploy-gate** — deploy currently isn't gated on tests
