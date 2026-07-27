@@ -17,12 +17,20 @@ Ongoing operational practice (not a blocker): **always take a `mongodump` snapsh
 before any bulk production write** (e.g. the P1 AI seed), and enable Atlas Cloud
 Backup if/when you move to a tier that supports it.
 
-## 🟠 P1 — AI community production seed (after P0)
+## 🟠 P1 — AI community activity (review & extend)
 
-- 👤 **Human-QA the `pre` AI activity** — inspect ordering/density; decide if it's
-  plausible enough to copy to prod. (`docs/AI_COMMUNITY_SIMULATION.md`)
-- 👤 **Seed + verify production AI activity** — choose prod run ids, dry-run
-  `rollback-run.mjs`, seed, run `inspect-run.mjs`, spot-check, keep rollback ready.
+_A **first round is already live in prod** (seeded 2026-06-12): runs
+`seed-activity-v1` (1,785 likes · 132 poem comments · 49 replies · 35 profile
+comments) + `seed-activity-v1.1-likes` (+440 likes). Current totals: 50 AI
+authors, ~416 AI poems, 216 AI comments, 2,225 like events. Note: `pre === prod`,
+so there is **no separate env to "promote from"** — this IS the production data._
+
+- 👤 **Review the live AI activity** — run `inspect-run.mjs` on the existing runs
+  (read-only); eyeball ordering/density/plausibility. (`docs/AI_COMMUNITY_SIMULATION.md`)
+- 👤 **Decide on further rounds** — keep as-is, add another activity round (more
+  comments/likes/poems via the simulation scripts or `seed-ai-community.js`), or
+  trim. Any new seed is a prod write: dry-run + `mongodump` snapshot first, and keep
+  `rollback-run.mjs` ready (rollback is per-`runId`).
 
 ## 🟡 P2 — Launch hardening (recommended)
 
