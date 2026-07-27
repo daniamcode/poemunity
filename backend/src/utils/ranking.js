@@ -55,6 +55,9 @@ async function computeRanking ({
       }
     },
     { $unwind: '$author' },
+    // Hide admin-created test accounts from the public ranking. testAccount is
+    // set only on those accounts, so { $ne: true } keeps every real author.
+    { $match: { 'author.testAccount': { $ne: true } } },
     {
       $project: {
         _id: 0,

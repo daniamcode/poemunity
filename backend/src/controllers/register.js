@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const registerRouter = require('express').Router()
 const Author = require('../models/Author')
 const { slugifyAuthor } = require('../utils/slugUtils')
+const { issueVerifyToken } = require('./verify')
 
 const USERNAME_MIN = 3
 const USERNAME_MAX = 30
@@ -119,6 +120,17 @@ registerRouter.post('/', async (req, res) => {
 
     try {
       const savedAuthor = await newAuthor.save()
+
+      // Send the email-verification link. Registration has already succeeded and
+      // the user can log in immediately (low friction) — a send failure (or the
+      // no-op path when email is unconfigured) must never fail the request, so
+      // this is best-effort.
+      try {
+        await issueVerifyToken(savedAuthor)
+      } catch (emailErr) {
+        console.error('Verification email could not be sent:', emailErr)
+      }
+
       return res.json(savedAuthor)
     } catch (err) {
       // Lost the race: the unique index rejected a concurrent duplicate. Map

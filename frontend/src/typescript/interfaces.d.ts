@@ -88,5 +88,8 @@ export interface Context {
     privateFields?: string[]
     config: object
     isAdmin: boolean
+    // Whether the logged-in user has confirmed their email. Drives the
+    // "verify your email" banner. Undefined/false for logged-out visitors.
+    emailVerified?: boolean
     setState: (state: Context) => void
 }

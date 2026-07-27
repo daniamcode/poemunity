@@ -5,6 +5,10 @@ function buildFilter (query) {
   const filter = {}
   if (query.type) filter.type = query.type
   if (query.fake === 'true') filter.fake = true
+  // Never surface admin-created test accounts in public author listings.
+  // testAccount is set only on those accounts, so { $ne: true } keeps every
+  // real author (the field is absent on them).
+  filter.testAccount = { $ne: true }
   return filter
 }
 

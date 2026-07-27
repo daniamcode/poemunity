@@ -20,6 +20,10 @@ function sha256 (token) {
 async function createUser (overrides = {}) {
   const body = { ...USER, ...overrides }
   await request(app).post('/api/v1/register').send(body).expect(200)
+  // Registration now also sends an email-verification link (PR3). These tests
+  // are about the password-reset email, so drop the registration send to isolate
+  // the reset flow's sendEmail calls.
+  sendEmail.mockClear()
   return Author.findOne({ email: body.email })
 }
 

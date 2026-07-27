@@ -34,6 +34,19 @@ const authorSchema = new Schema({
   // not hand out working reset links. Cleared on successful reset (single-use).
   resetTokenHash: String,
   resetTokenExpiry: Date,
+  // email verification — same rule as password reset: store only the sha256
+  // HASH of the token, never the raw token (that lives only in the emailed
+  // link). Cleared on successful verification (single-use).
+  emailVerified: { type: Boolean, default: false },
+  verifyTokenHash: String,
+  verifyTokenExpiry: Date,
+  // Admin-created disposable test accounts. Defaults to false on real accounts;
+  // set true on admin test users so the partial email index below can exclude
+  // them from strict email uniqueness — letting many test accounts share one
+  // email. (The index filter uses `testAccount: false`, a supported equality:
+  // MongoDB partial indexes forbid $ne and $exists:false, so real accounts must
+  // carry an explicit `false` rather than merely lacking the field.)
+  testAccount: { type: Boolean, default: false },
   poems: [{ type: Schema.Types.ObjectId, ref: 'Poem' }]
 })
 
@@ -42,7 +55,23 @@ const authorSchema = new Schema({
 // casing. Sparse so the many famous/ai authors without auth fields are exempt.
 const CI_COLLATION = { locale: 'en', strength: 2 }
 authorSchema.index({ username: 1 }, { unique: true, sparse: true, collation: CI_COLLATION })
-authorSchema.index({ email: 1 }, { unique: true, sparse: true, collation: CI_COLLATION })
+// Email uniqueness excludes test accounts. partialFilterExpression replaces
+// sparse (they cannot be combined): the index only covers docs that HAVE an
+// email AND have testAccount === false, so real users keep strict CI-unique
+// emails while admin-created test accounts (testAccount: true) can share one.
+// NOTE: partial-index filters forbid $ne AND $exists:false (both compile to
+// $not), so the filter must use the positive equality `testAccount: false` —
+// which is why real accounts carry an explicit default `false` (existing rows
+// are backfilled by scripts/verify-existing-users.js). Changing this index also
+// requires DROPPING the old email_1 index first (see that script).
+authorSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    collation: CI_COLLATION,
+    partialFilterExpression: { email: { $exists: true }, testAccount: false }
+  }
+)
 
 authorSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -53,6 +82,11 @@ authorSchema.set('toJSON', {
     // Never serialize password-reset secrets to any client.
     delete returnedObject.resetTokenHash
     delete returnedObject.resetTokenExpiry
+    // Same for email-verification secrets.
+    delete returnedObject.verifyTokenHash
+    delete returnedObject.verifyTokenExpiry
+    // Internal-only flag; never surface it on public author payloads.
+    delete returnedObject.testAccount
   }
 })
 

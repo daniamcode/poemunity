@@ -8,6 +8,7 @@ import createEmotionCache from '../src/lib/emotionCache'
 import { AppProvider } from '../src/App'
 import Header from '../src/components/Header/Header'
 import Footer from '../src/components/Footer/Footer'
+import VerifyBanner from '../src/components/Auth/VerifyBanner'
 import '../src/App.scss'
 import '../src/components/List/List.scss'
 import '../src/components/Detail/Detail.scss'
@@ -21,6 +22,7 @@ import '../src/components/PageNotFound/PageNotFound.scss'
 import '../src/components/Profile/Profile.scss'
 import '../src/components/Ranking/Ranking.scss'
 import '../src/components/Register/Register.scss'
+import '../src/components/Auth/VerifyBanner.scss'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -54,6 +56,7 @@ export default function MyApp({ Component, pageProps, emotionCache = clientSideE
                     <div className='container'>
                         <a className='skip-link' href='#main-content'>Skip to main content</a>
                         <Header />
+                        <VerifyBanner />
                         <div className='margin-body' id='main-content' tabIndex={-1}>
                             <Component {...pageProps} />
                         </div>

@@ -1,0 +1,32 @@
+.verify-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: #fff4e5;
+    color: #7a4f01;
+    border-bottom: 1px solid #f0d9b5;
+    font-size: 0.9rem;
+    text-align: center;
+
+    &__button {
+        border: 1px solid #7a4f01;
+        background: transparent;
+        color: #7a4f01;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+    }
+
+    &__sent {
+        font-weight: 600;
+    }
+}

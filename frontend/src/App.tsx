@@ -42,7 +42,8 @@ function getAuthState(user?: ServerUser | null): Omit<Context, 'elementToEdit' |
         gender: user?.gender ?? '',
         privateFields: user?.privateFields ?? [],
         config: user?.config ?? { withCredentials: true },
-        isAdmin: user?.isAdmin ?? false
+        isAdmin: user?.isAdmin ?? false,
+        emailVerified: user?.emailVerified ?? false
     }
 }
 

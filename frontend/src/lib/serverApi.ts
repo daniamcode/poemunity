@@ -15,6 +15,7 @@ export interface ServerUser {
     gender: string
     privateFields: string[]
     isAdmin: boolean
+    emailVerified: boolean
     config: { withCredentials: true }
 }
 
@@ -46,6 +47,9 @@ export function buildServerUser(token: string): ServerUser | null {
         gender: jwt.gender ?? '',
         privateFields: jwt.privateFields ?? [],
         isAdmin: jwt.isAdmin ?? false,
+        // The JWT is identity-only and carries no verification state; default to
+        // false. The DB-backed profile (fetchServerUser) is the source of truth.
+        emailVerified: false,
         config: { withCredentials: true }
     }
 }
@@ -73,6 +77,7 @@ export async function fetchServerUser(token?: string): Promise<ServerUser | null
         gender: profile.gender ?? '',
         privateFields: profile.privateFields ?? [],
         isAdmin: profile.isAdmin ?? false,
+        emailVerified: profile.emailVerified ?? false,
         config: { withCredentials: true }
     }
 }

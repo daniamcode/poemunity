@@ -8,6 +8,8 @@ const rateLimit = require('express-rate-limit')
 const loginRouter = require('./src/controllers/login')
 const registerRouter = require('./src/controllers/register')
 const passwordRouter = require('./src/controllers/password')
+const verifyRouter = require('./src/controllers/verify')
+const adminRouter = require('./src/controllers/admin')
 const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
@@ -79,6 +81,17 @@ const passwordLimiter = rateLimit({
   skip: req => process.env.NODE_ENV === 'test'
 })
 
+// Rate-limit verification endpoints so /verify/confirm can't be used to brute
+// tokens and /verify/resend can't spray emails. Mirrors passwordLimiter.
+const verifyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many verification attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: req => process.env.NODE_ENV === 'test'
+})
+
 const availabilityLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 30,
@@ -92,6 +105,8 @@ app.use('/api/v1/login', loginLimiter, loginRouter)
 app.use('/api/v1/register/availability', availabilityLimiter)
 app.use('/api/v1/register', registerLimiter, registerRouter)
 app.use('/api/v1/password', passwordLimiter, passwordRouter)
+app.use('/api/v1/verify', verifyLimiter, verifyRouter)
+app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)
 app.use('/api/v1/poem', poemRouter)

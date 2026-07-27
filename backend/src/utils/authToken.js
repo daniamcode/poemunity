@@ -36,7 +36,11 @@ function buildAuthorProfile (author) {
     gender: author.gender || '',
     website: author.website || '',
     privateFields: author.privateFields || [],
-    isAdmin: String(author._id) === getAdminId()
+    isAdmin: String(author._id) === getAdminId(),
+    // Drives the client's "verify your email" banner. Deliberately NOT in the
+    // JWT payload — the token stays identity-only; verification state is read
+    // fresh from the DB via this profile.
+    emailVerified: author.emailVerified ?? false
   }
 }
 
@@ -50,5 +54,6 @@ function signAuthorToken (author) {
 
 module.exports = {
   signAuthorToken,
-  buildAuthorProfile
+  buildAuthorProfile,
+  getAdminId
 }

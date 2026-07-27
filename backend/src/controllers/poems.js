@@ -4,6 +4,7 @@ const Poem = require('../models/Poem')
 const Author = require('../models/Author')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
+const requireVerified = require('../middleware/requireVerified')
 const { generatePoemSlug } = require('../utils/slugUtils')
 const { computeRanking } = require('../utils/ranking')
 
@@ -177,7 +178,7 @@ poemsRouter.get('/', async (req, res) => {
   }
 })
 
-poemsRouter.post('/', userExtractor, async (req, res) => {
+poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
   const poemData = req.body
   const { userId } = req
 

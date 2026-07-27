@@ -1,6 +1,7 @@
 const commentsRouter = require('express').Router()
 const Comment = require('../models/Comment')
 const userExtractor = require('../middleware/userExtractor')
+const requireVerified = require('../middleware/requireVerified')
 
 const AUTHOR_FIELDS = 'name slug picture'
 
@@ -33,7 +34,7 @@ commentsRouter.get('/', async (req, res) => {
 })
 
 // POST /api/v1/comments
-commentsRouter.post('/', userExtractor, async (req, res) => {
+commentsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
   const { targetType, targetId, body, parentId } = req.body
   if (!targetType || !targetId || !body?.trim()) {
     return res.status(400).json({ error: 'targetType, targetId, and body are required' })
