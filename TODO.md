@@ -35,8 +35,14 @@ actionable list.
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤝 **Flip `REQUIRE_EMAIL_VERIFICATION=true`** once email is confirmed working, to
-  gate publishing behind a verified email (backend `requireVerified` middleware).
+- 👤 **Flip `REQUIRE_EMAIL_VERIFICATION=true`** — **ready now** (email confirmed
+  working 2026-07-27). Set `REQUIRE_EMAIL_VERIFICATION=true` in the backend Vercel
+  env (Production) + redeploy — no code change, the `requireVerified` middleware
+  reads it at runtime. Gates `POST /poems` and `POST /comments` for unverified
+  users (403 `EMAIL_UNVERIFIED`; fail-open on lookup errors). Safe: existing users
+  were backfilled `emailVerified:true` by the migration and new signups get a
+  verification link. Verify by registering a fresh account and confirming it's
+  blocked from publishing until it clicks the link.
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
   so visual diffs fail the run (🤖).
