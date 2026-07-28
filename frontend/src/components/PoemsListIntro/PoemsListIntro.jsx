@@ -1,9 +1,9 @@
 import { SearchBar } from '../List/components/SearchBar'
 
-function PoemsListIntro({ onSearchChange }) {
+function PoemsListIntro({ searchValue, resultCount, onSearchChange }) {
     return (
         <div className='list__intro'>
-            <SearchBar onChange={onSearchChange} />
+            <SearchBar value={searchValue} onChange={onSearchChange} resultCount={resultCount} />
         </div>
     )
 }

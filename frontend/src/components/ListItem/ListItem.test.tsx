@@ -63,8 +63,8 @@ describe('ListItem (Refactored)', () => {
         return render(<Provider store={store}>{component}</Provider>)
     }
 
-    test('should render all child components when filter matches', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+    test('should render all child components', () => {
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByTestId('poem-header')).toBeInTheDocument()
         expect(screen.getByTestId('poem-content')).toBeInTheDocument()
@@ -72,84 +72,65 @@ describe('ListItem (Refactored)', () => {
     })
 
     test('should render poem header with correct data', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByText('Beautiful Sunset by Jane Doe')).toBeInTheDocument()
     })
 
     test('should render poem content', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByText('The sun sets over the horizon...')).toBeInTheDocument()
     })
 
     test('should pass correct likesCount to PoemFooter', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByText(/Likes: 2/)).toBeInTheDocument()
     })
 
     test('should show like button when user is logged in and not poem owner', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByText(/ShowLike: true/)).toBeInTheDocument()
     })
 
     test('should NOT show like button when user is poem owner', () => {
         const contextAsOwner = { ...mockContext, userId: 'user-123' }
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={contextAsOwner} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={contextAsOwner} />)
 
         expect(screen.getByText(/ShowLike: false/)).toBeInTheDocument()
     })
 
     test('should NOT show like button when user is not logged in', () => {
         const contextLoggedOut = { ...mockContext, user: '' }
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={contextLoggedOut} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={contextLoggedOut} />)
 
         expect(screen.getByText(/ShowLike: false/)).toBeInTheDocument()
     })
 
     test('should show user as owner when userId matches poem userId', () => {
         const contextAsOwner = { ...mockContext, userId: 'user-123' }
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={contextAsOwner} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={contextAsOwner} />)
 
         expect(screen.getByText(/IsOwner: true/)).toBeInTheDocument()
     })
 
     test('should show user as owner when user is admin', () => {
         const contextAsAdmin = { ...mockContext, userId: 'admin-789', isAdmin: true }
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={contextAsAdmin} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={contextAsAdmin} />)
 
         expect(screen.getByText(/IsOwner: true/)).toBeInTheDocument()
     })
 
     test('should NOT show user as owner when not owner or admin', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByText(/IsOwner: false/)).toBeInTheDocument()
     })
 
-    test('should filter by author name (case insensitive)', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='jane' context={mockContext} />)
-
-        expect(screen.getByTestId('poem-header')).toBeInTheDocument()
-    })
-
-    test('should NOT render when filter does not match author', () => {
-        const { container } = renderWithRouter(<ListItem poem={mockPoem} filter='john' context={mockContext} />)
-
-        expect(screen.queryByTestId('poem-header')).not.toBeInTheDocument()
-        expect(container.querySelector('.poem__block')).not.toBeInTheDocument()
-    })
-
-    test('should render when filter is empty', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
-
-        expect(screen.getByTestId('poem-header')).toBeInTheDocument()
-    })
-
     test('should call usePoemActions hook with correct params', () => {
-        renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(usePoemActionsModule.usePoemActions).toHaveBeenCalledWith({
             poem: mockPoem,
@@ -158,7 +139,7 @@ describe('ListItem (Refactored)', () => {
     })
 
     test('should have correct CSS classes', () => {
-        const { container } = renderWithRouter(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        const { container } = renderWithRouter(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(container.querySelector('.poem__detail')).toBeInTheDocument()
         expect(container.querySelector('.poem__block')).toBeInTheDocument()
@@ -166,7 +147,7 @@ describe('ListItem (Refactored)', () => {
 
     test('should determine isLiked correctly when user liked the poem', () => {
         const poemLikedByUser = { ...mockPoem, likes: ['user-456', 'user-2'] }
-        renderWithRouter(<ListItem poem={poemLikedByUser} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={poemLikedByUser} context={mockContext} />)
 
         // The component should detect user-456 in likes
         expect(screen.getByTestId('poem-footer')).toBeInTheDocument()
@@ -174,14 +155,14 @@ describe('ListItem (Refactored)', () => {
 
     test('should handle poem with no likes', () => {
         const poemWithNoLikes = { ...mockPoem, likes: [] }
-        renderWithRouter(<ListItem poem={poemWithNoLikes} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={poemWithNoLikes} context={mockContext} />)
 
         expect(screen.getByText(/Likes: 0/)).toBeInTheDocument()
     })
 
     test('should handle undefined likes array', () => {
         const poemWithUndefinedLikes = { ...mockPoem, likes: undefined as any }
-        renderWithRouter(<ListItem poem={poemWithUndefinedLikes} filter='' context={mockContext} />)
+        renderWithRouter(<ListItem poem={poemWithUndefinedLikes} context={mockContext} />)
 
         expect(screen.getByText(/Likes: 0/)).toBeInTheDocument()
     })

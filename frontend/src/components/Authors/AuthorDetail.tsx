@@ -92,7 +92,7 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
 
             <div className='author-detail__poems'>
                 {poems.map(poem => (
-                    <ListItem key={poem.id} poem={poem} filter='' context={context} />
+                    <ListItem key={poem.id} poem={poem} context={context} />
                 ))}
                 {isLoading && <CircularProgress />}
                 {!isLoading && poems.length === 0 && (

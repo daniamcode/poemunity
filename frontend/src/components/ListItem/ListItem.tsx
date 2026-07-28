@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import normalizeString from '../../utils/normalizeString'
 import { Poem, Context } from '../../typescript/interfaces'
 import type { RootState } from '../../redux/store'
 import { selectAuthorEntityById } from '../../redux/reducers/authorEntitiesReducers'
@@ -9,11 +8,10 @@ import { usePoemActions } from '../../hooks/usePoemActions'
 
 interface Props {
     poem: Poem
-    filter: string
     context: Context
 }
 
-const ListItem = React.memo(function ListItem({ poem, filter, context }: Props) {
+const ListItem = React.memo(function ListItem({ poem, context }: Props) {
     const { onDelete, onLike, onEdit } = usePoemActions({ poem, context })
 
     // Author display fields are denormalized onto the poem, but the normalized
@@ -32,11 +30,6 @@ const ListItem = React.memo(function ListItem({ poem, filter, context }: Props) 
 
     // Determine if the user is the owner or admin
     const isOwner = !!(context.user && (poem.userId === context.userId || context.isAdmin))
-
-    // Filter by author name
-    if (!normalizeString(authorName).includes(filter)) {
-        return null
-    }
 
     return (
         <main key={poem.id} className='poem__detail'>

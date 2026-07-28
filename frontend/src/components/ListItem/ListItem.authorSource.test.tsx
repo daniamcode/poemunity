@@ -61,7 +61,7 @@ beforeEach(() => {
 const renderWith = (state: any) =>
     render(
         <Provider store={mockStore(state)}>
-            <ListItem poem={stalePoem} filter='' context={context} />
+            <ListItem poem={stalePoem} context={context} />
         </Provider>
     )
 
@@ -91,20 +91,4 @@ describe('ListItem author source of truth', () => {
         expect(screen.getByTestId('author-slug')).toHaveTextContent('old-name')
     })
 
-    test('filters by the resolved (store) author name, not the stale poem copy', () => {
-        // Store says "New Name"; filtering for "new" should match even though the
-        // poem's own author field still says "Old Name".
-        const state = {
-            authorEntities: {
-                ids: ['author-1'],
-                entities: { 'author-1': { id: 'author-1', name: 'New Name', picture: 'p.jpg', slug: 'new-name' } }
-            }
-        }
-        render(
-            <Provider store={mockStore(state)}>
-                <ListItem poem={stalePoem} filter='new' context={context} />
-            </Provider>
-        )
-        expect(screen.getByTestId('poem-header')).toBeInTheDocument()
-    })
 })

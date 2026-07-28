@@ -162,7 +162,7 @@ describe('MUI Components Visual Regression Tests', () => {
         }
 
         test('should render list item correctly', () => {
-            const { container } = render(<ListItem poem={mockPoem} context={mockContext} filter='' />, {
+            const { container } = render(<ListItem poem={mockPoem} context={mockContext} />, {
                 wrapper: AllTheProviders
             })
             expect(container.firstChild).toMatchSnapshot()
@@ -170,7 +170,7 @@ describe('MUI Components Visual Regression Tests', () => {
 
         test('should render list item with likes correctly', () => {
             const likedPoem = { ...mockPoem, likes: ['user-1', 'user-2', 'test-user-id'] }
-            const { container } = render(<ListItem poem={likedPoem} context={mockContext} filter='' />, {
+            const { container } = render(<ListItem poem={likedPoem} context={mockContext} />, {
                 wrapper: AllTheProviders
             })
             expect(container.firstChild).toMatchSnapshot()

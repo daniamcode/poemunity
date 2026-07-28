@@ -53,8 +53,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟢 P3 — Frontend quality & refactors (code)
 
-- 🤖 **Search** — All searches (general search, inside my profile search, and in mobile) are poor. They only show within what's visible. We should call the backend to do a proper search. Also, we should only launch a search when at least 2 characters are typed and wait to search until the user stops writing, so maybe add a short delay on typing? i mean, i need you do handle a short investigation of what are common patterns for this and choose the best one and more modern. Launch a subagent to carry out the online investigation
-
 - 🤖 **Finish the TypeScript migration** — `MyPoems.jsx`, `Register.jsx`,
   `Profile.jsx`, `MyFavouritePoems.jsx`, plus util files (`parseJWT.js`,
   `notifications.js`, `sortPoems.js`, `axiosInstance.js`). (`frontend/CLEANUP.md` §1)
@@ -116,6 +114,29 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Server-backed search** (2026-07-28): search was a client-side filter over the
+  poems already on screen, matching **author name only** (`ListItem` returned
+  `null` for non-matches), so anything past the first page was unreachable and
+  infinite scroll had to be frozen while filtering to avoid fetching the whole
+  dataset. Now `GET /api/v1/poems?q=` searches poem **titles and author names**
+  across the collection, composed with the existing genre/origin/userId/likedBy
+  filters and paginated normally. Client side: `useSearchQuery` (300ms debounce,
+  2-character minimum, one AbortController per fetch) feeds `q` to all three
+  search bars — dashboard/genre list, My Poems, My Favourites. `getAction` now
+  accepts a `signal` and treats a cancellation as a non-event rather than an
+  error. Design notes:
+  - The regex is **unanchored** and therefore cannot use an index — deliberate.
+    An indexable `^term` regex would only match titles *starting* with the term
+    ("love" would miss "A Song of Love"), and `$text` stems whole words so the
+    partial words of search-as-you-type match nothing. The upgrade path when the
+    collection outgrows a scan is **Atlas Search**, not an index on this query.
+  - Poem **body text is deliberately not searched** — every result becomes a
+    partial-text hit that needs snippet highlighting to be scannable. Revisit
+    together with highlighting.
+  - The search box is **not** an ARIA combobox: there is no popup listbox, the
+    results replace page content. It is a `searchbox` plus a polite `role=status`
+    region announcing the result count and the minimum-length hint.
 
 - **Fixed the flaky backend test suite** (2026-07-28): ~25% of runs failed on a
   random test with a bogus status (302/404/401) or a bare `socket hang up`.

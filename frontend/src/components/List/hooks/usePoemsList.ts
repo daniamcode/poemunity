@@ -23,9 +23,13 @@ export interface UsePoemsListParams {
     origin: string
     orderBy: string
     initialData?: InitialPoemsData
+    /** Debounced search query, already past the minimum length. '' means none. */
+    q?: string
+    /** Fresh AbortSignal per fetch, so a superseded request cannot land late. */
+    nextSignal?: () => AbortSignal
 }
 
-export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsListParams) {
+export function usePoemsList({ genre, origin, orderBy, initialData, q = '', nextSignal }: UsePoemsListParams) {
     const dispatch = useAppDispatch()
     const poemsListQuery = useSelector((state: RootState) => state.poemsListQuery)
     // Cache stores poem ids; resolve them back to Poem[] via the entity store.
@@ -46,7 +50,20 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
         }
     }, [dispatch])
 
-    // Fetch when origin/genre changes — skip the first run if we seeded from SSR
+    // Every fetch (initial, search, load-more, retry) sends the same filters;
+    // only the page differs. Keeping one builder means search can never be
+    // dropped from one of them.
+    const buildParams = (page: number) => ({
+        page,
+        limit: PAGINATION_LIMIT,
+        orderBy: effectiveOrderBy,
+        ...(origin !== 'all' && { origin }),
+        ...(genre && { genre }),
+        ...(q && { q })
+    })
+
+    // Fetch when origin/genre/search changes — skip the first run if we seeded
+    // from SSR
     useEffect(() => {
         if (isSeeded.current) {
             isSeeded.current = false
@@ -55,18 +72,14 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
         if (origin) {
             dispatch(
                 getPoemsListAction({
-                    params: {
-                        page: 1,
-                        limit: PAGINATION_LIMIT,
-                        orderBy: effectiveOrderBy,
-                        ...(origin !== 'all' && { origin }),
-                        ...(genre && { genre })
-                    },
-                    options: { reset: true, fetch: true }
+                    params: buildParams(1),
+                    options: { reset: true, fetch: true },
+                    signal: nextSignal?.()
                 })
             )
         }
-    }, [origin, genre, effectiveOrderBy, dispatch])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [origin, genre, effectiveOrderBy, q, dispatch])
 
     const poems = (() => {
         if (!resolvedPoems.length) return []
@@ -78,14 +91,9 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
             const nextPage = (poemsListQuery.page || 0) + 1
             dispatch(
                 getPoemsListAction({
-                    params: {
-                        page: nextPage,
-                        limit: PAGINATION_LIMIT,
-                        orderBy: effectiveOrderBy,
-                        ...(origin !== 'all' && { origin }),
-                        ...(genre && { genre })
-                    },
-                    options: { fetch: true, reset: false }
+                    params: buildParams(nextPage),
+                    options: { fetch: true, reset: false },
+                    signal: nextSignal?.()
                 })
             )
         }
@@ -94,14 +102,9 @@ export function usePoemsList({ genre, origin, orderBy, initialData }: UsePoemsLi
     const retry = () => {
         dispatch(
             getPoemsListAction({
-                params: {
-                    page: 1,
-                    limit: PAGINATION_LIMIT,
-                    orderBy: effectiveOrderBy,
-                    ...(origin !== 'all' && { origin }),
-                    ...(genre && { genre })
-                },
-                options: { reset: true, fetch: true }
+                params: buildParams(1),
+                options: { reset: true, fetch: true },
+                signal: nextSignal?.()
             })
         )
     }

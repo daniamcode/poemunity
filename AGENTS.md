@@ -143,6 +143,41 @@ later phase, scoped in the same doc.
 
 **Ranking freshness after mutations.** The author ranking (`rankingQuery`, the sidebar) is a **server-computed aggregate** (points = `3×poems + 1×likes`, top-10) — *not* part of the normalized entity store, because the client doesn't hold every poem and so can't recompute it. The three mutations that change author points — **like** (`PUT /poem/:id`), **create** (`POST /poems`), **delete** (`DELETE /poem/:id`) — **recompute and return the fresh ranking in their own response** (poem fields stay top-level, `ranking` is a sibling; delete returns `200 { ranking }` instead of `204`). The frontend adopts it verbatim via `setRanking(response.ranking)`, so points/order/tie-breaks stay 100% server-owned. `computeRanking()` lives in `backend/src/utils/ranking.js`, shared with `GET /poems/ranking`. A missing `ranking` field is a safe no-op, so frontend/backend can deploy in either order. Rejected alternatives: **(A)** optimistically patch cached points client-side — re-encodes the server formula and can't cross the top-N boundary; **(B)** refetch `GET /ranking` after each mutation — a second round-trip per like. Editing a poem (no point change) and profile edits (identity only — handled by the `authorEntities` overlay in `selectRanking`) deliberately carry no ranking.
 
+## Search (server-backed)
+
+Search is a **server** query, not a client-side filter. `GET /api/v1/poems?q=`
+matches poem **titles** and **author names** (case-insensitive), composed under
+`$and` so it narrows the existing `genre`/`origin`/`userId`/`likedBy` filters
+rather than replacing them, and paginates like any other list. Poem **body text
+is deliberately excluded** — without snippet highlighting, full-text hits are
+unscannable.
+
+The regex is **unanchored and escaped**, and therefore does a collection scan.
+That is the intended trade at this size. Do not "optimise" it into an anchored
+`^term` regex to make it indexable: that only matches titles *starting* with the
+term, so "love" stops finding "A Song of Love". `$text` is also not a substitute
+— it stems whole words, so the partial words produced by search-as-you-type
+match nothing. The real upgrade path is **Atlas Search**.
+
+Client side, `useSearchQuery` (`frontend/src/hooks/`) owns the whole policy and
+is shared by all three search bars (dashboard/genre list, My Poems, My
+Favourites): 300ms debounce, a 2-character minimum, and a fresh AbortController
+per fetch. `getAction` accepts that `signal` and treats `Axios.isCancel` as a
+non-event — without that, superseding a request would dispatch `rejected` and
+flash the list's error state on every keystroke. Aborting the request being
+replaced is what makes "latest wins" structural rather than luck.
+
+`SearchBar` is **not** an ARIA combobox — there is no popup listbox, results
+replace the page content. It is a `searchbox` plus a polite `role="status"`
+region announcing the result count and the minimum-length hint (a silent
+threshold is the actual anti-pattern). Pass `resultCount: undefined` while a
+request is in flight so nothing is announced until the count is real.
+
+Lists must keep the search box mounted while a query runs — the full-page
+spinner is gated on `!q`, or the input unmounts mid-search and the user loses
+focus and caret on every keystroke.
+
+
 ## Reference Docs
 
 - `TODO.md` — the backlog (priorities, deferred decisions, recently shipped).

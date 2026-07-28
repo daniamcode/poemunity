@@ -6,6 +6,7 @@ describe('ListHeader', () => {
     const mockProps = {
         origin: 'all',
         orderBy: 'Likes',
+        searchValue: '',
         onSearchChange: jest.fn(),
         onOriginChange: jest.fn(),
         onOrderChange: jest.fn()

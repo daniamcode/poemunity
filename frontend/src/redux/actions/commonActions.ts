@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import Axios from 'axios'
 import API from './axiosInstance'
 // import { LogLevels, trackError }   from 'utils/errorUtils';
 // import { isProduction, isStaging } from 'constants/environments';
@@ -103,6 +104,14 @@ interface GetActionProps {
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
     extraConfig?: object
+    /**
+     * AbortSignal for the request. Search-as-you-type fires overlapping
+     * requests, and without cancellation a slow earlier response can land
+     * after a faster later one and overwrite the results with stale data.
+     * Aborting the previous request before starting the next one makes
+     * "latest wins" structural rather than a matter of luck.
+     */
+    signal?: AbortSignal
 }
 
 export function getAction({
@@ -112,7 +121,8 @@ export function getAction({
     dispatch,
     options = { reset: false, update: false, fetch: true },
     callbacks,
-    extraConfig = {}
+    extraConfig = {},
+    signal
 }: GetActionProps) {
     const {
         requestAction,
@@ -136,7 +146,8 @@ export function getAction({
         dispatch({ type: requestAction })
         API({}, extraConfig)
             .get(url, {
-                params
+                params,
+                signal
             })
             .then(response => {
                 let responseData = response.data
@@ -159,6 +170,12 @@ export function getAction({
                 }
             })
             .catch(error => {
+                // A deliberately cancelled request is not a failure: dispatching
+                // rejected here would flash "Something went wrong" every time the
+                // user types another letter.
+                if (Axios.isCancel(error)) {
+                    return
+                }
                 const serializedError = error?.response?.data || {
                     message: error?.message || 'An error occurred',
                     status: error?.response?.status,

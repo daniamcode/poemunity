@@ -8,12 +8,23 @@ interface ListHeaderProps {
     genre?: string
     origin: string
     orderBy: string
+    searchValue: string
+    resultCount?: number
     onSearchChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
     onOriginChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
     onOrderChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
-export function ListHeader({ genre, origin, orderBy, onSearchChange, onOriginChange, onOrderChange }: ListHeaderProps) {
+export function ListHeader({
+    genre,
+    origin,
+    orderBy,
+    searchValue,
+    resultCount,
+    onSearchChange,
+    onOriginChange,
+    onOrderChange
+}: ListHeaderProps) {
     return (
         <div className='list__intro'>
             {genre && (
@@ -22,7 +33,7 @@ export function ListHeader({ genre, origin, orderBy, onSearchChange, onOriginCha
                     {genre.toUpperCase()}
                 </p>
             )}
-            <SearchBar onChange={onSearchChange} />
+            <SearchBar value={searchValue} onChange={onSearchChange} resultCount={resultCount} />
             <OriginFilter value={origin} onChange={onOriginChange} />
             <SortFilter value={orderBy} onChange={onOrderChange} />
         </div>

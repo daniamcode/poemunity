@@ -196,7 +196,14 @@ export const PROFILE_FAVOURITE_POEMS = 'My favourite poems'
 export const LIKE = 'Like'
 export const LIKES = 'Likes'
 export const READ_MORE = 'Read more'
-export const SEARCH_PLACEHOLDER = 'Search an author'
+export const SEARCH_PLACEHOLDER = 'Search poems and authors'
+// Below this many characters the query is not sent. A one-letter query matches
+// most of the collection, so it costs a round trip to return noise. The gate is
+// announced rather than silent (SEARCH_MIN_LENGTH_HINT) — a search box that
+// ignores you with no explanation is the actual anti-pattern.
+export const SEARCH_MIN_LENGTH = 2
+export const SEARCH_MIN_LENGTH_HINT = `Type ${SEARCH_MIN_LENGTH} or more characters to search`
+export const SEARCH_NO_RESULTS = 'No poems match your search.'
 export const ORDER_BY = 'Order poems by: '
 export const ORDER_BY_TITLE = 'Title'
 export const ORDER_BY_DATE = 'Date'

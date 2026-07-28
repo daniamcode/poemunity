@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 import { AppContext } from '../../App'
 import CircularProgress from '../CircularIndeterminate'
 import { useSelector } from 'react-redux'
@@ -6,14 +6,15 @@ import { useAppDispatch } from '../../redux/store'
 import { getMyFavouritePoemsAction } from '../../redux/actions/poemsActions'
 import { selectMyFavouritePoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
-import { PAGINATION_LIMIT } from '../../data/constants'
+import { useSearchQuery } from '../../hooks/useSearchQuery'
+import { PAGINATION_LIMIT, SEARCH_NO_RESULTS } from '../../data/constants'
 import ListItem from '../ListItem/ListItem'
 import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 
 function MyFavouritePoems() {
     const context = useContext(AppContext)
 
-    const [filter, setFilter] = useState('')
+    const { input: searchInput, q, nextSignal, onSearchChange } = useSearchQuery()
 
     // Redux
     const dispatch = useAppDispatch()
@@ -22,25 +23,26 @@ function MyFavouritePoems() {
     // Cache stores poem ids; resolve them to full poems via the entity store.
     const poems = useSelector(selectMyFavouritePoemsPoems)
 
-    // Initial load
+    // Initial load, and every time the debounced search query changes. Search
+    // runs on the server, so a new query is a new first page rather than a
+    // filter over whatever happens to be loaded.
     useEffect(() => {
         if (context?.userId) {
-            const queryOptions = {
-                reset: true,
-                fetch: true
-            }
             dispatch(
                 getMyFavouritePoemsAction({
                     params: {
                         likedBy: context.userId,
                         page: 1,
-                        limit: PAGINATION_LIMIT
+                        limit: PAGINATION_LIMIT,
+                        ...(q && { q })
                     },
-                    options: queryOptions
+                    options: { reset: true, fetch: true },
+                    signal: nextSignal()
                 })
             )
         }
-    }, [context?.userId, dispatch])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [context?.userId, q, dispatch])
 
     // Infinite scroll handler
     const handleLoadMore = () => {
@@ -51,12 +53,14 @@ function MyFavouritePoems() {
                     params: {
                         likedBy: context.userId,
                         page: nextPage,
-                        limit: PAGINATION_LIMIT
+                        limit: PAGINATION_LIMIT,
+                        ...(q && { q })
                     },
                     options: {
                         fetch: true,
                         reset: false
-                    }
+                    },
+                    signal: nextSignal()
                 })
             )
         }
@@ -68,19 +72,25 @@ function MyFavouritePoems() {
         hasMore: myFavouritePoemsQuery.hasMore
     })
 
-    const handleSearchChange = event => {
-        setFilter(event.target.value)
-    }
-
-    if (myFavouritePoemsQuery.isFetching && !poems.length) {
+    // Full-page spinner only on the very first load. During a search the
+    // header must stay mounted, or the input unmounts mid-query and the user
+    // loses focus and their caret on every keystroke.
+    if (myFavouritePoemsQuery.isFetching && !poems.length && !q) {
         return <CircularProgress />
     }
 
     return (
         <>
-            <PoemsListIntro onSearchChange={handleSearchChange} />
+            <PoemsListIntro
+                searchValue={searchInput}
+                resultCount={myFavouritePoemsQuery.isFetching ? undefined : poems.length}
+                onSearchChange={onSearchChange}
+            />
+            {!myFavouritePoemsQuery.isFetching && poems.length === 0 && q && (
+                <p className='list__empty'>{SEARCH_NO_RESULTS}</p>
+            )}
             {poems.map(poem => (
-                <ListItem key={poem.id} poem={poem} filter={filter} context={context} />
+                <ListItem key={poem.id} poem={poem} context={context} />
             ))}
             {/* Infinite scroll sentinel */}
             <div ref={sentinelRef} style={{ height: '20px' }} />

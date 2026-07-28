@@ -23,10 +23,18 @@ exports[`MyPoems should match without id 1`] = `
             />
           </svg>
           <input
-            aria-label="Search an author"
+            aria-describedby="search-input__status"
+            aria-label="Search poems and authors"
             class="search-input__field"
-            placeholder="Search an author"
-            type="text"
+            placeholder="Search poems and authors"
+            type="search"
+            value=""
+          />
+          <div
+            aria-live="polite"
+            class="search-input__status"
+            id="search-input__status"
+            role="status"
           />
         </div>
       </div>
@@ -54,10 +62,18 @@ exports[`MyPoems should match without id 1`] = `
           />
         </svg>
         <input
-          aria-label="Search an author"
+          aria-describedby="search-input__status"
+          aria-label="Search poems and authors"
           class="search-input__field"
-          placeholder="Search an author"
-          type="text"
+          placeholder="Search poems and authors"
+          type="search"
+          value=""
+        />
+        <div
+          aria-live="polite"
+          class="search-input__status"
+          id="search-input__status"
+          role="status"
         />
       </div>
     </div>

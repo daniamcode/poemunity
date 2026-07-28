@@ -26,6 +26,11 @@ jest.mock('axios', () => {
         __esModule: true,
         default: {
             create: mockCreateFn,
+            // getAction consults isCancel to tell a deliberately aborted
+            // request from a real failure. Default to "not a cancel" so the
+            // existing error-handling tests keep exercising the error path;
+            // the cancel path has its own tests below.
+            isCancel: jest.fn(() => false),
             __mockGet: mockGetFn,
             __mockPost: mockPostFn,
             __mockPut: mockPutFn,
@@ -202,7 +207,66 @@ describe('commonActions', () => {
                 dispatch
             })
 
-            expect(mockGet).toHaveBeenCalledWith('/test', { params })
+            expect(mockGet).toHaveBeenCalledWith('/test', { params, signal: undefined })
+        })
+
+        // Search-as-you-type cancels the request it supersedes. A cancellation
+        // is a deliberate act, not a failure: dispatching rejected for it would
+        // flash the list's error state on every keystroke.
+        describe('request cancellation', () => {
+            test('passes the signal through to axios', () => {
+                const controller = new AbortController()
+
+                getAction({
+                    type: 'TEST_ACTION',
+                    url: '/test',
+                    dispatch,
+                    signal: controller.signal
+                })
+
+                expect(mockGet).toHaveBeenCalledWith('/test', {
+                    params: undefined,
+                    signal: controller.signal
+                })
+            })
+
+            test('does not dispatch rejected when the request was cancelled', async () => {
+                const cancelError = new Error('canceled')
+                mockGet.mockRejectedValue(cancelError)
+                ;(axios as any).isCancel.mockReturnValue(true)
+
+                getAction({
+                    type: 'TEST_ACTION',
+                    url: '/test',
+                    dispatch,
+                    callbacks: mockCallbacks
+                })
+
+                await new Promise(resolve => setTimeout(resolve, 10))
+
+                expect(dispatch).not.toHaveBeenCalledWith(
+                    expect.objectContaining({ type: 'TEST_ACTION_rejected' })
+                )
+                expect(mockCallbacks.error).not.toHaveBeenCalled()
+                ;(axios as any).isCancel.mockReturnValue(false)
+            })
+
+            test('still dispatches rejected for a genuine failure', async () => {
+                mockGet.mockRejectedValue(new Error('Network Error'))
+
+                getAction({
+                    type: 'TEST_ACTION',
+                    url: '/test',
+                    dispatch,
+                    callbacks: mockCallbacks
+                })
+
+                await new Promise(resolve => setTimeout(resolve, 10))
+
+                expect(dispatch).toHaveBeenCalledWith(
+                    expect.objectContaining({ type: 'TEST_ACTION_rejected' })
+                )
+            })
         })
 
         test('should handle network error without response', async () => {

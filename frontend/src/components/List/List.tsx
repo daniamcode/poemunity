@@ -1,14 +1,14 @@
 import React from 'react'
-import { useState, useContext, useCallback, useMemo } from 'react'
+import { useContext, useCallback, useMemo } from 'react'
 import { AppContext } from '../../App'
 import CircularProgress from '../CircularIndeterminate'
-import normalizeString from '../../utils/normalizeString'
 import { addQueryParam, useFiltersFromQuery } from '../../utils/urlUtils'
 import ListItem from '../ListItem/ListItem'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
+import { useSearchQuery } from '../../hooks/useSearchQuery'
 import { ListHeader } from './components/ListHeader'
 import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
-import { ORDER_BY_LIKES } from '../../data/constants'
+import { ORDER_BY_LIKES, SEARCH_NO_RESULTS } from '../../data/constants'
 
 interface ListProps {
     genre?: string
@@ -23,7 +23,7 @@ interface ListProps {
 
 function List({ genre: genreProp, initialData, match }: ListProps) {
     const genre = genreProp ?? match?.params?.genre
-    const [filter, setFilter] = useState<string>('')
+    const { input: searchInput, q, nextSignal, onSearchChange } = useSearchQuery()
 
     const [paramsData, setParamsData] = useFiltersFromQuery({
         orderBy: ORDER_BY_LIKES,
@@ -51,17 +51,19 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
         genre,
         origin: paramsData.origin,
         orderBy: paramsData.orderBy,
-        initialData
+        initialData,
+        q,
+        nextSignal
     })
 
-    // Setup infinite scroll.
-    // While a client-side search filter is active, freeze pagination: filtered
-    // items collapse to null, which would otherwise keep the sentinel on screen
-    // and make infinite scroll fetch the entire dataset (a self-inflicted DoS).
-    const isFiltering = filter.length > 0
+    // Infinite scroll works normally during a search now. It used to be frozen
+    // while filtering, because filtering happened client-side: non-matching
+    // items rendered as null, so the sentinel stayed on screen and paging kept
+    // firing until the whole dataset was fetched. With the server doing the
+    // search, a page of results is a page of matches and hasMore is accurate.
     const sentinelRef = useInfiniteScroll({
         onLoadMore: handleLoadMore,
-        hasMore: hasMore && !isFiltering,
+        hasMore,
         isLoading
     })
 
@@ -77,12 +79,10 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
         setParamsData((prev: any) => ({ ...prev, origin: value }))
     }, [])
 
-    const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFilter(normalizeString(event.target.value))
-    }, [])
-
-    // Show full page loader only on initial load (no poems yet)
-    if (isLoading && !hasItems) {
+    // Full-page loader only on the very first load. During a search the header
+    // must stay mounted, or the input unmounts mid-query and the user loses
+    // focus and their caret on every keystroke.
+    if (isLoading && !hasItems && !q) {
         return <CircularProgress />
     }
 
@@ -93,7 +93,9 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
                     genre={genre}
                     origin={paramsData.origin}
                     orderBy={paramsData.orderBy}
-                    onSearchChange={handleSearchChange}
+                    searchValue={searchInput}
+                    resultCount={isLoading ? undefined : poems.length}
+                    onSearchChange={onSearchChange}
                     onOriginChange={handleOriginChange}
                     onOrderChange={handleOrderChange}
                 />
@@ -107,12 +109,12 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
 
                 {!isError && !isLoading && poems.length === 0 && (
                     <div className='list__empty'>
-                        <p>No poems found. Try adjusting your filters.</p>
+                        <p>{q ? SEARCH_NO_RESULTS : 'No poems found. Try adjusting your filters.'}</p>
                     </div>
                 )}
 
                 {!isError && poems.map(poem => (
-                    <ListItem key={poem?.id} poem={poem} filter={filter} context={listItemContext} />
+                    <ListItem key={poem?.id} poem={poem} context={listItemContext} />
                 ))}
 
                 {isLoading && hasItems && (

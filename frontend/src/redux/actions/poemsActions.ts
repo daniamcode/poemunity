@@ -58,9 +58,10 @@ interface GetPoemsListActionProps {
     params?: object | null
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
+    signal?: AbortSignal
 }
 
-export function getPoemsListAction({ params, options, callbacks }: GetPoemsListActionProps) {
+export function getPoemsListAction({ params, options, callbacks, signal }: GetPoemsListActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.POEMS_LIST,
@@ -68,6 +69,7 @@ export function getPoemsListAction({ params, options, callbacks }: GetPoemsListA
             dispatch,
             params,
             options,
+            signal,
             callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
@@ -98,9 +100,10 @@ interface GetMyPoemsActionProps {
     params?: object
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
+    signal?: AbortSignal
 }
 
-export function getMyPoemsAction({ params, options, callbacks }: GetMyPoemsActionProps) {
+export function getMyPoemsAction({ params, options, callbacks, signal }: GetMyPoemsActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.MY_POEMS,
@@ -108,6 +111,7 @@ export function getMyPoemsAction({ params, options, callbacks }: GetMyPoemsActio
             dispatch,
             params,
             options,
+            signal,
             callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }
@@ -117,9 +121,10 @@ interface GetMyFavouritePoemsActionProps {
     params?: object
     options?: ReduxOptions
     callbacks?: ReduxCallbacks
+    signal?: AbortSignal
 }
 
-export function getMyFavouritePoemsAction({ params, options, callbacks }: GetMyFavouritePoemsActionProps) {
+export function getMyFavouritePoemsAction({ params, options, callbacks, signal }: GetMyFavouritePoemsActionProps) {
     return function dispatcher(dispatch: AppDispatch) {
         return getAction({
             type: ACTIONS.MY_FAVOURITE_POEMS,
@@ -127,6 +132,7 @@ export function getMyFavouritePoemsAction({ params, options, callbacks }: GetMyF
             dispatch,
             params,
             options,
+            signal,
             callbacks: withAuthorSeeding(dispatch, callbacks)
         })
     }

@@ -37,6 +37,9 @@ jest.mock('axios', () => {
         __esModule: true,
         default: {
             create: mockCreateFn,
+            // getAction consults isCancel to distinguish a deliberately aborted
+            // request from a real failure.
+            isCancel: jest.fn(() => false),
             __mockGet: mockGetFn,
             __mockPost: mockPostFn,
             __mockPut: mockPutFn,

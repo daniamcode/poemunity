@@ -38,6 +38,40 @@ function findSortForOrder (orderBy) {
   }
 }
 
+// User input goes into a $regex, so every regex metacharacter has to be inert.
+// Without this, a query like "a(" is an invalid pattern (500) and ".*" is a
+// user-supplied full scan.
+function escapeRegex (input) {
+  return String(input).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// Free-text search over poem titles and author names.
+//
+// The regex is deliberately UNANCHORED, which means it cannot use an index and
+// scans the collection. That is the intended trade at this size: an anchored
+// `^term` regex would use an index but would only match titles that START with
+// the term, so searching "love" would miss "A Song of Love" — not what anyone
+// means by search. A `$text` index is not an option either: it stems whole
+// words, so the partial words produced by search-as-you-type ("lov") match
+// nothing. If the collection outgrows a scan, the upgrade is Atlas Search, not
+// an index on this query.
+async function buildSearchCondition (q) {
+  const rx = { $regex: escapeRegex(q), $options: 'i' }
+
+  // Author names live in another collection, so matching them takes a second
+  // query. Only _id is selected to keep it light. This $in grows with the
+  // number of matching authors; it is fine at the current author count, and is
+  // the other thing Atlas Search would replace.
+  const authors = await Author.find({ $or: [{ name: rx }, { username: rx }] }).select('_id')
+
+  const conditions = [{ title: rx }]
+  if (authors.length > 0) {
+    conditions.push({ authorId: { $in: authors.map((a) => a._id) } })
+  }
+
+  return { $or: conditions }
+}
+
 function serializePoem (poem) {
   const returnedObject = typeof poem.toJSON === 'function' ? poem.toJSON() : { ...poem }
   returnedObject.id = returnedObject._id
@@ -137,6 +171,14 @@ poemsRouter.get('/', async (req, res) => {
 
     if (req.query.genre) {
       filter.genre = { $regex: `^${req.query.genre}$`, $options: 'i' }
+    }
+
+    // Search goes under $and rather than $or, because the userId filter above
+    // already owns the top-level $or. Top-level keys are implicitly ANDed, so
+    // the two compose: "poems by me" AND "matching this text".
+    const q = String(req.query.q || '').trim()
+    if (q) {
+      filter.$and = [await buildSearchCondition(q)]
     }
 
     const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined

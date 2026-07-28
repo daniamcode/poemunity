@@ -390,7 +390,8 @@ describe('List', () => {
             options: {
                 reset: true,
                 fetch: true
-            }
+            },
+            signal: expect.any(AbortSignal)
         })
     })
 

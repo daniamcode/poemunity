@@ -78,28 +78,28 @@ describe('ListItem - Like Functionality Integration Tests', () => {
     }
 
     test('should show unlike icon (empty heart) for poem not yet liked by user', () => {
-        renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         expect(screen.getByTestId('unlike-icon')).toBeInTheDocument()
         expect(screen.queryByTestId('like-icon')).not.toBeInTheDocument()
     })
 
     test('should show like icon (filled heart) for poem already liked by user', () => {
-        renderWithProviders(<ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoemLikedByUser} context={mockContext} />)
 
         expect(screen.getByTestId('like-icon')).toBeInTheDocument()
         expect(screen.queryByTestId('unlike-icon')).not.toBeInTheDocument()
     })
 
     test('should have correct CSS class for unlike icon', () => {
-        renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         const unlikeIcon = screen.getByTestId('unlike-icon')
         expect(unlikeIcon).toHaveClass('poem__unlikes-icon')
     })
 
     test('should have correct CSS class for like icon', () => {
-        renderWithProviders(<ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoemLikedByUser} context={mockContext} />)
 
         const likeIcon = screen.getByTestId('like-icon')
         expect(likeIcon).toHaveClass('poem__likes-icon')
@@ -109,7 +109,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Setup: poem not liked by user
         likePoemActionSpy.mockReturnValue({ type: 'LIKE_POEM' })
 
-        renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         const unlikeIcon = screen.getByTestId('unlike-icon')
         fireEvent.click(unlikeIcon)
@@ -127,7 +127,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Setup: poem already liked by user
         likePoemActionSpy.mockReturnValue({ type: 'LIKE_POEM' })
 
-        renderWithProviders(<ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoemLikedByUser} context={mockContext} />)
 
         const likeIcon = screen.getByTestId('like-icon')
         fireEvent.click(likeIcon)
@@ -144,7 +144,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
     test('should update the single poem entity (not per-cache) in success callback when liking', () => {
         likePoemActionSpy.mockReturnValue({ type: 'LIKE_POEM' })
 
-        renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         const unlikeIcon = screen.getByTestId('unlike-icon')
         fireEvent.click(unlikeIcon)
@@ -167,7 +167,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
     })
 
     test('should update UI when poem prop changes from not liked to liked', () => {
-        const { rerender } = renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        const { rerender } = renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         // Initially should show unlike icon
         expect(screen.getByTestId('unlike-icon')).toBeInTheDocument()
@@ -181,7 +181,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Re-render with updated poem prop
         rerender(
             <Provider store={store}>
-                    <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                    <ListItem poem={updatedPoem} context={mockContext} />
             </Provider>
         )
 
@@ -192,7 +192,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
     test('should update UI when poem prop changes from liked to not liked', () => {
         const { rerender } = renderWithProviders(
-            <ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />
+            <ListItem poem={mockPoemLikedByUser} context={mockContext} />
         )
 
         // Initially should show like icon
@@ -207,7 +207,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
         // Re-render with updated poem prop
         rerender(
             <Provider store={store}>
-                    <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                    <ListItem poem={updatedPoem} context={mockContext} />
             </Provider>
         )
 
@@ -217,7 +217,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
     })
 
     test('should update likes count when poem prop changes', () => {
-        const { rerender } = renderWithProviders(<ListItem poem={mockPoem} filter='' context={mockContext} />)
+        const { rerender } = renderWithProviders(<ListItem poem={mockPoem} context={mockContext} />)
 
         // Initially has 2 likes
         expect(screen.getByText(/2 Likes/i)).toBeInTheDocument()
@@ -230,7 +230,7 @@ describe('ListItem - Like Functionality Integration Tests', () => {
 
         rerender(
             <Provider store={store}>
-                    <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                    <ListItem poem={updatedPoem} context={mockContext} />
             </Provider>
         )
 

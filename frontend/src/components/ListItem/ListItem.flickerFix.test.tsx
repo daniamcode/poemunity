@@ -54,7 +54,7 @@ describe('ListItem - No Flicker Tests', () => {
     describe('Unliking a liked poem', () => {
         test('should NOT flicker when unliking - icon should stay as unlike after click', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemLikedByUser} context={mockContext} />
             )
 
             // Initially should show like icon (filled heart)
@@ -72,7 +72,7 @@ describe('ListItem - No Flicker Tests', () => {
             await act(async () => {
                 rerender(
                     <Provider store={store}>
-                            <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                            <ListItem poem={updatedPoem} context={mockContext} />
                     </Provider>
                 )
             })
@@ -100,7 +100,7 @@ describe('ListItem - No Flicker Tests', () => {
 
         test('should maintain consistent state during multiple rapid re-renders after unlike', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemLikedByUser} context={mockContext} />
             )
 
             // Track all icon states during re-renders
@@ -116,7 +116,7 @@ describe('ListItem - No Flicker Tests', () => {
                 await act(async () => {
                     rerender(
                         <Provider store={store}>
-                                <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                                <ListItem poem={updatedPoem} context={mockContext} />
                         </Provider>
                     )
                 })
@@ -136,7 +136,7 @@ describe('ListItem - No Flicker Tests', () => {
     describe('Liking an unliked poem', () => {
         test('should NOT flicker when liking - icon should stay as like after click', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemNotLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemNotLikedByUser} context={mockContext} />
             )
 
             // Initially should show unlike icon (empty heart)
@@ -154,7 +154,7 @@ describe('ListItem - No Flicker Tests', () => {
             await act(async () => {
                 rerender(
                     <Provider store={store}>
-                            <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                            <ListItem poem={updatedPoem} context={mockContext} />
                     </Provider>
                 )
             })
@@ -182,7 +182,7 @@ describe('ListItem - No Flicker Tests', () => {
 
         test('should maintain consistent state during multiple rapid re-renders after like', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemNotLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemNotLikedByUser} context={mockContext} />
             )
 
             // Track all icon states during re-renders
@@ -198,7 +198,7 @@ describe('ListItem - No Flicker Tests', () => {
                 await act(async () => {
                     rerender(
                         <Provider store={store}>
-                                <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                                <ListItem poem={updatedPoem} context={mockContext} />
                         </Provider>
                     )
                 })
@@ -218,7 +218,7 @@ describe('ListItem - No Flicker Tests', () => {
     describe('Counter consistency', () => {
         test('counter should never temporarily show incorrect value when unliking', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemLikedByUser} context={mockContext} />
             )
 
             const likesCounts: number[] = []
@@ -232,7 +232,7 @@ describe('ListItem - No Flicker Tests', () => {
                 await act(async () => {
                     rerender(
                         <Provider store={store}>
-                                <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                                <ListItem poem={updatedPoem} context={mockContext} />
                         </Provider>
                     )
                 })
@@ -248,7 +248,7 @@ describe('ListItem - No Flicker Tests', () => {
 
         test('counter should never temporarily show incorrect value when liking', async () => {
             const { rerender } = renderWithProviders(
-                <ListItem poem={mockPoemNotLikedByUser} filter='' context={mockContext} />
+                <ListItem poem={mockPoemNotLikedByUser} context={mockContext} />
             )
 
             const likesCounts: number[] = []
@@ -262,7 +262,7 @@ describe('ListItem - No Flicker Tests', () => {
                 await act(async () => {
                     rerender(
                         <Provider store={store}>
-                                <ListItem poem={updatedPoem} filter='' context={mockContext} />
+                                <ListItem poem={updatedPoem} context={mockContext} />
                         </Provider>
                     )
                 })
