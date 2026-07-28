@@ -32,7 +32,7 @@ poemRouter.get('/:poemId', async (req, res) => {
 // like poem
 poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req
-  if (poem.likes.some((id) => id == req.userId)) {
+  if (poem.likes.some((id) => id === req.userId)) {
     poem.likes.splice(poem.likes.indexOf(req.userId), 1)
   } else {
     poem.likes.push(req.userId)

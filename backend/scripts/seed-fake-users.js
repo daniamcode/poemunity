@@ -4540,7 +4540,7 @@ async function run () {
   }
 
   console.log('\n--- Updating user poem references ---')
-  for (const [username, user] of Object.entries(userMap)) {
+  for (const user of Object.values(userMap)) {
     const poems = await Poem.find({ userId: user._id.toString() }, '_id')
     user.poems = poems.map(p => p._id)
     await user.save()

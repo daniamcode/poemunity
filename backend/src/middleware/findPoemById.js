@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken')
 const Poem = require('../models/Poem')
 
 module.exports = async (req, res, next) => {

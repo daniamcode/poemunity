@@ -6,7 +6,6 @@
 
 const request = require('supertest')
 const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const { app } = require('../../app')
 const Author = require('../models/Author')
 const Poem = require('../models/Poem')

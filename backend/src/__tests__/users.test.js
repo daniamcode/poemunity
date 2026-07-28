@@ -151,7 +151,8 @@ describe('Users API', () => {
         picture: 'pic1.jpg'
       })
 
-      const user2 = await User.create({
+      // Second user exists only so the assertions prove filtering by user1
+      await User.create({
         username: 'user2',
         name: 'User Two',
         email: 'user2@example.com',

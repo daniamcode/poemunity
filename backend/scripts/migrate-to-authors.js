@@ -100,7 +100,7 @@ async function main () {
   // Step 3: Backfill authorId on user poems
   // Use $convert with onError:null — poems with numeric userId (old fake IDs 1-7) get null and are caught below
   const userResult = await Poem.updateMany(
-    { userId: { $exists: true, $ne: null, $ne: '' }, authorId: { $exists: false } },
+    { userId: { $exists: true, $nin: [null, ''] }, authorId: { $exists: false } },
     [{ $set: { authorId: { $convert: { input: '$userId', to: 'objectId', onError: null } } } }]
   )
   console.log(`Backfilled authorId on ${userResult.modifiedCount} user poems via userId`)
