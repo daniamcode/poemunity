@@ -10,9 +10,13 @@ import { SEARCH_MIN_LENGTH } from '../data/constants'
  * Splits the raw input (what the box shows, updated on every keystroke) from
  * the query actually sent to the server (`q` — debounced, trimmed, and empty
  * until the minimum length is reached).
+ *
+ * `initialQuery` seeds the box, e.g. from `?q=` in the URL.
  */
-export function useSearchQuery() {
-    const [input, setInput] = useState('')
+export function useSearchQuery(initialQuery: string = '') {
+    // Seeded from the URL so a "search all poems" link can carry the query
+    // across a navigation instead of dropping what the user typed.
+    const [input, setInput] = useState(initialQuery)
     const debounced = useDebouncedValue(input)
 
     const trimmed = debounced.trim()

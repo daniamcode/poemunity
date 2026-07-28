@@ -279,6 +279,20 @@
     }
 }
 
+.list__empty-action {
+    padding: $space-sm $space-5;
+    background: $color-primary;
+    color: #fff;
+    border-radius: $radius-md;
+    text-decoration: none;
+    font-size: $fs-base;
+    text-align: center;
+
+    &:hover {
+        background: $color-primary-hover;
+    }
+}
+
 .list__error { color: $color-error; }
 
 @media screen and (max-width: $bp-sm) {

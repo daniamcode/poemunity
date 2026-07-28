@@ -180,6 +180,21 @@ export function categoryToSlug(category: string): string {
         .replace(/[^a-z0-9-]/g, '')
         .replace(/-+/g, '-')
 }
+// Reverse of categoryToSlug, for showing a human label ("Silence") when all we
+// hold is the route slug ("silence"). Falls back to the slug so an unknown or
+// retired category still reads sensibly rather than rendering blank.
+export function slugToCategory(slug: string): string {
+    return CATEGORIES.find(category => categoryToSlug(category) === slug) ?? slug
+}
+
+// Labels for the Authors dropdown values, so a message can name the active
+// filter using the same word the user picked.
+export const ORIGIN_LABELS: Record<string, string> = {
+    famous: 'Famous',
+    user: 'Users',
+    ai: 'AI'
+}
+
 export const ALL = 'All'
 export const PROFILE_SUBTITLE_CREATE = 'Insert a poem:'
 export const PROFILE_SUBTITLE_UPDATE = 'Modify a poem:'

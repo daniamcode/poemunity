@@ -1,5 +1,7 @@
 import React from 'react'
 import { useContext, useCallback, useMemo } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { AppContext } from '../../App'
 import CircularProgress from '../CircularIndeterminate'
 import { addQueryParam, useFiltersFromQuery } from '../../utils/urlUtils'
@@ -8,7 +10,7 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useSearchQuery } from '../../hooks/useSearchQuery'
 import { ListHeader } from './components/ListHeader'
 import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
-import { ORDER_BY_LIKES, SEARCH_NO_RESULTS } from '../../data/constants'
+import { ORDER_BY_LIKES, slugToCategory, ORIGIN_LABELS } from '../../data/constants'
 
 interface ListProps {
     genre?: string
@@ -23,7 +25,11 @@ interface ListProps {
 
 function List({ genre: genreProp, initialData, match }: ListProps) {
     const genre = genreProp ?? match?.params?.genre
-    const { input: searchInput, q, nextSignal, onSearchChange } = useSearchQuery()
+    const router = useRouter()
+    // A "search all poems" link carries the query in ?q= so it survives the
+    // navigation off a genre page.
+    const queryFromUrl = typeof router.query.q === 'string' ? router.query.q : ''
+    const { input: searchInput, q, nextSignal, onSearchChange } = useSearchQuery(queryFromUrl)
 
     const [paramsData, setParamsData] = useFiltersFromQuery({
         orderBy: ORDER_BY_LIKES,
@@ -79,6 +85,20 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
         setParamsData((prev: any) => ({ ...prev, origin: value }))
     }, [])
 
+    // What the current view is scoped to, so an empty result can say WHY it is
+    // empty instead of implying the search itself found nothing anywhere.
+    const scopes = [
+        genre && slugToCategory(genre),
+        paramsData.origin !== 'all' && ORIGIN_LABELS[paramsData.origin]
+    ].filter(Boolean)
+    const isScoped = scopes.length > 0
+
+    const emptyMessage = (() => {
+        if (!q) return 'No poems found. Try adjusting your filters.'
+        if (!isScoped) return `No poems match “${q}”.`
+        return `No poems match “${q}” in ${scopes.join(' · ')}.`
+    })()
+
     // Full-page loader only on the very first load. During a search the header
     // must stay mounted, or the input unmounts mid-query and the user loses
     // focus and their caret on every keystroke.
@@ -109,7 +129,16 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
 
                 {!isError && !isLoading && poems.length === 0 && (
                     <div className='list__empty'>
-                        <p>{q ? SEARCH_NO_RESULTS : 'No poems found. Try adjusting your filters.'}</p>
+                        <p>{emptyMessage}</p>
+                        {/* A search only looks inside the filters that are
+                            active, so "no results" on a genre page is easy to
+                            read as "search is broken". Name what is scoping it
+                            and offer one tap out, keeping the query. */}
+                        {q && isScoped && (
+                            <Link className='list__empty-action' href={`/?q=${encodeURIComponent(q)}`}>
+                                Search all poems for “{q}”
+                            </Link>
+                        )}
                     </div>
                 )}
 
