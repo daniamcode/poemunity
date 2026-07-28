@@ -81,10 +81,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ### Housekeeping / follow-ups raised this session
 
-- 🤖 **Fix pre-existing backend lint errors** so `pnpm lint` passes in `backend/`
-  (e.g. `src/controllers/poem.js` `==`→`===`, unused vars in
-  `src/middleware/findPoemById.js` and seed scripts). Blocks adding a backend
-  lint step to CI.
 - 🤖 **Speed up the sitemap** — `pages/sitemap.xml.ts` pages the poems API 100 at
   a time (~160 sequential calls for 16k poems → ~25 s cold generation, risking the
   serverless timeout). It's already CDN-cached (`s-maxage=86400`), so this only
@@ -118,6 +114,28 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Fixed the flaky backend test suite** (2026-07-28): ~25% of runs failed on a
+  random test with a bogus status (302/404/401) or a bare `socket hang up`.
+  Root cause was **not** in our code: supertest opens a new `http.Server` per
+  request via `app.listen(0)`, which binds the **wildcard** address. With
+  `SO_REUSEADDR` the OS hands out an ephemeral port even though another local
+  process already holds it on `127.0.0.1` (the allocator sees a different bind
+  address) — then supertest points its client at `127.0.0.1:<port>` and the
+  kernel routes to the *more specific* binding. The suite was literally talking
+  to other apps on the machine (a stray Cypress runner answering `302 -> /__/`,
+  Chrome answering `404`). `jest.setup.js` now listens **once per test file on
+  loopback** and hands supertest that server, so it never opens its own. Guarded
+  by `src/__tests__/test-harness.test.js`. Measured 0/30 failures after the fix
+  (vs 3/12 before) with the colliding processes still running.
+
+- **Backend lint is clean** (2026-07-27): fixed the 6 pre-existing `standard`
+  errors — `poem.js` like-toggle `==`→`===` (safe: `likes` is `[String]` and the
+  JWT `id` deserialises to a string, and the adjacent `indexOf` already relied on
+  strict equality), unused `jwt`/`mongoose`/`user2` bindings, and a real latent bug
+  in `migrate-to-authors.js` where a duplicate `$ne` key (`{ $ne: null, $ne: '' }`)
+  silently dropped the null check — now `$nin: [null, '']`. `pnpm lint` exits 0, so
+  a backend lint step can be added to CI.
 
 - Email/auth: transactional email infra (Resend), password reset (forgot + reset),
   email verification + admin test accounts (`POST /api/v1/admin/test-users`),
