@@ -48,7 +48,9 @@ Only the non-obvious parts are worth recording:
 
 - Backend `pnpm dev` runs nodemon on port 4200 with `DEBUG=app,app:*`.
 - Backend `pnpm test` uses `mongodb-memory-server`, so no live database is needed.
-- Backend `pnpm lint` is Standard.js with `--fix`.
+- In **both** workspaces `pnpm lint` **checks** and `pnpm lint:fix` auto-fixes (backend is
+  Standard.js, frontend is ESLint). CI runs the check-only form, so never point it at the
+  `--fix` variant — that would repair errors in the runner and pass a hollow gate.
 - Vercel's frontend build gate runs `pnpm lint && pnpm typecheck && pnpm test --no-coverage && pnpm build` (`frontend/vercel.json`).
 - The backend deploy is **not** gated on tests — `backend/vercel.json` only routes traffic
   to `api/index.js`. CI-on-push is the guard. Adding a real gate means migrating off the

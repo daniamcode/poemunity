@@ -44,7 +44,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
   backend:
-    name: Backend — test
+    name: Backend — lint & test
     runs-on: ubuntu-latest
 
     defaults:
@@ -67,6 +67,11 @@ jobs:
       # mismatches are caught here instead of at deploy time.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Check-only (no --fix): CI must fail on lint errors, not quietly repair
+      # them in the runner and pass. Use `pnpm lint:fix` locally.
+      - name: Lint
+        run: pnpm lint
 
       - name: Test
         run: pnpm test

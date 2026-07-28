@@ -134,8 +134,14 @@ so there is **no separate env to "promote from"** — this IS the production dat
   JWT `id` deserialises to a string, and the adjacent `indexOf` already relied on
   strict equality), unused `jwt`/`mongoose`/`user2` bindings, and a real latent bug
   in `migrate-to-authors.js` where a duplicate `$ne` key (`{ $ne: null, $ne: '' }`)
-  silently dropped the null check — now `$nin: [null, '']`. `pnpm lint` exits 0, so
-  a backend lint step can be added to CI.
+  silently dropped the null check — now `$nin: [null, '']`.
+
+- **Backend lint gated in CI** (2026-07-28): both workflows now run `pnpm lint` in the
+  backend job before tests. Backend scripts were realigned with the frontend convention
+  — `lint` **checks**, `lint:fix` auto-fixes — because the old `lint` was
+  `standard --fix`, which in CI would have silently repaired errors in the runner and
+  passed a hollow gate. Verified: the step exits non-zero on bad code and leaves the file
+  unmodified.
 
 - Email/auth: transactional email infra (Resend), password reset (forgot + reset),
   email verification + admin test accounts (`POST /api/v1/admin/test-users`),
