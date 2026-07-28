@@ -53,6 +53,8 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟢 P3 — Frontend quality & refactors (code)
 
+- 🤖 **Search** — All searches (general search, inside my profile search, and in mobile) are poor. They only show within what's visible. We should call the backend to do a proper search. Also, we should only launch a search when at least 2 characters are typed and wait to search until the user stops writing, so maybe add a short delay on typing? i mean, i need you do handle a short investigation of what are common patterns for this and choose the best one and more modern. Launch a subagent to carry out the online investigation
+
 - 🤖 **Finish the TypeScript migration** — `MyPoems.jsx`, `Register.jsx`,
   `Profile.jsx`, `MyFavouritePoems.jsx`, plus util files (`parseJWT.js`,
   `notifications.js`, `sortPoems.js`, `axiosInstance.js`). (`frontend/CLEANUP.md` §1)
