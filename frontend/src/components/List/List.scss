@@ -101,6 +101,17 @@
         color: $color-text-placeholder;
     }
 
+    // App.scss draws an app-wide `input:focus-visible` outline for keyboard
+    // users. Here that lands as a second, square ring inside the container's
+    // rounded one. Suppress it for THIS field only — the container already
+    // shows focus via :focus-within (border + ring), so nothing is lost, and
+    // the global rule keeps protecting every other input. Needs the extra
+    // pseudo-class to outrank `input:focus-visible`; a plain class does not.
+    &:focus,
+    &:focus-visible {
+        outline: none;
+    }
+
     // Turning off the native appearance also hides the clear button, which is
     // worth keeping — it saves a phone user holding backspace. Redraw it in the
     // placeholder grey rather than the platform's blue.
