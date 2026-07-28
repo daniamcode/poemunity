@@ -20,11 +20,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
+      # Pinned, not `latest`: pnpm 11 requires Node >= 22.13, so a floating
+      # `latest` silently broke CI at install time on a Node 20 runner. Bump
+      # this deliberately, together with node-version, and keep it in step with
+      # the lockfileVersion (9.0 => pnpm 9/10).
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -56,11 +60,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
+      # Pinned, not `latest`: pnpm 11 requires Node >= 22.13, so a floating
+      # `latest` silently broke CI at install time on a Node 20 runner. Bump
+      # this deliberately, together with node-version, and keep it in step with
+      # the lockfileVersion (9.0 => pnpm 9/10).
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       # Match Vercel's install (pnpm + pnpm-lock.yaml). --frozen-lockfile fails
       # the build if pnpm-lock.yaml drifts from package.json, so lockfile
