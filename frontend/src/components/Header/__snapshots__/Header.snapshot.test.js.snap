@@ -404,10 +404,14 @@ exports[`Header should match without id 1`] = `
             AI
           </a>
         </nav>
-        <button
-          aria-label="Log in"
-          class="header__login"
-        />
+        <div
+          class="header__actions"
+        >
+          <button
+            aria-label="Log in"
+            class="header__login"
+          />
+        </div>
       </section>
     </div>
   </body>,
@@ -811,10 +815,14 @@ exports[`Header should match without id 1`] = `
           AI
         </a>
       </nav>
-      <button
-        aria-label="Log in"
-        class="header__login"
-      />
+      <div
+        class="header__actions"
+      >
+        <button
+          aria-label="Log in"
+          class="header__login"
+        />
+      </div>
     </section>
   </div>,
   "debug": [Function],

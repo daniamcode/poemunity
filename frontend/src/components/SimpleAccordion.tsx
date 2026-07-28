@@ -10,11 +10,23 @@ import { CATEGORIES_TITLE, CATEGORIES, MUST_HAVE_CATEGORIES, ALL, CATEGORIES_BRO
 
 interface SimpleAccordionProps {
     genre?: string
+    /**
+     * Collapse the panel after a category is chosen. On for the header dropdown,
+     * where the panel floats over the page and would otherwise stay open on top of
+     * the results you just navigated to. Off for the dashboard sidebar, which is a
+     * persistent nav list that should keep showing where you are.
+     */
+    closeOnSelect?: boolean
 }
 
-export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
+export default function SimpleAccordion({ genre, closeOnSelect = false }: SimpleAccordionProps) {
     const [expanded, setExpanded] = useState(false)
     const [showAll, setShowAll] = useState(false)
+
+    // Only navigation collapses the panel — "Browse all" expands the list in place.
+    const handleSelect = () => {
+        if (closeOnSelect) setExpanded(false)
+    }
 
     useEffect(() => {
         if (genre) {
@@ -50,6 +62,7 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                                 active: isActiveCategory(category)
                             })}
                             href={`/${categoryToSlug(category)}`}
+                            onClick={handleSelect}
                         >
                             {category}
                         </Link>
@@ -62,6 +75,7 @@ export default function SimpleAccordion({ genre }: SimpleAccordionProps) {
                         active: !genre
                     })}
                     href='/'
+                    onClick={handleSelect}
                 >
                     {ALL}
                 </Link>

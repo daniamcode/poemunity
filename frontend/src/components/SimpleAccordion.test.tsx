@@ -167,6 +167,53 @@ describe('SimpleAccordion', () => {
         expect(accordion).toHaveClass('Mui-expanded')
     })
 
+    // The header dropdown floats over the page, so leaving it open after a
+    // category is picked covers the results you just navigated to. The dashboard
+    // sidebar is a persistent nav list and must NOT collapse.
+    describe('closeOnSelect', () => {
+        const expand = (container: HTMLElement) => {
+            const summary = screen.getByText(CATEGORIES_TITLE).closest('.MuiAccordionSummary-root')
+            if (summary) fireEvent.click(summary)
+            expect(container.querySelector('.accordion')).toHaveClass('Mui-expanded')
+        }
+
+        test('collapses after picking a category when enabled', () => {
+            const { container } = renderWithRouter(<SimpleAccordion closeOnSelect />)
+            expand(container)
+
+            fireEvent.click(screen.getByText(MUST_HAVE_CATEGORIES[0]))
+
+            expect(container.querySelector('.accordion')).not.toHaveClass('Mui-expanded')
+        })
+
+        test('collapses after picking "ALL" when enabled', () => {
+            const { container } = renderWithRouter(<SimpleAccordion closeOnSelect />)
+            expand(container)
+
+            fireEvent.click(screen.getByText(ALL))
+
+            expect(container.querySelector('.accordion')).not.toHaveClass('Mui-expanded')
+        })
+
+        test('stays open for "Browse all categories", which is not navigation', () => {
+            const { container } = renderWithRouter(<SimpleAccordion closeOnSelect />)
+            expand(container)
+
+            fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
+
+            expect(container.querySelector('.accordion')).toHaveClass('Mui-expanded')
+        })
+
+        test('stays open after picking a category when disabled (dashboard sidebar)', () => {
+            const { container } = renderWithRouter(<SimpleAccordion />)
+            expand(container)
+
+            fireEvent.click(screen.getByText(MUST_HAVE_CATEGORIES[0]))
+
+            expect(container.querySelector('.accordion')).toHaveClass('Mui-expanded')
+        })
+    })
+
     test('should sort must-have categories alphabetically by default', () => {
         const { container } = renderWithRouter(<SimpleAccordion />)
 

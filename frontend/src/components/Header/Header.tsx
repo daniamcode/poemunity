@@ -30,7 +30,7 @@ function Header() {
         <section className='header'>
             {!isAuthOrProfilePage && (
                 <div className='header__dropdown'>
-                    <Accordion />
+                    <Accordion closeOnSelect />
                 </div>
             )}
             <div className='header__brand'>
@@ -50,27 +50,31 @@ function Header() {
                 <Link href='/terms'>Terms</Link>
                 <Link href='/terms#ai-community-activity' title='AI activity disclosure'>AI</Link>
             </nav>
-            {context?.user ? (
-                <Link href='/profile' className='header__profile-picture' aria-label='Your profile'>
-                    {context?.picture ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                            src={context.picture}
-                            alt={context.username}
-                            className='header__profile-img'
-                            loading='lazy'
-                        />
-                    ) : (
-                        <span
-                            className='header__profile-initials'
-                            style={{ backgroundColor: getAvatarColor(context.username || '') }}
-                        >
-                            {getInitials(context.username || '?')}
-                        </span>
-                    )}
-                </Link>
-            ) : <></>}
-            {context?.user ? <LogoutButton /> : <LoginButton />}
+            {/* Grouped so the avatar and the auth button space as one right-hand
+                unit, instead of each becoming its own space-between column. */}
+            <div className='header__actions'>
+                {context?.user ? (
+                    <Link href='/profile' className='header__profile-picture' aria-label='Your profile'>
+                        {context?.picture ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={context.picture}
+                                alt={context.username}
+                                className='header__profile-img'
+                                loading='lazy'
+                            />
+                        ) : (
+                            <span
+                                className='header__profile-initials'
+                                style={{ backgroundColor: getAvatarColor(context.username || '') }}
+                            >
+                                {getInitials(context.username || '?')}
+                            </span>
+                        )}
+                    </Link>
+                ) : <></>}
+                {context?.user ? <LogoutButton /> : <LoginButton />}
+            </div>
         </section>
     )
 }
