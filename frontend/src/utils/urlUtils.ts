@@ -1,12 +1,27 @@
 import { useEffect, useState } from 'react'
 
+// The app writes its own query params with JSON.stringify, so `origin` round
+// trips as '"user"' and parses back cleanly. Everything else in the URL does
+// not: a plain ?q=Shake, or the utm_source / fbclid / ref params that every ad
+// click, share and newsletter link carries. A bare JSON.parse threw on those,
+// and because parseQuery reads EVERY key — not just the ones the caller asked
+// for — one foreign param took down the whole page with a client-side
+// exception. Fall back to the raw string instead.
+function parseParamValue(raw: string) {
+    try {
+        return JSON.parse(raw)
+    } catch {
+        return raw
+    }
+}
+
 export function parseQuery(url: string = window.location.search): Record<string, any> {
     const urlParams = new URLSearchParams(url)
     return Array.from(urlParams.keys()).reduce(
         (acc: Record<string, any>, key) => {
             if (key !== '__proto__') {
-                // we use non-null assertion operator by now to bypass typescript's error
-                acc[key] = urlParams.has(key) ? JSON.parse(urlParams.get(key)!) : null
+                const raw = urlParams.get(key)
+                acc[key] = raw === null ? null : parseParamValue(raw)
             }
             return acc
         },

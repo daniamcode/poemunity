@@ -94,6 +94,62 @@ describe('urlUtils', () => {
 
             expect(result).toEqual({ config: { theme: 'dark', lang: 'en' } })
         })
+
+        // parseQuery reads EVERY key in the URL, not just the ones the caller
+        // asked for, and it used to JSON.parse each one unguarded. The app's own
+        // params are JSON.stringify'd so they round-trip, but anything else in
+        // the URL is a bare string — and a single throw took down the entire
+        // page with "Application error: a client-side exception has occurred".
+        // Every case below crashed the site before the fix.
+        describe('non-JSON values (params the app did not write)', () => {
+            test('keeps a bare string instead of throwing', () => {
+                expect(parseQuery('?q=Shake')).toEqual({ q: 'Shake' })
+            })
+
+            test.each([
+                ['google ads', '?utm_source=google', { utm_source: 'google' }],
+                ['facebook share', '?fbclid=abc123', { fbclid: 'abc123' }],
+                ['referrer tag', '?ref=twitter', { ref: 'twitter' }],
+                ['email campaign', '?utm_medium=email', { utm_medium: 'email' }]
+            ])('survives a %s link', (_label, url, expected) => {
+                expect(() => parseQuery(url)).not.toThrow()
+                expect(parseQuery(url)).toEqual(expected)
+            })
+
+            test('one unparseable param does not poison the valid ones beside it', () => {
+                // The real regression: a tracking param arriving alongside the
+                // app's own filters must not cost us the filters.
+                expect(parseQuery('?origin="famous"&utm_source=google')).toEqual({
+                    origin: 'famous',
+                    utm_source: 'google'
+                })
+            })
+
+            test('handles a query containing spaces and symbols', () => {
+                expect(parseQuery('?q=' + encodeURIComponent('a b&c'))).toEqual({ q: 'a b&c' })
+            })
+
+            test('treats an empty value as an empty string, not a crash', () => {
+                expect(parseQuery('?q=')).toEqual({ q: '' })
+            })
+
+            test('still parses valid JSON rather than always falling back to raw', () => {
+                // The fallback must not swallow the app's own encoding: 'famous'
+                // has to come back unquoted, or every filter comparison breaks.
+                expect(parseQuery('?origin="famous"&count=42&flag=true')).toEqual({
+                    origin: 'famous',
+                    count: 42,
+                    flag: true
+                })
+            })
+
+            test('keeps ignoring __proto__ while tolerating junk', () => {
+                const result = parseQuery('?__proto__=polluted&q=Shake')
+
+                expect(result).toEqual({ q: 'Shake' })
+                expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+            })
+        })
     })
 
     describe('urlParse', () => {
