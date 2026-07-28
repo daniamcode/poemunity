@@ -34,8 +34,12 @@ export function ListHeader({
                 </p>
             )}
             <SearchBar value={searchValue} onChange={onSearchChange} resultCount={resultCount} />
-            <OriginFilter value={origin} onChange={onOriginChange} />
-            <SortFilter value={orderBy} onChange={onOrderChange} />
+            {/* Grouped so the two dropdowns share one row on phones instead of
+                costing two lines of a sticky header. */}
+            <div className='list__filters'>
+                <OriginFilter value={origin} onChange={onOriginChange} />
+                <SortFilter value={orderBy} onChange={onOrderChange} />
+            </div>
         </div>
     )
 }
