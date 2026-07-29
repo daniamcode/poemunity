@@ -117,7 +117,9 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
                         href={`/authors/${author.slug}`}
                     >
                         <span className='authors-index__author-name'>{author.name}</span>
-                        <span className='authors-index__author-count'>{author.count} poems</span>
+                        <span className='authors-index__author-count'>
+                            {author.count} {author.count === 1 ? 'poem' : 'poems'}
+                        </span>
                     </Link>
                 ))}
                 {!isFetching && !authors?.length && (

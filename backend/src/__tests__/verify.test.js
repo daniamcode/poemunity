@@ -294,8 +294,14 @@ describe('POST /api/v1/admin/test-users (admin test-account exemption)', () => {
 
 describe('test accounts are hidden from public views', () => {
   test('excluded from the author listing', async () => {
-    await Author.create({ name: 'Real Author', slug: 'real-author', username: 'realone', type: 'user' })
-    await Author.create({ name: 'Test Author', slug: 'test-author', username: 'testone', type: 'user', testAccount: true })
+    const real = await Author.create({ name: 'Real Author', slug: 'real-author', username: 'realone', type: 'user' })
+    const test = await Author.create({ name: 'Test Author', slug: 'test-author', username: 'testone', type: 'user', testAccount: true })
+    // Both need a poem: the listing now hides authors who have published
+    // nothing, so without these the test account would be excluded for the
+    // wrong reason and prove nothing. With them, it is hidden despite having
+    // published — which is what this test is actually about.
+    await Poem.create({ title: 'r1', poem: 'x', genre: 'love', origin: 'user', authorId: real._id, likes: [] })
+    await Poem.create({ title: 't1', poem: 'y', genre: 'love', origin: 'user', authorId: test._id, likes: [] })
 
     const res = await request(app).get('/api/v1/authors').expect(200)
     const names = res.body.map(a => a.name)

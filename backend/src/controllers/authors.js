@@ -12,12 +12,40 @@ function buildFilter (query) {
   return filter
 }
 
-// GET /api/authors/letters — which letters have at least one author
+const countLookup = {
+  $lookup: {
+    from: 'poems',
+    let: { aid: '$_id' },
+    pipeline: [
+      { $match: { $expr: { $eq: ['$authorId', '$$aid'] } } },
+      { $count: 'n' }
+    ],
+    as: 'poemCount'
+  }
+}
+
+const countProject = {
+  name: 1,
+  slug: 1,
+  picture: 1,
+  username: 1,
+  count: { $ifNull: [{ $arrayElemAt: ['$poemCount.n', 0] }, 0] }
+}
+
+// An author with nothing to read is not worth a row: registering creates an
+// Author immediately, so the public list filled up with empty accounts. Applied
+// to the letter index too — filtering the listings alone would leave letters
+// enabled that open onto an empty page.
+const HAS_POEMS = { $match: { count: { $gt: 0 } } }
+
+// GET /api/authors/letters — which letters have at least one author WITH poems
 authorsRouter.get('/letters', async (req, res) => {
   try {
     const results = await Author.aggregate([
       { $match: buildFilter(req.query) },
-      { $project: { letter: { $toUpper: { $substrCP: [{ $trim: { input: '$name' } }, 0, 1] } } } },
+      countLookup,
+      { $project: { ...countProject, letter: { $toUpper: { $substrCP: [{ $trim: { input: '$name' } }, 0, 1] } } } },
+      HAS_POEMS,
       { $match: { letter: { $regex: '^[A-Z]$' } } },
       { $group: { _id: '$letter' } },
       { $sort: { _id: 1 } }
@@ -34,25 +62,13 @@ authorsRouter.get('/', async (req, res) => {
   try {
     const filter = buildFilter(req.query)
 
-    const countLookup = {
-      $lookup: {
-        from: 'poems',
-        let: { aid: '$_id' },
-        pipeline: [
-          { $match: { $expr: { $eq: ['$authorId', '$$aid'] } } },
-          { $count: 'n' }
-        ],
-        as: 'poemCount'
-      }
-    }
-    const countProject = { name: 1, slug: 1, picture: 1, username: 1, count: { $ifNull: [{ $arrayElemAt: ['$poemCount.n', 0] }, 0] } }
-
     if (req.query.letter) {
       const letter = req.query.letter.toUpperCase()
       const authors = await Author.aggregate([
         { $match: { name: { $regex: `^${letter}`, $options: 'i' }, ...filter } },
         countLookup,
         { $project: countProject },
+        HAS_POEMS,
         { $sort: { name: 1 } }
       ])
       return res.json(authors.map(a => ({ id: String(a._id), name: a.name || a.username, slug: a.slug, picture: a.picture, count: a.count })))
@@ -63,6 +79,7 @@ authorsRouter.get('/', async (req, res) => {
       { $match: filter },
       countLookup,
       { $project: countProject },
+      HAS_POEMS,
       { $sort: { count: -1 } },
       { $limit: limit }
     ])

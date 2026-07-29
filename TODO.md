@@ -65,6 +65,7 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🔵 P4 — Maintenance & product decisions (low / when convenient)
 
+- Add to my profile the poems where i commented something, to decide how i show poem+comment. Check if the tabs component in my profile supports well a third tab or if we can use are more modern component that we can reuse from some library
 - 🤖 **Raise test coverage** — add tests for still-untested components/utilities.
   (`frontend/CLEANUP.md` Phase 2 has the full breakdown.)
 - 🤖 **Dependency & tooling upkeep** — `pnpm outdated`, update ESLint, keep
