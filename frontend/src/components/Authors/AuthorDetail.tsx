@@ -74,7 +74,9 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
                 {metaParts.length > 0 && (
                     <p className='author-detail__meta'>{metaParts.join(' · ')}</p>
                 )}
-                {total > 0 && <p className='author-detail__count'>{total} poems</p>}
+                {total > 0 && (
+                    <p className='author-detail__count'>{total} {total === 1 ? 'poem' : 'poems'}</p>
+                )}
 
                 {authorProfile?.bio && (
                     <p className='author-detail__bio'>{authorProfile.bio}</p>
