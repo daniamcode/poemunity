@@ -63,7 +63,12 @@ export function usePoemsList({ genre, origin, orderBy, initialData, q = '', next
     })
 
     // Fetch when origin/genre/search changes — skip the first run if we seeded
-    // from SSR
+    // from SSR.
+    //
+    // That skip makes the SERVER responsible for honouring ?q= on first paint:
+    // getServerSideProps passes q through, and if it ever stops doing so the
+    // page renders a search box filled in beside the full unfiltered list, with
+    // no client fetch to correct it. Pinned by src/__tests__/searchSsr.test.ts.
     useEffect(() => {
         if (isSeeded.current) {
             isSeeded.current = false
