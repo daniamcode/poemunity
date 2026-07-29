@@ -6,7 +6,6 @@ import * as loginReducers from './loginReducers'
 import * as authorsReducers from './authorsReducers'
 import { authorEntitiesReducer } from './authorEntitiesReducers'
 import { poemEntitiesReducer } from './poemEntitiesReducers'
-import { listContextQuery } from './listContextReducers'
 
 // todo: understand why this is needed, and also in other places
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
@@ -24,8 +23,7 @@ const rootReducer = combineReducers({
     ...restOfLoginReducers,
     ...restOfAuthorsReducers,
     authorEntities: authorEntitiesReducer,
-    poemEntities: poemEntitiesReducer,
-    listContextQuery
+    poemEntities: poemEntitiesReducer
 })
 
 export { rootReducer }

@@ -44,20 +44,14 @@ so there is **no separate env to "promote from"** — this IS the production dat
   **Plan (deferred, not now):** create a copy of prod and point `MONGODB_PRE` at it
   so `pre` becomes a real separate environment.
 
-- 👤 **Build the next-poem indexes in production** — the "next poem" walk
-  (`GET /api/v1/poem/:poemId/next`) is declared against three compound indexes on
-  `Poem`: `{ authorId: 1, date: -1, _id: -1 }`, `{ genre: 1, date: -1, _id: -1 }`
-  and `{ date: -1, _id: -1 }` (`backend/src/models/Poem.js`). They are **schema
-  declarations only** — nothing has been built against the live cluster, and
-  Mongoose `autoIndex` must not be relied on to do it silently. Creating them is a
-  **production write**: `mongodump` snapshot first, then build them deliberately
-  (background/rolling build via Atlas). Until then the walk works but each hop is
-  a collection scan + in-memory sort. Two known gaps, both deferred: genre bucket
-  membership matches case-insensitively (`^genre$` /i, mirroring the list filter),
-  so its index serves the sort but not the equality seek — a normalized lowercase
-  `genre` field or a collation index would fix that; and listing genre buckets
-  groups by `$toLower`, which cannot use an index at all (it runs only when a
-  bucket is exhausted, not on every hop).
+- 👤 **Build the next-poem index in production** — the "next poem" walk
+  (`GET /api/v1/poem/:poemId/next`) is declared against one compound index on
+  `Poem`: `{ authorId: 1, date: -1, _id: -1 }` (`backend/src/models/Poem.js`).
+  It is a **schema declaration only** — nothing has been built against the live
+  cluster, and Mongoose `autoIndex` must not be relied on to do it silently.
+  Creating it is a **production write**: `mongodump` snapshot first, then build
+  it deliberately (background/rolling build via Atlas). Until then the walk works
+  but each hop is a collection scan + in-memory sort.
 
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`

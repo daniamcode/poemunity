@@ -191,116 +191,73 @@ spinner is gated on `!q`, or the input unmounts mid-search and the user loses
 focus and caret on every keystroke.
 
 
-## Next poem (the dimension walk)
+## Next poem (one rule)
 
-The poem detail page carries one "Next poem" control. It is **never hidden and
-never dead-ends**, and it never changes what you are browsing by — it only
-advances along it.
+The poem detail page carries one **"Next poem"** control. It is never hidden and
+never dead-ends, and it answers the same way for every reader:
 
-**Two levels, and keeping them separate is the whole design.**
+1. the **author's next poem**;
+2. that author exhausted → the **next author alphabetically**, at their newest
+   poem;
+3. the last author → **wrap** to the first author.
 
-**Level 1 — which poems are in play (dimension & bucket).** A *dimension* is what
-the reader is browsing by: `genre` or `author`. A *bucket* is one value of it (the
-Love genre; Marta Ruiz). Buckets **partition** the collection — every poem has
-exactly one author and exactly one genre — and that partition is why one lap
-visits every poem exactly once. An earlier design widened scope instead
-(author → genre → global); it skipped poems, because a widening step jumps over
-everything between two poems of the same author. Do not reintroduce that shape.
+**It deliberately ignores where the reader came from.** An earlier version
+followed the list you were browsing (genre lists walked genres, author pages
+walked authors) and upgraded the href client-side from the Redux list caches.
+That was removed on purpose: the same poem offered different destinations
+depending on your history, and a refresh — which wipes the caches — silently
+changed the answer. If you are tempted to reintroduce list-awareness, that is
+the tradeoff you are re-opening.
 
-Genre bucket keys are **lowercased** (`$toLower` in the aggregation,
-`toLowerCase()` on the current poem). Membership is matched case-insensitively to
-mirror the list filter, so if `Love` and `love` were listed as two buckets each
-would match *all* love poems, the buckets would overlap instead of partition, and
-the lap would revisit poems. Pinned by the mixed-case lap test. Author buckets sort
-by display name with `_id` as tie-break, since two poets can share a name.
+**Two orderings, both fixed.** Within an author, `date` DESC with `_id` DESC as
+tie-break; between authors, display name (`name || username`) ASC with `_id` ASC
+as tie-break. Neither tie-break is decoration: poems seeded in one batch share an
+identical `date` and two poets can share a display name, and without the second
+key "next" is ambiguous and the walk can ping-pong between two records forever.
 
-**Level 2 — the order inside a bucket: `date` DESC, `_id` DESC.** "Next" is the
-first poem *strictly after* the current one:
-`{ $or: [{ date: { $lt: cur.date } }, { date: cur.date, _id: { $lt: cur._id } }] }`.
-The `_id` tie-break is not decoration — seeded poems share an identical `date`,
-and with `date` alone "next" would ping-pong between two of them forever.
-**Undated poems must be named explicitly**: BSON sorts null/missing lowest (so
-they land at the end of a `date: -1` sort), but MongoDB's range operators never
-compare across BSON types, so `{ date: { $lt: <Date> } }` does *not* match them.
-Without the extra `{ date: null }` branch the undated tail is unreachable. See
-`strictlyAfter()` in `backend/src/controllers/poem.js`.
+**Why one lap covers everything.** Authors partition the collection — every poem
+has exactly one — so following the walk from any poem visits every poem exactly
+once before returning to the start. `poem.next.test.js` pins this from *every*
+starting point on a fixture with interleaved authors and repeated dates. Two
+traps that fixture exists to catch, both of which produced hollow green tests
+before being fixed: a shared date across two *different* authors never exercises
+the within-author tie-break, and an author creation order that matches name order
+cyclically makes an `_id` sort indistinguishable from an alphabetical one.
 
-**Endpoint** — `GET /api/v1/poem/:poemId/next?dimension=genre|author` (`:poemId`
-resolves by ObjectId **or** slug via the shared `findPoemByIdOrSlug` helper;
-declared before `GET /:poemId` so it cannot be shadowed). `dimension` is optional
-and defaults to `genre` — the no-context case: a direct link, a refresh, a
-crawler. Each step runs only when the previous returned nothing:
+**Poems with no author are skipped** as destinations — they belong to no author,
+so the walk cannot place them. Landing *on* one still moves forward: it starts
+the reader at the first author rather than dead-ending.
 
-1. **`same-bucket`** — next poem in the current bucket.
-2. **`next-bucket`** — first poem of the next bucket alphabetically. "First"
-   means first in the same total order, i.e. the newest.
-3. **`wrap`** — first poem of the first bucket alphabetically. If that resolves
-   to the current poem (a single-poem collection) the response is
-   `{ poem: null, scope: null }` and the frontend hides the control — the only
-   case where it is hidden.
+**Undated poems** are the subtle one. BSON sorts null/missing lowest so they sort
+last, but MongoDB range operators never compare across BSON types, meaning
+`{ date: { $lt: <a Date> } }` does **not** match a missing date. Left unhandled
+the undated tail is unreachable, so `strictlyAfter()` names it explicitly.
 
-Response: `{ poem, scope: 'same-bucket' | 'next-bucket' | 'wrap' }`. The scope is
-part of the contract because the UI needs to know whether a bucket was crossed.
+### API and frontend
 
-**Cross-bucket entry is always by date**, even when the list the reader came from
-was ordered by likes or title. Honouring those would mean re-running the ranking
-aggregate on every hop. The inconsistency is deliberate and noted in the code.
+`GET /api/v1/poem/:poemId/next` (`:poemId` = ObjectId or slug, unauthenticated)
+takes **no parameters** — the rule is entirely server-owned. It returns
+`200 { poem }`, with `poem: null` when the collection holds nothing else, or
+`404` when the current poem does not exist.
 
-**Genreless-poem guard.** Every poem currently has a genre, so the partition
-holds. A poem with a missing/empty genre (or no resolvable author, in the author
-dimension) belongs to no bucket, and rather than drop out of the walk it degrades
-to the plain global date order, reported as `next-bucket` so the card labels
-itself from the destination. A malformed record degrades; it does not become
-permanently unreachable.
-
-**When you add a poem field, do not introduce a second ordering source.** Both
-levels read from exactly one place each — bucket membership from `genre`/
-`authorId`, order from `date`+`_id`. A new "featured", "pinned" or "sort weight"
-field that quietly participates in either breaks the partition or the total order,
-and with them the visit-everything-once guarantee.
-
-**Frontend: SSR answer first, client upgrade after.** `getServerSideProps`
-(`pages/detail/[poemId].tsx`) fetches `/next` **in parallel** with the poem via
-`Promise.all` — `/next` resolves the poem itself, so making it serial would just
-add a hop to TTFB. A failed/absent answer is `null` and renders nothing. SSR sends
-no `dimension` (it has no browsing context), so it gets the `genre` default.
-
-After hydration `useNextPoem` (`src/components/Detail/hooks/`) upgrades the href
-to the neighbour in whichever ordered list cache holds the current poem — zero
-network calls, and it automatically respects the reader's genre, `origin`,
-`orderBy` and active `?q=`. At the tail of the poems-list cache with `hasMore` it
-takes the same load-more path infinite scroll uses. The cache also names the
-dimension: `authorPoemsQuery` ⇒ `author`, an active genre filter ⇒ `genre`,
-anything else ⇒ none. **`author` is the only dimension worth a client round-trip**
-(`GET /next?dimension=author`), because SSR already answered for `genre`.
-
-**Browsing context is client state only** — `listContextQuery`
-(`src/redux/reducers/listContextReducers.ts`), which `usePoemsList` fills with the
-active query, because the list caches keep ids + `page`/`hasMore` but not the
-filters that produced them. Never put it in the URL: a `?from=my-favourites` in a
-shared link is meaningless or leaky to the recipient.
+`getServerSideProps` fetches it **in parallel** with the poem itself (the
+endpoint resolves the poem on its own, so it must not add a hop to TTFB), and a
+failure is swallowed to `null` — the control renders nothing rather than breaking
+the page. It also re-runs on client-side navigation between detail pages, so the
+answer stays fresh as the reader walks; `useNextPoem` only fetches when props
+arrive without one.
 
 The card (`components/NextPoemCard.tsx`) is a real `<Link>` inside
 `<nav aria-label="Poem navigation">`, rendered **between `.poem__block` and the
 comments sentinel** — never below the comments, which lazy-load and grow
-unbounded. It always names the bucket being **arrived in**, so `same-bucket` and
-`next-bucket` share one label formula (for `same-bucket` the destination's
-bucket is the current one anyway); only `wrap` reads differently. Its
-**responsive labels are a pure CSS swap**: both strings are in the DOM and a
-`$bp-md` media query picks one. Branching on viewport width in JS would differ
-between server and client render and cause a hydration mismatch on every detail
-page. Both spans are `aria-hidden`; the accessible name is stated once via
-`aria-label`.
+unbounded. Its label is the single string **"Next poem"** at every width: it once
+varied by scope and viewport ("Next poem in Garden" / "In Garden"), which took
+four strings and a CSS swap to express a distinction the reader never asked for.
+The visible text is `aria-hidden` and the accessible name is stated once via
+`aria-label`; the trailing arrow is decorative for the same reason, and holds
+still under `prefers-reduced-motion`.
 
-**Every label variant keeps the word "Next"** — only the redundant "poem" is
-dropped when space is tight (`Next in Garden`, not `In Garden`). The narrow
-strings originally dropped it entirely, which saved two words and cost the line
-its meaning: on its own it reads as a section heading for the poem below rather
-than as a way forward. A `test.each` pins the prefix. The trailing arrow is
-`aria-hidden` for the same reason the label spans are — it repeats what the text
-already says — and it holds still under `prefers-reduced-motion`.
-
-Indexes backing the walk are declared on the schema but **not yet built in
+The index backing the walk is declared on the schema but **not yet built in
 production** — see `TODO.md`.
 
 ## Reference Docs

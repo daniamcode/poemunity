@@ -243,16 +243,6 @@
     color: $color-text-medium;
 }
 
-// Responsive labels are a pure CSS swap: both strings are in the DOM and the
-// media query decides. Doing this in JS would desync SSR from hydration.
-.next-poem__scope-wide { display: none; }
-.next-poem__scope-narrow { display: inline; }
-
-@media screen and (min-width: $bp-md) {
-    .next-poem__scope-wide { display: inline; }
-    .next-poem__scope-narrow { display: none; }
-}
-
 .poem__comments-sentinel {
     width: 1px;
     height: 1px;

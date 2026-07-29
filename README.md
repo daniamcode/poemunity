@@ -105,11 +105,11 @@ The CSV contains `Title`, `Poem`, `Poet`, and `Tags` columns. Tags are mapped to
 
 ## Next poem
 
-Every poem page ends with a **Next poem** card, and it never dead-ends. It follows whatever you were already browsing rather than dropping you somewhere unrelated: reading through the Love genre, it stays in Love; reading an author's page, it stays with that author. When that runs out it moves on to the next genre (or the next author) alphabetically, and after the last one it loops back to the first. Arriving with no context at all — a shared link, a refresh — it simply follows the poem's own genre.
+Every poem page ends with a **Next poem** card, and it never dead-ends. One rule, the same for everyone however they arrived: it continues with that poem's author, and once you have read all of their poems it moves on to the next author alphabetically, starting at their newest. After the last author it loops back to the first, so you can keep going indefinitely.
 
-The one property worth knowing: because every poem has exactly one genre and exactly one author, those groups **partition** the whole collection. So a single lap of Next visits every poem exactly once before it starts repeating — no poem is skipped and none comes round twice early. Within a group, poems run newest first.
+Because every poem has exactly one author, the authors partition the whole collection — which means one lap around the loop shows you every poem exactly once before anything repeats. That property is pinned by a test that walks from every possible starting point.
 
-Mechanics — the endpoint, the ordering rules, and the constraints that keep the guarantee true — are in `AGENTS.md`.
+It deliberately does *not* try to continue whichever list you were browsing. An earlier version did, and the same poem then offered different destinations depending on how you got there, with a refresh silently changing the answer. Mechanics are in `AGENTS.md`.
 
 ## Deployment (Vercel + MongoDB Atlas)
 

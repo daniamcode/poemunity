@@ -5,13 +5,14 @@ const Author = require('../models/Author')
 
 // GET /api/v1/poem/:poemId/next
 //
-// The walk follows the DIMENSION the reader is browsing (genre or author) and
-// never changes it. Buckets — one genre, one author — partition the collection,
-// which is what makes a lap visit every poem exactly once.
+// ONE rule, independent of where the reader came from:
 //
-//   1. same-bucket : next poem in this bucket, by date DESC / _id DESC
-//   2. next-bucket : first poem of the next bucket alphabetically
-//   3. wrap        : first poem of the first bucket alphabetically
+//   1. the author's next poem, by date DESC / _id DESC
+//   2. author exhausted -> the next author alphabetically, at their newest poem
+//   3. last author      -> wrap to the first author alphabetically
+//
+// Authors partition the collection (every poem has exactly one), which is what
+// makes a lap visit every poem exactly once before repeating.
 
 const D = (iso) => new Date(iso)
 
@@ -30,9 +31,8 @@ function makePoem (overrides) {
   })
 }
 
-function next (idOrSlug, dimension) {
-  const url = `/api/v1/poem/${idOrSlug}/next`
-  return request(app).get(dimension ? `${url}?dimension=${dimension}` : url)
+function next (idOrSlug) {
+  return request(app).get(`/api/v1/poem/${idOrSlug}/next`)
 }
 
 describe('GET /api/v1/poem/:poemId/next', () => {
@@ -40,348 +40,290 @@ describe('GET /api/v1/poem/:poemId/next', () => {
   let bob
 
   beforeEach(async () => {
-    // 'Alice Adams' sorts before 'Bob Brown' — the bucket walk is alphabetical.
+    // 'Alice Adams' sorts before 'Bob Brown' — the author walk is alphabetical.
     alice = await makeAuthor('alice', 'Alice Adams')
     bob = await makeAuthor('bob', 'Bob Brown')
   })
 
-  test('404 when the current poem does not exist', async () => {
-    const response = await next('507f1f77bcf86cd799439011').expect(404)
-    expect(response.body.error).toBe('poem not found')
-  })
-
-  test('404 for a malformed id (neither ObjectId nor slug)', async () => {
-    await next('definitely-not-a-poem').expect(404)
-  })
-
-  test('resolves the current poem by slug as well as by id', async () => {
-    const current = await makePoem({ title: 'A', slug: 'poem-a', authorId: alice._id, date: D('2024-03-01') })
-    const expected = await makePoem({ title: 'B', authorId: alice._id, date: D('2024-02-01') })
-
-    const bySlug = await next('poem-a').expect(200)
-    const byId = await next(current._id).expect(200)
-
-    expect(bySlug.body.poem.id).toBe(String(expected._id))
-    expect(bySlug.body).toEqual(byId.body)
-  })
-
-  test('serializes the poem like GET /poem/:id, with the populated author fields', async () => {
-    const current = await makePoem({ title: 'A', authorId: alice._id, date: D('2024-03-01') })
-    await makePoem({ title: 'B', authorId: alice._id, date: D('2024-02-01') })
-
-    const { body } = await next(current._id).expect(200)
-    expect(body.poem).toHaveProperty('id')
-    expect(body.poem).toHaveProperty('title')
-    expect(body.poem).toHaveProperty('poem')
-    expect(body.poem).toHaveProperty('genre')
-    expect(body.poem).toHaveProperty('likes')
-    expect(body.poem.author).toBe('Alice Adams')
-    expect(body.poem.userId).toBe(String(alice._id))
-    expect(body.poem).not.toHaveProperty('authorId')
-  })
-
-  describe('dimension: genre', () => {
-    test('continues the current genre, ignoring newer poems in other genres', async () => {
-      const current = await makePoem({ title: 'Love A', genre: 'love', authorId: alice._id, date: D('2024-03-01') })
-      // Newer than the expected answer, but a different genre — must not win.
-      await makePoem({ title: 'Sad X', genre: 'sad', authorId: alice._id, date: D('2024-02-15') })
-      const expected = await makePoem({ title: 'Love B', genre: 'love', authorId: bob._id, date: D('2024-02-01') })
-
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.scope).toBe('same-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
+  describe('resolving the current poem', () => {
+    test('404 when it does not exist', async () => {
+      const response = await next('507f1f77bcf86cd799439011').expect(404)
+      expect(response.body.error).toBe('poem not found')
     })
 
-    test("'Love' and 'love' are ONE bucket, not two", async () => {
-      const current = await makePoem({ title: 'A', genre: 'Love', authorId: alice._id, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'B', genre: 'lOvE', authorId: bob._id, date: D('2024-02-01') })
-
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.scope).toBe('same-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
+    test('404 for a malformed id (neither ObjectId nor slug)', async () => {
+      await next('definitely-not-a-poem').expect(404)
     })
 
-    test('crosses to the next genre alphabetically at its newest poem', async () => {
-      const current = await makePoem({ title: 'Happy last', genre: 'happy', authorId: alice._id, date: D('2024-03-01') })
-      // 'happy' < 'love' < 'sad', so 'love' must win even though this 'sad'
-      // poem is much newer.
-      await makePoem({ title: 'Sad newest', genre: 'sad', authorId: bob._id, date: D('2024-06-01') })
-      const expected = await makePoem({ title: 'Love newest', genre: 'love', authorId: bob._id, date: D('2024-02-01') })
-      await makePoem({ title: 'Love older', genre: 'love', authorId: bob._id, date: D('2024-01-01') })
+    test('resolves by slug as well as by id', async () => {
+      const current = await makePoem({ title: 'A', slug: 'poem-a', authorId: alice._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'B', authorId: alice._id, date: D('2024-02-01') })
 
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.scope).toBe('next-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
-    })
+      const bySlug = await next('poem-a').expect(200)
+      const byId = await next(current._id).expect(200)
 
-    test('wraps from the last genre alphabetically to the first', async () => {
-      const expected = await makePoem({ title: 'Happy newest', genre: 'happy', authorId: alice._id, date: D('2024-02-01') })
-      await makePoem({ title: 'Happy older', genre: 'happy', authorId: alice._id, date: D('2024-01-01') })
-      const current = await makePoem({ title: 'Sad only', genre: 'sad', authorId: bob._id, date: D('2024-03-01') })
-
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.scope).toBe('wrap')
-      expect(body.poem.id).toBe(String(expected._id))
-    })
-
-    test('a single-genre collection wraps to its own newest poem', async () => {
-      const newest = await makePoem({ title: 'Newest', genre: 'love', authorId: alice._id, date: D('2024-03-01') })
-      const oldest = await makePoem({ title: 'Oldest', genre: 'love', authorId: bob._id, date: D('2024-01-01') })
-
-      const { body } = await next(oldest._id, 'genre').expect(200)
-      expect(body.scope).toBe('wrap')
-      expect(body.poem.id).toBe(String(newest._id))
+      expect(bySlug.body.poem.id).toBe(String(expected._id))
+      expect(byId.body.poem.id).toBe(String(expected._id))
     })
   })
 
-  describe('dimension: author', () => {
-    test('continues the current author, ignoring newer poems by others', async () => {
-      const current = await makePoem({ title: 'Alice A', authorId: alice._id, date: D('2024-03-01') })
-      await makePoem({ title: 'Bob X', authorId: bob._id, date: D('2024-02-15') })
-      const expected = await makePoem({ title: 'Alice B', authorId: alice._id, date: D('2024-02-01') })
+  describe('1. continuing with the same author', () => {
+    test('returns that author\'s next poem by date, newest first', async () => {
+      const current = await makePoem({ title: 'Newest', authorId: alice._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Middle', authorId: alice._id, date: D('2024-02-01') })
+      await makePoem({ title: 'Oldest', authorId: alice._id, date: D('2024-01-01') })
 
-      const { body } = await next(current._id, 'author').expect(200)
-      expect(body.scope).toBe('same-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+      expect(response.body.poem.title).toBe('Middle')
     })
 
-    test('crosses to the next author alphabetically at their newest poem', async () => {
-      const current = await makePoem({ title: 'Alice last', authorId: alice._id, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'Bob newest', authorId: bob._id, date: D('2024-02-01') })
+    test('skips other authors even when their poems fall in between by date', async () => {
+      const current = await makePoem({ title: 'Alice newest', authorId: alice._id, date: D('2024-03-01') })
+      await makePoem({ title: 'Bob middle', authorId: bob._id, date: D('2024-02-15') })
+      const expected = await makePoem({ title: 'Alice older', authorId: alice._id, date: D('2024-02-01') })
+
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+    })
+
+    test('populates the author so the card can name it', async () => {
+      const current = await makePoem({ authorId: alice._id, date: D('2024-03-01') })
+      await makePoem({ authorId: alice._id, date: D('2024-02-01') })
+
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.author).toBe('Alice Adams')
+      expect(response.body.poem.authorSlug).toBe('alice')
+    })
+
+    // Poems seeded in one batch share an identical `date`. Without a second sort
+    // key "next" is ambiguous and the walk can ping-pong between two of them.
+    test('breaks ties on _id so identical dates still have a strict order', async () => {
+      const same = D('2024-03-01')
+      const poems = []
+      for (let i = 0; i < 4; i++) {
+        poems.push(await makePoem({ title: `Tied ${i}`, authorId: alice._id, date: same }))
+      }
+      const descending = [...poems].sort((a, b) => (String(a._id) < String(b._id) ? 1 : -1))
+
+      const seen = []
+      let cursor = descending[0]
+      for (let i = 0; i < 3; i++) {
+        const response = await next(cursor._id).expect(200)
+        seen.push(response.body.poem.id)
+        cursor = { _id: response.body.poem.id }
+      }
+
+      expect(seen).toEqual(descending.slice(1).map((p) => String(p._id)))
+    })
+  })
+
+  describe('2. crossing to the next author', () => {
+    test('opens the next author alphabetically at their newest poem', async () => {
+      const current = await makePoem({ title: 'Alice only', authorId: alice._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Bob newest', authorId: bob._id, date: D('2024-05-01') })
       await makePoem({ title: 'Bob older', authorId: bob._id, date: D('2024-01-01') })
 
-      const { body } = await next(current._id, 'author').expect(200)
-      expect(body.scope).toBe('next-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+      expect(response.body.poem.title).toBe('Bob newest')
     })
 
-    test('orders author buckets by display name, not by insertion order or id', async () => {
-      // Created last, but 'Aaron Zebra' sorts first.
-      const aaron = await makeAuthor('zzz-handle', 'Aaron Zebra')
-      const current = await makePoem({ title: 'Alice last', authorId: alice._id, date: D('2024-03-01') })
-      const aaronPoem = await makePoem({ title: 'Aaron newest', authorId: aaron._id, date: D('2024-02-01') })
-      await makePoem({ title: 'Bob newest', authorId: bob._id, date: D('2024-06-01') })
+    test('orders authors by display name, not by insertion or id', async () => {
+      // Creation order and name order must differ by more than a ROTATION, or an
+      // _id sort produces the same cycle and the test passes while asserting
+      // nothing. Created 1,2,3,4; named so the alphabetical order is 1,3,2,4.
+      // Successor of #1 is then #3 by name but #2 by _id.
+      const a1 = await makeAuthor('u1', 'Aaa First')
+      const a2 = await makeAuthor('u2', 'Ccc Third')
+      const a3 = await makeAuthor('u3', 'Bbb Second')
+      const a4 = await makeAuthor('u4', 'Ddd Fourth')
 
-      // 'Aaron Zebra' < 'Alice Adams' < 'Bob Brown': from Alice the next bucket
-      // is Bob...
-      const { body } = await next(current._id, 'author').expect(200)
-      expect(body.scope).toBe('next-bucket')
-      expect(body.poem.title).toBe('Bob newest')
+      const current = await makePoem({ title: 'by Aaa', authorId: a1._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'by Bbb', authorId: a3._id, date: D('2024-02-01') })
+      const wrongByIdOrder = await makePoem({ title: 'by Ccc', authorId: a2._id, date: D('2024-02-01') })
+      await makePoem({ title: 'by Ddd', authorId: a4._id, date: D('2024-02-01') })
 
-      // ...and from Bob (the last bucket) it wraps to Aaron, not back to Alice.
-      const fromBob = await next(body.poem.id, 'author').expect(200)
-      expect(fromBob.body.scope).toBe('wrap')
-      expect(fromBob.body.poem.id).toBe(String(aaronPoem._id))
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+      expect(response.body.poem.id).not.toBe(String(wrongByIdOrder._id))
     })
 
-    test('wraps from the last author alphabetically to the first', async () => {
-      const expected = await makePoem({ title: 'Alice newest', authorId: alice._id, date: D('2024-02-01') })
+    test('falls back to the username when an author has no name', async () => {
+      const anon = await Author.create({ username: 'aaa-anon', slug: 'aaa-anon', origin: 'user' })
+      const current = await makePoem({ authorId: anon._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Alice poem', authorId: alice._id, date: D('2024-02-01') })
+
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+    })
+
+    test('skips authors that have no poems at all', async () => {
+      await makeAuthor('barry', 'Barry Between')
+      const current = await makePoem({ authorId: alice._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Bob poem', authorId: bob._id, date: D('2024-02-01') })
+
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+    })
+  })
+
+  describe('3. wrapping', () => {
+    test('the last author wraps to the first author\'s newest poem', async () => {
+      const expected = await makePoem({ title: 'Alice newest', authorId: alice._id, date: D('2024-05-01') })
       await makePoem({ title: 'Alice older', authorId: alice._id, date: D('2024-01-01') })
       const current = await makePoem({ title: 'Bob only', authorId: bob._id, date: D('2024-03-01') })
 
-      const { body } = await next(current._id, 'author').expect(200)
-      expect(body.scope).toBe('wrap')
-      expect(body.poem.id).toBe(String(expected._id))
+      const response = await next(current._id).expect(200)
+
+      expect(response.body.poem.id).toBe(String(expected._id))
+    })
+
+    test('a single-poem collection has nothing to show', async () => {
+      const only = await makePoem({ authorId: alice._id, date: D('2024-03-01') })
+
+      const response = await next(only._id).expect(200)
+
+      expect(response.body.poem).toBeNull()
     })
   })
 
-  describe('dimension default', () => {
-    test('omitting ?dimension= walks genres, not authors', async () => {
-      const current = await makePoem({ title: 'Love A', genre: 'love', authorId: alice._id, date: D('2024-03-01') })
-      const genreAnswer = await makePoem({ title: 'Love B', genre: 'love', authorId: bob._id, date: D('2024-02-01') })
-      const authorAnswer = await makePoem({ title: 'Alice sad', genre: 'sad', authorId: alice._id, date: D('2024-01-01') })
+  describe('poems with no author', () => {
+    // A product decision: they belong to no author, so the walk cannot place
+    // them and never offers them as a destination.
+    test('are never returned as the next poem', async () => {
+      const current = await makePoem({ title: 'Alice only', authorId: alice._id, date: D('2024-03-01') })
+      await makePoem({ title: 'Orphan', authorId: undefined, date: D('2024-02-15') })
+      const expected = await makePoem({ title: 'Bob poem', authorId: bob._id, date: D('2024-02-01') })
 
-      const defaulted = await next(current._id).expect(200)
-      expect(defaulted.body.poem.id).toBe(String(genreAnswer._id))
+      const response = await next(current._id).expect(200)
 
-      // Same request with the dimension stated, to prove the default IS genre...
-      const explicitGenre = await next(current._id, 'genre').expect(200)
-      expect(explicitGenre.body).toEqual(defaulted.body)
-
-      // ...and that the other dimension really would have answered differently.
-      const explicitAuthor = await next(current._id, 'author').expect(200)
-      expect(explicitAuthor.body.poem.id).toBe(String(authorAnswer._id))
+      expect(response.body.poem.id).toBe(String(expected._id))
+      expect(response.body.poem.title).not.toBe('Orphan')
     })
 
-    test('an unrecognised dimension falls back to genre rather than erroring', async () => {
-      const current = await makePoem({ title: 'Love A', genre: 'love', authorId: alice._id, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'Love B', genre: 'love', authorId: bob._id, date: D('2024-02-01') })
+    test('landing on one still moves forward, starting at the first author', async () => {
+      const orphan = await makePoem({ title: 'Orphan', authorId: undefined, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Alice newest', authorId: alice._id, date: D('2024-05-01') })
+      await makePoem({ title: 'Bob poem', authorId: bob._id, date: D('2024-01-01') })
 
-      const { body } = await next(current._id, 'nonsense').expect(200)
-      expect(body.poem.id).toBe(String(expected._id))
-    })
-  })
+      const response = await next(orphan._id).expect(200)
 
-  describe('guards', () => {
-    test('a poem with no genre falls back to the global date order', async () => {
-      const current = await makePoem({ title: 'Malformed', genre: undefined, authorId: alice._id, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'Next by date', genre: 'sad', authorId: bob._id, date: D('2024-02-01') })
-      await makePoem({ title: 'Older', genre: 'love', authorId: bob._id, date: D('2024-01-01') })
-
-      const { body } = await next(current._id, 'genre').expect(200)
-      // It degrades instead of dead-ending, and is labelled from the
-      // destination's bucket rather than its own (which does not exist).
-      expect(body.scope).toBe('next-bucket')
-      expect(body.poem.id).toBe(String(expected._id))
+      expect(response.body.poem.id).toBe(String(expected._id))
     })
 
-    test('a whitespace-only genre degrades the same way', async () => {
-      const current = await makePoem({ title: 'Malformed', genre: '   ', authorId: alice._id, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'Next by date', genre: 'sad', authorId: bob._id, date: D('2024-02-01') })
+    test('an author row that no longer exists is treated the same way', async () => {
+      const ghostId = '507f1f77bcf86cd799439011'
+      const current = await makePoem({ authorId: ghostId, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Alice newest', authorId: alice._id, date: D('2024-05-01') })
 
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.poem.id).toBe(String(expected._id))
-    })
+      const response = await next(current._id).expect(200)
 
-    test('a genreless poem that is last by date wraps to the newest poem overall', async () => {
-      const newest = await makePoem({ title: 'Newest', genre: 'love', authorId: bob._id, date: D('2024-05-01') })
-      const current = await makePoem({ title: 'Malformed oldest', genre: '', authorId: alice._id, date: D('2024-01-01') })
-
-      const { body } = await next(current._id, 'genre').expect(200)
-      expect(body.scope).toBe('wrap')
-      expect(body.poem.id).toBe(String(newest._id))
-    })
-
-    test('a poem with no author degrades the same way in the author dimension', async () => {
-      const current = await makePoem({ title: 'Orphan', authorId: undefined, date: D('2024-03-01') })
-      const expected = await makePoem({ title: 'Next by date', authorId: alice._id, date: D('2024-02-01') })
-
-      const { body } = await next(current._id, 'author').expect(200)
-      expect(body.poem.id).toBe(String(expected._id))
-    })
-
-    test('returns { poem: null, scope: null } for a single-poem collection', async () => {
-      const only = await makePoem({ title: 'Only', authorId: alice._id, date: D('2024-01-01') })
-
-      const { body } = await next(only._id, 'genre').expect(200)
-      expect(body).toEqual({ poem: null, scope: null })
-
-      const asAuthor = await next(only._id, 'author').expect(200)
-      expect(asAuthor.body).toEqual({ poem: null, scope: null })
+      expect(response.body.poem.id).toBe(String(expected._id))
     })
   })
 
-  describe('total order inside a bucket', () => {
-    test('the _id tie-break makes poems sharing a date deterministic and non-repeating', async () => {
-      const sameDate = D('2024-05-05')
-      // Sequential inserts ⇒ increasing _id, so DESC walks them in reverse.
-      const first = await makePoem({ title: 'Tie 1', genre: 'love', authorId: alice._id, date: sameDate })
-      const second = await makePoem({ title: 'Tie 2', genre: 'love', authorId: alice._id, date: sameDate })
-      const third = await makePoem({ title: 'Tie 3', genre: 'love', authorId: alice._id, date: sameDate })
+  describe('undated poems', () => {
+    // BSON sorts null/missing lowest so they sort last, but range operators never
+    // compare across BSON types: { date: { $lt: <Date> } } does NOT match a
+    // missing date. Unhandled, the undated tail would be unreachable.
+    test('sort after every dated poem by the same author, and are still reached', async () => {
+      const current = await makePoem({ title: 'Dated', authorId: alice._id, date: D('2024-03-01') })
+      const expected = await makePoem({ title: 'Undated', authorId: alice._id, date: undefined })
 
-      const afterThird = await next(third._id, 'genre').expect(200)
-      expect(afterThird.body.poem.id).toBe(String(second._id))
+      const response = await next(current._id).expect(200)
 
-      const afterSecond = await next(second._id, 'genre').expect(200)
-      expect(afterSecond.body.poem.id).toBe(String(first._id))
-      // Without the tie-break this would return `third` again and the two would
-      // ping-pong forever.
-      expect(afterSecond.body.poem.id).not.toBe(String(third._id))
-
-      const afterFirst = await next(first._id, 'genre').expect(200)
-      expect(afterFirst.body.scope).toBe('wrap')
-      expect(afterFirst.body.poem.id).toBe(String(third._id))
+      expect(response.body.poem.id).toBe(String(expected._id))
     })
 
-    test('undated poems sort last within a bucket and are still reached', async () => {
-      const dated = await makePoem({ title: 'Dated', genre: 'love', authorId: alice._id, date: D('2024-01-01') })
-      const undatedA = await makePoem({ title: 'Undated A', genre: 'love', authorId: alice._id })
-      const undatedB = await makePoem({ title: 'Undated B', genre: 'love', authorId: alice._id })
+    test('an undated poem still leads on to the next author', async () => {
+      const current = await makePoem({ title: 'Alice undated', authorId: alice._id, date: undefined })
+      const expected = await makePoem({ title: 'Bob poem', authorId: bob._id, date: D('2024-02-01') })
 
-      const step1 = await next(dated._id, 'genre').expect(200)
-      expect(step1.body.poem.id).toBe(String(undatedB._id))
+      const response = await next(current._id).expect(200)
 
-      const step2 = await next(step1.body.poem.id, 'genre').expect(200)
-      expect(step2.body.poem.id).toBe(String(undatedA._id))
-
-      const step3 = await next(step2.body.poem.id, 'genre').expect(200)
-      expect(step3.body.scope).toBe('wrap')
-      expect(step3.body.poem.id).toBe(String(dated._id))
+      expect(response.body.poem.id).toBe(String(expected._id))
     })
   })
 
-  describe('the walk is total', () => {
-    // THE headline guarantee, and the whole reason the design follows a
-    // dimension instead of widening scope: buckets partition the collection, so
-    // one lap visits every poem exactly once. The fixture deliberately
-    // interleaves authors AND genres and includes a run of identical dates —
-    // the exact combination that broke the earlier widening cascade.
-    async function seedInterleaved (authors) {
-      const genres = ['love', 'sad', 'happy']
-      const sharedDate = D('2024-04-04')
-      const created = []
-      for (let i = 0; i < 9; i++) {
-        created.push(await makePoem({
-          title: `Poem ${i}`,
-          authorId: authors[i % authors.length]._id,
-          genre: genres[i % genres.length],
-          date: i < 3 ? sharedDate : D(`2024-0${(i % 9) + 1}-01`)
-        }))
+  // The headline property. Authors partition the collection, so following the
+  // walk from ANY poem must visit every poem exactly once before returning to
+  // the start. The fixture interleaves authors by date and repeats a date, which
+  // is precisely the shape that breaks a naive implementation.
+  describe('the walk is a single loop over every poem', () => {
+    async function walkFrom (startId, size) {
+      const seen = []
+      let cursor = startId
+      for (let i = 0; i < size; i++) {
+        const response = await next(cursor).expect(200)
+        expect(response.body.poem).not.toBeNull()
+        cursor = response.body.poem.id
+        seen.push(cursor)
       }
-      return created
+      return seen
     }
 
-    async function assertFullLap (created, dimension) {
-      const allIds = created.map((p) => String(p._id)).sort()
-
-      for (const start of created) {
-        const startId = String(start._id)
-        const visited = [startId]
-        let cursor = startId
-
-        for (let step = 0; step < created.length; step++) {
-          const { body } = await next(cursor, dimension).expect(200)
-          expect(body.poem).not.toBeNull()
-          // A poem is never its own next — that would dead-end the control.
-          expect(body.poem.id).not.toBe(cursor)
-          cursor = body.poem.id
-          if (cursor === startId) break
-          visited.push(cursor)
-        }
-
-        // Back at the start, having seen every poem exactly once.
-        expect(cursor).toBe(startId)
-        expect(new Set(visited).size).toBe(created.length)
-        expect([...visited].sort()).toEqual(allIds)
-      }
-    }
-
-    test('dimension=genre: every start visits every poem exactly once', async () => {
-      const created = await seedInterleaved([alice, bob])
-      await assertFullLap(created, 'genre')
-    })
-
-    test('dimension=author: every start visits every poem exactly once', async () => {
+    test('every starting point visits all poems exactly once, then repeats', async () => {
       const carol = await makeAuthor('carol', 'Carol Clark')
-      const created = await seedInterleaved([alice, bob, carol])
-      await assertFullLap(created, 'author')
-    })
+      const shared = D('2024-02-01')
+      const poems = [
+        await makePoem({ title: 'a1', authorId: alice._id, date: D('2024-06-01') }),
+        await makePoem({ title: 'b1', authorId: bob._id, date: D('2024-05-01') }),
+        await makePoem({ title: 'c1', authorId: carol._id, date: D('2024-04-01') }),
+        // a2/a3 share a date within ONE author, which is what actually exercises
+        // the _id tie-break; b2/c2 share one across authors, which does not.
+        await makePoem({ title: 'a2', authorId: alice._id, date: shared }),
+        await makePoem({ title: 'a3', authorId: alice._id, date: shared }),
+        await makePoem({ title: 'b2', authorId: bob._id, date: shared }),
+        await makePoem({ title: 'c2', authorId: carol._id, date: D('2024-01-01') })
+      ]
+      const ids = poems.map((p) => String(p._id))
 
-    test('dimension=genre with three authors interleaved: still one clean lap', async () => {
-      const carol = await makeAuthor('carol', 'Carol Clark')
-      const created = await seedInterleaved([alice, bob, carol])
-      await assertFullLap(created, 'genre')
-    })
+      for (const start of ids) {
+        const seen = await walkFrom(start, ids.length)
 
-    test('mixed-case genres are one bucket, so the lap stays clean', async () => {
-      // The real reason bucket keys are lowercased. If 'Love' and 'love' were
-      // listed as two buckets, each would still match ALL love poems (membership
-      // is case-insensitive, mirroring the list filter), the buckets would
-      // overlap instead of partition, and the lap would revisit poems.
-      // Spelling order matters: the OLDEST poem of each bucket is the one whose
-      // key decides where the walk crosses to, so the odd casings go there.
-      const created = []
-      const spellings = ['LOVE', 'Love', 'love', 'Sad', 'sad']
-      for (let i = 0; i < spellings.length; i++) {
-        created.push(await makePoem({
-          title: `Poem ${i}`,
-          authorId: (i % 2 === 0 ? alice : bob)._id,
-          genre: spellings[i],
-          date: D(`2024-0${i + 1}-01`)
-        }))
+        // Every poem exactly once, ending back where it began.
+        expect(new Set(seen).size).toBe(ids.length)
+        expect([...seen].sort()).toEqual([...ids].sort())
+        expect(seen[seen.length - 1]).toBe(start)
       }
+    })
 
-      await assertFullLap(created, 'genre')
+    test('holds when one author owns everything', async () => {
+      const poems = []
+      for (let i = 0; i < 4; i++) {
+        poems.push(await makePoem({ title: `only-${i}`, authorId: alice._id, date: D(`2024-0${i + 1}-01`) }))
+      }
+      const ids = poems.map((p) => String(p._id))
+
+      for (const start of ids) {
+        const seen = await walkFrom(start, ids.length)
+        expect(new Set(seen).size).toBe(ids.length)
+        expect(seen[seen.length - 1]).toBe(start)
+      }
+    })
+
+    test('holds when every author owns exactly one poem', async () => {
+      const carol = await makeAuthor('carol', 'Carol Clark')
+      const poems = [
+        await makePoem({ title: 'a', authorId: alice._id, date: D('2024-01-01') }),
+        await makePoem({ title: 'b', authorId: bob._id, date: D('2024-06-01') }),
+        await makePoem({ title: 'c', authorId: carol._id, date: D('2024-03-01') })
+      ]
+      const ids = poems.map((p) => String(p._id))
+
+      for (const start of ids) {
+        const seen = await walkFrom(start, ids.length)
+        expect(new Set(seen).size).toBe(ids.length)
+        expect(seen[seen.length - 1]).toBe(start)
+      }
     })
   })
 })
