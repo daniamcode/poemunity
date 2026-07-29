@@ -1,5 +1,7 @@
 import { GetServerSideProps } from 'next'
 import Detail from '../../src/components/Detail/Detail'
+import Accordion from '../../src/components/SimpleAccordion'
+import AuthorsAccordion from '../../src/components/AuthorsAccordion'
 import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
@@ -29,7 +31,19 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
                 url={`${baseUrl}/detail/${poemId}`}
                 type='article'
             />
-            <Detail initialPoem={initialPoem ?? undefined} initialNextPoem={initialNextPoem} />
+            {/* The rail lives at PAGE level, not inside Detail: Detail is
+                rendered directly by its own tests and snapshots, and pulling
+                the authors fetch into them would make component tests depend on
+                navigation data they do not care about. */}
+            <div className='poem-page'>
+                <div className='poem-page__accordion'>
+                    <Accordion />
+                    <AuthorsAccordion />
+                </div>
+                <div className='poem-page__content'>
+                    <Detail initialPoem={initialPoem ?? undefined} initialNextPoem={initialNextPoem} />
+                </div>
+            </div>
         </>
     )
 }

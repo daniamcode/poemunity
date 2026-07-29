@@ -316,10 +316,51 @@
 }
 
 
+// ---------------------------------------------------------------------------
+// Wide-screen frame for a single poem: the same Categories/Authors rail the
+// lists carry. Below $bp-xl the header's hamburger is the menu (see
+// Header.scss), so the rail stays hidden and the poem keeps the full width.
+// Without this, wide screens had NO menu on a poem page at all: the header
+// dropdown is hidden at $bp-xl on the assumption a sidebar takes over, and the
+// sidebar only existed on the dashboard.
+// ---------------------------------------------------------------------------
+.poem-page__accordion {
+    display: none;
+}
+
 @media screen and (min-width: $bp-xl) {
+    .poem-page {
+        display: flex;
+        flex-direction: row;
+    }
+
+    // Matching .dashboard__accordion exactly, so the rail does not shift
+    // position as the reader moves between a list and a poem.
+    .poem-page__accordion {
+        display: block;
+        position: sticky;
+        top: 100px;
+        align-self: flex-start;
+        width: 15%;
+        margin-left: 3%;
+        margin-right: 3%;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    .poem-page__content {
+        // min-width: 0 so a long title cannot push the column wider than its
+        // share and squeeze the rail — the flex default is min-width: auto.
+        min-width: 0;
+        flex: 1;
+    }
+
+    // Widths are relative to the CONTENT column now, not the viewport: 40vw
+    // beside a 21%-wide rail leaves the poem visibly off-centre.
     .poem__block,
     .next-poem {
-        width: 40vw;
+        width: 55%;
+        max-width: 800px;
     }
 }
 
