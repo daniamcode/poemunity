@@ -7,7 +7,7 @@ import { getMyPoemsAction } from '../../redux/actions/poemsActions'
 import { selectMyPoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useSearchQuery } from '../../hooks/useSearchQuery'
-import { PAGINATION_LIMIT, SEARCH_NO_RESULTS } from '../../data/constants'
+import { PAGINATION_LIMIT, SEARCH_NO_RESULTS, MY_POEMS_EMPTY } from '../../data/constants'
 import ListItem from '../ListItem/ListItem'
 import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 
@@ -86,8 +86,8 @@ function MyPoems() {
                 resultCount={myPoemsQuery.isFetching ? undefined : poems.length}
                 onSearchChange={onSearchChange}
             />
-            {!myPoemsQuery.isFetching && poems.length === 0 && q && (
-                <p className='list__empty'>{SEARCH_NO_RESULTS}</p>
+            {!myPoemsQuery.isFetching && poems.length === 0 && (
+                <p className='list__empty'>{q ? SEARCH_NO_RESULTS : MY_POEMS_EMPTY}</p>
             )}
             {poems.map(poem => (
                 <ListItem key={poem.id} poem={poem} context={context} />

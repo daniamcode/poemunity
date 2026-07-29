@@ -567,6 +567,11 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
               />
             </div>
           </div>
+          <p
+            class="list__empty"
+          >
+            No poems yet. Publish one and it will show up here.
+          </p>
           <div
             style="height: 20px;"
           />

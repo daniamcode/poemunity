@@ -38,6 +38,11 @@ exports[`MyFavouritePoems should match without id 1`] = `
           />
         </div>
       </div>
+      <p
+        class="list__empty"
+      >
+        No poems yet. Poems you like will show up here.
+      </p>
       <div
         style="height: 20px;"
       />
@@ -77,6 +82,11 @@ exports[`MyFavouritePoems should match without id 1`] = `
         />
       </div>
     </div>
+    <p
+      class="list__empty"
+    >
+      No poems yet. Poems you like will show up here.
+    </p>
     <div
       style="height: 20px;"
     />

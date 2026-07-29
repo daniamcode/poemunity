@@ -226,6 +226,10 @@ export const SEARCH_PLACEHOLDER = 'Search poems and authors'
 export const SEARCH_MIN_LENGTH = 2
 export const SEARCH_MIN_LENGTH_HINT = `Type ${SEARCH_MIN_LENGTH} or more characters to search`
 export const SEARCH_NO_RESULTS = 'No poems match your search.'
+// An empty profile tab is a different situation from a search that found
+// nothing: there is no query to relax, so the message says what would fill it.
+export const MY_POEMS_EMPTY = "No poems yet. Publish one and it will show up here."
+export const MY_FAVOURITE_POEMS_EMPTY = 'No poems yet. Poems you like will show up here.'
 export const ORDER_BY = 'Order poems by: '
 export const ORDER_BY_TITLE = 'Title'
 export const ORDER_BY_DATE = 'Date'
