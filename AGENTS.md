@@ -15,7 +15,7 @@ Monorepo with two independently-deployed apps:
 **Use pnpm in both workspaces.** CI installs with `pnpm --frozen-lockfile`, so an
 npm-generated lockfile fails the build before deploy.
 
-Both deploy on Vercel (two separate projects) against MongoDB Atlas; CI via GitHub Actions (lint, typecheck, tests — no deploy step, Vercel deploys on push). Custom domain: `poemunity.com` (apex is canonical; `www` and the `.vercel.app` URL redirect to it).
+Both deploy on Vercel (two separate projects) against MongoDB Atlas; CI via GitHub Actions (lint, typecheck, tests — no deploy step, Vercel deploys on push). **CI and deploys are scoped per app** — see Deployment. Custom domain: `poemunity.com` (apex is canonical; `www` and the `.vercel.app` URL redirect to it).
 
 State is split: **server state** in Redux Toolkit caches, **client/auth state** in `AppContext`. Server state is normalized — authors and poems live once in `createEntityAdapter` entity stores and list caches hold arrays of ids (see "Done: single source of truth" below).
 
@@ -119,7 +119,20 @@ later phase, scoped in the same doc.
 
 ### Deployment
 
-- Two Vercel projects: `poemunity-frontend` (root `frontend/`) and `poemunity-backend` (root `backend/`), both triggered by pushes to `master`/`development`. Consider per-project **Ignored Build Step** (`git diff --quiet HEAD^ HEAD -- .`) so each only builds when its own directory changes.
+- Two Vercel projects: `poemunity-frontend` (root `frontend/`) and `poemunity-backend` (root `backend/`), triggered by pushes to `master`/`development`.
+- **Each app builds only when its own directory changes.** Both `vercel.json`s carry
+  `"ignoreCommand": "git diff --quiet HEAD^ HEAD -- ."`, which Vercel runs from the
+  project's Root Directory — exit 0 (no changes there) means skip the build. A commit
+  touching only shared root files (`AGENTS.md`, `TODO.md`, `.github/`) deploys neither.
+- **CI is one workflow per app**, `.github/workflows/frontend.yml` and `backend.yml`,
+  each with a `paths` filter and both branches. They replaced the old per-branch
+  `poemunity-master.yml` / `poemunity-development.yml` pair, which duplicated every
+  step across four copies. Each workflow also watches its own file, so a change to the
+  steps can prove itself when no app code moved. The frontend build is **two `if`-guarded
+  steps** rather than one with a ternary on the secret: `cond && A || B` silently falls
+  through to `B` when `A` is empty, which would build `master` against the pre backend.
+- Path-filtered jobs are safe only because `master` has **no required status checks**. If
+  those are ever added, a skipped job hangs as "Expected" and blocks the merge.
 - MongoDB Atlas (Network Access `0.0.0.0/0` for Vercel's dynamic IPs). No AWS static file serving — the frontend is served by Vercel/Next, the backend is a serverless function.
 - Work is committed directly to `master` (branch protection blocks force-push and deletion). A `develop` branch workflow is deliberately deferred — see `TODO.md`.
 
