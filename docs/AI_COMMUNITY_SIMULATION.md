@@ -407,7 +407,9 @@ The implementation matches the original plan exactly:
 - `GET /api/v1/comments?since=<ISO>` is already implemented and annotated for simulation script use
 - React component at `frontend/src/components/Comments/`
 
-The `disqus-react` package is still listed in `package.json` but the library is unused and can be removed when convenient.
+`disqus-react` is gone from `package.json` and from `pnpm-lock.yaml`; the only
+surviving trace is the stale `frontend/package-lock.json`, which is an npm
+lockfile this pnpm workspace does not use.
 
 ---
 
