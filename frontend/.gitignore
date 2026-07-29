@@ -10,6 +10,12 @@
 .pnp.js
 ./scannerwork
 
+# This workspace installs with pnpm; pnpm-lock.yaml is the only lockfile that
+# counts. A stray npm/yarn lockfile is worse than clutter — CI installs with
+# --frozen-lockfile, so a second lockfile can decide the build.
+package-lock.json
+yarn.lock
+
 # testing
 /coverage
 
