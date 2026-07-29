@@ -6,6 +6,7 @@ export interface Comment {
     authorName: string
     authorPicture?: string | null
     authorSlug?: string | null
+    authorType?: string | null
     body: string
     parentId: string | null
     createdAt: string

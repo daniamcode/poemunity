@@ -44,12 +44,11 @@ function Header() {
                 </Link>
                 <p className='list__presentation'>{getSubtitle()}</p>
             </div>
+            {/* Privacy / Terms / AI live in the footer only. They were desktop-only
+                here (hidden below 900px), so this duplicated them for wide
+                screens while leaving mobile with no route to them at all. AI
+                content is now labelled where it appears instead. */}
             <div className='separator' />
-            <nav className='header__legal-links' aria-label='Policy links'>
-                <Link href='/privacy'>Privacy</Link>
-                <Link href='/terms'>Terms</Link>
-                <Link href='/terms#ai-community-activity' title='AI activity disclosure'>AI</Link>
-            </nav>
             {/* Grouped so the avatar and the auth button space as one right-hand
                 unit, instead of each becoming its own space-between column. */}
             <div className='header__actions'>

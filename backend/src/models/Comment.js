@@ -25,6 +25,9 @@ commentSchema.set('toJSON', {
       ret.authorName = a.name
       ret.authorPicture = a.picture || null
       ret.authorSlug = a.slug || null
+      // Lets the client label AI-assisted comments where they appear, rather
+      // than relying on a site-wide disclosure the reader may never scroll to.
+      ret.authorType = a.type || null
     }
     delete ret.simulationRunId
     delete ret.simulationKind

@@ -3,7 +3,8 @@ const Comment = require('../models/Comment')
 const userExtractor = require('../middleware/userExtractor')
 const requireVerified = require('../middleware/requireVerified')
 
-const AUTHOR_FIELDS = 'name slug picture'
+// `type` rides along so the UI can mark AI-authored comments as such.
+const AUTHOR_FIELDS = 'name slug picture type'
 
 const getAdminId = () =>
   process.env.NODE_ENV === 'development'

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { AuthorAvatar } from './AuthorAvatar'
+import { AiBadge } from '../../common/AiBadge'
 import { slugify } from '../../../utils/urlUtils'
 
 interface PoemHeaderProps {
@@ -10,9 +11,10 @@ interface PoemHeaderProps {
     picture: string
     date: string
     authorSlug?: string
+    authorType?: string | null
 }
 
-export function PoemHeader({ poemId, title, author, picture, date, authorSlug: authorSlugProp }: PoemHeaderProps) {
+export function PoemHeader({ poemId, title, author, picture, date, authorSlug: authorSlugProp, authorType }: PoemHeaderProps) {
     const authorSlug = authorSlugProp || slugify(author)
 
     return (
@@ -27,6 +29,7 @@ export function PoemHeader({ poemId, title, author, picture, date, authorSlug: a
                 <Link href={`/authors/${authorSlug}`} className='poem__author'>
                     {author}
                 </Link>
+                <AiBadge authorType={authorType} />
             </div>
             <div className='poem__date'>{format(new Date(date), "MM/dd/yyyy HH:mm'h'")}</div>
         </section>

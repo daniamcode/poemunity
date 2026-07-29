@@ -44,3 +44,32 @@ textarea:focus-visible,
 .separator {
     flex-grow: 1;
 }
+
+// AI transparency badge. Global because it appears on poem cards, the poem
+// detail page and comments — three different stylesheets. Deliberately quiet:
+// it is a provenance label, not a warning, and it sits beside author names that
+// must stay the more prominent element.
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: $space-2;
+    padding: 1px $space-2;
+    border: 1px solid $color-border;
+    border-radius: $radius-full;
+    background: $color-bg-subtle;
+    color: $color-text-secondary;
+    font-size: $fs-xs;
+    font-weight: $fw-semibold;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: $transition-base;
+
+    &:hover,
+    &:focus-visible {
+        border-color: $color-primary;
+        color: $color-primary;
+    }
+}

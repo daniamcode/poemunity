@@ -211,6 +211,13 @@ export const PROFILE_FAVOURITE_POEMS = 'My favourite poems'
 export const LIKE = 'Like'
 export const LIKES = 'Likes'
 export const READ_MORE = 'Read more'
+// AI transparency. The footer carries the full statement, but the footer is out
+// of reach on the views that scroll infinitely, so AI-authored poems and
+// comments carry a badge linking here.
+export const AI_DISCLOSURE_HREF = '/terms#ai-community-activity'
+export const AI_BADGE_LABEL = 'AI'
+export const AI_BADGE_TITLE = 'AI-assisted community account — read what this means'
+
 export const SEARCH_PLACEHOLDER = 'Search poems and authors'
 // Below this many characters the query is not sent. A one-letter query matches
 // most of the collection, so it costs a round trip to return noise. The gate is

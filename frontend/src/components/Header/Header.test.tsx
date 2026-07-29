@@ -123,12 +123,16 @@ describe('Header', () => {
         expect(screen.getByText('Your poem community!')).toBeInTheDocument()
     })
 
-    test('should render legal links in the fixed header', () => {
+    // These links live in the footer only. In the header they were hidden below
+    // 900px, so they duplicated the footer on desktop while leaving mobile with
+    // no route to them at all. AI content now carries its own badge, which is
+    // what actually needed to survive infinite scroll.
+    test('should not duplicate the footer legal links', () => {
         renderWithContext(mockContextLoggedOut)
 
-        expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy')
-        expect(screen.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms')
-        expect(screen.getByRole('link', { name: 'AI' })).toHaveAttribute('href', '/terms#ai-community-activity')
+        expect(screen.queryByRole('link', { name: 'Privacy' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Terms' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'AI' })).not.toBeInTheDocument()
     })
 
     test('should render the logo as a single home link wrapping the wordmark image', () => {

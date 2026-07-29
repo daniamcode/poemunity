@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { Poem } from '../../../typescript/interfaces'
 import { AuthorAvatar } from '../../ListItem/components/AuthorAvatar'
+import { AiBadge } from '../../common/AiBadge'
 import { slugify } from '../../../utils/urlUtils'
 
 interface PoemContentProps {
@@ -22,6 +23,7 @@ export function PoemContent({ poem }: PoemContentProps) {
                     <Link href={`/authors/${authorSlug}`} className='poem__author'>
                         {poem.author}
                     </Link>
+                    <AiBadge authorType={poem.authorType} />
                 </div>
                 {poem.date && <div className='poem__date'>{format(new Date(poem.date), "MM/dd/yyyy HH:mm'h'")}</div>}
             </section>

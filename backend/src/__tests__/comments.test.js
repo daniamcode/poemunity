@@ -63,6 +63,55 @@ describe('Comments API', () => {
       expect(res.body[0].authorSlug).toBe(author.slug)
     })
 
+    // The client badges AI-authored comments in place. The site-wide disclosure
+    // sits in the footer, which is out of reach on the views that scroll
+    // infinitely, so the label has to travel with the comment — and it cannot
+    // without this field.
+    describe('authorType (drives the AI badge)', () => {
+      test('exposes the author type on listed comments', async () => {
+        await Comment.create({
+          targetType: 'poem',
+          targetId: poemTargetId,
+          authorId: author._id,
+          body: 'Beautiful verse'
+        })
+
+        const res = await request(app)
+          .get(`/api/v1/comments?targetType=poem&targetId=${poemTargetId}`)
+          .expect(200)
+
+        expect(res.body[0].authorType).toBe('user')
+      })
+
+      test('reports an AI author as such', async () => {
+        const ai = await makeAuthor({ name: 'Helpful Bot', type: 'ai' })
+        await Comment.create({
+          targetType: 'poem',
+          targetId: poemTargetId,
+          authorId: ai._id,
+          body: 'Nice imagery'
+        })
+
+        const res = await request(app)
+          .get(`/api/v1/comments?targetType=poem&targetId=${poemTargetId}`)
+          .expect(200)
+
+        expect(res.body[0].authorType).toBe('ai')
+      })
+
+      test('returns the type on a freshly posted comment too', async () => {
+        // The POST response is rendered straight into the thread, so a missing
+        // type here would leave a just-posted comment unlabelled until reload.
+        const res = await request(app)
+          .post('/api/v1/comments')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ targetType: 'poem', targetId: String(poemTargetId), body: 'Mine' })
+          .expect(201)
+
+        expect(res.body.authorType).toBe('user')
+      })
+    })
+
     test('returns comments sorted oldest-first', async () => {
       const old = new Date('2024-01-01')
       const recent = new Date('2024-06-01')

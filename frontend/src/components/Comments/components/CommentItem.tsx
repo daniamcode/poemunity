@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
+import { AiBadge } from '../../common/AiBadge'
 import { Comment, Context } from '../../../typescript/interfaces'
 import CommentForm from './CommentForm'
 
@@ -95,6 +96,7 @@ export default function CommentItem({ comment, replies, context, onDelete, onRep
                     ) : (
                         <span className={styles.commentAuthor}>{comment.authorName}</span>
                     )}
+                    <AiBadge authorType={comment.authorType} />
                     <span className={styles.commentDate}>{formatDate(comment.createdAt)}</span>
                 </div>
                 {canDelete && (

@@ -21,6 +21,7 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
     const authorName = authorEntity?.name ?? poem.author
     const authorPicture = authorEntity?.picture ?? poem.picture
     const authorSlug = authorEntity?.slug ?? poem.authorSlug
+    const authorType = authorEntity?.type ?? poem.authorType
 
     // Determine if the current user can see like button (not their own poem)
     const showLikeButton = !!(context.user && poem.userId !== context.userId)
@@ -41,6 +42,7 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
                     picture={authorPicture}
                     date={poem.date}
                     authorSlug={authorSlug}
+                    authorType={authorType}
                 />
                 <PoemContent poemId={poem.id} content={poem.poem} />
                 <PoemFooter
