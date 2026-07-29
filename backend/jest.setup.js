@@ -62,7 +62,14 @@ mongoose.set('strictQuery', false)
 jest.setTimeout(30000)
 
 beforeAll(async () => {
-  // Create in-memory MongoDB instance
+  // Create in-memory MongoDB instance.
+  //
+  // This runs once PER TEST FILE, so on a cold cache every Jest worker races to
+  // download the same mongod binary and fight over its lockfile; the loser dies
+  // with "Cannot unlock file .../mongodb-binaries/<v>.lock" and takes its whole
+  // suite with it. CI fetches the binary once before Jest starts (see the
+  // "Pre-fetch mongod binary" step in .github/workflows/backend.yml) — do not
+  // drop that step. Locally the binary is cached after the first run.
   mongoServer = await MongoMemoryServer.create()
   const mongoUri = mongoServer.getUri()
 
