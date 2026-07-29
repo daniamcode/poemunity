@@ -1,52 +1,19 @@
-name: CI — master
+name: Backend CI
 
+# Only when the backend actually changes — see the note in frontend.yml.
 on:
   push:
-    branches: [master]
+    branches: [master, development]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
   pull_request:
-    branches: [master]
+    branches: [master, development]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
 
 jobs:
-  frontend:
-    name: Frontend — test & build
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./frontend
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-
-      # Pinned, not `latest`: pnpm 11 requires Node >= 22.13, so a floating
-      # `latest` silently broke CI at install time on a Node 20 runner. Bump
-      # this deliberately, together with node-version, and keep it in step with
-      # the lockfileVersion (9.0 => pnpm 9/10).
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Type check
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test --no-coverage
-
-      - name: Build
-        run: pnpm build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-
   backend:
     name: Backend — lint & test
     runs-on: ubuntu-latest

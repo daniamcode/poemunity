@@ -1,0 +1,75 @@
+name: Frontend CI
+
+# Only when the frontend actually changes. Previously every push ran both apps'
+# jobs, so a backend-only commit still spent ~2 minutes linting, typechecking,
+# testing and building the frontend for a tree it had not touched.
+#
+# The workflow file itself is included: a change to these steps must be able to
+# prove itself, even when no application code moved.
+#
+# Safe to skip: master has no required status checks, so a job that does not run
+# leaves nothing waiting on it. If required checks are ever added, path-filtered
+# jobs will hang as "Expected" and will need a merge-queue-style always-run stub.
+on:
+  push:
+    branches: [master, development]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [master, development]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  frontend:
+    name: Frontend — test & build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Pinned, not `latest`: pnpm 11 requires Node >= 22.13, so a floating
+      # `latest` silently broke CI at install time on a Node 20 runner. Bump
+      # this deliberately, together with node-version, and keep it in step with
+      # the lockfileVersion (9.0 => pnpm 9/10).
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --no-coverage
+
+      # Two explicit steps rather than one with a ternary on the secret. The
+      # `cond && A || B` idiom falls through to B whenever A is empty, so an
+      # unset production secret would silently build master against the pre
+      # backend instead of failing.
+      - name: Build (production API)
+        if: github.ref_name == 'master' || github.base_ref == 'master'
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+      - name: Build (pre API)
+        if: github.ref_name != 'master' && github.base_ref != 'master'
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL_PRE }}
