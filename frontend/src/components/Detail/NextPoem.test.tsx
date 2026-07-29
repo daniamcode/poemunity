@@ -262,7 +262,7 @@ describe('Detail — next poem control', () => {
             })
 
             expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent('Next poem in love')
-            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('In love')
+            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('Next in love')
         })
 
         test('same-bucket in the author dimension names the author', () => {
@@ -275,7 +275,7 @@ describe('Detail — next poem control', () => {
             const { container } = renderDetail(null, store)
 
             expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent('Next poem by Marta Ruiz')
-            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('By Marta Ruiz')
+            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('Next by Marta Ruiz')
         })
 
         test('next-bucket labels the bucket being ARRIVED in, from the destination poem', () => {
@@ -286,14 +286,36 @@ describe('Detail — next poem control', () => {
             })
 
             expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent('Next poem in sad')
-            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('In sad')
+            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('Next in sad')
         })
 
         test('wrap says the lap is starting again', () => {
             const { container } = renderDetail({ poem: poem({ id: 'poem-2' }), scope: 'wrap' })
 
-            expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent('Starting over')
+            expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent('Next poem — starting over')
             expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent('Next poem')
+        })
+
+        // The narrow labels once dropped the word entirely ("In Garden"), which
+        // shortened the line by two words and cost it its meaning — on its own it
+        // reads as a section heading for the poem below, not as a way forward.
+        test.each([
+            ['genre same-bucket', { poem: poem({ id: 'poem-2', genre: 'love' }), scope: 'same-bucket' }],
+            ['genre next-bucket', { poem: poem({ id: 'poem-2', genre: 'sad' }), scope: 'next-bucket' }],
+            ['wrap', { poem: poem({ id: 'poem-2' }), scope: 'wrap' }]
+        ])('every label variant keeps the word "Next" (%s)', (_name, next) => {
+            const { container } = renderDetail(next as never)
+
+            expect(container.querySelector('.next-poem__scope-wide')).toHaveTextContent(/^Next/)
+            expect(container.querySelector('.next-poem__scope-narrow')).toHaveTextContent(/^Next/)
+        })
+
+        test('the arrow is decorative — the label already carries the meaning', () => {
+            const { container } = renderDetail({ poem: poem({ id: 'poem-2' }), scope: 'same-bucket' })
+
+            const arrow = container.querySelector('.next-poem__arrow')
+            expect(arrow).toBeInTheDocument()
+            expect(arrow).toHaveAttribute('aria-hidden', 'true')
         })
 
         test('the accessible name uses the wide label and is stated once', () => {

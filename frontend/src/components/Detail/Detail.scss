@@ -161,31 +161,67 @@
     margin: 0 $space-5 $space-5;
 }
 
+// The primary tint is the RESTING state, not just a hover. On $color-bg-subtle
+// (#f8f9fa) the card was near-invisible against the white page and read as one
+// more block of content; the tint is what makes it look like somewhere to go.
+// Both values are existing palette entries — the same pair used for tags.
 .next-poem__card {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-md;
+    background: $color-primary-bg;
+    border: 1px solid rgba($color-primary, 0.3);
+    border-radius: $radius-md;
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+        border-color: $color-primary;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    // Nudge the arrow on hover, but hold still for anyone who asked not to be
+    // moved.
+    &:hover .next-poem__arrow {
+        transform: translateX(3px);
+    }
+}
+
+.next-poem__body {
     display: flex;
     flex-direction: column;
     // A flex item defaults to min-width: auto and would refuse to shrink below
     // its intrinsic width, so a long unbroken title overflows the card instead
     // of clamping. Same trap List.scss already documents for the search box.
     min-width: 0;
+    flex: 1;
     gap: 4px;
-    padding: $space-md;
-    background: $color-bg-subtle;
-    border: 1px solid $color-border;
-    border-radius: $radius-md;
-    text-decoration: none;
-    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
 
-    &:hover,
-    &:focus-visible {
-        background: $color-primary-bg;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+.next-poem__arrow {
+    // Never let the arrow absorb the shrink that belongs to the title.
+    flex-shrink: 0;
+    color: $color-primary-dark;
+    transition: transform 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .next-poem__arrow {
+        transition: none;
+    }
+
+    .next-poem__card:hover .next-poem__arrow {
+        transform: none;
     }
 }
 
 .next-poem__scope {
     font-size: $fs-sm;
-    color: $color-text-accessible-muted;
+    // Primary-dark rather than muted grey: this line is the navigation cue, so
+    // it should read as a control. 5.5:1 on the tinted background, past AA.
+    color: $color-primary-dark;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }

@@ -292,6 +292,14 @@ between server and client render and cause a hydration mismatch on every detail
 page. Both spans are `aria-hidden`; the accessible name is stated once via
 `aria-label`.
 
+**Every label variant keeps the word "Next"** — only the redundant "poem" is
+dropped when space is tight (`Next in Garden`, not `In Garden`). The narrow
+strings originally dropped it entirely, which saved two words and cost the line
+its meaning: on its own it reads as a section heading for the poem below rather
+than as a way forward. A `test.each` pins the prefix. The trailing arrow is
+`aria-hidden` for the same reason the label spans are — it repeats what the text
+already says — and it holds still under `prefers-reduced-motion`.
+
 Indexes backing the walk are declared on the schema but **not yet built in
 production** — see `TODO.md`.
 

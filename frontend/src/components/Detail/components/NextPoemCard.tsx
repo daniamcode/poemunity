@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { NextPoemTarget } from '../hooks/useNextPoem'
 
 interface NextPoemCardProps {
@@ -13,13 +14,18 @@ interface NextPoemCardProps {
 // and next-bucket share one formula — for same-bucket the destination's
 // author/genre is the current one anyway. Only a wrap reads differently,
 // because "you have come full circle" is the useful thing to say.
+//
+// Every variant keeps the word "Next". The narrow strings used to drop it
+// ("In Garden"), which shortened the line by two words and cost it its meaning:
+// on its own it reads as a section heading for the poem below, not as a way
+// forward. Only the redundant "poem" is dropped when space is tight.
 function labelsFor({ scope, dimension, author, genre }: NextPoemTarget): { wide: string, narrow: string } {
     if (scope === 'wrap') {
-        return { wide: 'Starting over', narrow: 'Next poem' }
+        return { wide: 'Next poem — starting over', narrow: 'Next poem' }
     }
     return dimension === 'author'
-        ? { wide: `Next poem by ${author}`, narrow: `By ${author}` }
-        : { wide: `Next poem in ${genre}`, narrow: `In ${genre}` }
+        ? { wide: `Next poem by ${author}`, narrow: `Next by ${author}` }
+        : { wide: `Next poem in ${genre}`, narrow: `Next in ${genre}` }
 }
 
 export function NextPoemCard({ target }: NextPoemCardProps) {
@@ -39,12 +45,17 @@ export function NextPoemCard({ target }: NextPoemCardProps) {
                 // stated once here instead of being read twice.
                 aria-label={`${wide}: ${target.title} by ${target.author}`}
             >
-                <span className='next-poem__scope' aria-hidden='true'>
-                    <span className='next-poem__scope-wide'>{wide}</span>
-                    <span className='next-poem__scope-narrow'>{narrow}</span>
+                <span className='next-poem__body' aria-hidden='true'>
+                    <span className='next-poem__scope'>
+                        <span className='next-poem__scope-wide'>{wide}</span>
+                        <span className='next-poem__scope-narrow'>{narrow}</span>
+                    </span>
+                    <span className='next-poem__title'>{target.title}</span>
+                    <span className='next-poem__author'>by {target.author}</span>
                 </span>
-                <span className='next-poem__title' aria-hidden='true'>{target.title}</span>
-                <span className='next-poem__author' aria-hidden='true'>by {target.author}</span>
+                {/* Decorative: the label already says "Next", so announcing the
+                    arrow too would just repeat it. */}
+                <ArrowForwardIcon className='next-poem__arrow' aria-hidden='true' />
             </Link>
         </nav>
     )
