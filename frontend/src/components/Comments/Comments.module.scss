@@ -87,6 +87,10 @@
 .commentMeta {
     display: flex;
     flex-direction: column;
+    // Not stretch: children here are a name, a badge and a date, none of which
+    // should span the row. It also stops .commentAuthor's link box (and so its
+    // hover underline and click target) running the full width of the comment.
+    align-items: flex-start;
     flex: 1;
 }
 

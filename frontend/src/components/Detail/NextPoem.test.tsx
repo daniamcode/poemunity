@@ -17,6 +17,10 @@ jest.mock('./hooks/useDetailPoem')
 jest.mock('../../hooks/usePoemActions')
 jest.mock('../Comments/CommentsSection', () => ({
     __esModule: true,
+    // COMMENTS_ANCHOR must be re-exported: Detail compares window.location.hash
+    // against it, and a mock that only provides `default` silently makes that
+    // comparison `#undefined`.
+    COMMENTS_ANCHOR: 'comments',
     default: () => <div data-testid='comments-section'>Comments</div>
 }))
 jest.mock('../../App', () => {

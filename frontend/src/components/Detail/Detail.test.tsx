@@ -13,7 +13,14 @@ jest.mock('./hooks/useDetailPoem')
 jest.mock('../../hooks/usePoemActions')
 jest.mock('../Comments/CommentsSection', () => ({
     __esModule: true,
-    default: () => <div data-testid='comments-section'>Comments</div>
+    // COMMENTS_ANCHOR must be re-exported: Detail compares window.location.hash
+    // against it, and a mock that only provides `default` silently makes that
+    // comparison `#undefined`.
+    COMMENTS_ANCHOR: 'comments',
+    // Carries the real id: without it document.getElementById(COMMENTS_ANCHOR)
+    // returns null, the optional chain short-circuits, and the scroll assertion
+    // below would pass while testing nothing.
+    default: () => <div id='comments' data-testid='comments-section'>Comments</div>
 }))
 
 // Mock AppContext - define mockContext first
@@ -180,6 +187,99 @@ describe('Detail', () => {
 
         expect(screen.getByTestId('comments-section')).toBeInTheDocument()
         expect(disconnect).toHaveBeenCalled()
+    })
+
+    // The comments icon links to #comments from a list AND from this page. The
+    // section is lazily mounted, so without this the browser's anchor handling
+    // finds nothing to scroll to and the link silently does nothing.
+    describe('the #comments anchor', () => {
+        const setHash = (hash: string) => {
+            window.history.replaceState(null, '', hash || window.location.pathname)
+        }
+
+        // jsdom does not implement scrollIntoView at all, so every test in this
+        // block needs the stub — not just the ones that assert on it.
+        let scrollIntoView: jest.Mock
+
+        beforeEach(() => {
+            scrollIntoView = jest.fn()
+            Element.prototype.scrollIntoView = scrollIntoView
+        })
+
+        afterEach(() => setHash(''))
+
+        test('mounts the comments immediately when the page is opened at #comments', () => {
+            // Observer present, so nothing would mount on its own.
+            global.IntersectionObserver = jest.fn(() => ({
+                observe: jest.fn(),
+                unobserve: jest.fn(),
+                disconnect: jest.fn(),
+                root: null,
+                rootMargin: '',
+                thresholds: [],
+                takeRecords: jest.fn()
+            })) as any
+            setHash('#comments')
+
+            renderWithProviders(<Detail />)
+
+            expect(screen.getByTestId('comments-section')).toBeInTheDocument()
+        })
+
+        test('mounts them on a same-page click, which fires hashchange rather than remounting', () => {
+            global.IntersectionObserver = jest.fn(() => ({
+                observe: jest.fn(),
+                unobserve: jest.fn(),
+                disconnect: jest.fn(),
+                root: null,
+                rootMargin: '',
+                thresholds: [],
+                takeRecords: jest.fn()
+            })) as any
+
+            renderWithProviders(<Detail />)
+            expect(screen.queryByTestId('comments-section')).not.toBeInTheDocument()
+
+            act(() => {
+                setHash('#comments')
+                window.dispatchEvent(new HashChangeEvent('hashchange'))
+            })
+
+            expect(screen.getByTestId('comments-section')).toBeInTheDocument()
+        })
+
+        test('scrolls to the section once it is committed to the DOM', () => {
+            setHash('#comments')
+
+            renderWithProviders(<Detail />)
+
+            expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start' })
+        })
+
+        test('does not scroll when the comments mount by scrolling instead', () => {
+            // No hash: the IntersectionObserver path mounts them, and hijacking
+            // the reader's scroll position at that moment would be a bug.
+            renderWithProviders(<Detail />)
+
+            expect(screen.getByTestId('comments-section')).toBeInTheDocument()
+            expect(scrollIntoView).not.toHaveBeenCalled()
+        })
+
+        test('leaves the lazy behaviour alone when there is no hash', () => {
+            global.IntersectionObserver = jest.fn(() => ({
+                observe: jest.fn(),
+                unobserve: jest.fn(),
+                disconnect: jest.fn(),
+                root: null,
+                rootMargin: '',
+                thresholds: [],
+                takeRecords: jest.fn()
+            })) as any
+
+            renderWithProviders(<Detail />)
+
+            expect(screen.queryByTestId('comments-section')).not.toBeInTheDocument()
+        })
     })
 
     test('should apply correct CSS classes to main container', () => {

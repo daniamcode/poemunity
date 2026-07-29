@@ -3,6 +3,7 @@ import Link from 'next/link'
 import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
 import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
+import { COMMENTS_ANCHOR } from '../../Comments/CommentsSection'
 import { ConfirmDialog } from '../../common/ConfirmDialog'
 
 interface PoemActionsProps {
@@ -50,7 +51,11 @@ export function PoemActions({ poemId, isOwner, onEdit, onDelete }: PoemActionsPr
                     />
                 </>
             )}
-            <Link href={`/detail/${poemId}`} className='poem__comments-icon' aria-label='View comments'>
+            <Link
+                href={`/detail/${poemId}#${COMMENTS_ANCHOR}`}
+                className='poem__comments-icon'
+                aria-label='View comments'
+            >
                 <SubjectSharpIcon style={{ fill: '#000' }} />
             </Link>
         </>

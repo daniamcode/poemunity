@@ -189,7 +189,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <a
         aria-label="View comments"
         class="poem__comments-icon"
-        href="/detail/test-poem-id"
+        href="/detail/test-poem-id#comments"
       >
         <svg
           aria-hidden="true"
@@ -320,7 +320,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
       <a
         aria-label="View comments"
         class="poem__comments-icon"
-        href="/detail/test-poem-id"
+        href="/detail/test-poem-id#comments"
       >
         <svg
           aria-hidden="true"
@@ -446,7 +446,7 @@ exports[`MUI Components Visual Regression Tests PoemFooter should render poem fo
   <a
     aria-label="View comments"
     class="poem__comments-icon"
-    href="/detail/test-poem-id"
+    href="#comments"
   >
     <svg
       aria-hidden="true"

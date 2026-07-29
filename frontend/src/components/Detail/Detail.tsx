@@ -7,7 +7,7 @@ import { usePoemActions } from '../../hooks/usePoemActions'
 import { PoemNotFound } from './components/PoemNotFound'
 import { PoemContent } from './components/PoemContent'
 import { PoemFooter } from './components/PoemFooter'
-import CommentsSection from '../Comments/CommentsSection'
+import CommentsSection, { COMMENTS_ANCHOR } from '../Comments/CommentsSection'
 import { NextPoemCard } from './components/NextPoemCard'
 import { useNextPoem, NextPoemResponse } from './hooks/useNextPoem'
 import { Poem } from '../../typescript/interfaces'
@@ -22,6 +22,7 @@ function Detail({ initialPoem, initialNextPoem }: DetailProps) {
     const poemId = router.query.poemId as string
     const context = useContext(AppContext)
     const commentsSentinelRef = useRef<HTMLDivElement | null>(null)
+    const wantsCommentsScroll = useRef(false)
     const [shouldLoadComments, setShouldLoadComments] = useState(false)
     const { poem, isLoading, isError, retry } = useDetailPoem(poemId, initialPoem)
     // Server answer first (SSR), upgraded after hydration to the neighbour in
@@ -36,6 +37,33 @@ function Detail({ initialPoem, initialNextPoem }: DetailProps) {
     useEffect(() => {
         setShouldLoadComments(false)
     }, [poem.id])
+
+    // The comments icon links to #comments, from a list or from this page. The
+    // section is lazily mounted, so the browser's own anchor handling finds
+    // nothing to scroll to and the link looks broken. Mount it on demand, then
+    // scroll once it exists. `hashchange` covers the same-page click, which
+    // does not re-run the mount effect.
+    useEffect(() => {
+        const jumpToComments = () => {
+            if (window.location.hash !== `#${COMMENTS_ANCHOR}`) return
+            wantsCommentsScroll.current = true
+            setShouldLoadComments(true)
+        }
+
+        jumpToComments()
+        window.addEventListener('hashchange', jumpToComments)
+        return () => window.removeEventListener('hashchange', jumpToComments)
+    }, [poem.id])
+
+    // Scrolling is a separate effect on purpose: it has to run AFTER the section
+    // is committed to the DOM. Doing it inside the handler above (even behind a
+    // requestAnimationFrame) can fire before React commits, and then there is
+    // nothing to scroll to.
+    useEffect(() => {
+        if (!shouldLoadComments || !wantsCommentsScroll.current) return
+        wantsCommentsScroll.current = false
+        document.getElementById(COMMENTS_ANCHOR)?.scrollIntoView({ block: 'start' })
+    }, [shouldLoadComments])
 
     useEffect(() => {
         if (!poem.id || shouldLoadComments) return

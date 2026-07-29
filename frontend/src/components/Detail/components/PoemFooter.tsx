@@ -4,6 +4,7 @@ import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
 import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
 import { LIKE, LIKES } from '../../../data/constants'
+import { COMMENTS_ANCHOR } from '../../Comments/CommentsSection'
 import { Poem, Context } from '../../../typescript/interfaces'
 import { ConfirmDialog } from '../../common/ConfirmDialog'
 
@@ -93,7 +94,9 @@ export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFoot
                 }}
             />
 
-            <Link href={`/detail/${poem.id}`} className='poem__comments-icon' aria-label='View comments'>
+            {/* Already on the poem, so this is a pure in-page jump. Detail.tsx
+                watches for the hash and forces the lazy comments to mount. */}
+            <Link href={`#${COMMENTS_ANCHOR}`} className='poem__comments-icon' aria-label='View comments'>
                 <SubjectSharpIcon
                     style={{
                         fill: '#000'

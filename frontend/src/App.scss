@@ -52,6 +52,13 @@ textarea:focus-visible,
 .ai-badge {
     display: inline-flex;
     align-items: center;
+    // Defensive, and load-bearing: this badge is documented as safe to drop in
+    // anywhere. Dropped into a COLUMN flex container, the default
+    // `align-items: stretch` sizes it to the full row width — `inline-flex` does
+    // not protect a flex ITEM from that — and `border-radius: $radius-full` then
+    // renders the pill as a page-wide lens. A definite width disables stretch,
+    // and is a no-op in a row container, which is already shrink-to-fit.
+    width: fit-content;
     margin-left: $space-2;
     padding: 1px $space-2;
     border: 1px solid $color-border;

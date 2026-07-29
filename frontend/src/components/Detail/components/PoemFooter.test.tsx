@@ -160,7 +160,7 @@ describe('PoemFooter', () => {
     test('should render comments link with correct href', () => {
         renderWithRouter(<PoemFooter poem={mockPoem} context={mockContext} {...mockHandlers} />)
         const commentsLink = screen.getByRole('link')
-        expect(commentsLink).toHaveAttribute('href', '/detail/poem-123')
+        expect(commentsLink).toHaveAttribute('href', '#comments')
     })
 
     test('should NOT show edit/delete icons when user is not logged in', () => {

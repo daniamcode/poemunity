@@ -25,7 +25,7 @@ describe('PoemActions', () => {
 
         const commentsLink = container.querySelector('.poem__comments-icon')
         expect(commentsLink).toBeInTheDocument()
-        expect(commentsLink).toHaveAttribute('href', '/detail/poem-789')
+        expect(commentsLink).toHaveAttribute('href', '/detail/poem-789#comments')
     })
 
     test('should NOT render edit and delete icons when not owner', () => {
@@ -94,7 +94,7 @@ describe('PoemActions', () => {
         renderWithRouter(<PoemActions {...defaultProps} poemId='different-poem-123' />)
 
         const commentsLink = screen.getByRole('link', { name: 'View comments' })
-        expect(commentsLink).toHaveAttribute('href', '/detail/different-poem-123')
+        expect(commentsLink).toHaveAttribute('href', '/detail/different-poem-123#comments')
     })
 
     test('should have correct styles on delete icon', () => {

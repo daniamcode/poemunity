@@ -7,6 +7,9 @@ import CommentForm from './components/CommentForm'
 import styles from './Comments.module.scss'
 import { manageError, manageSuccess } from '../../utils/notifications'
 
+/** Anchor targeted by the comments icon, from a list or from the poem itself. */
+export const COMMENTS_ANCHOR = 'comments'
+
 interface CommentsSectionProps {
     targetType: 'poem' | 'profile'
     targetId: string
@@ -38,7 +41,9 @@ export default function CommentsSection({ targetType, targetId }: CommentsSectio
     }
 
     return (
-        <section className={styles.comments}>
+        // The comments icon on every poem card links here. The id is the anchor
+        // it targets, so it has to stay in sync with COMMENTS_ANCHOR.
+        <section id={COMMENTS_ANCHOR} className={styles.comments}>
             <h3 className={styles.commentsTitle}>
                 {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
             </h3>
