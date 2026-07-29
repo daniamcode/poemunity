@@ -5,6 +5,7 @@ import { getPoemsListAction } from '../../../redux/actions/poemsActions'
 import { getTypes } from '../../../redux/actions/commonActions'
 import { ACTIONS } from '../../../redux/reducers/poemsReducers'
 import { poemsUpserted } from '../../../redux/reducers/poemEntitiesReducers'
+import { listContextSet } from '../../../redux/reducers/listContextReducers'
 import { selectPoemsListPoems } from '../../../redux/selectors/poemCacheSelectors'
 import sortPoems from '../../../utils/sortPoems'
 import { ORDER_BY_LIKES, PAGINATION_LIMIT } from '../../../data/constants'
@@ -61,6 +62,15 @@ export function usePoemsList({ genre, origin, orderBy, initialData, q = '', next
         ...(genre && { genre }),
         ...(q && { q })
     })
+
+    // Record the active query as browsing context. The Detail page's "next poem"
+    // control reads it to fetch the next page when the reader walks off the end
+    // of the cached list — the cache itself keeps ids and page/hasMore but not
+    // the filters that produced them. Client state only, never the URL.
+    useEffect(() => {
+        dispatch(listContextSet(buildParams(1)))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [origin, genre, effectiveOrderBy, q, dispatch])
 
     // Fetch when origin/genre/search changes — skip the first run if we seeded
     // from SSR.

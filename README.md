@@ -103,6 +103,14 @@ https://www.kaggle.com/datasets/tgdivy/poetry-foundation-poems
 
 The CSV contains `Title`, `Poem`, `Poet`, and `Tags` columns. Tags are mapped to the app's genre system; the seed script is at `backend/scripts/seed-poems.js`.
 
+## Next poem
+
+Every poem page ends with a **Next poem** card, and it never dead-ends. It follows whatever you were already browsing rather than dropping you somewhere unrelated: reading through the Love genre, it stays in Love; reading an author's page, it stays with that author. When that runs out it moves on to the next genre (or the next author) alphabetically, and after the last one it loops back to the first. Arriving with no context at all — a shared link, a refresh — it simply follows the poem's own genre.
+
+The one property worth knowing: because every poem has exactly one genre and exactly one author, those groups **partition** the whole collection. So a single lap of Next visits every poem exactly once before it starts repeating — no poem is skipped and none comes round twice early. Within a group, poems run newest first.
+
+Mechanics — the endpoint, the ordering rules, and the constraints that keep the guarantee true — are in `AGENTS.md`.
+
 ## Deployment (Vercel + MongoDB Atlas)
 
 Two separate Vercel projects, both connected to this GitHub repo:

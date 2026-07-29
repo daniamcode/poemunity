@@ -44,6 +44,21 @@ so there is **no separate env to "promote from"** — this IS the production dat
   **Plan (deferred, not now):** create a copy of prod and point `MONGODB_PRE` at it
   so `pre` becomes a real separate environment.
 
+- 👤 **Build the next-poem indexes in production** — the "next poem" walk
+  (`GET /api/v1/poem/:poemId/next`) is declared against three compound indexes on
+  `Poem`: `{ authorId: 1, date: -1, _id: -1 }`, `{ genre: 1, date: -1, _id: -1 }`
+  and `{ date: -1, _id: -1 }` (`backend/src/models/Poem.js`). They are **schema
+  declarations only** — nothing has been built against the live cluster, and
+  Mongoose `autoIndex` must not be relied on to do it silently. Creating them is a
+  **production write**: `mongodump` snapshot first, then build them deliberately
+  (background/rolling build via Atlas). Until then the walk works but each hop is
+  a collection scan + in-memory sort. Two known gaps, both deferred: genre bucket
+  membership matches case-insensitively (`^genre$` /i, mirroring the list filter),
+  so its index serves the sort but not the equality seek — a normalized lowercase
+  `genre` field or a collation index would fix that; and listing genre buckets
+  groups by `$toLower`, which cannot use an index at all (it runs only when a
+  bucket is exhausted, not on every hop).
+
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
   so visual diffs fail the run (🤖).
@@ -73,8 +88,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
 - 🤖 **Backend TypeScript migration** — backend is still plain JS. (checklist "Low")
 - 🤝 **Public backend URL review** — is exposing `poemunity-backend.vercel.app`
   directly acceptable? Audit what's reachable.
-- 👤 **Comments provider decision** — keep Disqus (price?), build our own, or another
-  provider.
 - 👤 **Likes distribution for the simulation** — weight famous poems / themes matched
   to each AI personality.
 - 👤 **Monarch idea** — what's script vs. AI-generated, and how to invoke Claude
@@ -116,6 +129,11 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## ✅ Recently shipped (context — do not re-add)
 
+- **Own comments system, replacing Disqus**: comments were once a third-party
+  Disqus embed. They are now first-party end to end — `Comment` model, the
+  `/api/v1/comments` routes, and `CommentsSection` on both poems and profiles —
+  which is what made AI-authored comments and profile comments possible at all.
+  The provider question is closed; do not reopen it.
 - **Server-backed search** (2026-07-28): search was a client-side filter over the
   poems already on screen, matching **author name only** (`ListItem` returned
   `null` for non-matches), so anything past the first page was unreachable and

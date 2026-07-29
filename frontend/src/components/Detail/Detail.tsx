@@ -8,19 +8,25 @@ import { PoemNotFound } from './components/PoemNotFound'
 import { PoemContent } from './components/PoemContent'
 import { PoemFooter } from './components/PoemFooter'
 import CommentsSection from '../Comments/CommentsSection'
+import { NextPoemCard } from './components/NextPoemCard'
+import { useNextPoem, NextPoemResponse } from './hooks/useNextPoem'
 import { Poem } from '../../typescript/interfaces'
 
 interface DetailProps {
     initialPoem?: Poem
+    initialNextPoem?: NextPoemResponse | null
 }
 
-function Detail({ initialPoem }: DetailProps) {
+function Detail({ initialPoem, initialNextPoem }: DetailProps) {
     const router = useRouter()
     const poemId = router.query.poemId as string
     const context = useContext(AppContext)
     const commentsSentinelRef = useRef<HTMLDivElement | null>(null)
     const [shouldLoadComments, setShouldLoadComments] = useState(false)
     const { poem, isLoading, isError, retry } = useDetailPoem(poemId, initialPoem)
+    // Server answer first (SSR), upgraded after hydration to the neighbour in
+    // whichever list cache the reader arrived from.
+    const nextPoem = useNextPoem(poem.id, initialNextPoem)
     const { onLike, onDelete, onEdit } = usePoemActions({
         poem,
         context,
@@ -83,6 +89,9 @@ function Detail({ initialPoem }: DetailProps) {
                         <br />
                         <PoemFooter poem={poem} context={context} onLike={onLike} onDelete={onDelete} onEdit={onEdit} />
                     </section>
+                    {/* Above the comments, always: comments lazy-load and grow
+                        unbounded, so anything below them is unreachable. */}
+                    {nextPoem && <NextPoemCard target={nextPoem} />}
                     <div ref={commentsSentinelRef} className='poem__comments-sentinel' aria-hidden='true' />
                     {shouldLoadComments && <CommentsSection targetType='poem' targetId={poem.id} />}
                 </main>
