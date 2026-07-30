@@ -55,21 +55,28 @@ describe('PoemOfTheWeek', () => {
         })
 
         // Four lines is enough to tempt a reader without reprinting the poem in
-        // a sidebar.
+        // a sidebar. Each line is a separate element so it can wrap with a
+        // hanging indent, so assert on the lines rather than on joined text —
+        // reading textContent back would pass just as happily if they all
+        // collapsed into one run.
+        const linesOf = (container: HTMLElement) =>
+            Array.from(container.querySelectorAll('.potw__line')).map(el => el.textContent)
+
         test('excerpts the opening lines only', () => {
             const { container } = renderWith({ poem: POEM })
 
-            const excerpt = container.querySelector('.potw__excerpt')!.textContent!
-            expect(excerpt.split('\n')).toHaveLength(4)
-            expect(excerpt).toContain('I met a traveller')
-            expect(excerpt).not.toContain('Stand in the desert')
+            expect(linesOf(container)).toEqual([
+                'I met a traveller',
+                'from an antique land',
+                'Who said',
+                'Two vast and trunkless legs'
+            ])
         })
 
         test('drops blank lines rather than spending the excerpt on them', () => {
-            renderWith({ poem: { ...POEM, poem: 'One\n\n\nTwo\n\nThree\nFour\nFive' } })
+            const { container } = renderWith({ poem: { ...POEM, poem: 'One\n\n\nTwo\n\nThree\nFour\nFive' } })
 
-            const excerpt = screen.getByText(/One/).textContent!
-            expect(excerpt.split('\n')).toEqual(['One', 'Two', 'Three', 'Four'])
+            expect(linesOf(container)).toEqual(['One', 'Two', 'Three', 'Four'])
         })
     })
 

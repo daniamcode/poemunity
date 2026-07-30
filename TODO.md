@@ -50,16 +50,17 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤖 **Repair the Cypress suite, then put it in CI** (measured 2026-07-30).
-  Full run: **34 tests — 1 passing, 16 failing, 17 skipped. All 4 specs red.**
+- 🤖 **Repair the Cypress suite, then put it in CI** (re-measured 2026-07-30 after
+  the readiness fix). Full run: **34 tests — 3 passing, 14 failing, 17 skipped.**
+  `ranking.cy.ts` is green; the other three specs are still red.
 
   | spec | tests | passing | failing | skipped |
   |---|---|---|---|---|
   | `comments.cy.ts` | 21 | 0 | 5 | 16 |
   | `create-poem.cy.ts` | 7 | 0 | 6 | 1 |
-  | `ranking.cy.ts` | 2 | 0 | 2 | 0 |
+  | `ranking.cy.ts` | 2 | **2** | 0 | 0 |
   | `register.cy.ts` | 4 | 1 | 3 | 0 |
-  | **total** | **34** | **1** | **16** | **17** |
+  | **total** | **34** | **3** | **14** | **17** |
 
   (The skipped ones are not passing — they are downstream of a failed `before`
   hook, so they will surface more failures once the earlier ones are fixed.)
@@ -95,6 +96,40 @@ so there is **no separate env to "promote from"** — this IS the production dat
   finally have a PR to hold. Note the existing trap: required checks plus
   path-filtered workflows leave skipped jobs hanging as "Expected" forever, so
   that move needs an always-run aggregator job.
+
+- 🤝 **Run a security review of the whole app** — never done end to end; the
+  hardening that exists (helmet, rate limiters, hashed reset tokens, non-enumerating
+  login) was added feature by feature, so nobody has looked for the gaps *between*
+  those features. Worth a dedicated pass rather than folding into other work.
+  Concrete things to check, roughly in order of what would hurt most:
+  - **Authorization, not just authentication.** Every mutating route: does it check
+    that `req.userId` OWNS the poem/comment/profile it is editing or deleting, or
+    only that *someone* is logged in? An IDOR here is a stranger deleting your poem.
+    Same question for the admin routes — is `isAdmin` re-checked server-side on each
+    request, or trusted from the token/client?
+  - **Injection into Mongo queries.** Any place a request body or query string
+    reaches a filter object unvalidated can smuggle operators (`{$ne: null}`,
+    `{$gt: ''}`) — classic auth bypass. Also confirm the search regex is still
+    escaped (it is by design — keep a test on it).
+  - **XSS in user content.** Poems, comments, bios and display names are shown
+    everywhere and now also travel into `<script type="application/ld+json">`
+    (JsonLd escapes `<`) and into meta tags. Check the rendering paths for
+    `dangerouslySetInnerHTML` and confirm nothing reflects raw input.
+  - **Session and cookie posture.** httpOnly/secure/sameSite flags, JWT expiry,
+    whether `passwordChangedAt` revocation covers every route, and what happens to
+    a token whose author was deleted.
+  - **Rate limiting coverage.** Limiters exist on login/register/password/verify —
+    but not, as far as anyone has checked, on poem/comment creation or the
+    availability endpoint, which are the cheap spam and enumeration surfaces.
+  - **Dependency and header baseline.** `pnpm audit` in both workspaces, plus a
+    look at the live response headers (helmet defaults vs what Vercel actually
+    sends) and at CORS: `FRONTEND_URLS` should not be permissive in prod.
+  - **Secrets handling.** `SIMULATION_INTERNAL_SECRET` bypasses the login limiter —
+    confirm it is compared in constant time and cannot be probed. See also the P0
+    rotation item above.
+  Deliverable: a findings list with severities, then fixes as their own tasks.
+  Each finding that gets fixed needs a regression test — a security fix without one
+  silently un-fixes itself in six months.
 
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
   to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script

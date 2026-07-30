@@ -3,26 +3,34 @@
 // Sits under the ranking in the right rail. No display rules of its own: the
 // rail is already hidden below $bp-xl (see Dashboard.scss), and repeating that
 // here would mean two places to keep in step.
+// The SAME card shell as the ranking (white surface, soft shadow, $radius-lg),
+// deliberately — the two sit one above the other in the same rail, and a tinted
+// bordered panel next to a shadowed white one reads as two unrelated widgets
+// rather than one column. Everything distinctive about this card is in its
+// typography, not in its box.
 .potw {
     // Sits at the TOP of the rail now, so no top margin — see Dashboard.tsx.
-    margin-bottom: $space-xl;
-    padding: $space-md;
-    background: $color-primary-bg;
-    border: 1px solid rgba($color-primary, 0.3);
-    border-radius: $radius-md;
+    margin-bottom: $space-lg;
+    padding: $space-5;
+    background: $color-bg-surface;
+    border-radius: $radius-lg;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+// An eyebrow, not a headline. It names the section; the poem's own title is
+// what the reader is meant to look at, so this stays small, quiet and
+// letter-spaced instead of competing at $fs-md in brand blue.
 .potw__heading {
     margin: 0;
-    font-size: $fs-md;
+    font-size: $fs-xs;
     font-weight: $fw-semibold;
-    color: $color-primary-dark;
+    color: $color-text-secondary;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
 }
 
 .potw__week {
-    margin: 2px 0 $space-3;
+    margin: $space-1 0 $space-3;
     font-size: $fs-xs;
     color: $color-text-accessible-muted;
 }
@@ -46,7 +54,17 @@
     text-decoration: none;
     align-items: center;
     gap: $space-2;
-    margin: $space-2 0 $space-3;
+    margin: $space-3 0;
+
+    // AuthorAvatar is sized for a poem byline (44px) and carries its own
+    // right margin. Both are wrong in a sidebar: at full size it outweighs the
+    // poem title beside it, and the margin stacks with this flex gap.
+    .poem__picture {
+        width: 28px;
+        height: 28px;
+        margin-right: 0;
+        font-size: $fs-xs;
+    }
 }
 
 .potw__author-name {
@@ -68,12 +86,23 @@
 
 .potw__excerpt {
     margin: 0 0 $space-3;
-    // The poem's own line breaks carry its shape — the one thing not to lose
-    // when quoting four lines of verse.
-    white-space: pre-line;
-    font-size: $fs-sm-plus;
-    line-height: $lh-relaxed;
+    padding-left: $space-3;
+    // Marks the four lines as quoted verse rather than card copy. A rule is
+    // enough; quotation marks would fight the poem's own punctuation.
+    border-left: 2px solid $color-border-subtle;
+    font-size: $fs-sm;
+    line-height: $lh-base;
     color: $color-text-medium;
+}
+
+// The poem's own line breaks carry its shape — the one thing not to lose when
+// quoting four lines of verse. Each line is its own block so that a line too
+// long for the rail wraps with a hanging indent, marking the overflow as a
+// continuation rather than a fifth line.
+.potw__line {
+    display: block;
+    padding-left: $space-3;
+    text-indent: -$space-3;
 }
 
 .potw__read {

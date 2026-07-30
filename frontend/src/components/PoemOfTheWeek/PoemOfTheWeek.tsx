@@ -11,12 +11,11 @@ import { POEM_OF_THE_WEEK_TITLE } from '../../data/constants'
 /** How much of the poem to show before the reader has to open it. */
 const EXCERPT_LINES = 4
 
-function excerptOf(text: string): string {
+function excerptOf(text: string): string[] {
     return String(text || '')
         .split('\n')
         .filter(line => line.trim())
         .slice(0, EXCERPT_LINES)
-        .join('\n')
 }
 
 /**
@@ -70,7 +69,17 @@ export function PoemOfTheWeek() {
                 <span className='potw__author-name'>{poem.author}</span>
             </Link>
 
-            <p className='potw__excerpt'>{excerptOf(poem.poem)}</p>
+            {/* One element per verse line, not a single pre-line block. The rail
+                is narrow enough that most lines wrap, and a wrapped continuation
+                is indistinguishable from the next line of the poem — four lines
+                of verse read as eight ragged ones. Separate blocks let each line
+                carry a hanging indent, which is how verse has always been set in
+                a narrow column. */}
+            <p className='potw__excerpt'>
+                {excerptOf(poem.poem).map((line, i) => (
+                    <span className='potw__line' key={i}>{line}</span>
+                ))}
+            </p>
             <Link href={href} className='potw__read'>Read the poem</Link>
         </section>
     )
