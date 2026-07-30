@@ -120,6 +120,44 @@ later phase, scoped in the same doc.
 
 ### Testing
 
+**Three habits, each of which caught a real bug that a passing suite had missed.**
+
+1. **Red-check every new test.** Break the implementation, watch the test fail,
+   restore it. Tests that pass against broken code are worse than no tests — four
+   shipped-looking ones were caught this way in a single day (mixed-case genre
+   buckets, alphabetical author ordering, the next-poem arrow, `scrollIntoView`),
+   each passing happily against a deliberately broken implementation.
+
+2. **Give selection and ordering tests a distractor.** Build the fixture so a
+   WRONG implementation returns a DIFFERENT answer. An author-ordering test
+   passed with an `_id` sort because creation order happened to match alphabetical
+   order cyclically; a mixed-case genre test passed with the lowercasing removed
+   because the only spelling that mattered sat on the one poem that never decided
+   a crossing.
+
+3. **Never let one value play two roles in a fixture.** Records are addressed by
+   **slug** in the URL and by **id** in the normalized store. `src/test-utils/fixtures.ts`
+   keeps them deliberately different — use `makePoem()` rather than a hand-rolled
+   literal. This is not hypothetical: `useDetailPoem` looked its entity up with the
+   URL parameter, so every visit to `/detail/<slug>` missed the store and likes
+   never re-rendered. All 984 tests passed, because every one addressed the hook
+   by id.
+
+**Integration tests earn their place where units are mocked past each other.**
+`Detail.test.tsx` mocks `useDetailPoem`, and the hook's own tests addressed it by
+id — so between them nobody exercised the path a reader actually takes.
+`src/__tests__/detailLike.integration.test.tsx` renders the real components,
+hooks, thunks and reducers with **only axios mocked**, and fails if that bug is
+reintroduced.
+
+**Know what tests cannot reach.** A sticky rail taller than the viewport hid
+Poem of the week completely; the right rail vanishes below `$bp-xl`; a commit
+adding a needed backend fallback never deployed at all despite green CI. Lint,
+typecheck, 984 tests and the build all passed through every one of those. Layout
+needs a browser, and a deploy needs verifying against the live URL — never
+inferred from CI.
+
+
 - **Frontend**: Jest + React Testing Library, `ts-jest`/`babel-jest`, jsdom. Snapshots in `__snapshots__/`. Always run under `TZ=UTC NODE_ENV=test`.
 - **Backend**: Jest + Supertest + `mongodb-memory-server`. `jest.setup.js` owns the shared loopback server and per-test collection cleanup — see Gotchas before changing it.
 
