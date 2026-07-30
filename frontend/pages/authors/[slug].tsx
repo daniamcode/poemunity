@@ -4,6 +4,7 @@ import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { InitialAuthorPoemsData } from '../../src/components/Authors/useAuthorPoems'
 import { JsonLd } from '../../src/components/JsonLd'
+import { Breadcrumbs } from '../../src/components/Breadcrumbs'
 import { authorStructuredData } from '../../src/utils/structuredData'
 import { authorTitle, authorDescription } from '../../src/utils/seo'
 
@@ -43,6 +44,14 @@ export default function AuthorDetailPage({ initialPoems, initialAuthor, slug, ba
                     authorType: initialAuthor?.type,
                     poems: initialPoems?.poems
                 })}
+            />
+            <Breadcrumbs
+                baseUrl={baseUrl}
+                crumbs={[
+                    { name: 'Poemunity', path: '/' },
+                    { name: 'Authors', path: '/authors' },
+                    { name: authorName }
+                ]}
             />
             <AuthorDetail
                 initialPoems={initialPoems ?? undefined}

@@ -6,6 +6,9 @@ import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
 import { JsonLd } from '../../src/components/JsonLd'
+import { Breadcrumbs } from '../../src/components/Breadcrumbs'
+import { categoryToSlug } from '../../src/data/constants'
+import capitalizeFirstLetter from '../../src/utils/capitalizeFirstLetter'
 import { poemStructuredData } from '../../src/utils/structuredData'
 import { poemTitle, poemDescription } from '../../src/utils/seo'
 import { Poem } from '../../src/typescript/interfaces'
@@ -53,6 +56,23 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
                     <AuthorsAccordion />
                 </div>
                 <div className='poem-page__content'>
+                    {/* Poemunity > Love > The moon and the sun. The middle crumb
+                        is the poem's own genre, which is also the list it would
+                        appear in — so the trail matches how the site is browsed,
+                        not just how the URL is shaped. */}
+                    <Breadcrumbs
+                        baseUrl={baseUrl}
+                        crumbs={[
+                            { name: 'Poemunity', path: '/' },
+                            ...(initialPoem?.genre
+                                ? [{
+                                    name: `${capitalizeFirstLetter(initialPoem.genre)} poems`,
+                                    path: `/${categoryToSlug(initialPoem.genre)}`
+                                }]
+                                : []),
+                            { name: initialPoem?.title || 'Poem' }
+                        ]}
+                    />
                     <Detail initialPoem={initialPoem ?? undefined} initialNextPoem={initialNextPoem} />
                 </div>
             </div>

@@ -174,3 +174,30 @@ export function poemStructuredData({ poem, url, baseUrl }: PoemStructuredDataArg
 
     return data
 }
+
+export interface Crumb {
+    name: string
+    /** Site-relative path. Omitted on the current page, which is not a link. */
+    path?: string
+}
+
+/**
+ * BreadcrumbList — the one type here that Google actually renders as a search
+ * feature, replacing the raw URL with a `Poemunity › Love › Title` trail.
+ *
+ * The final crumb carries no `item`: it is the current page, so it is not a link
+ * on screen either, and the markup mirrors that. Google documents both forms as
+ * valid; matching the visible state is the version that stays honest.
+ */
+export function breadcrumbStructuredData(crumbs: Crumb[], baseUrl: string): JsonLdObject {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: crumbs.map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: crumb.name,
+            ...(crumb.path ? { item: `${baseUrl}${crumb.path}` } : {})
+        }))
+    }
+}

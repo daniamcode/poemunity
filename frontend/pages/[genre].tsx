@@ -5,6 +5,7 @@ import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import capitalizeFirstLetter from '../src/utils/capitalizeFirstLetter'
 import { JsonLd } from '../src/components/JsonLd'
+import { Breadcrumbs } from '../src/components/Breadcrumbs'
 import { genreStructuredData } from '../src/utils/structuredData'
 import { genreTitle, genreDescription } from '../src/utils/seo'
 import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH } from '../src/data/constants'
@@ -55,6 +56,10 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
                     })}
                 />
             )}
+            <Breadcrumbs
+                baseUrl={baseUrl}
+                crumbs={[{ name: 'Poemunity', path: '/' }, { name: `${label} poems` }]}
+            />
             <Dashboard initialData={initialData ?? undefined} />
         </>
     )

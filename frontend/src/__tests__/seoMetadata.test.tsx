@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from 'next'
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import GenrePage, { getServerSideProps as genreProps } from '../../pages/[genre]'
 import AuthorPage from '../../pages/authors/[slug]'
 import DetailPage from '../../pages/detail/[poemId]'
@@ -64,6 +64,17 @@ function propOf(attr: string, value: string, read: string): string | undefined {
 
 function linkOf(rel: string): string | undefined {
     return propOf('rel', rel, 'href')
+}
+
+// There are now two ld+json blocks per page (the page entity and the
+// breadcrumb trail), so assert on WHICH types are present rather than counting.
+function jsonLdTypes(): string[] {
+    return allTags()
+        .filter(tag => tag.type === 'script')
+        .map(tag => {
+            const html = (tag.props.dangerouslySetInnerHTML as { __html: string }).__html
+            return JSON.parse(html)['@type'] as string
+        })
 }
 
 function metaOf(name: string): string | undefined {
@@ -165,9 +176,6 @@ describe('genre page metadata', () => {
 describe('genre JSON-LD', () => {
     beforeEach(() => { heads.length = 0 })
 
-    const scripts = () =>
-        allTags().filter(tag => tag.type === 'script')
-
     test('is emitted on a plain genre page', () => {
         render(
             <GenrePage
@@ -179,11 +187,12 @@ describe('genre JSON-LD', () => {
             />
         )
 
-        expect(scripts()).toHaveLength(1)
+        expect(jsonLdTypes()).toContain('CollectionPage')
     })
 
     // The markup would describe a filtered subset while claiming to be the
-    // genre's collection page — and the page is noindex anyway.
+    // genre's collection page — and the page is noindex anyway. The breadcrumb
+    // trail stays: it describes where the reader is, which is still true.
     test('is suppressed on search results', () => {
         render(
             <GenrePage
@@ -195,7 +204,8 @@ describe('genre JSON-LD', () => {
             />
         )
 
-        expect(scripts()).toHaveLength(0)
+        expect(jsonLdTypes()).not.toContain('CollectionPage')
+        expect(jsonLdTypes()).toContain('BreadcrumbList')
     })
 })
 
@@ -234,6 +244,40 @@ describe('author page metadata', () => {
         renderAuthor({ initialAuthor: null })
 
         expect(titleOf()).toBe('35 poems by John Doe | Poemunity')
+    })
+})
+
+describe('breadcrumbs on the listing pages', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const trail = () => screen.getAllByRole('listitem').map(li => li.textContent)
+
+    test('a genre page reads Poemunity > <genre> poems', () => {
+        render(
+            <GenrePage
+                initialData={{ poems: [], page: 1, hasMore: false, total: 46 }}
+                initialUser={null}
+                genre='love'
+                baseUrl='https://poemunity.com'
+                isSearch={false}
+            />
+        )
+
+        expect(trail()).toEqual(['Poemunity', 'Love poems'])
+    })
+
+    test('an author page reads Poemunity > Authors > <name>', () => {
+        render(
+            <AuthorPage
+                initialPoems={{ poems: [], page: 1, hasMore: false, total: 35 } as never}
+                initialAuthor={{ name: 'John Doe' } as never}
+                initialUser={null}
+                slug='john-doe'
+                baseUrl='https://poemunity.com'
+            />
+        )
+
+        expect(trail()).toEqual(['Poemunity', 'Authors', 'John Doe'])
     })
 })
 
@@ -302,19 +346,32 @@ describe('poem page metadata', () => {
         expect(propOf('property', 'og:image', 'content')).not.toContain('avatars/moon14.jpg')
     })
 
-    describe('JSON-LD', () => {
-        const scripts = () => allTags().filter(tag => tag.type === 'script')
+    test('the breadcrumb trail runs through the poem\'s own genre', () => {
+        renderPoem()
 
+        expect(screen.getAllByRole('listitem').map(li => li.textContent))
+            .toEqual(['Poemunity', 'Love poems', 'The moon and the sun'])
+        expect(screen.getByRole('link', { name: 'Love poems' })).toHaveAttribute('href', '/love')
+    })
+
+    test('the trail skips the genre crumb when the poem has none', () => {
+        renderPoem({ ...POEM, genre: '' })
+
+        expect(screen.getAllByRole('listitem').map(li => li.textContent))
+            .toEqual(['Poemunity', 'The moon and the sun'])
+    })
+
+    describe('JSON-LD', () => {
         test('is emitted for a poem', () => {
             renderPoem()
 
-            expect(scripts()).toHaveLength(1)
+            expect(jsonLdTypes()).toContain('Poem')
         })
 
         test('is skipped when the poem could not be loaded', () => {
             renderPoem(null)
 
-            expect(scripts()).toHaveLength(0)
+            expect(jsonLdTypes()).not.toContain('Poem')
         })
     })
 })

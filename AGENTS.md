@@ -302,6 +302,13 @@ poem's title next to its poet. JSON-LD uses schema.org's exact `Poem` type,
 carries the like count (visible in the footer) and deliberately omits
 `commentCount`, which is not known at render time because comments lazy-load.
 
+**Breadcrumbs** (`components/Breadcrumbs.tsx`) are the one type here Google
+renders as an actual search feature — `CollectionPage`, `Poem` and `Person` are
+**not** rich-result types, so the Rich Results Test reports "no items detected"
+for them and that is correct, not a fault. Use validator.schema.org to check the
+rest. The trail is rendered as well as marked up, and the final crumb is neither
+a link on screen nor an `item` in the markup.
+
 `JsonLd` escapes `<` as `\u003c`. This is not cosmetic: the payload carries poem
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.

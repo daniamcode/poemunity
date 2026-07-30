@@ -99,3 +99,47 @@ textarea:focus-visible,
     white-space: nowrap;
     border: 0;
 }
+
+// Breadcrumb trail. Muted on purpose — it is orientation, not content, and it
+// sits above page titles that should stay the loudest thing on screen.
+.breadcrumbs {
+    max-width: 800px;
+    margin: $space-3 auto 0;
+    padding: 0 $space-4;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+}
+
+.breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.breadcrumbs__item {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+
+    // The separator is generated, not a DOM node: it is decoration, and a real
+    // element would be read out between every crumb by a screen reader.
+    + .breadcrumbs__item::before {
+        content: '›';
+        color: $color-text-placeholder;
+    }
+}
+
+.breadcrumbs__link {
+    color: $color-text-secondary;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary;
+        text-decoration: underline;
+    }
+}
