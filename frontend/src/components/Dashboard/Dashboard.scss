@@ -62,5 +62,13 @@
         align-self: flex-start;
         width: 16%;
         margin-right: 4%;
+        // Both are REQUIRED, not polish — the accordion rail already has them.
+        // A sticky element taller than the viewport pins its top and travels
+        // down the page with the reader, so anything below the fold inside it
+        // can never be scrolled to. The ranking alone nearly fills the viewport;
+        // adding Poem of the week underneath it put the card permanently out of
+        // reach. Scrolling the rail itself is what makes the overflow reachable.
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
     }
 }
