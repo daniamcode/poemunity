@@ -1,4 +1,5 @@
 import { Poem } from '../typescript/interfaces'
+import { slugify } from './urlUtils'
 
 /**
  * JSON-LD builders for the pages that list poems.
@@ -118,4 +119,58 @@ export function authorStructuredData({
     if (image) person.image = image
 
     return { ...page, author: person }
+}
+
+export interface PoemStructuredDataArgs {
+    poem: Poem
+    url: string
+    baseUrl: string
+}
+
+/**
+ * schema.org has an exact type for this — `Poem`, a subtype of CreativeWork —
+ * so there is no need to describe it as a generic Article.
+ *
+ * `text` carries the poem because it is fully visible on the page; the same rule
+ * that keeps item lists honest allows this. The like count is included for the
+ * same reason: it is rendered right there in the footer.
+ *
+ * `commentCount` is deliberately absent. Comments are lazy-loaded and their
+ * count is not known at render time, and inventing a number — or paying for an
+ * extra request to learn it — is worse than omitting an optional field.
+ */
+export function poemStructuredData({ poem, url, baseUrl }: PoemStructuredDataArgs): JsonLdObject {
+    const data: JsonLdObject = {
+        '@context': 'https://schema.org',
+        '@type': 'Poem',
+        name: poem.title,
+        url,
+        isPartOf: { '@type': 'WebSite', name: SITE, url: baseUrl }
+    }
+
+    if (poem.poem) data.text = poem.poem
+    if (poem.genre) data.genre = poem.genre
+    if (poem.date) data.datePublished = poem.date
+
+    if (Array.isArray(poem.likes)) {
+        data.interactionStatistic = {
+            '@type': 'InteractionCounter',
+            interactionType: 'https://schema.org/LikeAction',
+            userInteractionCount: poem.likes.length
+        }
+    }
+
+    // Same rule as the author pages: no Person entity for an AI persona, because
+    // that would assert a real human exists in the very format search engines
+    // treat as authoritative.
+    if (poem.authorType !== 'ai' && poem.author) {
+        const slug = poem.authorSlug || slugify(poem.author)
+        data.author = {
+            '@type': 'Person',
+            name: poem.author,
+            ...(slug ? { url: `${baseUrl}/authors/${slug}` } : {})
+        }
+    }
+
+    return data
 }

@@ -15,7 +15,11 @@ export function PoemContent({ poem }: PoemContentProps) {
     return (
         <>
             <section>
-                <h2 className='poem__title'>{poem.title}</h2>
+                {/* h1, not h2: on a poem's own page the poem's title IS the
+                    top-level heading. It was an h2 with no h1 anywhere above it,
+                    which left the page's most important element outranked by
+                    nothing. Styling is unchanged. */}
+                <h1 className='poem__title'>{poem.title}</h1>
                 <div className='poem__author-container'>
                     <Link href={`/authors/${authorSlug}`}>
                         <AuthorAvatar name={poem.author} picture={poem.picture} />

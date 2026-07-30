@@ -1,4 +1,4 @@
-import { genreStructuredData, authorStructuredData } from './structuredData'
+import { genreStructuredData, authorStructuredData, poemStructuredData } from './structuredData'
 import { Poem } from '../typescript/interfaces'
 
 const poem = (over: Partial<Poem> & { id: string }): Poem => ({
@@ -115,6 +115,79 @@ describe('authorStructuredData', () => {
             const data = build({ authorType: type as string })
 
             expect(data.author).toMatchObject({ '@type': 'Person' })
+        })
+    })
+})
+
+describe('poemStructuredData', () => {
+    const build = (over: Partial<Poem> = {}) =>
+        poemStructuredData({
+            poem: poem({ id: 'p1', title: 'The Sound of Rain', slug: 'rain-gil', ...over }),
+            url: `${BASE}/detail/rain-gil`,
+            baseUrl: BASE
+        })
+
+    // schema.org has an exact type for this, so there is no reason to describe
+    // a poem as a generic Article.
+    test('uses the Poem type', () => {
+        expect(build()['@type']).toBe('Poem')
+    })
+
+    test('carries the poem text, genre and publication date', () => {
+        const data = build({ poem: 'I miss you like the moon.', genre: 'love', date: '2024-01-15T10:30:00.000Z' })
+
+        expect(data.text).toBe('I miss you like the moon.')
+        expect(data.genre).toBe('love')
+        expect(data.datePublished).toBe('2024-01-15T10:30:00.000Z')
+    })
+
+    // Visible in the footer as "N Likes", so the markup stays honest.
+    test('reports the like count', () => {
+        const data = build({ likes: ['a', 'b', 'c'] })
+
+        expect(data.interactionStatistic).toMatchObject({
+            '@type': 'InteractionCounter',
+            interactionType: 'https://schema.org/LikeAction',
+            userInteractionCount: 3
+        })
+    })
+
+    test('reports zero likes rather than omitting the counter', () => {
+        expect(build({ likes: [] })).toMatchObject({
+            interactionStatistic: { userInteractionCount: 0 }
+        })
+    })
+
+    // Lazy-loaded, so the count is unknown at render time. Inventing one is
+    // worse than leaving an optional field out.
+    test('omits commentCount, which is not known at render time', () => {
+        expect(build()).not.toHaveProperty('commentCount')
+    })
+
+    describe('authorship', () => {
+        test('links the author to their page', () => {
+            const data = build({ author: 'Ana Gil', authorSlug: 'ana-gil' })
+
+            expect(data.author).toMatchObject({
+                '@type': 'Person',
+                name: 'Ana Gil',
+                url: `${BASE}/authors/ana-gil`
+            })
+        })
+
+        test('derives the slug when the poem carries none, matching the visible link', () => {
+            const data = build({ author: 'Ana Gil', authorSlug: undefined })
+
+            expect(data.author).toMatchObject({ url: `${BASE}/authors/ana-gil` })
+        })
+
+        // Same rule as the author pages: no machine-readable claim that a human
+        // wrote this.
+        test('emits no Person for an AI poem', () => {
+            const data = build({ authorType: 'ai' })
+
+            expect(data.author).toBeUndefined()
+            expect(data['@type']).toBe('Poem')
         })
     })
 })

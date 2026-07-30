@@ -64,9 +64,12 @@ describe('PoemContent', () => {
         expect(content?.textContent).toBe('')
     })
 
-    test('should render title as h2 element', () => {
+    // On a poem's own page the title IS the top-level heading. It was an h2
+    // with no h1 anywhere above it, leaving the page's most important element
+    // outranked by nothing at all.
+    test('renders the title as the page h1', () => {
         render(<PoemContent poem={mockPoem} />)
-        const title = screen.getByText('A Beautiful Poem')
-        expect(title.tagName).toBe('H2')
+
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('A Beautiful Poem')
     })
 })

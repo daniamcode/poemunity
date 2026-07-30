@@ -1,4 +1,11 @@
-import { genreTitle, authorTitle, genreDescription, authorDescription } from './seo'
+import {
+    genreTitle,
+    authorTitle,
+    genreDescription,
+    authorDescription,
+    poemTitle,
+    poemDescription
+} from './seo'
 import { Poem } from '../typescript/interfaces'
 
 const poem = (title: string, author: string): Poem => ({
@@ -110,6 +117,61 @@ describe('seo descriptions', () => {
 
         test('stays grammatical with no poems', () => {
             expect(authorDescription('John Doe', 0)).toContain('Poems by John Doe on Poemunity.')
+        })
+    })
+})
+
+describe('poem metadata', () => {
+    describe('poemTitle', () => {
+        // No count, no decoration: people search a poem's title next to its
+        // poet, so the plain phrase is the strongest form this can take.
+        test('reads "TITLE by AUTHOR"', () => {
+            expect(poemTitle('The Sound of Rain', 'Marta Ruiz')).toBe('The Sound of Rain by Marta Ruiz')
+        })
+
+        test('drops the attribution when there is no author', () => {
+            expect(poemTitle('The Sound of Rain')).toBe('The Sound of Rain')
+        })
+
+        test('falls back to something sayable when the title is empty', () => {
+            expect(poemTitle('', 'Marta Ruiz')).toBe('Poem by Marta Ruiz')
+        })
+    })
+
+    describe('poemDescription', () => {
+        // A poem is mostly line breaks, and they land in the meta tag verbatim.
+        test('flattens the poem onto one line', () => {
+            expect(poemDescription('I miss you like\n\nthe moon misses the sun'))
+                .toBe('I miss you like the moon misses the sun')
+        })
+
+        test('leaves a short poem untouched', () => {
+            expect(poemDescription('Short and complete.')).toBe('Short and complete.')
+        })
+
+        test('cuts on a word boundary, not mid-word', () => {
+            const result = poemDescription('word '.repeat(60))
+
+            expect(result.length).toBeLessThanOrEqual(155)
+            expect(result.endsWith('word…')).toBe(true)
+        })
+
+        test('does not leave dangling punctuation before the ellipsis', () => {
+            const result = poemDescription(`${'word '.repeat(30)}end, ${'more '.repeat(20)}`)
+
+            expect(result).not.toContain(',…')
+        })
+
+        // No space to cut on: a hard cut beats returning nothing.
+        test('still truncates a single unbroken run', () => {
+            const result = poemDescription('x'.repeat(300))
+
+            expect(result.length).toBeLessThanOrEqual(155)
+            expect(result.endsWith('…')).toBe(true)
+        })
+
+        test('uses the fallback for an empty poem', () => {
+            expect(poemDescription('', 'A poem on Poemunity.')).toBe('A poem on Poemunity.')
         })
     })
 })

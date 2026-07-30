@@ -5,6 +5,9 @@ import AuthorsAccordion from '../../src/components/AuthorsAccordion'
 import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
+import { JsonLd } from '../../src/components/JsonLd'
+import { poemStructuredData } from '../../src/utils/structuredData'
+import { poemTitle, poemDescription } from '../../src/utils/seo'
 import { Poem } from '../../src/typescript/interfaces'
 
 interface PageProps {
@@ -16,21 +19,30 @@ interface PageProps {
 }
 
 export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poemId }: PageProps) {
-    const title = initialPoem?.title
-        ? `${initialPoem.title} by ${initialPoem.author}`
-        : 'Poem'
-    const description = initialPoem?.poem || ''
-    const image = initialPoem?.picture || undefined
+    const title = poemTitle(initialPoem?.title ?? '', initialPoem?.author)
+    const description = poemDescription(initialPoem?.poem ?? '')
+    // A poem is reachable by BOTH its id and its slug, so the two URLs are
+    // duplicates of each other. Canonicalise to the slug — which is also what
+    // the sitemap emits — instead of to whichever form the visitor happened to
+    // arrive on, which is what a bare `poemId` would do.
+    const canonicalId = initialPoem?.slug || poemId
+    const url = `${baseUrl}/detail/${canonicalId}`
 
     return (
         <>
+            {/* No `image`: it used to pass the AUTHOR'S AVATAR, a ~44px profile
+                picture, as the 1200x630 social card — which crops to mush or is
+                rejected outright. SeoHead's site card is the better default
+                until there is a real per-poem image. */}
             <SeoHead
                 title={title}
                 description={description}
-                image={image}
-                url={`${baseUrl}/detail/${poemId}`}
+                url={url}
                 type='article'
             />
+            {initialPoem && (
+                <JsonLd id='poem' data={poemStructuredData({ poem: initialPoem, url, baseUrl })} />
+            )}
             {/* The rail lives at PAGE level, not inside Detail: Detail is
                 rendered directly by its own tests and snapshots, and pulling
                 the authors fetch into them would make component tests depend on

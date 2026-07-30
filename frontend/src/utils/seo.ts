@@ -76,3 +76,37 @@ export function authorDescription(name: string, total: number, bio?: string): st
     const trimmedBio = bio?.trim()
     return trimmedBio ? `${lead} ${trimmedBio}` : `${lead} Read, like and share their poetry.`
 }
+
+/**
+ * "The Sound of Rain by Marta Ruiz" — deliberately NOT given a count or any
+ * other decoration. People search a poem's title alongside its poet, so the
+ * plain phrase is the strongest thing this title can be.
+ */
+export function poemTitle(title: string, author?: string): string {
+    const name = title?.trim() || 'Poem'
+    const by = author?.trim()
+    return by ? `${name} by ${by}` : name
+}
+
+/** Longest a description can be before search engines start truncating it. */
+const DESCRIPTION_LIMIT = 155
+
+/**
+ * The poem itself, flattened into one line.
+ *
+ * A poem is mostly line breaks, and they travel into the meta tag verbatim as
+ * whitespace runs. Collapsing them is what turns the opening stanza into a
+ * readable sentence. The cut then lands on a word boundary rather than mid-word,
+ * which is the difference between "the moon misses the sun…" and "the moon miss…".
+ */
+export function poemDescription(text: string, fallback = ''): string {
+    const flat = String(text || '').replace(/\s+/g, ' ').trim()
+    if (!flat) return fallback
+    if (flat.length <= DESCRIPTION_LIMIT) return flat
+
+    const clipped = flat.slice(0, DESCRIPTION_LIMIT - 1)
+    const lastSpace = clipped.lastIndexOf(' ')
+    // A single unbroken run longer than the limit has no boundary to fall back
+    // on, so keep the hard cut rather than returning nothing.
+    return `${(lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped).replace(/[,;:.\s]+$/, '')}…`
+}

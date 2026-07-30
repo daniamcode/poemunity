@@ -2,6 +2,7 @@ import { GetServerSidePropsContext } from 'next'
 import { render } from '@testing-library/react'
 import GenrePage, { getServerSideProps as genreProps } from '../../pages/[genre]'
 import AuthorPage from '../../pages/authors/[slug]'
+import DetailPage from '../../pages/detail/[poemId]'
 
 jest.mock('../../src/lib/serverApi', () => ({
     serverFetch: jest.fn(async () => ({ poems: [], page: 1, hasMore: false, total: 0 })),
@@ -17,6 +18,20 @@ jest.mock('../components/Dashboard/Dashboard', () => ({
 jest.mock('../components/Authors/AuthorDetail', () => ({
     __esModule: true,
     default: () => <div>author</div>
+}))
+jest.mock('../components/Detail/Detail', () => ({
+    __esModule: true,
+    default: () => <div>detail</div>
+}))
+// The poem page carries the Categories/Authors rail, and those pull from the
+// redux store — irrelevant to <head>, so keep them out of the render entirely.
+jest.mock('../components/SimpleAccordion', () => ({
+    __esModule: true,
+    default: () => <div>categories</div>
+}))
+jest.mock('../components/AuthorsAccordion', () => ({
+    __esModule: true,
+    default: () => <div>authors</div>
 }))
 
 // next/head renders nothing into the container in a test env, so capture the
@@ -40,6 +55,15 @@ function allTags(): AnyElement[] {
         (child): child is AnyElement =>
             !!child && typeof child === 'object' && 'props' in (child as object)
     )
+}
+
+function propOf(attr: string, value: string, read: string): string | undefined {
+    const match = allTags().find(tag => tag.props[attr] === value)
+    return match ? (match.props[read] as string) : undefined
+}
+
+function linkOf(rel: string): string | undefined {
+    return propOf('rel', rel, 'href')
 }
 
 function metaOf(name: string): string | undefined {
@@ -210,5 +234,87 @@ describe('author page metadata', () => {
         renderAuthor({ initialAuthor: null })
 
         expect(titleOf()).toBe('35 poems by John Doe | Poemunity')
+    })
+})
+
+describe('poem page metadata', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const POEM = {
+        id: '68f2abc',
+        slug: 'the-moon-and-the-sun-moon14',
+        title: 'The moon and the sun',
+        author: 'Moon14',
+        authorSlug: 'moon14',
+        poem: 'I miss you like\n\nthe moon misses the sun',
+        genre: 'love',
+        date: '2024-01-15T10:30:00.000Z',
+        likes: ['a', 'b'],
+        picture: 'https://poemunity.com/avatars/moon14.jpg',
+        userId: 'u1'
+    }
+
+    const renderPoem = (poem: Record<string, unknown> | null = POEM, poemId = POEM.slug) =>
+        render(
+            <DetailPage
+                initialPoem={poem as never}
+                initialNextPoem={null}
+                initialUser={null}
+                baseUrl='https://poemunity.com'
+                poemId={poemId}
+            />
+        )
+
+    test('the title names the poem and its poet', () => {
+        renderPoem()
+
+        expect(titleOf()).toBe('The moon and the sun by Moon14 | Poemunity')
+    })
+
+    test('the description is the poem, flattened onto one line', () => {
+        renderPoem()
+
+        expect(metaOf('description')).toBe('I miss you like the moon misses the sun')
+    })
+
+    // A poem resolves by BOTH its id and its slug, so the two URLs duplicate
+    // each other. The canonical used to echo whichever form the visitor arrived
+    // on, so an id URL declared ITSELF canonical and disagreed with the sitemap,
+    // which emits slugs.
+    describe('canonical URL', () => {
+        test('points at the slug even when reached by id', () => {
+            renderPoem(POEM, '68f2abc')
+
+            expect(linkOf('canonical')).toBe('https://poemunity.com/detail/the-moon-and-the-sun-moon14')
+        })
+
+        test('falls back to the id for a poem with no slug', () => {
+            renderPoem({ ...POEM, slug: undefined }, '68f2abc')
+
+            expect(linkOf('canonical')).toBe('https://poemunity.com/detail/68f2abc')
+        })
+    })
+
+    // It used to pass the author's ~44px avatar as the 1200x630 social card.
+    test('does not pass the author avatar as the social image', () => {
+        renderPoem()
+
+        expect(propOf('property', 'og:image', 'content')).not.toContain('avatars/moon14.jpg')
+    })
+
+    describe('JSON-LD', () => {
+        const scripts = () => allTags().filter(tag => tag.type === 'script')
+
+        test('is emitted for a poem', () => {
+            renderPoem()
+
+            expect(scripts()).toHaveLength(1)
+        })
+
+        test('is skipped when the poem could not be loaded', () => {
+            renderPoem(null)
+
+            expect(scripts()).toHaveLength(0)
+        })
     })
 })

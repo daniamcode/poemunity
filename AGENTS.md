@@ -290,6 +290,18 @@ Two rules for the structured data:
   footer and the per-poem badges exist to make. Their pages describe the
   collection and stay silent about authorship.
 
+**Poem pages** canonicalise to the **slug**, never to the requested URL: a poem
+resolves by both id and slug, so the two are duplicates, and echoing whichever
+form the visitor arrived on made id URLs declare themselves canonical and
+disagree with the sitemap (which emits slugs). They pass **no** `image` — that
+used to be the author's ~44px avatar being served as a 1200x630 social card. The
+description is the poem with whitespace collapsed and the cut moved to a word
+boundary; a poem is mostly line breaks, and they travel into the meta tag
+verbatim. The title is `<title> by <author>` with no count — people search a
+poem's title next to its poet. JSON-LD uses schema.org's exact `Poem` type,
+carries the like count (visible in the footer) and deliberately omits
+`commentCount`, which is not known at render time because comments lazy-load.
+
 `JsonLd` escapes `<` as `\u003c`. This is not cosmetic: the payload carries poem
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
