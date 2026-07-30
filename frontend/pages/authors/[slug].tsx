@@ -3,6 +3,8 @@ import AuthorDetail, { AuthorProfile } from '../../src/components/Authors/Author
 import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { InitialAuthorPoemsData } from '../../src/components/Authors/useAuthorPoems'
+import { JsonLd } from '../../src/components/JsonLd'
+import { authorStructuredData } from '../../src/utils/structuredData'
 import { authorTitle, authorDescription } from '../../src/utils/seo'
 
 interface PageProps {
@@ -18,14 +20,29 @@ export default function AuthorDetailPage({ initialPoems, initialAuthor, slug, ba
         || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Author')
     const total = initialPoems?.total ?? 0
     const image = initialAuthor?.picture || undefined
+    const url = `${baseUrl}/authors/${slug}`
+    const description = authorDescription(authorName, total, initialAuthor?.bio)
 
     return (
         <>
             <SeoHead
                 title={authorTitle(authorName, total)}
-                description={authorDescription(authorName, total, initialAuthor?.bio)}
+                description={description}
                 image={image}
-                url={`${baseUrl}/authors/${slug}`}
+                url={url}
+            />
+            <JsonLd
+                id='author-collection'
+                data={authorStructuredData({
+                    name: authorName,
+                    description,
+                    url,
+                    baseUrl,
+                    bio: initialAuthor?.bio,
+                    image,
+                    authorType: initialAuthor?.type,
+                    poems: initialPoems?.poems
+                })}
             />
             <AuthorDetail
                 initialPoems={initialPoems ?? undefined}

@@ -260,6 +260,40 @@ still under `prefers-reduced-motion`.
 The index backing the walk is declared on the schema but **not yet built in
 production** — see `TODO.md`.
 
+## SEO metadata
+
+Titles and descriptions for the listing pages are built in `src/utils/seo.ts`;
+JSON-LD in `src/utils/structuredData.ts`, serialised by `components/JsonLd.tsx`.
+
+Word order differs by page type **on purpose**, mirroring how people search:
+`46 Love poems` (the phrase is "love poems", so the count leads and the phrase
+stays intact) but `35 poems by John Doe` (nobody searches "John Doe poems"). A
+count of 0 drops the number entirely and 1 is singular — `0 Love poems` and
+`1 Love poems` both shipped-looking bad enough to be pinned by tests.
+
+**`?q=` pages are `noindex,follow`** with a canonical to the clean genre URL.
+Otherwise every query anyone types becomes an indexable page claiming the genre
+holds only what it matched, since the SSR `total` is the FILTERED total. `follow`
+rather than `nofollow` because the poems it links to are worth crawling — hence
+`SeoHead`'s `followLinks` prop, which the auth pages deliberately do not set.
+
+The genre `<h1>` reads the **live** total from the store, not the SSR one, or it
+keeps claiming the unfiltered count while the reader looks at search results.
+
+Two rules for the structured data:
+
+- **It must describe what the page actually renders.** Item lists are built from
+  the poems that were rendered, never from the total. Claiming more is a
+  spam-policy violation, not an optimisation.
+- **AI personas get no `Person` entity.** Emitting one would assert in
+  machine-readable form that a real human exists — undoing the AI disclosure the
+  footer and the per-poem badges exist to make. Their pages describe the
+  collection and stay silent about authorship.
+
+`JsonLd` escapes `<` as `\u003c`. This is not cosmetic: the payload carries poem
+titles and author names into a raw `<script>`, where the HTML parser ends the
+element at the first literal `</script>` regardless of JSON quoting.
+
 ## Reference Docs
 
 - `TODO.md` — the backlog (priorities, deferred decisions, recently shipped).

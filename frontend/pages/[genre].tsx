@@ -4,6 +4,8 @@ import { SeoHead } from '../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import capitalizeFirstLetter from '../src/utils/capitalizeFirstLetter'
+import { JsonLd } from '../src/components/JsonLd'
+import { genreStructuredData } from '../src/utils/structuredData'
 import { genreTitle, genreDescription } from '../src/utils/seo'
 import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH } from '../src/data/constants'
 
@@ -19,6 +21,8 @@ interface PageProps {
 export default function GenrePage({ initialData, genre, baseUrl, isSearch }: PageProps) {
     const label = capitalizeFirstLetter(genre.replace(/-/g, ' '))
     const total = initialData?.total ?? 0
+    const url = `${baseUrl}/${genre}`
+    const description = genreDescription(label, total, initialData?.poems)
 
     return (
         <>
@@ -31,11 +35,26 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
                 holds 3 poems. */}
             <SeoHead
                 title={genreTitle(label, total)}
-                description={genreDescription(label, total, initialData?.poems)}
-                url={`${baseUrl}/${genre}`}
+                description={description}
+                url={url}
                 noIndex={isSearch}
                 followLinks={isSearch}
             />
+            {/* Not on search results: the markup would describe a filtered
+                subset while claiming to be the genre's collection page, and the
+                page is noindex anyway. */}
+            {!isSearch && (
+                <JsonLd
+                    id='genre-collection'
+                    data={genreStructuredData({
+                        label,
+                        description,
+                        url,
+                        baseUrl,
+                        poems: initialData?.poems
+                    })}
+                />
+            )}
             <Dashboard initialData={initialData ?? undefined} />
         </>
     )

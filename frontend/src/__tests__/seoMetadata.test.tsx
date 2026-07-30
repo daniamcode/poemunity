@@ -32,25 +32,25 @@ jest.mock('next/head', () => ({
 
 type AnyElement = React.ReactElement<Record<string, unknown>>
 
-function tagsOf(head: React.ReactNode): AnyElement[] {
-    const flat = (Array.isArray(head) ? head.flat(Infinity) : [head]) as unknown[]
-    return flat.filter(
+// Scan EVERY captured head, not just the last: these pages render two, one for
+// the meta tags and one for the JSON-LD, and which comes last is an
+// implementation detail no assertion should depend on.
+function allTags(): AnyElement[] {
+    return (heads.flat(Infinity) as unknown[]).filter(
         (child): child is AnyElement =>
             !!child && typeof child === 'object' && 'props' in (child as object)
     )
 }
 
-function metaOf(head: React.ReactNode, name: string): string | undefined {
-    const match = tagsOf(head).find(tag => tag.props.name === name)
+function metaOf(name: string): string | undefined {
+    const match = allTags().find(tag => tag.props.name === name)
     return match ? (match.props.content as string) : undefined
 }
 
-function titleOf(head: React.ReactNode): string {
-    const match = tagsOf(head).find(tag => tag.type === 'title')
+function titleOf(): string {
+    const match = allTags().find(tag => tag.type === 'title')
     return String(match?.props.children)
 }
-
-const lastHead = () => heads[heads.length - 1]
 
 describe('genre page metadata', () => {
     beforeEach(() => { heads.length = 0 })
@@ -70,13 +70,13 @@ describe('genre page metadata', () => {
     test('the title carries the count', () => {
         renderGenre()
 
-        expect(titleOf(lastHead())).toBe('46 Love poems | Poemunity')
+        expect(titleOf()).toBe('46 Love poems | Poemunity')
     })
 
     test('a multi-word genre slug reads as words', () => {
         renderGenre({ genre: 'love-and-loss' })
 
-        expect(titleOf(lastHead())).toBe('46 Love and loss poems | Poemunity')
+        expect(titleOf()).toBe('46 Love and loss poems | Poemunity')
     })
 
     test('the description names poems from the page', () => {
@@ -89,7 +89,7 @@ describe('genre page metadata', () => {
             }
         })
 
-        expect(metaOf(lastHead(), 'description')).toContain('“Silence” by Ana Gil')
+        expect(metaOf('description')).toContain('“Silence” by Ana Gil')
     })
 
     // Without this, every ?q= anyone ever types becomes an indexable page, and
@@ -100,13 +100,13 @@ describe('genre page metadata', () => {
         test('are noindex but still followed', () => {
             renderGenre({ isSearch: true })
 
-            expect(metaOf(lastHead(), 'robots')).toBe('noindex,follow')
+            expect(metaOf('robots')).toBe('noindex,follow')
         })
 
         test('the plain genre page is left indexable', () => {
             renderGenre({ isSearch: false })
 
-            expect(metaOf(lastHead(), 'robots')).toBeUndefined()
+            expect(metaOf('robots')).toBeUndefined()
         })
     })
 
@@ -138,6 +138,43 @@ describe('genre page metadata', () => {
     })
 })
 
+describe('genre JSON-LD', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const scripts = () =>
+        allTags().filter(tag => tag.type === 'script')
+
+    test('is emitted on a plain genre page', () => {
+        render(
+            <GenrePage
+                initialData={{ poems: [], page: 1, hasMore: false, total: 46 }}
+                initialUser={null}
+                genre='love'
+                baseUrl='https://poemunity.com'
+                isSearch={false}
+            />
+        )
+
+        expect(scripts()).toHaveLength(1)
+    })
+
+    // The markup would describe a filtered subset while claiming to be the
+    // genre's collection page — and the page is noindex anyway.
+    test('is suppressed on search results', () => {
+        render(
+            <GenrePage
+                initialData={{ poems: [], page: 1, hasMore: false, total: 3 }}
+                initialUser={null}
+                genre='love'
+                baseUrl='https://poemunity.com'
+                isSearch
+            />
+        )
+
+        expect(scripts()).toHaveLength(0)
+    })
+})
+
 describe('author page metadata', () => {
     beforeEach(() => { heads.length = 0 })
 
@@ -156,7 +193,7 @@ describe('author page metadata', () => {
     test('the title reads "N poems by NAME"', () => {
         renderAuthor()
 
-        expect(titleOf(lastHead())).toBe('35 poems by John Doe | Poemunity')
+        expect(titleOf()).toBe('35 poems by John Doe | Poemunity')
     })
 
     // The bio used to REPLACE the count sentence, so a bio that never mentioned
@@ -164,7 +201,7 @@ describe('author page metadata', () => {
     test('the description keeps the count even when there is a bio', () => {
         renderAuthor({ initialAuthor: { name: 'John Doe', bio: 'Grew up in Cádiz.' } as never })
 
-        const description = metaOf(lastHead(), 'description')
+        const description = metaOf('description')
         expect(description).toContain('35 poems by John Doe')
         expect(description).toContain('Grew up in Cádiz.')
     })
@@ -172,6 +209,6 @@ describe('author page metadata', () => {
     test('falls back to a name derived from the slug', () => {
         renderAuthor({ initialAuthor: null })
 
-        expect(titleOf(lastHead())).toBe('35 poems by John Doe | Poemunity')
+        expect(titleOf()).toBe('35 poems by John Doe | Poemunity')
     })
 })
