@@ -137,3 +137,62 @@ describe('useDetailPoem', () => {
         })
     })
 })
+
+// A poem is addressable by slug OR id, but the entity store is keyed by id
+// alone. Looking it up with the URL parameter meant that on /detail/<slug> —
+// which is every link on the site — the lookup missed, the view fell back to the
+// fetch cache, and a like updated an entity nothing on screen was reading. The
+// like reached the server; the heart and the counter never moved.
+describe('useDetailPoem addressed by SLUG', () => {
+    const wrapper = ({ children }: any) => React.createElement(
+        Provider as React.ComponentType<any>,
+        { store },
+        children
+    )
+
+    const POEM: Poem = {
+        id: '69f0cb2d9496d1ecf2660f6c',
+        slug: 'rock-salvation-mordecai-ben-isaac',
+        title: 'Rock of My Salvation',
+        author: 'Mordecai ben Isaac',
+        date: '2024-01-15T10:30:00.000Z',
+        genre: 'faith',
+        likes: [],
+        picture: '',
+        poem: 'Mighty, praised beyond compare',
+        userId: 'author-1'
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        ;(poemActions.getPoemAction as jest.Mock).mockReturnValue({ type: 'GET_POEM' })
+        act(() => { store.dispatch(poemRemoved(POEM.id)) })
+    })
+
+    test('reads the entity even though the URL carries the slug', () => {
+        act(() => { store.dispatch(poemUpserted({ ...POEM, likes: ['user-1'] })) })
+
+        const { result } = renderHook(() => useDetailPoem(POEM.slug!, POEM), { wrapper })
+
+        expect(result.current.poem.likes).toEqual(['user-1'])
+    })
+
+    test('a like dispatched against the id updates the view', () => {
+        act(() => { store.dispatch(poemUpserted(POEM)) })
+        const { result } = renderHook(() => useDetailPoem(POEM.slug!, POEM), { wrapper })
+        expect(result.current.poem.likes).toEqual([])
+
+        // Exactly what usePoemActions dispatches on a successful like.
+        act(() => { store.dispatch(poemUpdated({ id: POEM.id, changes: { likes: ['user-1'] } })) })
+
+        expect(result.current.poem.likes).toEqual(['user-1'])
+    })
+
+    test('still works when the URL carries the id instead', () => {
+        act(() => { store.dispatch(poemUpserted({ ...POEM, likes: ['user-2'] })) })
+
+        const { result } = renderHook(() => useDetailPoem(POEM.id, POEM), { wrapper })
+
+        expect(result.current.poem.likes).toEqual(['user-2'])
+    })
+})

@@ -23,7 +23,15 @@ export function useDetailPoem(poemId: string, initialPoem?: Poem) {
     // Single source of truth: read the poem from the normalized entity store.
     // getPoemAction seeds it on fetch, and a like dispatches poemUpdated against
     // it, so the Detail view stays in sync without a bespoke cache-patch thunk.
-    const poemEntity = useSelector((state: RootState) => selectPoemEntityById(state, poemId))
+    // Look the entity up by the poem's REAL id, never by the URL parameter.
+    // A poem is addressable by slug or id, and the entity store is keyed by id
+    // only — so on /detail/<slug> this lookup missed every time, the view fell
+    // back to the fetch cache, and a like (which dispatches poemUpdated against
+    // the id) updated a record nothing on screen was reading. The like reached
+    // the server; the heart and the counter just never moved.
+    const fetched = poemQuery?.item || initialPoem
+    const entityId = fetched?.id || poemId
+    const poemEntity = useSelector((state: RootState) => selectPoemEntityById(state, entityId))
 
     useEffect(() => {
         dispatch(getPoemAction({ options: { reset: true, fetch: false } }))
@@ -39,7 +47,7 @@ export function useDetailPoem(poemId: string, initialPoem?: Poem) {
     }, [dispatch, poemId])
 
     // Prefer the normalized entity; fall back to the fetch cache, SSR data, then empty
-    const poem: Poem = poemEntity || poemQuery?.item || initialPoem || initialPoemState
+    const poem: Poem = poemEntity || fetched || initialPoemState
 
     const isLoading = poemQuery.isFetching && !poem.id
     const isError = poemQuery.isError || false
