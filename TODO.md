@@ -50,6 +50,22 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
+- 🤝 **Scraped junk in famous poem titles** (found 2026-07-30). **1,369** poems
+  carry `Launch Audio in a New Window` inside `title`, and **1,879** titles
+  contain raw newlines — ~9% of the collection. Example:
+  `"Adam\n  \n  Means Earth*\n \n \n  \n   Launch Audio in a New Window"`.
+  Import artifacts from the original Poetry Foundation scrape, so **pre-existing**
+  — but the SEO work (2026-07-30) promoted titles into `<title>`, `<h1>`, JSON-LD
+  and breadcrumbs, so it is now visible in far more places than before, and Poem
+  of the week can serve one straight into the sidebar.
+  **The slugs are the hard part.** They were generated from the dirty titles
+  (`adam-means-earth-launch-audio-new-window-samuel-menashe`) and are already in
+  the sitemap, in canonicals and in any indexed URL. Cleaning titles is easy;
+  regenerating slugs breaks live URLs unless old→new redirects come with it. So
+  decide first: (a) clean titles only, leave slugs as they are — ugly URLs,
+  correct pages; (b) clean both and add redirects — right long-term, more work.
+  Either way it is a **production write**: dry-run + `mongodump` first.
+
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
   to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script
   writes straight to **production**, and there's nowhere safe to rehearse a seed or

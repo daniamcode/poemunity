@@ -2,7 +2,7 @@ const request = require('supertest')
 const { app } = require('../../app')
 const Poem = require('../models/Poem')
 const Author = require('../models/Author')
-const { weekIndex, weekStart } = require('../controllers/poems')
+const { weekIndex, weekStart, WEEK_STRIDE } = require('../controllers/poems')
 
 // GET /api/v1/poems/poem-of-the-week
 //
@@ -106,13 +106,41 @@ describe('GET /api/v1/poems/poem-of-the-week', () => {
 
     const total = await Poem.countDocuments({ origin: 'famous' })
     const ordered = await Poem.find({ origin: 'famous' }).sort({ _id: 1 })
+    const pick = (week) => String(ordered[(week * WEEK_STRIDE) % total]._id)
 
     const thisWeek = weekIndex(new Date('2026-07-27T00:00:00Z'))
     const nextWeek = weekIndex(new Date('2026-08-03T00:00:00Z'))
 
     expect(nextWeek).toBe(thisWeek + 1)
-    expect(String(ordered[thisWeek % total]._id))
-      .not.toBe(String(ordered[nextWeek % total]._id))
+    expect(pick(thisWeek)).not.toBe(pick(nextWeek))
+  })
+
+  // The collection is stored in TITLE order, so stepping one position per week
+  // served eight consecutive "Dear ..." poems — different poets, but it reads as
+  // broken curation. The stride is what breaks that adjacency, and it only works
+  // if it stays coprime with the collection size.
+  describe('the weekly stride', () => {
+    test('jumps far enough to leave alphabetically adjacent poems behind', () => {
+      expect(WEEK_STRIDE).toBeGreaterThan(1000)
+    })
+
+    test('is prime, so it still visits every poem before repeating', () => {
+      for (let d = 2; d * d <= WEEK_STRIDE; d++) {
+        expect(WEEK_STRIDE % d).not.toBe(0)
+      }
+    })
+
+    test('walks the whole collection rather than a subset', async () => {
+      for (let i = 0; i < 12; i++) await makeFamousPoem(`Poem ${i}`, i)
+      const total = await Poem.countDocuments({ origin: 'famous' })
+
+      const visited = new Set()
+      for (let week = 0; week < total; week++) {
+        visited.add((week * WEEK_STRIDE) % total)
+      }
+
+      expect(visited.size).toBe(total)
+    })
   })
 
   test('wraps around rather than running out of poems', async () => {

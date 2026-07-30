@@ -142,6 +142,11 @@ poemsRouter.get('/ranking', async (req, res) => {
   }
 })
 
+// Distance to jump per week. Prime, and far larger than any cluster of
+// similarly-titled poems, so consecutive weeks land in unrelated parts of the
+// collection. See the note at the skip below for why stepping by one failed.
+const WEEK_STRIDE = 7919
+
 // Poem of the week — one famous poem, rotating every Monday.
 //
 // Deterministic, not stored: the week number indexes into the famous poems, so
@@ -171,7 +176,15 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
     const total = await Poem.countDocuments(filter)
     if (total === 0) return res.json({ poem: null })
 
-    const index = weekIndex()
+    // Stride by a large prime instead of stepping one position per week.
+    //
+    // The collection is in TITLE order, so consecutive positions are
+    // alphabetically adjacent: stepping by one produced eight straight weeks of
+    // "Dear Mr. Fanelli", "Dear Mr. Merrill", "Dear One Absent...", "Dear
+    // Proofreader" — different poets, but it reads as broken curation. A prime
+    // stride jumps thousands of entries each week, and being coprime with most
+    // totals it still walks the whole collection before repeating.
+    const index = (weekIndex() * WEEK_STRIDE) % total
 
     // Sorting by _id lets the seek walk the _id index rather than sorting 15k
     // documents in memory. Famous poems are ~97% of the collection, so the scan
@@ -179,7 +192,7 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
     // one query a week.
     const poem = await Poem.findOne(filter)
       .sort({ _id: 1 })
-      .skip(index % total)
+      .skip(index)
       .populate('authorId', AUTHOR_FIELDS)
 
     return res.json({
@@ -354,3 +367,4 @@ poemsRouter.patch('/', userExtractor, async (req, res) => {
 module.exports = poemsRouter
 module.exports.weekIndex = weekIndex
 module.exports.weekStart = weekStart
+module.exports.WEEK_STRIDE = WEEK_STRIDE

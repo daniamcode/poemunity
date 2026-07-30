@@ -338,6 +338,12 @@ Sorted by `_id` so the seek walks the `_id` index instead of sorting 15k
 documents in memory. Famous poems are ~97% of the collection, so the scan rejects
 almost nothing — **no extra index is worth carrying** for one query a week.
 
+The weekly **stride** matters as much as the week number. The collection is
+stored in TITLE order, so stepping one position per week served eight consecutive
+"Dear ..." poems — different poets, but it reads as broken curation. Multiplying
+by a large prime (`WEEK_STRIDE`) jumps thousands of entries a week, and staying
+coprime with the total is what keeps it visiting every poem before repeating.
+
 Adding famous poems shifts `index % total`, so future picks reshuffle. Accepted:
 that set is effectively static, and the alternative is storing state.
 
