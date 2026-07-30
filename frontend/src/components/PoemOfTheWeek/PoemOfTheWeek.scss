@@ -4,7 +4,8 @@
 // rail is already hidden below $bp-xl (see Dashboard.scss), and repeating that
 // here would mean two places to keep in step.
 .potw {
-    margin-top: $space-xl;
+    // Sits at the TOP of the rail now, so no top margin — see Dashboard.tsx.
+    margin-bottom: $space-xl;
     padding: $space-md;
     background: $color-primary-bg;
     border: 1px solid rgba($color-primary, 0.3);

@@ -52,10 +52,16 @@ function Dashboard({ initialData, match }: DashboardProps) {
             </div>
             {/* Both live in the right rail, which only exists at $bp-xl — a
                 deliberate choice: this is a desktop-only extra, not something to
-                push above the poem list on a phone. */}
+                push above the poem list on a phone.
+
+                Poem of the week goes FIRST. Ten ranking rows are ~700px, so with
+                the card underneath it landed below the fold inside the rail's own
+                scroll — reachable only by putting the cursor over the rail, which
+                nobody discovers. The card is the thing worth seeing; the ranking
+                is the long secondary list, so it takes the overflow instead. */}
             <div className='dashboard__ranking'>
-                <Ranking />
                 <PoemOfTheWeek />
+                <Ranking />
             </div>
         </main>
     )
