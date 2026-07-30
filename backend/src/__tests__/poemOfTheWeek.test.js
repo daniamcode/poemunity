@@ -59,13 +59,36 @@ describe('weekIndex', () => {
 
 describe('GET /api/v1/poems/poem-of-the-week', () => {
   test('returns a famous poem and the Monday its week began', async () => {
-    await makeFamousPoem('Ozymandias', 1)
+    const created = await makeFamousPoem('Ozymandias', 1)
 
     const response = await get().expect(200)
 
     expect(response.body.poem.title).toBe('Ozymandias')
     expect(response.body.poem.author).toBe('Poet 1')
     expect(new Date(response.body.weekStart).getUTCDay()).toBe(1)
+
+    // The frontend bails on a poem with no id and renders nothing, so an
+    // undefined id is invisible in production rather than loud. Asserting only
+    // on the title let exactly that ship: the poem was serialized twice, and the
+    // second pass read an _id that toJSON had already renamed.
+    expect(response.body.poem.id).toBe(String(created._id))
+    expect(response.body.poem).not.toHaveProperty('_id')
+  })
+
+  // getUTCDay() === 1 is true of every Monday in history, so it passed happily
+  // while the card was dated to the year 2131 — the strided collection index was
+  // being handed to weekStart instead of the week number.
+  test('weekStart is THIS week, not merely some Monday', async () => {
+    await makeFamousPoem('Ozymandias', 3)
+
+    const response = await get().expect(200)
+
+    const start = new Date(`${response.body.weekStart}T00:00:00Z`)
+    const now = Date.now()
+    expect(start.getUTCDay()).toBe(1)
+    expect(now - start.getTime()).toBeGreaterThanOrEqual(0)
+    // Within the last seven days: it is the Monday of the current week.
+    expect(now - start.getTime()).toBeLessThan(7 * 86400000)
   })
 
   // The whole point of the feature: famous poets only.

@@ -184,7 +184,11 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
     // Proofreader" — different poets, but it reads as broken curation. A prime
     // stride jumps thousands of entries each week, and being coprime with most
     // totals it still walks the whole collection before repeating.
-    const index = (weekIndex() * WEEK_STRIDE) % total
+    // Keep these two separate. `week` identifies the WEEK and is what weekStart
+    // must be given; `index` is a position in the collection. Passing the strided
+    // index to weekStart dated the card to the year 2131.
+    const week = weekIndex()
+    const index = (week * WEEK_STRIDE) % total
 
     // Sorting by _id lets the seek walk the _id index rather than sorting 15k
     // documents in memory. Famous poems are ~97% of the collection, so the scan
@@ -195,9 +199,14 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
       .skip(index)
       .populate('authorId', AUTHOR_FIELDS)
 
+    // NOT serializePoem: that helper exists for raw aggregate output, where
+    // `_id` is still present. This is a Mongoose document, whose toJSON has
+    // already moved _id -> id, so serializing again read a field that was gone
+    // and set `id: undefined` — which the frontend treats as "no poem" and
+    // renders nothing at all.
     return res.json({
-      poem: poem ? serializePoem(poem) : null,
-      weekStart: weekStart(index).toISOString().slice(0, 10)
+      poem: poem ? poem.toJSON() : null,
+      weekStart: weekStart(week).toISOString().slice(0, 10)
     })
   } catch (error) {
     console.error(error)
