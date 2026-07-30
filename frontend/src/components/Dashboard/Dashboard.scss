@@ -20,6 +20,18 @@
     display: none;
 }
 
+// Genre pages only — it names the list below it ("46 Love poems"), which the
+// page otherwise left unsaid.
+.dashboard__heading {
+    margin: 0 auto $space-3;
+    padding: 0 $space-4;
+    max-width: 800px;
+    font-size: $fs-xl;
+    font-weight: $fw-semibold;
+    color: $color-text-dark;
+    text-align: center;
+}
+
 @media screen and (min-width: $bp-xl) {
     .dashboard {
         display: flex;

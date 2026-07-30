@@ -7,6 +7,13 @@ interface SeoHeadProps {
     url?: string
     type?: 'website' | 'article'
     noIndex?: boolean
+    /**
+     * Keep following links while staying out of the index. Off by default,
+     * which suits dead-end pages like login. On for search results, where the
+     * page itself is not worth indexing but the poems it links to are — a blanket
+     * `nofollow` there would waste the crawl.
+     */
+    followLinks?: boolean
 }
 
 const SITE_NAME = 'Poemunity'
@@ -32,7 +39,8 @@ export function SeoHead({
     image = DEFAULT_IMAGE,
     url,
     type = 'website',
-    noIndex = false
+    noIndex = false,
+    followLinks = false
 }: SeoHeadProps) {
     const fullTitle = title.startsWith(SITE_NAME) ? title : `${title} | ${SITE_NAME}`
     const safeDesc = truncate(description)
@@ -42,7 +50,13 @@ export function SeoHead({
         <Head>
             <title key='title'>{fullTitle}</title>
             <meta name='description' content={safeDesc} key='description' />
-            {noIndex && <meta name='robots' content='noindex,nofollow' key='robots' />}
+            {noIndex && (
+                <meta
+                    name='robots'
+                    content={followLinks ? 'noindex,follow' : 'noindex,nofollow'}
+                    key='robots'
+                />
+            )}
             {url && <link rel='canonical' href={url} key='canonical' />}
 
             <meta property='og:site_name' content={SITE_NAME} key='og:site_name' />

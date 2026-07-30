@@ -3,6 +3,7 @@ import AuthorDetail, { AuthorProfile } from '../../src/components/Authors/Author
 import { SeoHead } from '../../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { InitialAuthorPoemsData } from '../../src/components/Authors/useAuthorPoems'
+import { authorTitle, authorDescription } from '../../src/utils/seo'
 
 interface PageProps {
     initialPoems: InitialAuthorPoemsData | null
@@ -16,15 +17,13 @@ export default function AuthorDetailPage({ initialPoems, initialAuthor, slug, ba
     const authorName = initialAuthor?.name
         || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Author')
     const total = initialPoems?.total ?? 0
-    const description = initialAuthor?.bio
-        || `Read ${total > 0 ? `${total} poems` : 'poems'} by ${authorName} on Poemunity.`
     const image = initialAuthor?.picture || undefined
 
     return (
         <>
             <SeoHead
-                title={`${authorName} — Poems`}
-                description={description}
+                title={authorTitle(authorName, total)}
+                description={authorDescription(authorName, total, initialAuthor?.bio)}
                 image={image}
                 url={`${baseUrl}/authors/${slug}`}
             />

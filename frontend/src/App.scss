@@ -80,3 +80,22 @@ textarea:focus-visible,
         color: $color-primary;
     }
 }
+
+// Visible to screen readers and search engines, not on screen. Used for the
+// dashboard's h1, where the page already carries the brand and a second visible
+// title would just be noise.
+//
+// NOTE: List.scss inlines this same block for .search-input__status. Worth
+// collapsing into one place, but that file does not import this one, so it needs
+// a shared partial rather than a copy.
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
