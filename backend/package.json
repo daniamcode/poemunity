@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_ENV=test jest",
     "test:watch": "NODE_ENV=test jest --watch",
-    "test:cypress": "NODE_ENV=test PORT=4201 DEBUG=app,app:* nodemon -r ./cypress.setup.js index.js",
+    "test:cypress": "NODE_ENV=test PORT=4201 DEBUG=app,app:* node -r ./cypress.setup.js index.js",
     "coverage": "NODE_ENV=test jest --coverage",
     "dev": "NODE_ENV=development PORT=4200 DEBUG=app,app:* CHOKIDAR_USEPOLLING=1 nodemon index.js",
     "stg": "NODE_ENV=development PORT=4200 forever start index.js",

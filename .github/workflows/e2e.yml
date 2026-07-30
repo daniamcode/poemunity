@@ -26,6 +26,15 @@ on:
       - 'frontend/**'
       - 'backend/**'
       - '.github/workflows/e2e.yml'
+  # Weekly, so the suite cannot rot unnoticed between app commits. The path
+  # filters above mean your OWN changes always run it — what they cannot catch is
+  # drift from outside the repo: a new Cypress or Chrome, a transitive dependency
+  # update, a changed runner image. Without this, that surfaces weeks later
+  # tangled up with whatever you happened to be working on.
+  schedule:
+    - cron: '0 6 * * 1'
+  # And on demand, so "is it still green?" never requires an empty commit.
+  workflow_dispatch:
 
 jobs:
   e2e:
@@ -68,6 +77,21 @@ jobs:
       - name: Install Cypress binary
         run: pnpm exec cypress install
         working-directory: ./frontend
+
+      # mongodb-memory-server fetches a ~120MB MongoDB binary on first use.
+      # Cache it, and fetch it in its OWN step rather than inside the backend
+      # boot: the boot is on a 90s readiness timer, and a cold download ate most
+      # of it. Failing here is also a far clearer signal than "backend did not
+      # answer in time".
+      - name: Cache MongoDB binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('backend/pnpm-lock.yaml') }}
+
+      - name: Pre-fetch MongoDB binary
+        run: node -e "require('mongodb-memory-server').MongoMemoryServer.create().then(s => s.stop())"
+        working-directory: ./backend
 
       # `next dev`, not a production build, on purpose.
       #

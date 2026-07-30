@@ -170,6 +170,52 @@ so there is **no separate env to "promote from"** — this IS the production dat
 - 🤖 **Duplicate links on poem list items** — accessibility/UX bug from the checklist
   (`docs/PRODUCTION_CHECKLIST.md` → Frontend UI). Verify and fix.
 
+- 🤖 **Audit for wasted React renders; add `memo` / `useMemo` / `useCallback`
+  where they earn it.** Never done systematically. Start by *measuring* — React
+  DevTools Profiler with "record why each component rendered", or a temporary
+  `useEffect` render counter — because the whole point is to find renders nobody
+  suspected, and adding memoization by intuition usually just adds noise.
+  Known-suspicious places to look first:
+  - **`AppContext`** — one context object holding user, picture, isAdmin, config…
+    Every consumer re-renders when any field changes, and the provider's value is
+    rebuilt on each render. Splitting it is already its own item above; this is
+    the measurement that would justify it.
+  - **Lists** — `ListItem` is rendered once per poem on every list page. Check it
+    is `memo`'d and that the `context` and handler props it receives are stable,
+    or the memo does nothing.
+  - **Handlers passed into memoized children** — an inline arrow prop defeats
+    `memo` completely, which is the classic way this work gets undone silently.
+  - **Selectors** — confirm every selector returning a new array/object is
+    memoized (`createSelector`); an unmemoized one re-renders its subscriber on
+    *every* store action. `poemCacheSelectors`/`authorCacheSelectors` already do
+    this; new ones must too.
+  Rules for this task: **memoize only what a measurement showed**, note the
+  before/after in the commit, and remember `memo` has a cost of its own (a props
+  comparison per render). A component that always gets new props is *slower*
+  memoized. Do not blanket-wrap the codebase.
+
+- 🤖 **Hunt for performance problems, dead code and over-complication — including
+  with AI review.** No pass like this has been done. Worth doing as its own
+  focused sweep rather than folded into feature work, and worth pointing an AI
+  agent at with a concrete brief per area rather than "find issues", which
+  produces confident noise. Suggested areas:
+  - **Backend query cost** — N+1 patterns, missing/duplicate indexes
+    (`check-index-drift.js` reports both directions), aggregations that could be
+    a find, and the deliberately-unindexed search regex (documented in AGENTS.md
+    — that one is a known, accepted trade, not a finding).
+  - **Bundle size** — `@next/bundle-analyzer` on the frontend. MUI and date-fns
+    are the usual suspects for accidental full-package imports.
+  - **Core Web Vitals on real pages** — Lighthouse against poemunity.com, not
+    localhost. Images, font loading and layout shift, especially on the dashboard.
+  - **Dead code** — unused exports, components, SCSS, the legacy `User` model,
+    leftovers in `frontend/CLEANUP.md`.
+  - **Duplication and over-abstraction** — repeated fetch/normalise logic, hooks
+    that only ever have one caller, components with more props than behaviour.
+  **Ground rule: every finding needs a measurement or a concrete failure case
+  before anyone changes code.** An AI will happily propose refactors that trade
+  working code for churn; treat its output as a list of leads to verify, not a
+  work order. Anything that changes behaviour needs a red-checked test first.
+
 ## 🔵 P4 — Maintenance & product decisions (low / when convenient)
 
 - Add to my profile the poems where i commented something, to decide how i show poem+comment. Check if the tabs component in my profile supports well a third tab or if we can use are more modern component that we can reuse from some library

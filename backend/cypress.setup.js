@@ -1,3 +1,9 @@
+console.log('🔧 Setting up in-memory MongoDB for Cypress tests...')// Started by `pnpm test:cypress` with plain `node`, deliberately NOT nodemon.
+// Nodemon watched `*.*`, and mongodb-memory-server writes into the working
+// directory while it fetches its ~120MB binary — so on a cold machine the
+// download triggered a restart, and the second process raced the first for the
+// same `.downloading` temp file and died on ENOENT during rename. There is
+// nothing to watch during a test run anyway.
 const { MongoMemoryServer } = require('mongodb-memory-server')
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
@@ -98,7 +104,21 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-// Initialize the in-memory database
+// Initialize the in-memory database.
+//
+// This must run exactly once. It used to run TWICE, which is worth recording
+// because the cause is genuinely obscure: Cypress exports
+// NODE_OPTIONS=--import <tsx loader> for its own TypeScript config, and the
+// backend inherited it when spawned. Node runs module-customization hooks on a
+// separate WORKER THREAD, so the file was evaluated once as CommonJS and once
+// through the loader — same pid, two module registries, two `global` objects,
+// so no in-process flag could have caught it. Two MongoMemoryServers started,
+// mongoose ended up on the second, and on a cold CI runner the two downloads
+// raced for the same ~120MB temp file and killed the run with
+// `ENOENT: rename ...tgz.downloading`.
+//
+// `cypress.config.ts` now clears NODE_OPTIONS for the spawned backend. Keep it
+// that way — this is plain CommonJS and has no use for a TypeScript loader.
 setupInMemoryDatabase().catch(err => {
   console.error('❌ Failed to setup in-memory MongoDB:', err)
   process.exit(1)
