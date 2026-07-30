@@ -174,11 +174,14 @@
         margin: 4px 0 0;
     }
 
+    // An h2 now, so the browser's default heading margins have to be zeroed or
+    // the spacing shifts. Size and weight stay muted on purpose: it labels the
+    // list, it is not a second page title.
     &__count {
         color: $color-text-secondary;
         font-size: $fs-md;
         font-weight: $fw-regular;
-        margin-bottom: $space-md;
+        margin: 0 0 $space-md;
     }
 
     &__bio {

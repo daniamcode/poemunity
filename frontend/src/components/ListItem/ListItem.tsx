@@ -17,6 +17,12 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
     // Author display fields are denormalized onto the poem, but the normalized
     // authors store is the source of truth. Prefer it when the author is known;
     // fall back to the poem's copied fields (SSR first paint / not-yet-fetched).
+    // Every link out of this card addresses the poem the same way: by slug when
+    // it has one. Only the title link did, so "Read more" and the comments icon
+    // sent readers to /detail/<objectid> — a second, uglier URL for a poem the
+    // sitemap and the canonical both advertise under its slug.
+    const poemPath = poem.slug || poem.id
+
     const authorEntity = useSelector((state: RootState) => selectAuthorEntityById(state, poem.userId))
     const authorName = authorEntity?.name ?? poem.author
     const authorPicture = authorEntity?.picture ?? poem.picture
@@ -36,7 +42,7 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
         <main key={poem.id} className='poem__detail'>
             <section className='poem__block' id='poem__block'>
                 <PoemHeader
-                    poemId={poem.slug || poem.id}
+                    poemId={poemPath}
                     title={poem.title}
                     author={authorName}
                     picture={authorPicture}
@@ -44,9 +50,9 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
                     authorSlug={authorSlug}
                     authorType={authorType}
                 />
-                <PoemContent poemId={poem.id} content={poem.poem} />
+                <PoemContent poemId={poemPath} content={poem.poem} />
                 <PoemFooter
-                    poemId={poem.id}
+                    poemId={poemPath}
                     likesCount={poem.likes?.length || 0}
                     isLiked={isLiked}
                     showLikeButton={showLikeButton}

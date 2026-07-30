@@ -74,9 +74,6 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
                 {metaParts.length > 0 && (
                     <p className='author-detail__meta'>{metaParts.join(' · ')}</p>
                 )}
-                {total > 0 && (
-                    <p className='author-detail__count'>{total} {total === 1 ? 'poem' : 'poems'}</p>
-                )}
 
                 {authorProfile?.bio && (
                     <p className='author-detail__bio'>{authorProfile.bio}</p>
@@ -93,6 +90,16 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
             </header>
 
             <div className='author-detail__poems'>
+                {/* Heads the poem list rather than sitting up in the header: an
+                    h2 above the bio would put the bio inside a section called
+                    "35 poems". h1 stays the author's NAME — the page's subject
+                    is the person, who also has a bio and genres; the poems are
+                    one section of that. */}
+                {total > 0 && (
+                    <h2 className='author-detail__count'>
+                        {total} {total === 1 ? 'poem' : 'poems'}
+                    </h2>
+                )}
                 {poems.map(poem => (
                     <ListItem key={poem.id} poem={poem} context={context} />
                 ))}
