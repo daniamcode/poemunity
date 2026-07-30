@@ -531,51 +531,47 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
       <div
         class="MuiBox-root css-19kzrtu"
       >
-        <p
-          class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
+        <div
+          class="list__intro"
         >
           <div
-            class="list__intro"
+            class="search-input__container"
           >
-            <div
-              class="search-input__container"
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-input__icon css-1umw9bq-MuiSvgIcon-root"
+              data-testid="SearchIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
             >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium search-input__icon css-1umw9bq-MuiSvgIcon-root"
-                data-testid="SearchIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
-                />
-              </svg>
-              <input
-                aria-describedby="search-input__status"
-                aria-label="Search poems and authors"
-                class="search-input__field"
-                placeholder="Search poems and authors"
-                type="search"
-                value=""
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
               />
-              <div
-                aria-live="polite"
-                class="search-input__status"
-                id="search-input__status"
-                role="status"
-              />
-            </div>
+            </svg>
+            <input
+              aria-describedby="search-input__status"
+              aria-label="Search poems and authors"
+              class="search-input__field"
+              placeholder="Search poems and authors"
+              type="search"
+              value=""
+            />
+            <div
+              aria-live="polite"
+              class="search-input__status"
+              id="search-input__status"
+              role="status"
+            />
           </div>
-          <p
-            class="list__empty"
-          >
-            No poems yet. Publish one and it will show up here.
-          </p>
-          <div
-            style="height: 20px;"
-          />
+        </div>
+        <p
+          class="list__empty"
+        >
+          No poems yet. Publish one and it will show up here.
         </p>
+        <div
+          style="height: 20px;"
+        />
       </div>
     </div>
     <div
@@ -979,13 +975,9 @@ exports[`MUI Components Visual Regression Tests TabPanel should render tab panel
   <div
     class="MuiBox-root css-19kzrtu"
   >
-    <p
-      class="MuiTypography-root MuiTypography-body1 css-rizt0-MuiTypography-root"
-    >
-      <div>
-        Test Content
-      </div>
-    </p>
+    <div>
+      Test Content
+    </div>
   </div>
 </div>
 `;

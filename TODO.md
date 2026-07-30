@@ -50,72 +50,22 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤖 **Repair the Cypress suite, then put it in CI** (re-measured 2026-07-30 after
-  the proxy fix). Full run: **34 tests — 27 passing, 6 failing, 1 skipped.**
-  Three of four specs are green; only `create-poem.cy.ts` is red, and it is
-  blocked on an app bug rather than on the spec (see below).
-
-  | spec | tests | passing | failing | skipped |
-  |---|---|---|---|---|
-  | `comments.cy.ts` | 21 | **21** | 0 | 0 |
-  | `create-poem.cy.ts` | 7 | 0 | 6 | 1 |
-  | `ranking.cy.ts` | 2 | **2** | 0 | 0 |
-  | `register.cy.ts` | 4 | **4** | 0 | 0 |
-  | **total** | **34** | **27** | **6** | **1** |
-
-  **Running it locally needs the frontend pointed at the test backend:**
-  `NEXT_PUBLIC_API_URL=http://localhost:4201 pnpm dev` in `frontend/`, then
-  `npx cypress run`. Cypress starts the backend itself; it does not start the
-  frontend. Point the frontend at :4200 by mistake and the suite runs against
-  the **production database** — `create-poem.cy.ts` writes poems.
-
-  What the repair actually turned up — none of it was stale assertions:
-  1. **The suite was testing an app that does not ship.** `axiosInstance` had a
-     `window.Cypress` branch pointing the browser straight at `localhost:4201`,
-     bypassing the Next proxy — so the cookie-to-Bearer translation and the token
-     refresh, the two things most worth end-to-end coverage, were never
-     exercised, and every request was cross-origin and refused by CORS. Removing
-     that branch took the suite from 3 passing to 27 and deleted test-only code
-     from the production bundle.
-  2. **The E2E env came from a developer's `.env`.** `REQUIRE_EMAIL_VERIFICATION`
-     is `true` locally and unset on a fresh CI runner, so the specs would have
-     been red locally and green on CI. `cypress.setup.js` now pins it (and
-     `FRONTEND_URLS`) and seeds the fixture users `emailVerified: true`.
-  3. **A real, shipped UI bug** — see "delete × unclickable" under Recently
-     shipped.
-
-  Still open: `create-poem.cy.ts` fails on an **intermittent React hydration
-  mismatch on `/profile`** (own item below). Cypress turns any app exception into
-  a failure, which is the correct behaviour — do not silence it with
-  `uncaught:exception` to get the suite green.
-
-  (The skipped ones are not passing — they are downstream of a failed `before`
-  hook, so they will surface more failures once the earlier ones are fixed.)
-
-  Two distinct problems:
-  1. **Stale** — specs assert against shapes that have since been refactored.
-     `ranking.cy.ts` intercepted `**/api/v1/poems*` with `query:{origin:'user'}`,
-     but ranking moved to its own `/poems/ranking` route and **`*` does not match
-     `/` in a glob**, so the intercept could never fire and the spec timed out
-     waiting for a request the app was making all along. Fixed there; the other
-     three specs are unexamined and likely the same class.
-  2. **Flaky** — with the globs fixed, `ranking.cy.ts` passed 1-of-2 on one run
-     and 0-of-2 on the next, no code change between. Suspected:
-     `cypress.config.ts` waits a fixed 6s for the test backend instead of polling
-     for readiness, and the ranking fetch sits in a `useEffect` guarded on cache
-     state, so a failed hydration silently means no request at all.
-
-  **Then, and only then, add it to CI.** Order matters — a permanently red check
-  trains everyone to ignore CI, which is worse than having none:
-  1. Fix the stale specs, one at a time, verifying each against a real run.
-  2. Make it deterministic: poll the backend for readiness instead of sleeping 6s,
-     then run the whole suite ~5 times and require 5 green before trusting it.
-  3. Add `.github/workflows/e2e.yml` — own workflow, on push to `master` and
-     `development`, `paths: frontend/** backend/**`. It needs a built frontend on
-     :3000 and the test backend on :4201, so start both in the job.
-  4. **Do NOT put it in `frontend/vercel.json`'s build command.** It needs two
-     servers, takes minutes, and browser flake would block every deploy. Jest
-     (unit + integration) stays there — fast, hermetic, and a real gate today.
+- 🤖 **Add the Cypress suite to CI.** The suite is repaired and green:
+  **34 tests, 34 passing, 0 failing, 0 skipped**, verified over **5 consecutive
+  full runs** with no flake (measured 2026-07-30). What is left is only the CI
+  wiring:
+  1. Add `.github/workflows/e2e.yml` — own workflow, on push to `master` and
+     `development`, `paths: frontend/** backend/**`. It needs a frontend on :3000
+     and the test backend on :4201; Cypress starts the **backend** itself, so the
+     job only has to start the frontend.
+  2. **The frontend must be started with `NEXT_PUBLIC_API_URL=http://localhost:4201`.**
+     Locally that is `NEXT_PUBLIC_API_URL=http://localhost:4201 pnpm dev` in
+     `frontend/`, then `npx cypress run`. Start it against the default :4200 and
+     the suite runs against the **production database** — `create-poem.cy.ts`
+     writes poems. Worth an explicit guard in the job.
+  3. **Do NOT put it in `frontend/vercel.json`'s build command.** It needs two
+     servers, takes ~1 minute per run, and browser flake would block every
+     deploy. Jest (unit + integration) stays there — fast, hermetic, a real gate.
 
   **Caveat on "blocking":** CI cannot block a deploy today, because pushes go
   straight to `master` and Vercel deploys on push — the two race. Real gating
@@ -124,29 +74,37 @@ so there is **no separate env to "promote from"** — this IS the production dat
   path-filtered workflows leave skipped jobs hanging as "Expected" forever, so
   that move needs an always-run aggregator job.
 
-- 🤖 **Intermittent React hydration mismatch on `/profile`** (found 2026-07-30 by
-  `create-poem.cy.ts`, then reproduced in a normal browser — it is not a Cypress
-  artefact). React logs "Hydration failed because the initial UI does not match
-  what was rendered on the server", throws out of `updateHostComponent` (an
-  ELEMENT mismatch, not a text one) and falls back to client rendering, so the
-  page still works and the damage is a wasted render plus lost SSR benefit.
-  What has been ruled out, so nobody repeats it:
-  - **Not invalid nesting.** Re-parsing the server HTML with `DOMParser` and
-    comparing tag+class+depth against the hydrated DOM gives an exact match, so
-    the parser is not hoisting anything out of a `<p>`. (A document-order-only
-    fingerprint is NOT enough to conclude this — hoisting preserves document
-    order. Compare depth.)
-  - **Not Emotion/MUI cache setup.** `_document.tsx` does the standard
-    `createEmotionServer` + `extractCriticalToChunks` dance.
-  - **Not `initialUser`.** `AppProvider` seeds `useState` from the same page prop
-    on both sides.
-  Prime remaining suspect: **the Redux store is a module-level singleton**
-  (`src/redux/store/index.ts`) shared by every SSR request in a warm Node/Vercel
-  process, while the client always boots empty. Nothing dispatches during render
-  today, which is why it is intermittent rather than constant — but it is a
-  latent cross-request state leak between *users* and worth fixing on its own
-  merits (make the store per-request, the standard Next.js pattern). Reproduce by
-  loading `/profile` logged in, repeatedly, with the console open.
+- 🤖 **Extend Cypress/E2E coverage to the features shipped since it was written.**
+  The four existing specs (comments, create-poem, ranking, register) predate most
+  of the current product, so whole features have **no browser coverage at all** —
+  and repairing the suite just demonstrated that a browser catches a class of bug
+  jest cannot: an unclickable button caused by an overlapping pseudo-element, and
+  a hydration mismatch caused by invalid HTML nesting. Both passed lint,
+  typecheck and ~990 jest tests. Uncovered, roughly in order of what would hurt
+  most if broken:
+  - **Login / logout / session** — the cookie-to-Bearer proxy path is now
+    exercised incidentally by every spec, but nothing tests logging in through
+    the form, logging out, or an expired/invalid token.
+  - **Like a poem** — the exact bug fixed on 2026-07-30 (the heart and counter
+    not updating on a `/detail/<slug>` URL). There is a jest integration test;
+    a browser test would also cover the ranking refresh that rides along in the
+    like response.
+  - **Search** — debounce, 2-character minimum, "latest wins" when typing fast,
+    and that the input keeps focus and caret mid-query (the failure mode that
+    motivated keeping the search box mounted).
+  - **Next poem** — that the control appears, goes somewhere, and keeps going
+    across an author boundary.
+  - **Poem edit and delete**, including the confirmation modal.
+  - **Profile edit** — bio, picture, private fields.
+  - **Password reset and email verification** — both are live in prod and
+    entirely untested end to end.
+  - **Poem of the week** — desktop only; a viewport-dependent feature is exactly
+    what jsdom cannot see.
+  - **Responsive layout checks at `$bp-xl` and just below it.** Both browser bugs
+    found on 2026-07-30 lived at specific viewport widths.
+  Do this **after** the suite is in CI, so new specs land against a gate that is
+  already green, and keep each one meaningful: red-check it by breaking the
+  implementation before trusting it.
 
 - 🤝 **Run a security review of the whole app** — never done end to end; the
   hardening that exists (helmet, rate limiters, hashed reset tokens, non-enumerating
@@ -261,6 +219,31 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Cypress suite repaired: 34/34, five consecutive clean runs** (2026-07-30),
+  up from 1 passing. Three root causes, none of them a stale assertion:
+  the `window.Cypress` branch in `axiosInstance` that made the suite test an app
+  that does not ship; an E2E environment inherited from a developer's `.env`; and
+  two genuine app bugs (below). Still not in CI — that is its own P2 item.
+
+- **Hydration mismatch on `/profile`** (2026-07-30). Every load threw "Hydration
+  failed because the initial UI does not match what was rendered on the server"
+  and re-rendered the whole page client-side, losing the SSR benefit. Cause:
+  `TabPanel` wrapped its children in MUI `<Typography>`, which renders a `<p>` —
+  and the children are the poem list: divs, sections, an `<svg>`. The HTML parser
+  closes an open `<p>` when it meets flow content, so the DOM the browser built
+  from the SSR html could not match the tree React was hydrating. Fixed by
+  dropping the wrapper (`Typography` is for text).
+  **Correction to an earlier note in this file:** invalid nesting *was* the cause.
+  It had been "ruled out" by re-parsing the server HTML with `DOMParser` and
+  comparing tag+class+depth against the live DOM — that comparison is worthless
+  here, because by the time you run it React has already recovered by
+  **client-rendering the whole page**, and a client render builds div-inside-p
+  happily through the DOM API. Both trees end up identical. What actually found it
+  was bisection against a 1-second Cypress probe: delete half the tree, re-run,
+  repeat. `TabPanel.test.tsx` now guards the shape (no `<p>` ancestor around
+  flow content) — jsdom can never catch the symptom, since it does not parse
+  server HTML.
 
 - **Comment delete "×" was unclickable on wide screens** (2026-07-30). Between
   `$bp-xl` (1200px) and ~1310px the comments section — `width: 90vw`, capped at
