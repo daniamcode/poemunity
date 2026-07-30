@@ -10,7 +10,23 @@ actionable list.
 
 ## 🔴 P0 — Production go-live (blocks a real launch)
 
-_All P0 launch blockers are complete._ 🎉 (email on, prod migration, deploy
+- 👤 **Rotate the MongoDB password and `RESEND_API_KEY`** (exposed 2026-07-30).
+  An agent session sourced `backend/.env` in a way that made the shell echo it,
+  so the **Atlas connection string including the password** and the **Resend API
+  key** ended up in that session's transcript and tool logs. `.env` is gitignored
+  and untracked, so nothing reached the repository and the exposure is limited to
+  those logs — but both should be treated as compromised until rotated.
+  1. Atlas → Database Access → edit user → Edit Password → autogenerate. Update
+     `MONGODB` **and** `MONGODB_PRE` in the Vercel backend project and in local
+     `.env` (they point at the same cluster — see Gotchas).
+  2. Resend → API Keys → revoke and recreate. Update `RESEND_API_KEY` in Vercel
+     and locally.
+  While there: the current database **password is identical to the username**,
+  which is worth fixing on its own merits regardless of this incident.
+  **Never source `.env` from a shell** to read a value — unquoted values get
+  executed and echoed. Load it through `dotenv` in a script instead.
+
+_All other P0 launch blockers are complete._ 🎉 (email on, prod migration, deploy
 verification, database backup + restore drill — see Recently shipped.)
 
 Ongoing operational practice (not a blocker): **always take a `mongodump` snapshot
