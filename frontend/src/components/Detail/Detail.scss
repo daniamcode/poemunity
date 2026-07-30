@@ -355,12 +355,29 @@
         flex: 1;
     }
 
-    // Widths are relative to the CONTENT column now, not the viewport: 40vw
-    // beside a 21%-wide rail leaves the poem visibly off-centre.
+    // Counterweight. The rail is a real column, so on its own it shifts the poem
+    // off the centre of the PAGE — which is where a single poem belongs, and
+    // where it sat before the rail existed. This mirrors the rail's exact width
+    // and margins on the right, so the content column lands dead centre. The
+    // dashboard gets the same balance for free from its ranking panel; a poem
+    // page has nothing to put there, so the space stays empty on purpose.
+    //
+    // ::after rather than a spacer <div>: it is presentational only and has no
+    // business in the accessibility tree.
+    .poem-page::after {
+        content: '';
+        width: 15%;
+        margin-left: 3%;
+        margin-right: 3%;
+        flex-shrink: 0;
+    }
+
+    // Unchanged from before the rail existed. It has to stay a VIEWPORT
+    // fraction: the base rule is width: 90vw, which would overflow the ~58vw
+    // column left between the rail and its counterweight.
     .poem__block,
     .next-poem {
-        width: 55%;
-        max-width: 800px;
+        width: 40vw;
     }
 }
 
