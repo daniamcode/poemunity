@@ -321,12 +321,29 @@
     text-decoration: none;
 }
 
+// The tagline is the one line of voice in the chrome, so it gets the literary
+// face rather than the UI one: EB Garamond italic, an old-style Renaissance
+// serif, against the logo's wordmark. Quattrocento here read as another label.
 .list__presentation {
     display: none;
     margin-left: $space-7;
-    font-family: $font-heading;
+    font-family: $font-body;
+    font-style: italic;
+    // Garamond has a small x-height, so it needs a size up to hold its own
+    // beside the logo — at $fs-md it looked shrunken next to the wordmark.
+    font-size: $fs-lg;
+    letter-spacing: 0.01em;
     color: $color-logo;
-    font-size: $fs-md;
+
+    // Baseline nudge, NOT centring. The flex row already centres both boxes
+    // perfectly — measured, both mid-points land on the same pixel — but the eye
+    // aligns type by its BASELINE, and the logo is a PNG whose wordmark sits
+    // ~0.775 of the way down the file. Centred boxes therefore leave the tagline
+    // floating above the logo's baseline, which is what reads as "too high".
+    // `align-items: baseline` cannot fix it: an <img>'s baseline is its bottom
+    // edge, which would overshoot the other way. The offset scales with the
+    // LOGO height, so it is set alongside each logo size below.
+    position: relative;
 }
 
 .header__logo-img {
@@ -371,6 +388,8 @@
 
     .list__presentation {
         display: block;
+        // ~0.056 x the 40px logo — see the baseline note on the base rule.
+        top: 2px;
     }
 }
 
@@ -381,6 +400,11 @@
 
     .header__logo-img {
         height: 48px;
+    }
+
+    // Same 0.056 fraction against the larger logo.
+    .list__presentation {
+        top: 3px;
     }
 
     .header__dropdown-categories-icon {

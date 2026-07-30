@@ -5,6 +5,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react'
 import { Toaster } from 'react-hot-toast'
 import store from '../src/redux/store'
 import createEmotionCache from '../src/lib/emotionCache'
+import { fontBody, fontHeading } from '../src/lib/fonts'
 import { AppProvider } from '../src/App'
 import Header from '../src/components/Header/Header'
 import Footer from '../src/components/Footer/Footer'
@@ -36,6 +37,17 @@ interface MyAppProps extends AppProps {
 export default function MyApp({ Component, pageProps, emotionCache = clientSideEmotionCache }: MyAppProps) {
     return (
         <CacheProvider value={emotionCache}>
+            {/* Publish the loaded font families as CSS custom properties on
+                :root, which is what `$font-body` / `$font-heading` in
+                _variables.scss resolve to. It has to be :root rather than a
+                wrapper class — `body` sets font-family, and a variable declared
+                on a descendant is not visible to its ancestor. */}
+            <style jsx global>{`
+                :root {
+                    --font-body: ${fontBody.style.fontFamily};
+                    --font-heading: ${fontHeading.style.fontFamily};
+                }
+            `}</style>
             {process.env.NODE_ENV === 'production' && (
                 <>
                     <Script

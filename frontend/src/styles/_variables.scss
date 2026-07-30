@@ -46,8 +46,17 @@ $color-overlay: rgba(0, 0, 0, 0.45);
 // -----------------------------------------------------------------------------
 // Typography — families
 // -----------------------------------------------------------------------------
-$font-body:    'EB Garamond', serif;
-$font-heading: 'Quattrocento', serif;
+// The families are loaded by `src/lib/fonts.ts` (next/font/google) and published
+// as custom properties on :root by `_app.tsx`. Naming them directly here — which
+// is what this file used to do — loaded nothing: every visitor without them
+// installed locally got the generic `serif`, i.e. Times, and the site had never
+// actually rendered in its own typefaces.
+//
+// The literal names stay as the fallback so that anything rendered outside the
+// React tree (and any test environment where the variables are absent) still
+// asks for the right face before falling back to `serif`.
+$font-body:    var(--font-body, 'EB Garamond', serif);
+$font-heading: var(--font-heading, 'Quattrocento', serif);
 
 // Typography — size scale
 $fs-xs:        0.75rem;  // ~12px  small labels, tags

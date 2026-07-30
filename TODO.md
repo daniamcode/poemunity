@@ -107,6 +107,25 @@ so there is **no separate env to "promote from"** — this IS the production dat
   already green, and keep each one meaningful: red-check it by breaking the
   implementation before trusting it.
 
+- 🤝 **Decide what to do with the Selenium/Applitools visual suite** (`frontend/selenium/visual.spec.ts`).
+  It is **not** in CI, and it should not be added as-is. Three blockers, in order:
+  1. **It logs in with real credentials against `API_URL`, which defaults to
+     :4200.** In CI that would mean an automated login against production on
+     every push. It must be repointed at the test backend (:4201) first.
+  2. **It cannot fail.** It still calls `eyes.closeAsync()`, so visual diffs never
+     fail the run, and the baselines were never accepted in the Applitools
+     dashboard. A job that cannot go red is worse than no job — it just trains
+     people to ignore a green tick.
+  3. **It needs secrets** — `APPLITOOLS_API_KEY`, `SELENIUM_USERNAME`,
+     `SELENIUM_PASSWORD` as repo secrets.
+  Also note its DOM assertions now **overlap Cypress**, which covers those paths
+  properly. The genuinely additive part is the *visual* diffing.
+  **If it goes into CI, make it `schedule:`-only, never per-push.** Visual diffs
+  are very sensitive to font rendering differing between environments, so a
+  weekly run someone triages beats a per-commit gate that cries wolf. The honest
+  alternative is to delete the suite and rely on Cypress — decide which, rather
+  than leaving it in the repo unrun.
+
 - 🤝 **Run a security review of the whole app** — never done end to end; the
   hardening that exists (helmet, rate limiters, hashed reset tokens, non-enumerating
   login) was added feature by feature, so nobody has looked for the gaps *between*
