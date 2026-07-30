@@ -50,30 +50,51 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤖 **Repair the Cypress suite, then put it in CI** (assessed 2026-07-30).
-  A full run today: **34 tests, 1 passing, 16 failing, 17 skipped — all 4 specs
-  red.** Two distinct problems, and the second is the awkward one:
-  1. **Stale** — the specs predate refactors they assert against. `ranking.cy.ts`
-     intercepts `**/api/v1/poems*` with `query: {origin:'user'}`, but ranking
-     moved to its own route (`/poems/ranking`) and **`*` does not match `/` in a
-     glob**, so the intercept could never fire and the spec timed out waiting for
-     a request the app was making all along. `comments.cy.ts`, `create-poem.cy.ts`
-     and `register.cy.ts` are unexamined and likely similar.
-  2. **Flaky** — after fixing the globs, `ranking.cy.ts` passed 1-of-2 on one run
-     and 0-of-2 on the next with no code change. Suspected: `cypress.config.ts`
-     waits a fixed 6s for the test backend rather than polling for readiness, and
-     the app fetches the ranking from a `useEffect` guarded on cache state, so a
-     failed hydration silently means no request. Diagnose before trusting it.
-  **Do not add it to CI until it is green and stable** — a permanently red
-  required check trains everyone to ignore CI. Recommended shape once fixed: its
-  own workflow on push (NOT in the Vercel build command — it needs a frontend and
-  a backend running, takes minutes, and browser flake would block deploys).
-  Jest unit + integration stays where it is, in the frontend build gate.
-  **Real blocking needs the deferred `develop` → PR → `master` flow** — required
-  checks only bite when there is a PR to block, and today CI and the deploy race
-  each other. Note the existing caveat: required checks plus path-filtered
-  workflows make skipped jobs hang as "Expected", so that move needs an
-  always-run aggregator job.
+- 🤖 **Repair the Cypress suite, then put it in CI** (measured 2026-07-30).
+  Full run: **34 tests — 1 passing, 16 failing, 17 skipped. All 4 specs red.**
+
+  | spec | tests | passing | failing | skipped |
+  |---|---|---|---|---|
+  | `comments.cy.ts` | 21 | 0 | 5 | 16 |
+  | `create-poem.cy.ts` | 7 | 0 | 6 | 1 |
+  | `ranking.cy.ts` | 2 | 0 | 2 | 0 |
+  | `register.cy.ts` | 4 | 1 | 3 | 0 |
+  | **total** | **34** | **1** | **16** | **17** |
+
+  (The skipped ones are not passing — they are downstream of a failed `before`
+  hook, so they will surface more failures once the earlier ones are fixed.)
+
+  Two distinct problems:
+  1. **Stale** — specs assert against shapes that have since been refactored.
+     `ranking.cy.ts` intercepted `**/api/v1/poems*` with `query:{origin:'user'}`,
+     but ranking moved to its own `/poems/ranking` route and **`*` does not match
+     `/` in a glob**, so the intercept could never fire and the spec timed out
+     waiting for a request the app was making all along. Fixed there; the other
+     three specs are unexamined and likely the same class.
+  2. **Flaky** — with the globs fixed, `ranking.cy.ts` passed 1-of-2 on one run
+     and 0-of-2 on the next, no code change between. Suspected:
+     `cypress.config.ts` waits a fixed 6s for the test backend instead of polling
+     for readiness, and the ranking fetch sits in a `useEffect` guarded on cache
+     state, so a failed hydration silently means no request at all.
+
+  **Then, and only then, add it to CI.** Order matters — a permanently red check
+  trains everyone to ignore CI, which is worse than having none:
+  1. Fix the stale specs, one at a time, verifying each against a real run.
+  2. Make it deterministic: poll the backend for readiness instead of sleeping 6s,
+     then run the whole suite ~5 times and require 5 green before trusting it.
+  3. Add `.github/workflows/e2e.yml` — own workflow, on push to `master` and
+     `development`, `paths: frontend/** backend/**`. It needs a built frontend on
+     :3000 and the test backend on :4201, so start both in the job.
+  4. **Do NOT put it in `frontend/vercel.json`'s build command.** It needs two
+     servers, takes minutes, and browser flake would block every deploy. Jest
+     (unit + integration) stays there — fast, hermetic, and a real gate today.
+
+  **Caveat on "blocking":** CI cannot block a deploy today, because pushes go
+  straight to `master` and Vercel deploys on push — the two race. Real gating
+  needs the deferred `develop` → PR → `master` flow, where required checks
+  finally have a PR to hold. Note the existing trap: required checks plus
+  path-filtered workflows leave skipped jobs hanging as "Expected" forever, so
+  that move needs an always-run aggregator job.
 
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
   to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script
