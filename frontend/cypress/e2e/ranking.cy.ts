@@ -6,9 +6,15 @@
  * Switching genre categories must NOT trigger a second fetch.
  *
  * Actual endpoints (port 4201 in Cypress):
- *   GET /api/v1/poems?origin=user          ← ranking
+ *   GET /api/v1/poems/ranking?origin=user  ← ranking (server-computed)
  *   GET /api/v1/poems?page=1&limit=...     ← poem list
+ *   GET /api/v1/poems/poem-of-the-week     ← weekly pick
  *   GET /api/v1/authors?limit=10           ← authors accordion
+ *
+ * NOTE ON GLOBS: `*` does not match `/`. `**\/api/v1/poems*` therefore does NOT
+ * match /api/v1/poems/ranking — which is why this spec timed out waiting for a
+ * request that was being made all along. Ranking used to be a filter on the list
+ * endpoint (`/poems?origin=user`); it is its own route now.
  */
 
 describe('Ranking', () => {
@@ -20,11 +26,13 @@ describe('Ranking', () => {
             // Stub the poem list (has `page` query param, no `origin`)
             cy.intercept('GET', '**/api/v1/poems*page*', { body: [] }).as('poemsListRequest')
 
-            // Stub the ranking fetch (has `origin=user`, no `page`)
-            cy.intercept(
-                { method: 'GET', url: '**/api/v1/poems*', query: { origin: 'user' } },
-                { body: [] }
-            ).as('rankingRequest')
+            // Ranking is its own server-computed endpoint now.
+            cy.intercept('GET', '**/api/v1/poems/ranking*', { body: [] }).as('rankingRequest')
+
+            // Poem of the week shares the /poems/ prefix — stub it so it cannot
+            // be mistaken for the ranking call.
+            cy.intercept('GET', '**/api/v1/poems/poem-of-the-week*', { body: { poem: null } })
+                .as('poemOfTheWeekRequest')
         })
 
         it('does not call the ranking API again when switching categories', () => {

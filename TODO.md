@@ -50,6 +50,31 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
+- 🤖 **Repair the Cypress suite, then put it in CI** (assessed 2026-07-30).
+  A full run today: **34 tests, 1 passing, 16 failing, 17 skipped — all 4 specs
+  red.** Two distinct problems, and the second is the awkward one:
+  1. **Stale** — the specs predate refactors they assert against. `ranking.cy.ts`
+     intercepts `**/api/v1/poems*` with `query: {origin:'user'}`, but ranking
+     moved to its own route (`/poems/ranking`) and **`*` does not match `/` in a
+     glob**, so the intercept could never fire and the spec timed out waiting for
+     a request the app was making all along. `comments.cy.ts`, `create-poem.cy.ts`
+     and `register.cy.ts` are unexamined and likely similar.
+  2. **Flaky** — after fixing the globs, `ranking.cy.ts` passed 1-of-2 on one run
+     and 0-of-2 on the next with no code change. Suspected: `cypress.config.ts`
+     waits a fixed 6s for the test backend rather than polling for readiness, and
+     the app fetches the ranking from a `useEffect` guarded on cache state, so a
+     failed hydration silently means no request. Diagnose before trusting it.
+  **Do not add it to CI until it is green and stable** — a permanently red
+  required check trains everyone to ignore CI. Recommended shape once fixed: its
+  own workflow on push (NOT in the Vercel build command — it needs a frontend and
+  a backend running, takes minutes, and browser flake would block deploys).
+  Jest unit + integration stays where it is, in the frontend build gate.
+  **Real blocking needs the deferred `develop` → PR → `master` flow** — required
+  checks only bite when there is a PR to block, and today CI and the deploy race
+  each other. Note the existing caveat: required checks plus path-filtered
+  workflows make skipped jobs hang as "Expected", so that move needs an
+  always-run aggregator job.
+
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
   to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script
   writes straight to **production**, and there's nowhere safe to rehearse a seed or
