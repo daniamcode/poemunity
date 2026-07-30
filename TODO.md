@@ -44,15 +44,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
   **Plan (deferred, not now):** create a copy of prod and point `MONGODB_PRE` at it
   so `pre` becomes a real separate environment.
 
-- 👤 **Build the next-poem index in production** — the "next poem" walk
-  (`GET /api/v1/poem/:poemId/next`) is declared against one compound index on
-  `Poem`: `{ authorId: 1, date: -1, _id: -1 }` (`backend/src/models/Poem.js`).
-  It is a **schema declaration only** — nothing has been built against the live
-  cluster, and Mongoose `autoIndex` must not be relied on to do it silently.
-  Creating it is a **production write**: `mongodump` snapshot first, then build
-  it deliberately (background/rolling build via Atlas). Until then the walk works
-  but each hop is a collection scan + in-memory sort.
-
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤),
   then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts`
   so visual diffs fail the run (🤖).
@@ -122,6 +113,19 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Next-poem index + orphan cleanup** (2026-07-30): `{ authorId: 1, date: -1,
+  _id: -1 }` on `poems` was **already live** — `autoIndex` is on (`mongo.js` sets
+  no `autoIndex: false`), so it built itself on deploy. The earlier TODO claiming
+  it was schema-only and that autoIndex could not be relied on was wrong. The
+  check also found two **orphans** left by the next-poem simplification
+  (`genre_1_date_-1__id_-1`, `date_-1__id_-1`): autoIndex only ever CREATES, so
+  indexes removed from a schema live on, costing writes for queries that no
+  longer exist. Both dropped after a `mongodump`. `backend/scripts/check-index-drift.js`
+  now reports this class of drift (read-only, never creates or drops).
+  **autoIndex stays ON deliberately** — at ~16k documents builds take seconds, and
+  the failure mode it guards against is a large-collection problem. The discipline
+  it needs instead: when you remove an index from a schema, drop it explicitly.
 
 - **Own comments system, replacing Disqus**: comments were once a third-party
   Disqus embed. They are now first-party end to end — `Comment` model, the

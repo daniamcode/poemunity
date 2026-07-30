@@ -57,3 +57,9 @@ yarn-error.log*
 *.flac
 *.adts
 *.3gp
+
+# mongodump archives. These are FULL production snapshots — every user record,
+# every email — so they must never reach the repository. Kept out of git rather
+# than out of the working tree because taking one before a production write is
+# the documented practice (docs/DATABASE_BACKUP_RESTORE.md).
+/backups

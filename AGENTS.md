@@ -37,6 +37,12 @@ State is split: **server state** in Redux Toolkit caches, **client/auth state** 
   `src/__tests__/test-harness.test.js` guards it.
 - **Do not rely on `app.listen` on Vercel** — the serverless entry point is
   `backend/api/index.js` (see Backend entry points).
+- **Mongoose `autoIndex` is ON in production** (`backend/mongo.js` sets no
+  `autoIndex: false`). A new schema index therefore builds itself on deploy — but
+  autoIndex only ever **creates**. Remove an index from a schema and it lives on
+  in the database forever, costing writes for a query that no longer exists.
+  After removing one, drop it explicitly; `node backend/scripts/check-index-drift.js`
+  reports both directions and is strictly read-only.
 - **`TODO.md` is the backlog's single source of truth**, including deliberately deferred
   decisions. Check it before proposing work.
 
