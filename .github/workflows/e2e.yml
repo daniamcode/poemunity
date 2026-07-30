@@ -1,0 +1,126 @@
+name: E2E (Cypress)
+
+# Browser coverage, in its own workflow because it needs two servers and takes
+# ~2 minutes — far too slow and too stateful to bolt onto the frontend job.
+#
+# It watches BOTH apps: the specs drive the frontend but exercise the real
+# backend, so a backend change can break them just as easily.
+#
+# Deliberately NOT wired into `frontend/vercel.json`'s build command. That gate
+# has to stay fast and hermetic; browser flake there would block every deploy.
+#
+# Safe to skip on unrelated commits: master has no required status checks, so a
+# job that does not run leaves nothing waiting on it. If required checks are ever
+# added, path-filtered jobs hang as "Expected" forever and this needs an
+# always-run aggregator stub — the same trap noted in the other two workflows.
+on:
+  push:
+    branches: [master, development]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - '.github/workflows/e2e.yml'
+  pull_request:
+    branches: [master, development]
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  e2e:
+    name: E2E — Cypress
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Pinned for the same reason as the other workflows: pnpm 11 requires
+      # Node >= 22.13, so a floating `latest` breaks install on this runner.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # Both workspaces. Cypress spawns the test backend itself (see
+      # cypress.config.ts), so backend/node_modules has to exist even though no
+      # step here runs from that directory.
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./frontend
+
+      - name: Install backend dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./backend
+
+      # The Cypress binary lives outside node_modules and is ~500MB to download.
+      # Keyed on the resolved version so a dependency bump invalidates it.
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+
+      - name: Install Cypress binary
+        run: pnpm exec cypress install
+        working-directory: ./frontend
+
+      # `next dev`, not a production build, on purpose.
+      #
+      # In development React THROWS on a hydration mismatch, and Cypress turns
+      # any app exception into a test failure. A production build silently
+      # recovers from the same mismatch by re-rendering on the client, so the
+      # suite would go green over a real bug — which is exactly what happened on
+      # 2026-07-30: /profile nested the poem list inside a <p> and every load
+      # threw. Dev mode is what caught it, and the suite is verified stable there
+      # over five consecutive full runs.
+      #
+      # NEXT_PUBLIC_API_URL MUST point at the test backend on :4201. The Next
+      # proxy (pages/api/backend/[...path].ts) forwards there, and Cypress starts
+      # that backend on an in-memory Mongo. Leave it unset and the app defaults
+      # to :4200 — locally that is a developer's real backend, and
+      # create-poem.cy.ts WRITES POEMS.
+      - name: Start frontend
+        run: pnpm dev > /tmp/next-dev.log 2>&1 &
+        working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4201
+
+      # Poll rather than sleep. A cold runner compiles the first route on
+      # demand, so the wait is wildly variable; a fixed sleep is either a race or
+      # a tax on every run.
+      - name: Wait for frontend
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS -o /dev/null http://localhost:3000/; then
+              echo "frontend up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "frontend did not answer on :3000 within 90s"
+          cat /tmp/next-dev.log
+          exit 1
+        working-directory: ./frontend
+
+      # Cypress starts and stops the backend on :4201 itself, polling it for
+      # readiness before the first spec (cypress.config.ts).
+      - name: Run Cypress
+        run: pnpm cypress:run
+        working-directory: ./frontend
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Dump frontend log on failure
+        if: failure()
+        run: cat /tmp/next-dev.log

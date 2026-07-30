@@ -50,24 +50,25 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤖 **Add the Cypress suite to CI.** The suite is repaired and green:
-  **34 tests, 34 passing, 0 failing, 0 skipped**, verified over **5 consecutive
-  full runs** with no flake (measured 2026-07-30). What is left is only the CI
-  wiring:
-  1. Add `.github/workflows/e2e.yml` — own workflow, on push to `master` and
-     `development`, `paths: frontend/** backend/**`. It needs a frontend on :3000
-     and the test backend on :4201; Cypress starts the **backend** itself, so the
-     job only has to start the frontend.
-  2. **The frontend must be started with `NEXT_PUBLIC_API_URL=http://localhost:4201`.**
-     Locally that is `NEXT_PUBLIC_API_URL=http://localhost:4201 pnpm dev` in
-     `frontend/`, then `npx cypress run`. Start it against the default :4200 and
-     the suite runs against the **production database** — `create-poem.cy.ts`
-     writes poems. Worth an explicit guard in the job.
-  3. **Do NOT put it in `frontend/vercel.json`'s build command.** It needs two
-     servers, takes ~1 minute per run, and browser flake would block every
-     deploy. Jest (unit + integration) stays there — fast, hermetic, a real gate.
+- 👤 **Watch the first few `E2E (Cypress)` CI runs.** The workflow
+  (`.github/workflows/e2e.yml`) is in, but it has only ever been proven on a
+  laptop — a cold GitHub runner compiles routes on demand and is slower and more
+  contended, which is exactly where a suite that is green locally starts to
+  flake. If it goes red without an app change, fix the wait/timeout rather than
+  retrying, and do **not** reach for `uncaught:exception` to quiet it.
 
-  **Caveat on "blocking":** CI cannot block a deploy today, because pushes go
+  Two things about that workflow worth not undoing:
+  - It runs **`next dev`, not a production build.** In development React THROWS
+    on a hydration mismatch and Cypress fails the test; a production build
+    silently recovers by re-rendering client-side, so the suite would go green
+    over a real bug. That is not hypothetical — it is precisely the `/profile`
+    bug fixed on 2026-07-30.
+  - It sets `NEXT_PUBLIC_API_URL=http://localhost:4201`. Unset, the app defaults
+    to :4200, which locally is a real backend — and `create-poem.cy.ts` writes
+    poems. Same rule when running it by hand:
+    `NEXT_PUBLIC_API_URL=http://localhost:4201 pnpm dev`, then `npx cypress run`.
+
+  **Caveat on "blocking":** CI still cannot block a deploy, because pushes go
   straight to `master` and Vercel deploys on push — the two race. Real gating
   needs the deferred `develop` → PR → `master` flow, where required checks
   finally have a PR to hold. Note the existing trap: required checks plus
@@ -224,7 +225,8 @@ so there is **no separate env to "promote from"** — this IS the production dat
   up from 1 passing. Three root causes, none of them a stale assertion:
   the `window.Cypress` branch in `axiosInstance` that made the suite test an app
   that does not ship; an E2E environment inherited from a developer's `.env`; and
-  two genuine app bugs (below). Still not in CI — that is its own P2 item.
+  two genuine app bugs (below). Now runs in CI as its own workflow,
+  `.github/workflows/e2e.yml`.
 
 - **Hydration mismatch on `/profile`** (2026-07-30). Every load threw "Hydration
   failed because the initial UI does not match what was rendered on the server"

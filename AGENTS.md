@@ -175,8 +175,20 @@ inferred from CI.
   steps can prove itself when no app code moved. The frontend build is **two `if`-guarded
   steps** rather than one with a ternary on the secret: `cond && A || B` silently falls
   through to `B` when `A` is empty, which would build `master` against the pre backend.
+- **Plus a third workflow, `e2e.yml` (Cypress)** — the one job that is not per-app: the
+  specs drive the frontend but exercise the real backend, so it watches `frontend/**`
+  *and* `backend/**`. It is separate because it needs two servers and is the most
+  flake-prone, so a browser hiccup must not obscure whether lint and unit tests passed.
+  It runs **`next dev`, not a production build**: in development React *throws* on a
+  hydration mismatch and Cypress fails the test, while a production build silently
+  recovers by re-rendering client-side and the suite would go green over a real bug.
+  It sets `NEXT_PUBLIC_API_URL=http://localhost:4201`; unset, the app defaults to
+  :4200 and `create-poem.cy.ts` writes poems into whatever lives there. Cypress starts
+  the test backend itself — the job only starts the frontend.
 - Path-filtered jobs are safe only because `master` has **no required status checks**. If
   those are ever added, a skipped job hangs as "Expected" and blocks the merge.
+  CI also cannot *block a deploy* today: pushes go straight to `master` and Vercel
+  deploys on push, so the two race. Green CI is a signal, not a gate.
 - MongoDB Atlas (Network Access `0.0.0.0/0` for Vercel's dynamic IPs). No AWS static file serving — the frontend is served by Vercel/Next, the backend is a serverless function.
 - Work is committed directly to `master` (branch protection blocks force-push and deletion). A `develop` branch workflow is deliberately deferred — see `TODO.md`.
 

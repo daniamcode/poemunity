@@ -71,3 +71,8 @@ yarn-error.log*
 *.adts
 *.3gp
 *.tsbuildinfo
+
+# Cypress run artifacts — screenshots of failures, multi-MB each.
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
