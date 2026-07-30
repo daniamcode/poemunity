@@ -1,4 +1,4 @@
-import { Poem } from '../../typescript/interfaces'
+import { Poem, PoemOfTheWeek } from '../../typescript/interfaces'
 import { commonReducer, INITIAL } from './commonReducers'
 import { StateItem } from '../../typescript/interfaces'
 import { getTypes } from '../actions/commonActions'
@@ -9,6 +9,7 @@ export const ACTIONS = {
     MY_POEMS: 'my-poems',
     MY_FAVOURITE_POEMS: 'my-favourite-poems',
     RANKING: 'ranking',
+    POEM_OF_THE_WEEK: 'poem-of-the-week',
     CREATE_POEM: 'create-poem',
     AUTHOR_POEMS: 'author-poems'
 }
@@ -216,6 +217,20 @@ export function rankingQuery(state: StateItem<RankItem[]> = INITIAL, action: Act
         action,
         actionType: ACTIONS?.RANKING
     }) as StateItem<RankItem[]>
+}
+
+// Not a list cache: one poem plus the Monday its week began, exactly as the
+// server computed it. Nothing is derived client-side, so the pick cannot drift
+// between visitors.
+export function poemOfTheWeekQuery(
+    state: StateItem<PoemOfTheWeek> = INITIAL,
+    action: Action
+): StateItem<PoemOfTheWeek> {
+    return commonReducer({
+        state,
+        action,
+        actionType: ACTIONS?.POEM_OF_THE_WEEK
+    }) as StateItem<PoemOfTheWeek>
 }
 
 export function createPoemQuery(state: StateItem<Poem> = INITIAL, action: Action): StateItem<Poem> {

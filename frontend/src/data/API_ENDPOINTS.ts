@@ -1,6 +1,7 @@
 export const API_ENDPOINTS = {
     POEMS: '/api/v1/poems',
     POEMS_RANKING: '/api/v1/poems/ranking',
+    POEM_OF_THE_WEEK: '/api/v1/poems/poem-of-the-week',
     POEM: '/api/v1/poem',
     LOGIN: '/api/v1/login',
     REGISTER: '/api/v1/register',

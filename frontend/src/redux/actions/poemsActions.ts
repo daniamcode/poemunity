@@ -96,6 +96,18 @@ export function getRankingAction({ params, options, callbacks }: GetRankingActio
     }
 }
 
+// One read, no params: the server owns the pick entirely, so there is nothing
+// for the client to pass or recompute.
+export function getPoemOfTheWeekAction() {
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.POEM_OF_THE_WEEK,
+            url: API_ENDPOINTS.POEM_OF_THE_WEEK,
+            dispatch
+        })
+    }
+}
+
 interface GetMyPoemsActionProps {
     params?: object
     options?: ReduxOptions

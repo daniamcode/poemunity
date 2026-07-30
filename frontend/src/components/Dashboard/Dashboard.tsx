@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import Accordion from '../SimpleAccordion'
 import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
+import PoemOfTheWeek from '../PoemOfTheWeek/PoemOfTheWeek'
 import List from '../List/List'
 import { InitialPoemsData } from '../List/hooks/usePoemsList'
 import { RootState } from '../../redux/store'
@@ -49,8 +50,12 @@ function Dashboard({ initialData, match }: DashboardProps) {
                 <h1 className={genre ? 'dashboard__heading' : 'sr-only'}>{heading}</h1>
                 <List genre={genre} initialData={initialData} />
             </div>
+            {/* Both live in the right rail, which only exists at $bp-xl — a
+                deliberate choice: this is a desktop-only extra, not something to
+                push above the poem list on a phone. */}
             <div className='dashboard__ranking'>
                 <Ranking />
+                <PoemOfTheWeek />
             </div>
         </main>
     )

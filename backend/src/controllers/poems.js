@@ -142,6 +142,56 @@ poemsRouter.get('/ranking', async (req, res) => {
   }
 })
 
+// Poem of the week — one famous poem, rotating every Monday.
+//
+// Deterministic, not stored: the week number indexes into the famous poems, so
+// every visitor sees the same poem all week, it changes on its own, and there is
+// no cron job, no state and nothing to back up. A stored "current pick" would
+// need a scheduler AND a fallback for when the scheduler misses.
+//
+// Week boundary: 1 Jan 1970 was a Thursday, so day 0 is a Thursday. Adding 3
+// before dividing by 7 moves the boundary to Monday, which is what people mean
+// by "this week".
+function weekIndex (now = new Date()) {
+  const day = Math.floor(now.getTime() / 86400000)
+  return Math.floor((day + 3) / 7)
+}
+
+// Start of that week, as a plain date — the UI labels the section with it.
+function weekStart (index) {
+  return new Date((index * 7 - 3) * 86400000)
+}
+
+poemsRouter.get('/poem-of-the-week', async (req, res) => {
+  try {
+    // `origin` on the poem, not a join through the author: it is the same field
+    // the list endpoint filters on, and it avoids an $in over 3,300 author ids.
+    const filter = { origin: 'famous' }
+
+    const total = await Poem.countDocuments(filter)
+    if (total === 0) return res.json({ poem: null })
+
+    const index = weekIndex()
+
+    // Sorting by _id lets the seek walk the _id index rather than sorting 15k
+    // documents in memory. Famous poems are ~97% of the collection, so the scan
+    // rejects almost nothing on the way — no extra index is worth carrying for
+    // one query a week.
+    const poem = await Poem.findOne(filter)
+      .sort({ _id: 1 })
+      .skip(index % total)
+      .populate('authorId', AUTHOR_FIELDS)
+
+    return res.json({
+      poem: poem ? serializePoem(poem) : null,
+      weekStart: weekStart(index).toISOString().slice(0, 10)
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 poemsRouter.get('/', async (req, res) => {
   try {
     const filter = {}
@@ -302,3 +352,5 @@ poemsRouter.patch('/', userExtractor, async (req, res) => {
 })
 
 module.exports = poemsRouter
+module.exports.weekIndex = weekIndex
+module.exports.weekStart = weekStart

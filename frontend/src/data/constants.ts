@@ -249,3 +249,5 @@ export const PAGINATION_LIMIT = 10
 // Authors
 export const AUTHORS_TITLE = 'Authors'
 export const AUTHORS_BROWSE_ALL = 'Browse all authors →'
+
+export const POEM_OF_THE_WEEK_TITLE = 'Poem of the week'

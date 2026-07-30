@@ -1,0 +1,88 @@
+@use '../../styles/variables' as *;
+
+// Sits under the ranking in the right rail. No display rules of its own: the
+// rail is already hidden below $bp-xl (see Dashboard.scss), and repeating that
+// here would mean two places to keep in step.
+.potw {
+    margin-top: $space-xl;
+    padding: $space-md;
+    background: $color-primary-bg;
+    border: 1px solid rgba($color-primary, 0.3);
+    border-radius: $radius-md;
+}
+
+.potw__heading {
+    margin: 0;
+    font-size: $fs-md;
+    font-weight: $fw-semibold;
+    color: $color-primary-dark;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.potw__week {
+    margin: 2px 0 $space-3;
+    font-size: $fs-xs;
+    color: $color-text-accessible-muted;
+}
+
+.potw__title {
+    display: block;
+    font-family: $font-heading;
+    font-size: $fs-lg;
+    line-height: $lh-tight;
+    color: $color-text-dark;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        text-decoration: underline;
+    }
+}
+
+.potw__author {
+    display: flex;
+    text-decoration: none;
+    align-items: center;
+    gap: $space-2;
+    margin: $space-2 0 $space-3;
+}
+
+.potw__author-name {
+    font-size: $fs-sm;
+    color: $color-text-medium;
+    text-decoration: none;
+    // The avatar and the name are separate links; without this the name can be
+    // pushed to its intrinsic width and overflow the narrow rail.
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.potw__author:hover .potw__author-name,
+.potw__author:focus-visible .potw__author-name {
+    text-decoration: underline;
+}
+
+.potw__excerpt {
+    margin: 0 0 $space-3;
+    // The poem's own line breaks carry its shape — the one thing not to lose
+    // when quoting four lines of verse.
+    white-space: pre-line;
+    font-size: $fs-sm-plus;
+    line-height: $lh-relaxed;
+    color: $color-text-medium;
+}
+
+.potw__read {
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-primary-dark;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        text-decoration: underline;
+    }
+}

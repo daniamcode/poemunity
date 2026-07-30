@@ -319,6 +319,34 @@ a link on screen nor an `item` in the markup.
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
 
+## Poem of the week
+
+`GET /api/v1/poems/poem-of-the-week` returns one famous poem plus the Monday its
+week began. Famous only — filtered on the poem's own `origin: 'famous'` rather
+than joined through the author, which is the same field the list endpoint uses
+and avoids an `$in` over 3,300 author ids.
+
+**The pick is derived, never stored.** A week number indexes into the famous
+poems, so every visitor sees the same poem all week, it rotates on its own, and
+there is no cron job, no state and nothing to back up — a stored "current pick"
+would need a scheduler *and* a fallback for the week the scheduler misses.
+
+1 Jan 1970 was a Thursday, so `Math.floor((day + 3) / 7)` is what moves the
+boundary to **Monday**. Drop the `+ 3` and the poem changes mid-weekend.
+
+Sorted by `_id` so the seek walks the `_id` index instead of sorting 15k
+documents in memory. Famous poems are ~97% of the collection, so the scan rejects
+almost nothing — **no extra index is worth carrying** for one query a week.
+
+Adding famous poems shifts `index % total`, so future picks reshuffle. Accepted:
+that set is effectively static, and the alternative is storing state.
+
+The card is **desktop-only by design** — it sits under the ranking in the right
+rail, which is already hidden below `$bp-xl`, so it carries no display rules of
+its own. It renders **nothing** while loading, on error, or when there is no poem:
+a spinner in the corner of the page costs more attention than a sidebar extra is
+worth.
+
 ## Reference Docs
 
 - `TODO.md` — the backlog (priorities, deferred decisions, recently shipped).

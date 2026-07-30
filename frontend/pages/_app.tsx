@@ -21,6 +21,7 @@ import '../src/components/Legal/LegalPage.scss'
 import '../src/components/PageNotFound/PageNotFound.scss'
 import '../src/components/Profile/Profile.scss'
 import '../src/components/Ranking/Ranking.scss'
+import '../src/components/PoemOfTheWeek/PoemOfTheWeek.scss'
 import '../src/components/Register/Register.scss'
 import '../src/components/Auth/VerifyBanner.scss'
 

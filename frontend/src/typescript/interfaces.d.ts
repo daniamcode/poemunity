@@ -29,6 +29,13 @@ export interface Poem {
     authorType?: 'famous' | 'user' | 'ai'
 }
 
+/** Response of GET /api/v1/poems/poem-of-the-week. */
+export interface PoemOfTheWeek {
+    poem: Poem | null
+    /** ISO date (YYYY-MM-DD) of the Monday the week began. */
+    weekStart?: string
+}
+
 export interface Author {
     id?: string
     name: string
