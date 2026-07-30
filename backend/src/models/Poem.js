@@ -8,6 +8,12 @@ const poemSchema = new Schema({
   date: Date,
   origin: String,
   slug: { type: String, unique: true, sparse: true },
+  // Slugs this poem used to have. Cleaning the scraped titles (see
+  // scripts/clean-poem-titles.js) regenerates slugs, and the old ones are
+  // already in the sitemap, in canonicals and in anything indexed — so they stay
+  // resolvable here instead of 404ing. Not unique: a slug freed by one poem
+  // could legitimately be taken by another later.
+  slugHistory: { type: [String], index: true, default: undefined },
   authorId: { type: Schema.Types.ObjectId, ref: 'Author', index: true }
 }, { strict: false })
 

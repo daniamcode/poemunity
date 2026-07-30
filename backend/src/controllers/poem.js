@@ -20,6 +20,13 @@ async function findPoemByIdOrSlug (poemId, { populate = true } = {}) {
   if (!poem) {
     poem = await withAuthor(Poem.findOne({ slug: poemId }))
   }
+  // Last resort: a slug this poem used to have. Cleaning the scraped titles
+  // changed 1,899 slugs that were already public, so old links keep working —
+  // the page then canonicalises to the current slug, which is how the new URL
+  // eventually replaces the old one in search results.
+  if (!poem) {
+    poem = await withAuthor(Poem.findOne({ slugHistory: poemId }))
+  }
   return poem || null
 }
 
