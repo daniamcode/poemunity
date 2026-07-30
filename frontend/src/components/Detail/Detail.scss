@@ -366,6 +366,13 @@
     // business in the accessibility tree.
     .poem-page::after {
         content: '';
+        // It is empty space, and it must not be able to behave like anything
+        // else. As a later sibling it paints ON TOP of any content that
+        // overflows the centre column, and it swallowed the clicks on the
+        // delete "×" of a comment for exactly that reason. The overflow itself
+        // is fixed (Comments.module.scss), but a purely presentational spacer
+        // should never be able to take a click in the first place.
+        pointer-events: none;
         width: 15%;
         margin-left: 3%;
         margin-right: 3%;

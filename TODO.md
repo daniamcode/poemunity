@@ -51,16 +51,43 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ## 🟡 P2 — Launch hardening (recommended)
 
 - 🤖 **Repair the Cypress suite, then put it in CI** (re-measured 2026-07-30 after
-  the readiness fix). Full run: **34 tests — 3 passing, 14 failing, 17 skipped.**
-  `ranking.cy.ts` is green; the other three specs are still red.
+  the proxy fix). Full run: **34 tests — 27 passing, 6 failing, 1 skipped.**
+  Three of four specs are green; only `create-poem.cy.ts` is red, and it is
+  blocked on an app bug rather than on the spec (see below).
 
   | spec | tests | passing | failing | skipped |
   |---|---|---|---|---|
-  | `comments.cy.ts` | 21 | 0 | 5 | 16 |
+  | `comments.cy.ts` | 21 | **21** | 0 | 0 |
   | `create-poem.cy.ts` | 7 | 0 | 6 | 1 |
   | `ranking.cy.ts` | 2 | **2** | 0 | 0 |
-  | `register.cy.ts` | 4 | 1 | 3 | 0 |
-  | **total** | **34** | **3** | **14** | **17** |
+  | `register.cy.ts` | 4 | **4** | 0 | 0 |
+  | **total** | **34** | **27** | **6** | **1** |
+
+  **Running it locally needs the frontend pointed at the test backend:**
+  `NEXT_PUBLIC_API_URL=http://localhost:4201 pnpm dev` in `frontend/`, then
+  `npx cypress run`. Cypress starts the backend itself; it does not start the
+  frontend. Point the frontend at :4200 by mistake and the suite runs against
+  the **production database** — `create-poem.cy.ts` writes poems.
+
+  What the repair actually turned up — none of it was stale assertions:
+  1. **The suite was testing an app that does not ship.** `axiosInstance` had a
+     `window.Cypress` branch pointing the browser straight at `localhost:4201`,
+     bypassing the Next proxy — so the cookie-to-Bearer translation and the token
+     refresh, the two things most worth end-to-end coverage, were never
+     exercised, and every request was cross-origin and refused by CORS. Removing
+     that branch took the suite from 3 passing to 27 and deleted test-only code
+     from the production bundle.
+  2. **The E2E env came from a developer's `.env`.** `REQUIRE_EMAIL_VERIFICATION`
+     is `true` locally and unset on a fresh CI runner, so the specs would have
+     been red locally and green on CI. `cypress.setup.js` now pins it (and
+     `FRONTEND_URLS`) and seeds the fixture users `emailVerified: true`.
+  3. **A real, shipped UI bug** — see "delete × unclickable" under Recently
+     shipped.
+
+  Still open: `create-poem.cy.ts` fails on an **intermittent React hydration
+  mismatch on `/profile`** (own item below). Cypress turns any app exception into
+  a failure, which is the correct behaviour — do not silence it with
+  `uncaught:exception` to get the suite green.
 
   (The skipped ones are not passing — they are downstream of a failed `before`
   hook, so they will surface more failures once the earlier ones are fixed.)
@@ -96,6 +123,30 @@ so there is **no separate env to "promote from"** — this IS the production dat
   finally have a PR to hold. Note the existing trap: required checks plus
   path-filtered workflows leave skipped jobs hanging as "Expected" forever, so
   that move needs an always-run aggregator job.
+
+- 🤖 **Intermittent React hydration mismatch on `/profile`** (found 2026-07-30 by
+  `create-poem.cy.ts`, then reproduced in a normal browser — it is not a Cypress
+  artefact). React logs "Hydration failed because the initial UI does not match
+  what was rendered on the server", throws out of `updateHostComponent` (an
+  ELEMENT mismatch, not a text one) and falls back to client rendering, so the
+  page still works and the damage is a wasted render plus lost SSR benefit.
+  What has been ruled out, so nobody repeats it:
+  - **Not invalid nesting.** Re-parsing the server HTML with `DOMParser` and
+    comparing tag+class+depth against the hydrated DOM gives an exact match, so
+    the parser is not hoisting anything out of a `<p>`. (A document-order-only
+    fingerprint is NOT enough to conclude this — hoisting preserves document
+    order. Compare depth.)
+  - **Not Emotion/MUI cache setup.** `_document.tsx` does the standard
+    `createEmotionServer` + `extractCriticalToChunks` dance.
+  - **Not `initialUser`.** `AppProvider` seeds `useState` from the same page prop
+    on both sides.
+  Prime remaining suspect: **the Redux store is a module-level singleton**
+  (`src/redux/store/index.ts`) shared by every SSR request in a warm Node/Vercel
+  process, while the client always boots empty. Nothing dispatches during render
+  today, which is why it is intermittent rather than constant — but it is a
+  latent cross-request state leak between *users* and worth fixing on its own
+  merits (make the store per-request, the standard Next.js pattern). Reproduce by
+  loading `/profile` logged in, repeatedly, with the console open.
 
 - 🤝 **Run a security review of the whole app** — never done end to end; the
   hardening that exists (helmet, rate limiters, hashed reset tokens, non-enumerating
@@ -210,6 +261,19 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Comment delete "×" was unclickable on wide screens** (2026-07-30). Between
+  `$bp-xl` (1200px) and ~1310px the comments section — `width: 90vw`, capped at
+  800px — was wider than the poem page's centre column (~58vw once the rail and
+  its counterweight take their share), so it overflowed to the right and slid
+  UNDER `.poem-page::after`. That pseudo-element is the empty counterweight that
+  keeps the poem centred, it paints after its siblings, and it swallowed the
+  click. Nobody could delete their own comment at those widths. Fixed both ends:
+  `width: min(90vw, 100%)` keeps the section inside its column, and the
+  counterweight is now `pointer-events: none` because presentational space should
+  never be able to take a click. **Found by `comments.cy.ts`** — lint, typecheck
+  and 990 jest tests were all green through it, which is the whole argument for
+  having a browser in CI.
 
 - **Poem text cleanup** (2026-07-30): scraper artifacts removed from production —
   **1,962 titles** cleaned (trailing "Launch Audio in a New Window", raw newlines,

@@ -7,6 +7,20 @@ let mongoServer
 // Set environment variable for JWT secret
 process.env.SECRET = '1234'
 
+// PIN the verification gate rather than inheriting it.
+//
+// app.js loads backend/.env, so without this the E2E suite runs under whatever
+// the developer happens to have locally — and it is 'true' locally but unset on
+// a fresh CI runner with no .env. That is the worst possible combination: the
+// specs would fail on the machine of whoever has to fix them and pass on CI,
+// where nobody would ever see the gate. Pin it ON, matching production, so the
+// suite exercises the configuration real users meet.
+process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+
+// Same reason: .env carries the production FRONTEND_URL, which would make the
+// CORS allowlist reject the local frontend outright.
+process.env.FRONTEND_URLS = 'http://localhost:3000'
+
 // Suppress strictQuery warning
 mongoose.set('strictQuery', false)
 
@@ -25,7 +39,12 @@ async function createTestUsers () {
       continue
     }
     const passwordHash = await bcrypt.hash('1234', 10)
-    await Author.create({ ...u, passwordHash, type: 'user', fake: false })
+    // emailVerified: publishing and commenting are gated on it (requireVerified),
+    // so an unverified fixture user cannot reach any of the flows these specs
+    // exist to test — every write answered 403 and five `before` hooks died.
+    // A user who has poems and comments in production is, by construction, a
+    // verified one.
+    await Author.create({ ...u, passwordHash, type: 'user', fake: false, emailVerified: true })
     console.log(`👤 Created Author "${u.username}" (password: 1234)`)
   }
 }

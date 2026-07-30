@@ -1,21 +1,25 @@
 import Axios from 'axios'
 
-// Use port 4201 for Cypress tests, port 4200 for development
-// This allows Cypress tests to run without killing the dev backend
+// In the BROWSER every call goes through the Next proxy at /api/backend, which
+// attaches the httpOnly session cookie as a Bearer token and refreshes it when a
+// response carries a new one. On the SERVER (getServerSideProps) there is no
+// proxy to talk to, so it addresses the backend directly.
+//
+// There used to be a `window.Cypress` branch here pointing the browser straight
+// at localhost:4201. It meant the E2E suite exercised an application that does
+// not ship: no proxy, so no cookie-to-Bearer translation and no token refresh —
+// the two things most worth having end-to-end coverage of — and every request
+// was cross-origin, which the CORS allowlist rightly refused, so the app under
+// test could not even load a poem. Cypress now runs the real path; point the
+// frontend's NEXT_PUBLIC_API_URL at the test backend instead.
 const getBaseURL = () => {
     if (process.env.NODE_ENV === 'test') {
         return 'http://localhost:4200'
     }
-    if (typeof window !== 'undefined' && window.Cypress) {
-        return 'http://localhost:4201'
-    }
     if (typeof window !== 'undefined') {
         return '/api/backend'
     }
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.NEXT_PUBLIC_API_URL
-    }
-    return 'http://localhost:4200'
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
 }
 
 export default function API(headers, extraConfig) {

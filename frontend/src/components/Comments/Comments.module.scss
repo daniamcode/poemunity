@@ -1,7 +1,15 @@
 @use '../../styles/variables' as *;
 
 .comments {
-    width: 90vw;
+    // 90vw is right where this section IS the page's main column (a profile, or
+    // any narrow viewport). It is wrong inside the poem page's centre column,
+    // which is only ~58vw once the Categories/Authors rail and its counterweight
+    // take their share: at a 1280px viewport the column is ~742px while 90vw
+    // resolves to the 800px cap, so the section overflowed 58px to the right and
+    // slid UNDER `.poem-page::after`. The delete "×" sits at that right edge, so
+    // it became unclickable — the click landed on the counterweight instead.
+    // The 100% term keeps the section inside whatever column it is given.
+    width: min(90vw, 100%);
     max-width: 800px;
     margin: 0 auto $space-xl;
 }
