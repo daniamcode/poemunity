@@ -1,2 +1,7 @@
 # Local planning docs that contain personal info (e.g. real email addresses)
 docs/EMAIL_AUTH_PLAN.md
+
+# Production database dumps. Every user record and every email address lives in
+# these archives, so they must never reach the repository — the directory is
+# tracked-by-name only, never by content.
+/poemunity-backups

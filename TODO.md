@@ -50,22 +50,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🟡 P2 — Launch hardening (recommended)
 
-- 🤝 **Scraped junk in famous poem titles** (found 2026-07-30). **1,369** poems
-  carry `Launch Audio in a New Window` inside `title`, and **1,879** titles
-  contain raw newlines — ~9% of the collection. Example:
-  `"Adam\n  \n  Means Earth*\n \n \n  \n   Launch Audio in a New Window"`.
-  Import artifacts from the original Poetry Foundation scrape, so **pre-existing**
-  — but the SEO work (2026-07-30) promoted titles into `<title>`, `<h1>`, JSON-LD
-  and breadcrumbs, so it is now visible in far more places than before, and Poem
-  of the week can serve one straight into the sidebar.
-  **The slugs are the hard part.** They were generated from the dirty titles
-  (`adam-means-earth-launch-audio-new-window-samuel-menashe`) and are already in
-  the sitemap, in canonicals and in any indexed URL. Cleaning titles is easy;
-  regenerating slugs breaks live URLs unless old→new redirects come with it. So
-  decide first: (a) clean titles only, leave slugs as they are — ugly URLs,
-  correct pages; (b) clean both and add redirects — right long-term, more work.
-  Either way it is a **production write**: dry-run + `mongodump` first.
-
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical
   to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script
   writes straight to **production**, and there's nowhere safe to rehearse a seed or
@@ -145,6 +129,20 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Poem text cleanup** (2026-07-30): scraper artifacts removed from production —
+  **1,962 titles** cleaned (trailing "Launch Audio in a New Window", raw newlines,
+  double spaces), **885 bodies** and 69 titles had HTML entities decoded
+  (`&amp;` 5,418 · `&gt;` 49 · `&lt;` 24), **1,433 slugs** regenerated with 14
+  collisions suffixed. Old slugs live on in `Poem.slugHistory` and
+  `GET /poem/:idOrSlug` falls back to them, so nothing 404s; the page
+  canonicalises to the new slug. Re-runnable: `backend/scripts/clean-poem-text.js`
+  is dry-run by default. The sitemap needed no change — it is generated from the
+  API and picks up new slugs within its 24h CDN cache.
+  **Lesson worth keeping:** the migration was canaried with `--commit --limit 1`
+  first, which caught that the commit adding the `slugHistory` fallback had never
+  deployed (Vercel showed the previous commit as the latest backend build). Had
+  the full run gone ahead, 1,433 live URLs would have 404'd at once.
 
 - **Next-poem index + orphan cleanup** (2026-07-30): `{ authorId: 1, date: -1,
   _id: -1 }` on `poems` was **already live** — `autoIndex` is on (`mongo.js` sets
