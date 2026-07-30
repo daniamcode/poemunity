@@ -71,3 +71,39 @@ describe('generatePoemSlug with all-stop-word titles', () => {
     expect(generatePoemSlug('', '')).toBe('poem')
   })
 })
+
+const { decodeHtmlEntities } = require('../utils/htmlEntities')
+
+describe('decodeHtmlEntities', () => {
+  test('decodes the three entities that actually occur', () => {
+    expect(decodeHtmlEntities('About God &amp; Things')).toBe('About God & Things')
+    expect(decodeHtmlEntities('a &lt; b &gt; c')).toBe('a < b > c')
+  })
+
+  // Poems are full of ampersands followed by words. A permissive decoder that
+  // treated any &word; as an entity would eat this.
+  test('leaves ordinary text with ampersands alone', () => {
+    expect(decodeHtmlEntities('Sturm & Drang; the storm')).toBe('Sturm & Drang; the storm')
+    expect(decodeHtmlEntities('&nbsp; stays as written')).toBe('&nbsp; stays as written')
+  })
+
+  test('decodes &amp; last, so it cannot invent characters', () => {
+    // Decoding &amp; first would make this "&lt;" and then "<".
+    expect(decodeHtmlEntities('&amp;lt;')).toBe('&lt;')
+  })
+
+  test('passes non-strings through', () => {
+    expect(decodeHtmlEntities(null)).toBeNull()
+  })
+})
+
+describe('cleanPoemTitle with entities', () => {
+  test('decodes them, which is what fixes the slug too', () => {
+    expect(cleanPoemTitle('About God &amp; Things')).toBe('About God & Things')
+  })
+
+  test('handles an entity and the audio artifact together', () => {
+    expect(cleanPoemTitle('Art &amp; Craft\n \n   Launch Audio in a New Window'))
+      .toBe('Art & Craft')
+  })
+})

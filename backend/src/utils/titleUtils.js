@@ -1,9 +1,12 @@
-// Titles imported from the original poem scrape carry two artifacts:
+const { decodeHtmlEntities } = require('./htmlEntities')
+
+// Titles imported from the original poem scrape carry three artifacts:
 //
 //   1. a trailing "Launch Audio in a New Window" — the label of a player button
 //      that sat next to the title on the source page;
 //   2. raw newlines and runs of spaces, because the title spanned several
-//      elements there.
+//      elements there;
+//   3. undecoded HTML entities — 69 titles read "About God &amp; Things".
 //
 // Both were invisible while titles were only ever rendered inside a poem card.
 // Promoting them into <title>, <h1>, JSON-LD and breadcrumbs made them very
@@ -24,7 +27,7 @@ const AUDIO_ARTIFACT = /\s*Launch\s+Audio\s+in\s+a\s+New\s+Window\s*$/i
 function cleanPoemTitle (title) {
   if (typeof title !== 'string') return title
 
-  const cleaned = title
+  const cleaned = decodeHtmlEntities(title)
     .replace(AUDIO_ARTIFACT, '')
     .replace(/\s+/g, ' ')
     // Collapsing newlines leaves gaps before punctuation: "Aeneid\n , II" would
