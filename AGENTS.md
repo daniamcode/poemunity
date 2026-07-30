@@ -87,6 +87,16 @@ Only the non-obvious parts are worth recording:
 
 **Styling**: SCSS + MUI v7 (`@mui/material`) with Emotion. Config in `next.config.js`, `eslint.config.mjs`, `jest.config.js`, `tsconfig.json` (strict).
 
+**Fonts**: EB Garamond (body) and Quattrocento (headings) are loaded by
+`src/lib/fonts.ts` via `next/font/google` and published as `--font-body` /
+`--font-heading` on `:root` by `_app.tsx`; `$font-body` / `$font-heading` in
+`_variables.scss` are `var()` references to those. **Naming a family in SCSS
+loads nothing** — that was the bug: both families were named and never loaded, so
+every visitor got the generic `serif` (Times) and the site never rendered in its
+own typefaces. To check whether a family is real, measure it against `serif` on a
+canvas; identical widths mean it fell back. Adding a weight or style (e.g. an
+italic) means adding it in `fonts.ts`, or the browser synthesises one.
+
 ### Backend
 
 **Entry points**
