@@ -379,12 +379,13 @@ investigation did surface three real things:
   `date`. Genre validation shipped this session closed one field of this hole;
   the rest is still open. Worth doing before the P2 security review, not as part
   of it.
-- 👤 **Run Cypress and `pnpm build` against the drafts work.** Neither has run
-  since drafts landed: the create form gained a "Save as draft" action and the
-  profile a third tab, and `create-poem.cy.ts` drives that form. Per AGENTS.md,
-  layout needs a browser and a deploy needs verifying against the live URL —
-  green unit tests do not cover either. (A dev server was holding :3000 during
-  the session, and building would have clobbered its `.next`.)
+- 👤 **Verify the drafts work against the live URL.** CI's `E2E (Cypress)` job
+  went green on `7cf9127`, so the browser paths (including `create-poem.cy.ts`,
+  which drives the form that gained "Save as draft") ARE covered, and Vercel's
+  frontend build gate runs `pnpm build` — so neither needs running locally.
+  What is still unverified is the deploy itself: per AGENTS.md a deploy is
+  never inferred from green CI (a needed backend fallback once passed CI and
+  never deployed at all). Load the live site and exercise the Drafts tab.
 - 👤 **The header tagline's baseline offset is an estimate, not a measurement.**
   `top: 5px / 6px` on `.header .list__presentation` was reasoned, not measured:
   the Chrome tab was in a background window (`document.hidden`), so the browser
