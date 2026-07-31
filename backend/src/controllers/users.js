@@ -4,6 +4,7 @@ const Author = require('../models/Author')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 const { signAuthorToken, buildAuthorProfile } = require('../utils/authToken')
+const { PUBLISHED_MATCH } = require('../utils/poemVisibility')
 
 const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
 
@@ -45,7 +46,9 @@ async function storePicture (dataUrl, userId) {
 
 usersRouter.get('/', async (req, res) => {
   try {
-    const users = await User.find({}).populate('poems', 'poem date')
+    // Legacy route over the legacy User model, but it still dereferences poem
+    // ids — so it gets the same visibility match as every other public read.
+    const users = await User.find({}).populate({ path: 'poems', select: 'poem date', match: PUBLISHED_MATCH })
     res.json(users)
   } catch (error) {
     console.error(error)

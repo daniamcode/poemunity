@@ -222,6 +222,50 @@ inferred from CI.
 
 **Ranking freshness after mutations.** The author ranking (`rankingQuery`, the sidebar) is a **server-computed aggregate** (points = `3×poems + 1×likes`, top-10) — *not* part of the normalized entity store, because the client doesn't hold every poem and so can't recompute it. The three mutations that change author points — **like** (`PUT /poem/:id`), **create** (`POST /poems`), **delete** (`DELETE /poem/:id`) — **recompute and return the fresh ranking in their own response** (poem fields stay top-level, `ranking` is a sibling; delete returns `200 { ranking }` instead of `204`). The frontend adopts it verbatim via `setRanking(response.ranking)`, so points/order/tie-breaks stay 100% server-owned. `computeRanking()` lives in `backend/src/utils/ranking.js`, shared with `GET /poems/ranking`. A missing `ranking` field is a safe no-op, so frontend/backend can deploy in either order. Rejected alternatives: **(A)** optimistically patch cached points client-side — re-encodes the server formula and can't cross the top-N boundary; **(B)** refetch `GET /ranking` after each mutation — a second round-trip per like. Editing a poem (no point change) and profile edits (identity only — handled by the `authorEntities` overlay in `selectRanking`) deliberately carry no ranking.
 
+## Drafts (one visibility fragment)
+
+`Poem.status` is `'draft' | 'published'`, **defaulted to `published` and never
+backfilled**. The ~16k poems that predate the field carry no `status` at all, so
+"published" has to mean *published or absent* — that equivalence is what let this
+ship without a write to the production database, and it is why a filter written
+as `{ status: 'published' }` is a bug that hides the entire existing collection.
+
+**There is exactly one visibility fragment**, `PUBLISHED_MATCH` /
+`publishedOnly()` in `backend/src/utils/poemVisibility.js`, and every public read
+composes it: the list endpoint (search, genre, origin, userId, likedBy, and the
+paginated `total` — a filtered list with an unfiltered count advertises what it
+refused to show), `computeRanking()`, poem-of-the-week, `GET /poem/:id`, the
+next-poem walk (inside `findNext` and `firstAuthorAfter`, not at the call sites),
+author poem counts, comment creation, and the legacy `GET /users` populate. The
+frontend sitemap needs no change of its own — it crawls `GET /poems`.
+
+Two things about that fragment are deliberate. It is a single **top-level key**,
+so it composes with the `$or` (userId) and `$and` (search) the list endpoint
+already builds. And it is an **allowlist** (`$in: ['published', null]`), not
+`{ $ne: 'draft' }`: a status added later — scheduled, archived — stays invisible
+until somebody decides otherwise. Getting this wrong publishes private writing,
+which is why it is one helper rather than a line repeated at fifteen call sites.
+
+`src/__tests__/drafts.test.js` **enumerates the public endpoints in a table** and
+asserts none of them mentions a draft. Add a row when you add a route. Its
+fixture is built from distractors — a drafts-only author who sorts first, a draft
+that is the newest poem, a draft between two published ones so the within-author
+walk steps onto it, and a published poem inserted through the driver with no
+`status` key at all.
+
+Reading a draft is owner-or-admin and answers **404, not 403** — a 403 confirms
+that a poem exists at that slug. `req.userId` is a string from a JSON-serialized
+JWT, and `poem.authorId` may be populated, so the comparison goes through
+`authorIdOf()`. `userExtractor.optional` is the non-rejecting variant for routes
+that are public but answer differently for the owner.
+
+`GET /poems?status=draft` is the Drafts tab, scoped **by the session**, never by
+`?userId=`. Publish/withdraw is `PATCH /poem/:id { status }`, which returns a
+freshly recomputed `ranking` because it changes the author's poem count — an
+ordinary edit still returns none. Client-side, publishing is purely a
+**membership move** between id-lists (`movePoemBetweenDraftAndPublished`); the
+poem is one entity that both sides resolve through.
+
 ## Search (server-backed)
 
 Search is a **server** query, not a client-side filter. `GET /api/v1/poems?q=`

@@ -1,4 +1,4 @@
-import { EB_Garamond, Quattrocento } from 'next/font/google'
+import { EB_Garamond, Quattrocento, Great_Vibes } from 'next/font/google'
 
 /**
  * The two typefaces the design has always specified — and, until now, never
@@ -36,4 +36,26 @@ export const fontHeading = Quattrocento({
     weight: ['400', '700'],
     display: 'swap',
     variable: '--font-heading'
+})
+
+/**
+ * Display script — the header tagline only.
+ *
+ * A formal connected calligraphic face with the thick/thin contrast and swash
+ * capitals of pointed-pen lettering. Great Vibes is the closest thing Google
+ * Fonts carries to that style; the nearer alternatives are lighter and more
+ * casual (Alex Brush, Parisienne, Sacramento) or thinner (Tangerine).
+ *
+ * Ships one weight (400) and no italic — asking for either makes the browser
+ * synthesise it, which on a script this contrasty smears the thin strokes.
+ *
+ * Use it for ONE short phrase at a large size, never for body copy or anything
+ * a reader must scan: connected scripts drop legibility sharply below ~24px,
+ * and lowercase-heavy strings get hard to parse at any size.
+ */
+export const fontDisplay = Great_Vibes({
+    subsets: ['latin'],
+    weight: '400',
+    display: 'swap',
+    variable: '--font-display'
 })

@@ -1,5 +1,6 @@
 const authorsRouter = require('express').Router()
 const Author = require('../models/Author')
+const { PUBLISHED_MATCH } = require('../utils/poemVisibility')
 
 function buildFilter (query) {
   const filter = {}
@@ -17,7 +18,11 @@ const countLookup = {
     from: 'poems',
     let: { aid: '$_id' },
     pipeline: [
-      { $match: { $expr: { $eq: ['$authorId', '$$aid'] } } },
+      // Drafts are not part of an author's public body of work: this count is
+      // both the "35 poems" badge and — via HAS_POEMS — what decides whether the
+      // author appears at all. Counting drafts would list authors whose page,
+      // and whose letter in the index, then opens onto nothing.
+      { $match: { $expr: { $eq: ['$authorId', '$$aid'] }, ...PUBLISHED_MATCH } },
       { $count: 'n' }
     ],
     as: 'poemCount'

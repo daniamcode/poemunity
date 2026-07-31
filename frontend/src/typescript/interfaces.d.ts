@@ -13,6 +13,8 @@ export interface Comment {
     updatedAt: string
 }
 
+export type PoemStatus = 'draft' | 'published'
+
 export interface Poem {
     id: string
     author: string
@@ -27,6 +29,12 @@ export interface Poem {
     authorSlug?: string
     authorName?: string
     authorType?: 'famous' | 'user' | 'ai'
+    /**
+     * Draft = private to its author. Optional because the ~16k poems that
+     * predate the field carry no status at all and the server treats a missing
+     * one as published — so `undefined` here means published too.
+     */
+    status?: PoemStatus
 }
 
 /** Response of GET /api/v1/poems/poem-of-the-week. */

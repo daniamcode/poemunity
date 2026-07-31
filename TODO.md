@@ -177,8 +177,75 @@ so there is **no separate env to "promote from"** — this IS the production dat
   delete, create/save. (A regression test already guards `manageError` against
   `[object Object]`.)
 
+## 🟣 P2.5 — Profile & social features (product roadmap, 2026-07-31)
+
+Ordered by impact. Seeded by a competitor review (Yavendras' "Zona Privada":
+tabs for Perfil / Sube Contenido / Mi Actividad / Usuarios Seguidos / Seguidores /
+Notificaciones, a stats panel and a profile-completion bar) plus conventions from
+Allpoetry / HelloPoetry. **Today's profile** = picture, personal fields with
+per-field public/private toggles, bio, preferred genres, and two tabs (My Poems,
+My Favourites). Structurally missing: no social graph anywhere in the codebase,
+no notifications, and `Poem` has no `status` field — publishing is all-or-nothing.
+
+**Cross-cutting caveat for every item here:** all of them need a schema change, and
+`MONGODB_PRE` is the same cluster and database as `MONGODB`. Any backfill is a
+production write — `mongodump` snapshot first, dry-run first. `autoIndex` is on in
+prod, so new indexes build themselves on deploy but are never dropped when removed.
+
+1. ✅ **Drafts — private poems before publishing.** SHIPPED (2026-07-31) — see
+   Recently shipped. Remaining product decision: drafts are excluded from the
+   author's public poem count, which means an author whose whole body of work is
+   drafted disappears from the author index until they publish.
+2. 🤝 **Follow / followers.** The reference's `Usuarios Seguidos` / `Seguidores`, and
+   the thing that makes everything after it possible — there is currently no way to
+   keep up with a poet you liked. A `Follow` collection (`follower`, `following`,
+   compound unique index), **not** an array on `Author` (doesn't scale, can't
+   paginate). Follow button on `/authors/[slug]`, counts + two tabs on the profile.
+   Three product calls (👤), with recommendations: **famous poets** (~3,300)
+   followable? → yes, but they never publish so it's a reading list, not a feed.
+   **AI personas** followable? → yes, but keep the AI badge on every follow surface;
+   following a bot is in tension with the disclosure the footer and per-poem badges
+   exist to make. **Do followers affect ranking points?** → no. Currently
+   `3×poems + 1×likes` in `computeRanking()`; follower counts are gameable and it
+   would reshuffle everyone's rank overnight.
+3. 🤖 **Notifications.** Nothing currently brings a user back to the site. The
+   likes/comments half works standalone and can ship before item 2. In-app first
+   (header bell + a Notifications tab), then an optional weekly email digest —
+   Resend is already wired up behind `src/utils/email.js`. **Must collapse and
+   batch** ("12 people liked your poem", not twelve rows) or it becomes noise;
+   self-actions never notify.
+4. 🤖 **Your stats panel** (cheapest win). The reference's `Mis Estadísticas`, but
+   honest: poems published, likes received, rank if in the top 10 — `computeRanking()`
+   already computes this server-side, so it's mostly UI. **Deliberately drop the
+   day/week/month/year breakdown** from the reference: four unexplained decimals
+   (`2.12`, `2.10`, `64.54`) are decoration pretending to be feedback, and would
+   need time-bucketed aggregation that doesn't exist.
+5. 🤖 **Pinned poem.** One `featuredPoemId` on `Author`, rendered first on the public
+   author page. Poets have a piece they want read first; today the newest wins.
+6. 🤖 **Activity tab** — the reference's `Mi Actividad`: merged timeline of your
+   poems, comments and likes given. Mostly a query over data already stored.
+   (Supersedes the older P4 note about showing commented-on poems in the profile —
+   including its open question about whether the MUI tabs component handles a third
+   tab well, or should be swapped for something more modern and reusable.)
+7. 🤖 **Free-form tags.** Genres are a fixed `CATEGORIES` list; tags (`#grief`,
+   `#sonnet`, `#villanelle`) allow discovery by form and subject. Needs guardrails or
+   the namespace becomes noise: lowercase, deduped, capped per poem, autocomplete
+   from existing tags.
+8. 🤖 **Collections / series** (higher value later). Poets think in sequences and
+   chapbooks, but this only earns its place once users have enough poems for
+   grouping to matter.
+
+**Deliberately rejected from the reference site:**
+- **The "profile 45% complete" bar** — a nag that treats the user as an incomplete
+  record. The underlying goal is real (author pages look empty without bio/picture),
+  so instead: *one* dismissible contextual prompt on your own author page.
+- **The four-way points breakdown** — see item 4.
+- **`Vacío` placeholders on every empty field** — six red "Empty" labels make the
+  profile read as a form you failed. Omit empty fields; show one "add details" link.
+
 ## 🟢 P3 — Frontend quality & refactors (code)
 
+- SEO: Add a section with links to online poetry contests in english. Then write them to let them know that they are on my web, so a backlink would be appreciated
 - 🤖 **Finish the TypeScript migration** — `MyPoems.jsx`, `Register.jsx`,
   `Profile.jsx`, `MyFavouritePoems.jsx`, plus util files (`parseJWT.js`,
   `notifications.js`, `sortPoems.js`, `axiosInstance.js`). (`frontend/CLEANUP.md` §1)
@@ -237,7 +304,6 @@ so there is **no separate env to "promote from"** — this IS the production dat
 
 ## 🔵 P4 — Maintenance & product decisions (low / when convenient)
 
-- Add to my profile the poems where i commented something, to decide how i show poem+comment. Check if the tabs component in my profile supports well a third tab or if we can use are more modern component that we can reuse from some library
 - 🤖 **Raise test coverage** — add tests for still-untested components/utilities.
   (`frontend/CLEANUP.md` Phase 2 has the full breakdown.)
 - 🤖 **Dependency & tooling upkeep** — `pnpm outdated`, update ESLint, keep
@@ -250,7 +316,102 @@ so there is **no separate env to "promote from"** — this IS the production dat
 - 👤 **Monarch idea** — what's script vs. AI-generated, and how to invoke Claude
   invisibly (as Monarch does with Copilot).
 
+### Genre URLs & the CATEGORIES/database drift (raised 2026-07-31)
+
+Prompted by "is `/home` a duplicate of `/`?" — **it is not**: `Home` is a real
+entry in `CATEGORIES`, so `/home` is the genre page (63 poems), with its own
+title, its own canonical and a sitemap entry. Nothing to fix there. The
+investigation did surface three real things:
+
+- ✅ **Fixed — genre slugs were case-insensitive duplicates.** `/Home`, `/HOME`,
+  `/hOmE` all returned 200 with the same poems, each canonicalising to the URL it
+  was requested on — unbounded duplicate content, every genre times every casing,
+  each copy claiming to be the original. Now 308-redirects to the lowercase slug.
+- ✅ **Fixed — nonsense URLs were soft 404s.** `/asdfnonsense` returned 200 with an
+  "Asdfnonsense poems" heading and a self-referencing canonical, i.e. unlimited
+  crawlable self-canonical pages. Now `notFound: true` — but only for slugs that
+  are *also* backed by no poems (see below), so the four orphan genres survive.
+- ✅ **Fixed — four genres existed in the DB but not in `CATEGORIES`.**
+  `anger` (22 poems), `imagination` (51), `spirituality` (77), `sports` (18) —
+  **168 poems** whose pages rendered but which were absent from the sitemap and
+  unreachable from the category nav: orphaned from search. Now added to
+  `CATEGORIES` (a pure frontend change; no database write).
+
+  **Root cause, confirmed from `scripts/categorize-poems-progress.md`:** not
+  scraper drift (an earlier guess, and wrong). A deliberate **140-category
+  taxonomy** was designed for SEO; `categorize-poems.js` applied all 140 to the
+  database ("All 15,668 DB poems now have a genre from the 140-category slug
+  system"), and the doc's own mapping table lists e.g. `anger | Anger`. The list
+  was then transcribed into `frontend/src/data/constants.ts` — and four entries
+  never made it. One list, two copies, one lossy transcription. The count is
+  now **143**, not the 136 first reported here: that number came from a parser
+  that only understood single quotes and silently dropped `"Father's Day"`,
+  `"Mother's Day"` and `"Valentine's Day"`.
+- ✅ **Fixed — genre was never validated server-side.** `POST /poems` spreads the
+  request body into a `strict: false` model, so **any client could store any
+  genre string** — the dropdown constrained the UI only. `PATCH /poem/:id`
+  likewise. Both now 400 on a genre outside the curated list, and accept either
+  the display name or the slug (storing `Nature` beside `nature` would split one
+  category in two). The AI seed pipeline validates through the same helper and
+  **throws** rather than defaulting — it had been writing `p.genre` verbatim, and
+  its own docblock example used Title Case while the database stores slugs.
+- ✅ **Fixed — the mirrored list can no longer drift silently.** Runtime backend
+  code cannot read `frontend/src/data/constants.ts` (the Vercel root is
+  `backend/`), so the slugs are mirrored in `backend/src/data/categories.js` —
+  the same shape of risk that caused the original bug. `categoryDrift.test.js`
+  reads the real constants.ts and fails if the two disagree, and
+  `.github/workflows/backend.yml` now watches `frontend/src/data/constants.ts`
+  so editing the frontend list runs that check. Regenerate the mirror with
+  `node backend/scripts/sync-categories.js`.
+
+### Open after the 2026-07-31 session (drafts, genres, fonts)
+
+- 🤖 **`POST /poems` lets the client set `likes` and `date` directly.** The handler
+  spreads `...poemData` into the model and overrides only `genre`, `authorId`,
+  `origin`, `status` and `slug` — **`likes` is not overridden**, and `Poem` is
+  `strict: false`, so arbitrary extra fields persist too. A hand-made request
+  with `likes: [...]` therefore creates a poem that already has likes, and likes
+  are worth a ranking point each (`computeRanking`: `3×poems + 1×likes`), so this
+  is a direct self-promotion vector into the public sidebar; `date` is likewise
+  free, which moves list ordering and the next-poem walk. **Fix:** build the
+  document from an explicit allowlist rather than a spread (`title`, `poem`,
+  `genre`, `status` — nothing else), and force `likes: []` and a server-side
+  `date`. Genre validation shipped this session closed one field of this hole;
+  the rest is still open. Worth doing before the P2 security review, not as part
+  of it.
+- 👤 **Run Cypress and `pnpm build` against the drafts work.** Neither has run
+  since drafts landed: the create form gained a "Save as draft" action and the
+  profile a third tab, and `create-poem.cy.ts` drives that form. Per AGENTS.md,
+  layout needs a browser and a deploy needs verifying against the live URL —
+  green unit tests do not cover either. (A dev server was holding :3000 during
+  the session, and building would have clobbered its `.next`.)
+- 👤 **The header tagline's baseline offset is an estimate, not a measurement.**
+  `top: 5px / 6px` on `.header .list__presentation` was reasoned, not measured:
+  the Chrome tab was in a background window (`document.hidden`), so the browser
+  skipped layout and every rect read 0. The previous 2px/3px WAS measured, but
+  for EB Garamond italic — a script face puts its baseline elsewhere in the em
+  box, so the old number does not transfer. Re-measure with the window in the
+  foreground, or just nudge it by eye.
+- 👤 **Product call — an author whose poems are all drafts vanishes from `/authors`.**
+  Follows from the `HAS_POEMS` filter now excluding drafts. The alternative is a
+  letter index that opens onto an empty author page. Raised by the drafts work;
+  no action taken.
+- 🤖 **(Low) No search box on the Drafts tab** — deliberate for now: it would need
+  its own owner-scoped server query for a list that usually fits on one screen.
+
 ### Housekeeping / follow-ups raised this session
+
+- 🤖 **Index drift — run `check-index-drift.js` after any schema-index change.**
+  `autoIndex` is ON in production (`backend/mongo.js` sets no `autoIndex: false`),
+  which is **asymmetric**: adding an index to a schema builds it automatically on
+  deploy, but *removing* the line never drops it — the index lives on in Atlas
+  forever, costing write throughput for a query no longer issued, and invisibly,
+  since the code no longer mentions it. Nothing is broken today; this is a
+  standing rule, and it matters now because the P2.5 features each add indexes
+  (the `Follow` compound index, the drafts `status` filter). After removing an
+  index from a schema, drop it explicitly.
+  `node backend/scripts/check-index-drift.js` reports both directions and is
+  strictly read-only. Worth a run after each P2.5 item ships.
 
 - 🤖 **Speed up the sitemap** — `pages/sitemap.xml.ts` pages the poems API 100 at
   a time (~160 sequential calls for 16k poems → ~25 s cold generation, risking the
@@ -285,6 +446,20 @@ so there is **no separate env to "promote from"** — this IS the production dat
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Drafts — private poems before publishing** (2026-07-31, P2.5 item 1).
+  `Poem.status: 'draft' | 'published'`, **defaulted, never backfilled**: the
+  ~16k existing poems carry no `status` at all, and every read treats a missing
+  one as published, so shipping this required no production write. Visibility is
+  ONE fragment — `PUBLISHED_MATCH` / `publishedOnly()` in
+  `backend/src/utils/poemVisibility.js` — composed by every public read path, an
+  allowlist (`$in: ['published', null]`) rather than `$ne: 'draft'` so a status
+  added later is invisible by default. `src/__tests__/drafts.test.js` enumerates
+  the public endpoints in a table, so a route that forgets the filter fails a
+  test instead of leaking. A **Drafts** tab on the profile (`?status=draft`,
+  scoped by the SESSION, never by a query param), "Save as draft" on the create
+  form, and publish/withdraw as a `PATCH { status }` that returns a recomputed
+  ranking (publishing changes the author's poem count, so it changes points).
 
 - **Cypress suite repaired: 34/34, five consecutive clean runs** (2026-07-30),
   up from 1 passing. Three root causes, none of them a stale assertion:

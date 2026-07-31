@@ -397,6 +397,27 @@ describe('Poem API', () => {
       expect(response.body.genre).toBe('sad')
     })
 
+    test('rejects an edit to a genre outside the curated list', async () => {
+      // An edit must not be a way around the validation creation applies.
+      const poem = await Poem.create({
+        title: 'Edit Guard',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg'
+      })
+
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ genre: 'notacategory' })
+        .expect(400)
+
+      expect((await Poem.findById(poem._id)).genre).toBe('love')
+    })
+
     test('should update genre', async () => {
       const poem = await Poem.create({
         title: 'Test Poem',
@@ -412,10 +433,10 @@ describe('Poem API', () => {
       const response = await request(app)
         .patch(`/api/v1/poem/${poem._id}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .send({ genre: 'happy' })
+        .send({ genre: 'hope' })
         .expect(200)
 
-      expect(response.body.genre).toBe('happy')
+      expect(response.body.genre).toBe('hope')
     })
 
     test('should return 401 without authentication token', async () => {

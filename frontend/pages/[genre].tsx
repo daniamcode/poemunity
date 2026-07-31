@@ -8,7 +8,7 @@ import { JsonLd } from '../src/components/JsonLd'
 import { Breadcrumbs } from '../src/components/Breadcrumbs'
 import { genreStructuredData } from '../src/utils/structuredData'
 import { genreTitle, genreDescription } from '../src/utils/seo'
-import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH } from '../src/data/constants'
+import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH, isKnownCategorySlug } from '../src/data/constants'
 
 interface PageProps {
     initialData: InitialPoemsData | null
@@ -66,10 +66,47 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, query }) => {
-    const genre = params?.genre as string
+    const requested = params?.genre as string
+    const genre = requested.toLowerCase()
     const token = req.cookies?.token
     const protocol = (req.headers['x-forwarded-proto'] as string)?.split(',')[0] || 'http'
     const baseUrl = `${protocol}://${req.headers.host}`
+
+    // Genre slugs are lowercase, but the route matched ANY casing: /Home, /HOME
+    // and /hOmE all rendered the same 63 poems, each page canonicalising to the
+    // URL it was requested on. That is unbounded duplicate content — every
+    // genre times every casing — with each copy declaring itself the original.
+    // (Same rule the poem pages already follow: canonicalise to the slug, never
+    // to the requested URL.) 308 rather than 301 so the method is preserved and
+    // the redirect is explicitly permanent for crawlers.
+    if (requested !== genre) {
+        const qs = typeof query.q === 'string' && query.q ? `?q=${encodeURIComponent(query.q)}` : ''
+        return { redirect: { destination: `/${genre}${qs}`, permanent: true } }
+    }
+
+    // A slug that is neither a curated category nor backed by any poem used to
+    // render a perfectly normal-looking page: /asdfnonsense returned HTTP 200,
+    // an "Asdfnonsense poems" heading and a self-referencing canonical. That is
+    // a soft 404 — an unbounded set of crawlable, self-canonical URLs.
+    //
+    // The check cannot be "is it in CATEGORIES" alone: the database holds four
+    // genres that list does not (anger, imagination, spirituality, sports —
+    // ~168 real poems, almost all scraped famous ones), and 404ing those would
+    // delete live pages. So an unknown slug earns one unfiltered probe, and
+    // survives if it actually has poems. Only unknown slugs pay for it; curated
+    // ones skip straight through.
+    //
+    // The probe deliberately ignores ?q=: searching a real genre for something
+    // it does not contain is an empty result, not a missing page.
+    if (!isKnownCategorySlug(genre)) {
+        const probe = await serverFetch<InitialPoemsData>('/api/v1/poems', {
+            page: 1,
+            limit: 1,
+            genre
+        }, token)
+        if (!probe || probe.total === 0) return { notFound: true }
+    }
+
     // See the note in pages/index.tsx: ?q= has to be honoured server-side or the
     // seeded search box renders next to an unfiltered list.
     const q = typeof query.q === 'string' ? query.q.trim() : ''

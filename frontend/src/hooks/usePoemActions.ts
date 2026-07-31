@@ -1,15 +1,16 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../redux/store'
-import { deletePoemAction, likePoemAction } from '../redux/actions/poemActions'
+import { deletePoemAction, likePoemAction, savePoemAction } from '../redux/actions/poemActions'
 import {
     dropPoemFromCaches,
     dropPoemFromFavouritesCache,
     addPoemToFavouritesCache,
+    movePoemBetweenDraftAndPublished,
     setRanking
 } from '../redux/actions/poemsActions'
 import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
-import { Context, Poem } from '../typescript/interfaces'
+import { Context, Poem, PoemStatus } from '../typescript/interfaces'
 import { manageError, manageSuccess } from '../utils/notifications'
 
 export interface UsePoemActionsParams {
@@ -107,9 +108,39 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
         })
     }
 
+    // Publish a draft, or withdraw a published poem back into drafts. Both are a
+    // PATCH of `{ status }` on the poem route — the same route an edit uses.
+    const onSetStatus = (status: PoemStatus) => (event: React.SyntheticEvent) => {
+        event.preventDefault()
+        dispatch(
+            savePoemAction({
+                params: { poemId: poem.id },
+                context,
+                data: { status },
+                callbacks: {
+                    success: (response: any) => {
+                        // One entity, updated once; the id-lists only move it
+                        // between Drafts and the public lists.
+                        dispatch(poemUpdated({ id: poem.id, changes: { status } }))
+                        dispatch(movePoemBetweenDraftAndPublished({ poemId: poem.id, status }))
+                        // Publishing/withdrawing changes the author's poem count,
+                        // so the server recomputes the ranking and sends it back.
+                        dispatch(setRanking(response?.ranking))
+                        manageSuccess(status === 'published' ? 'Poem published' : 'Poem moved to drafts')
+                    },
+                    error: () => {
+                        manageError('Sorry. There was an error updating the poem')
+                    }
+                }
+            })
+        )
+    }
+
     return {
         onLike,
         onDelete,
-        onEdit
+        onEdit,
+        onPublish: onSetStatus('published'),
+        onUnpublish: onSetStatus('draft')
     }
 }

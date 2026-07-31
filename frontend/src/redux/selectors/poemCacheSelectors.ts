@@ -44,3 +44,6 @@ export const selectMyFavouritePoemsPoems = makeCachePoemsSelector(
 export const selectAuthorPoemsPoems = makeCachePoemsSelector(
     state => state.authorPoemsQuery?.item as CacheEntry[] | undefined
 )
+export const selectMyDraftsPoems = makeCachePoemsSelector(
+    state => state.myDraftsQuery?.item as CacheEntry[] | undefined
+)

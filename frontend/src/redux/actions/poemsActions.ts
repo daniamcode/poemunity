@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import store from '../store/index'
 import { getAction, getTypes, postAction } from './commonActions'
+import { removeFromCache, insertIntoCacheFront } from './poemCacheMembership'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import { ACTIONS } from '../reducers/poemsReducers'
 import { AppDispatch, RootState } from '../store'
@@ -150,6 +151,29 @@ export function getMyFavouritePoemsAction({ params, options, callbacks, signal }
     }
 }
 
+interface GetMyDraftsActionProps {
+    options?: ReduxOptions
+    callbacks?: ReduxCallbacks
+    signal?: AbortSignal
+    params?: object
+}
+
+// The Drafts tab. `status=draft` is scoped by the SESSION on the server, never
+// by a userId param — so this deliberately sends no author of its own.
+export function getMyDraftsAction({ params, options, callbacks, signal }: GetMyDraftsActionProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.MY_DRAFTS,
+            url: API_ENDPOINTS.POEMS,
+            dispatch,
+            params: { ...params, status: 'draft' },
+            options,
+            signal,
+            callbacks: withAuthorSeeding(dispatch, callbacks)
+        })
+    }
+}
+
 interface GetAuthorPoemsActionProps {
     params?: object | null
     options?: ReduxOptions
@@ -203,31 +227,55 @@ export function createPoemAction({ poem, context, callbacks, options = {} }: Cre
 // This is the complete replacement for the old updateXCacheAfterY family.
 // ---------------------------------------------------------------------------
 
-function idOf(entry: Poem | string): string {
-    return typeof entry === 'string' ? entry : entry?.id
-}
-
 const PAGINATED_CACHES: { actionType: string; key: keyof RootState }[] = [
     { actionType: ACTIONS.POEMS_LIST, key: 'poemsListQuery' },
     { actionType: ACTIONS.MY_POEMS, key: 'myPoemsQuery' },
     { actionType: ACTIONS.MY_FAVOURITE_POEMS, key: 'myFavouritePoemsQuery' },
+    { actionType: ACTIONS.AUTHOR_POEMS, key: 'authorPoemsQuery' },
+    // Drafts belong here too: deleting a draft must drop it from its own list.
+    { actionType: ACTIONS.MY_DRAFTS, key: 'myDraftsQuery' }
+]
+
+// The public lists a poem joins when it is published and leaves when it is
+// withdrawn. Author poems is included because the owner may be looking at their
+// own public author page.
+const PUBLIC_CACHES: { actionType: string; key: keyof RootState }[] = [
+    { actionType: ACTIONS.POEMS_LIST, key: 'poemsListQuery' },
+    { actionType: ACTIONS.MY_POEMS, key: 'myPoemsQuery' },
     { actionType: ACTIONS.AUTHOR_POEMS, key: 'authorPoemsQuery' }
 ]
 
-// Re-emit a paginated cache's fulfilled action with an explicit id-array so the
-// reducer's cache-update path (same page, length <=) replaces in place.
-function emitPaginated(dispatch: AppDispatch, actionType: string, cache: any, ids: string[], total?: number) {
-    const { fulfilledAction } = getTypes(actionType)
-    dispatch({
-        type: fulfilledAction,
-        payload: {
-            poems: ids,
-            page: cache.page,
-            hasMore: cache.hasMore,
-            total: total !== undefined ? total : cache.total,
-            totalPages: cache.totalPages
+interface MovePoemBetweenDraftAndPublishedProps {
+    poemId: string
+    status: 'draft' | 'published'
+}
+
+// Publish / unpublish is purely a MEMBERSHIP move: the poem itself is one entity
+// that both sides resolve through, so all that changes is which id-lists hold
+// its id. Publishing moves it out of Drafts and into the public lists;
+// withdrawing does the reverse.
+export function movePoemBetweenDraftAndPublished({ poemId, status }: MovePoemBetweenDraftAndPublishedProps) {
+    return function dispatcher(dispatch: AppDispatch) {
+        const state = store.getState() as RootState
+        const drafts = (state as any).myDraftsQuery
+
+        if (status === 'published') {
+            removeFromCache(dispatch, ACTIONS.MY_DRAFTS, drafts, poemId)
+            PUBLIC_CACHES.forEach(({ actionType, key }) => {
+                insertIntoCacheFront(dispatch, actionType, state[key] as any, poemId)
+            })
+            return
         }
-    })
+
+        PUBLIC_CACHES.forEach(({ actionType, key }) => {
+            removeFromCache(dispatch, actionType, state[key] as any, poemId)
+        })
+        // A withdrawn poem keeps its likes, but it is no longer readable, so it
+        // also leaves the favourites view of anyone looking at it — including
+        // the author's own.
+        removeFromCache(dispatch, ACTIONS.MY_FAVOURITE_POEMS, (state as any).myFavouritePoemsQuery, poemId)
+        insertIntoCacheFront(dispatch, ACTIONS.MY_DRAFTS, drafts, poemId)
+    }
 }
 
 interface DropPoemFromCachesProps {
@@ -241,15 +289,7 @@ export function dropPoemFromCaches({ poemId }: DropPoemFromCachesProps) {
         const state = store.getState() as RootState
 
         PAGINATED_CACHES.forEach(({ actionType, key }) => {
-            const cache = state[key] as any
-            if (!Array.isArray(cache?.item)) {
-                return
-            }
-            const kept = (cache.item as (Poem | string)[]).map(idOf).filter(id => id !== poemId)
-            if (kept.length === cache.item.length) {
-                return
-            }
-            emitPaginated(dispatch, actionType, cache, kept, Math.max(0, (cache.total || 0) - 1))
+            removeFromCache(dispatch, actionType, state[key] as any, poemId)
         })
     }
 }
@@ -263,15 +303,7 @@ interface DropPoemFromFavouritesCacheProps {
 export function dropPoemFromFavouritesCache({ poemId }: DropPoemFromFavouritesCacheProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { myFavouritePoemsQuery } = store.getState() as RootState
-        const cache = myFavouritePoemsQuery as any
-        if (!Array.isArray(cache?.item)) {
-            return
-        }
-        const kept = (cache.item as (Poem | string)[]).map(idOf).filter(id => id !== poemId)
-        if (kept.length === cache.item.length) {
-            return
-        }
-        emitPaginated(dispatch, ACTIONS.MY_FAVOURITE_POEMS, cache, kept, Math.max(0, (cache.total || 0) - 1))
+        removeFromCache(dispatch, ACTIONS.MY_FAVOURITE_POEMS, myFavouritePoemsQuery as any, poemId)
     }
 }
 
@@ -292,16 +324,16 @@ export function insertPoemIntoCaches({ response }: InsertPoemIntoCachesProps) {
         const state = store.getState() as RootState
         const poemId = response.id
 
-        const insertFront = (actionType: string, cache: any) => {
-            if (!Array.isArray(cache?.item)) {
-                return
-            }
-            const ids = (cache.item as (Poem | string)[]).map(idOf).filter(id => id !== poemId)
-            emitPaginated(dispatch, actionType, cache, [poemId, ...ids], (cache.total || 0) + 1)
+        // A poem saved as a draft is private: it belongs in the Drafts list and
+        // nowhere else. Putting it in the public caches would show the author a
+        // dashboard row that nobody else can see and that a refresh removes.
+        if (response.status === 'draft') {
+            insertIntoCacheFront(dispatch, ACTIONS.MY_DRAFTS, (state as any).myDraftsQuery, poemId)
+            return
         }
 
-        insertFront(ACTIONS.POEMS_LIST, (state as any).poemsListQuery)
-        insertFront(ACTIONS.MY_POEMS, (state as any).myPoemsQuery)
+        insertIntoCacheFront(dispatch, ACTIONS.POEMS_LIST, (state as any).poemsListQuery, poemId)
+        insertIntoCacheFront(dispatch, ACTIONS.MY_POEMS, (state as any).myPoemsQuery, poemId)
     }
 }
 
@@ -316,15 +348,7 @@ interface AddPoemToFavouritesCacheProps {
 export function addPoemToFavouritesCache({ poemId }: AddPoemToFavouritesCacheProps) {
     return function dispatcher(dispatch: AppDispatch) {
         const { myFavouritePoemsQuery } = store.getState() as RootState
-        const cache = myFavouritePoemsQuery as any
-        if (!Array.isArray(cache?.item)) {
-            return
-        }
-        const ids = (cache.item as (Poem | string)[]).map(idOf)
-        if (ids.includes(poemId)) {
-            return
-        }
-        emitPaginated(dispatch, ACTIONS.MY_FAVOURITE_POEMS, cache, [poemId, ...ids], (cache.total || 0) + 1)
+        insertIntoCacheFront(dispatch, ACTIONS.MY_FAVOURITE_POEMS, myFavouritePoemsQuery as any, poemId)
     }
 }
 

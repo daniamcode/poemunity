@@ -18,7 +18,7 @@ export default function Profile() {
     const poemsListPoems = useSelector(selectPoemsListPoems)
     const poemsListQuery = { ...poemsListQueryRaw, item: poemsListPoems }
 
-    const { poem, isEditing, updatePoemField, handleSend, handleReset, handleCancel } = useProfileForm(
+    const { poem, isEditing, updatePoemField, handleSend, handleSaveDraft, handleReset, handleCancel } = useProfileForm(
         context,
         poemQuery,
         poemsListQuery
@@ -49,6 +49,7 @@ export default function Profile() {
                                 updatePoemField={updatePoemField}
                                 poemQuery={poemQuery}
                                 handleSend={handleSend}
+                                handleSaveDraft={handleSaveDraft}
                                 handleReset={handleReset}
                                 handleCancel={handleCancel}
                             />

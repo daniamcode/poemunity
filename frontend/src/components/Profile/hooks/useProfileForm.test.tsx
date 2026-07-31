@@ -530,6 +530,56 @@ describe('useProfileForm', () => {
         )
     })
 
+    // Drafts. `status` rides on the SAME create/save calls — the only difference
+    // is whether the field is sent at all, which is what makes an ordinary edit
+    // status-preserving instead of silently republishing a draft.
+    test('handleSaveDraft creates the poem with status draft', () => {
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery),
+            { wrapper }
+        )
+
+        act(() => {
+            result.current.updatePoemField('title', 'Half Finished')
+            result.current.updatePoemField('content', 'a first line')
+            result.current.updatePoemField('category', 'love')
+        })
+
+        act(() => {
+            result.current.handleSaveDraft({
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>)
+        })
+
+        expect(poemsActions.createPoemAction).toHaveBeenCalledWith(
+            expect.objectContaining({
+                poem: expect.objectContaining({ title: 'Half Finished', status: 'draft' })
+            })
+        )
+    })
+
+    test('handleSend sends NO status, so publishing stays the default and an edit preserves it', () => {
+        const { result } = renderHook(
+            () => useProfileForm(mockContext, mockPoemQuery, mockPoemsListQuery),
+            { wrapper }
+        )
+
+        act(() => {
+            result.current.updatePoemField('title', 'Out Loud')
+            result.current.updatePoemField('content', 'said plainly')
+            result.current.updatePoemField('category', 'love')
+        })
+
+        act(() => {
+            result.current.handleSend({
+                preventDefault: jest.fn()
+            } as unknown as React.MouseEvent<HTMLButtonElement>)
+        })
+
+        const { poem } = (poemsActions.createPoemAction as jest.Mock).mock.calls[0][0]
+        expect(poem).not.toHaveProperty('status')
+    })
+
     test('should update cache after creating a poem successfully', () => {
         // The create response is the new poem with a `ranking` sibling.
         const createdPoem = { id: 'new-poem-456', title: 'Created Poem', userId: 'author-1' }

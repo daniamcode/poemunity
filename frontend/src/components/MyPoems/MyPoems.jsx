@@ -8,7 +8,7 @@ import { selectMyPoemsPoems } from '../../redux/selectors/poemCacheSelectors'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useSearchQuery } from '../../hooks/useSearchQuery'
 import { PAGINATION_LIMIT, SEARCH_NO_RESULTS, MY_POEMS_EMPTY } from '../../data/constants'
-import ListItem from '../ListItem/ListItem'
+import OwnerPoemRow from '../ListItem/OwnerPoemRow'
 import PoemsListIntro from '../PoemsListIntro/PoemsListIntro'
 
 function MyPoems() {
@@ -89,8 +89,11 @@ function MyPoems() {
             {!myPoemsQuery.isFetching && poems.length === 0 && (
                 <p className='list__empty'>{q ? SEARCH_NO_RESULTS : MY_POEMS_EMPTY}</p>
             )}
+            {/* The owner's own list, so each row carries the withdraw control —
+                this is the only route back into Drafts for an already-published
+                poem. */}
             {poems.map(poem => (
-                <ListItem key={poem.id} poem={poem} context={context} />
+                <OwnerPoemRow key={poem.id} poem={poem} context={context} />
             ))}
             {/* Infinite scroll sentinel */}
             <div ref={sentinelRef} style={{ height: '20px' }} />

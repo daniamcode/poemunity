@@ -34,6 +34,7 @@ export const CATEGORIES = [
     'Addiction',
     'Aging',
     'America',
+    'Anger',
     'Animal',
     'Anniversary',
     'Anxiety',
@@ -92,6 +93,7 @@ export const CATEGORIES = [
     'Humor',
     'Identity',
     'Illness',
+    'Imagination',
     'Immigration',
     'Inspirational',
     'Justice',
@@ -146,8 +148,10 @@ export const CATEGORIES = [
     'Son',
     'Sorrow & Grieving',
     'Space',
+    'Sports',
     'Spring',
     'Spiritual',
+    'Spirituality',
     'Stars',
     'Strength',
     'Success',
@@ -187,6 +191,27 @@ export function slugToCategory(slug: string): string {
     return CATEGORIES.find(category => categoryToSlug(category) === slug) ?? slug
 }
 
+// Built once rather than per call: /[genre] runs this on every request, and
+// CATEGORIES is a 136-entry list that never changes at runtime.
+const CATEGORY_SLUGS = new Set(CATEGORIES.map(categoryToSlug))
+
+/**
+ * Is this route slug one of the curated categories?
+ *
+ * Deliberately NOT `slugToCategory(slug) !== slug`: that only works by accident,
+ * because every CATEGORIES entry happens to be Title Case and so never equals
+ * its own slug. Add one lowercase entry and that test silently reports it as
+ * unknown.
+ *
+ * Note this answers "is it in the curated list", not "does it have poems" — the
+ * database holds genres that CATEGORIES does not (they came from the scraped
+ * famous poems, whose topic vocabulary was never reconciled with this list), so
+ * callers deciding whether a page is real must check for poems too.
+ */
+export function isKnownCategorySlug(slug: string): boolean {
+    return CATEGORY_SLUGS.has(slug)
+}
+
 // Labels for the Authors dropdown values, so a message can name the active
 // filter using the same word the user picked.
 export const ORIGIN_LABELS: Record<string, string> = {
@@ -208,6 +233,13 @@ export const PROFILE_RESET_POEM = 'Reset'
 export const PROFILE_CANCEL_EDIT = 'Cancel'
 export const PROFILE_POEMS = 'My poems'
 export const PROFILE_FAVOURITE_POEMS = 'My favourite poems'
+export const PROFILE_DRAFTS = 'Drafts'
+// Drafts: private until published. The second button on the create form, and
+// the per-poem toggle on the owner's own lists.
+export const PROFILE_SAVE_DRAFT = 'Save as draft'
+export const PUBLISH_POEM = 'Publish'
+export const UNPUBLISH_POEM = 'Move to drafts'
+export const DRAFT_BADGE = 'Draft'
 export const LIKE = 'Like'
 export const LIKES = 'Likes'
 export const READ_MORE = 'Read more'
@@ -230,6 +262,7 @@ export const SEARCH_NO_RESULTS = 'No poems match your search.'
 // nothing: there is no query to relax, so the message says what would fill it.
 export const MY_POEMS_EMPTY = "No poems yet. Publish one and it will show up here."
 export const MY_FAVOURITE_POEMS_EMPTY = 'No poems yet. Poems you like will show up here.'
+export const MY_DRAFTS_EMPTY = 'No drafts. Save a poem as a draft and it will wait for you here.'
 export const ORDER_BY = 'Order poems by: '
 export const ORDER_BY_TITLE = 'Title'
 export const ORDER_BY_DATE = 'Date'

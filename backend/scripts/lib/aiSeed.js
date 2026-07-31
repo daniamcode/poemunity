@@ -10,6 +10,7 @@
 
 const bcrypt = require('bcryptjs')
 const { slugifyAuthor, generatePoemSlug } = require('../../src/utils/slugUtils')
+const { normalizeGenre } = require('../../src/utils/genre')
 
 // Same case-insensitive collation as the Author unique indexes.
 const CI = { locale: 'en', strength: 2 }
@@ -91,11 +92,20 @@ async function addPoemForAuthor (Poem, Author, author, p) {
   const existing = await Poem.findOne({ title: p.title, authorId: author._id })
   if (existing) return { poem: existing, created: false }
 
+  // Validated, not passed through. The docblock example above uses a display
+  // name ('Nature') while the database stores slugs ('nature'), so an unchecked
+  // seed run could write a genre no genre page matches — and an unknown genre
+  // gets a poem with no category nav and no sitemap entry. Throwing beats
+  // defaulting: a silently substituted genre files the poem somewhere nobody
+  // chose.
+  const genre = normalizeGenre(p.genre)
+  if (!genre.ok) throw new Error(`${genre.error} (poem: ${JSON.stringify(p.title)})`)
+
   const slug = await buildUniquePoemSlug(Poem, p.title, author.name || author.username)
   const poem = new Poem({
     poem: p.poem,
     title: p.title,
-    genre: p.genre,
+    genre: genre.genre,
     likes: [],
     date: p.date ? new Date(p.date) : new Date(),
     origin: 'ai',

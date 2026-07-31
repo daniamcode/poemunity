@@ -84,11 +84,48 @@ describe('Poems API - Create and Update', () => {
       expect(updatedUser.poems).toHaveLength(1)
     })
 
+    // The category dropdown constrains the UI only: this endpoint spreads the
+    // request body into a `strict: false` model, so before validation any
+    // client could store an invented genre. The poem then had a URL but no
+    // category nav entry and no sitemap entry — orphaned from the moment it
+    // was written, exactly like the four categories the 140-category migration
+    // stranded (168 poems).
+    test('rejects a genre outside the curated category list', async () => {
+      const response = await request(app)
+        .post('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Orphan', poem: 'Content', genre: 'notacategory', date: new Date() })
+        .expect(400)
+
+      expect(response.body.error).toMatch(/genre/i)
+      expect(await Poem.findOne({ title: 'Orphan' })).toBeNull()
+    })
+
+    test('rejects a missing genre', async () => {
+      await request(app)
+        .post('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'No Genre', poem: 'Content', date: new Date() })
+        .expect(400)
+    })
+
+    test('stores the slug when given a category display name', async () => {
+      // Seed data and hand-made calls use display names; storing 'Sorrow &
+      // Grieving' beside 'sorrow-and-grieving' would split one category in two.
+      const response = await request(app)
+        .post('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Display Name', poem: 'Content', genre: 'Sorrow & Grieving', date: new Date() })
+        .expect(201)
+
+      expect(response.body.genre).toBe('sorrow-and-grieving')
+    })
+
     test('should create poem in database', async () => {
       const newPoem = {
         title: 'Database Poem',
         poem: 'This poem should be saved',
-        genre: 'happy',
+        genre: 'hope',
         date: new Date()
       }
 
@@ -219,7 +256,8 @@ describe('Poems API - Create and Update', () => {
     })
 
     test('should handle poems with different genres', async () => {
-      const genres = ['love', 'sad', 'happy', 'angry', 'nature']
+      // All real categories — the API rejects anything outside the curated list.
+      const genres = ['love', 'sad', 'hope', 'anger', 'nature']
 
       for (const genre of genres) {
         const response = await request(app)

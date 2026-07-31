@@ -57,6 +57,9 @@ $color-overlay: rgba(0, 0, 0, 0.45);
 // asks for the right face before falling back to `serif`.
 $font-body:    var(--font-body, 'EB Garamond', serif);
 $font-heading: var(--font-heading, 'Quattrocento', serif);
+// Display script, header tagline only — see src/lib/fonts.ts for why it is
+// limited to one short phrase. `cursive` is the only sane generic fallback.
+$font-display: var(--font-display, 'Great Vibes', cursive);
 
 // Typography — size scale
 $fs-xs:        0.75rem;  // ~12px  small labels, tags

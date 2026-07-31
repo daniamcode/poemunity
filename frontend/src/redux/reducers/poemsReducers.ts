@@ -11,7 +11,8 @@ export const ACTIONS = {
     RANKING: 'ranking',
     POEM_OF_THE_WEEK: 'poem-of-the-week',
     CREATE_POEM: 'create-poem',
-    AUTHOR_POEMS: 'author-poems'
+    AUTHOR_POEMS: 'author-poems',
+    MY_DRAFTS: 'my-drafts'
 }
 
 // A list cache stores only poem ids; the full poems live in the normalized
@@ -239,6 +240,55 @@ export function createPoemQuery(state: StateItem<Poem> = INITIAL, action: Action
         action,
         actionType: ACTIONS?.CREATE_POEM
     })
+}
+
+// The owner's own drafts. Same id-list shape as every other list cache — the
+// poems themselves live once in poemEntities — so a draft that is published
+// (or an edit to one) is a single entity update, not a copy to patch.
+export function myDraftsQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {
+    const { rejectedAction, requestAction, fulfilledAction, resetAction } = getTypes(ACTIONS.MY_DRAFTS)
+
+    switch (action.type) {
+        case requestAction: {
+            if (state.abortController) {
+                state.abortController.abort()
+            }
+            return Object.assign({}, state, { isFetching: true })
+        }
+        case fulfilledAction: {
+            const { poems, page, hasMore, total, totalPages } = action.payload
+            const isFirstPage = page === 1
+            const isCacheUpdate = state.item && state.page === page && poems.length <= state.item.length
+            const incomingIds = toIds(poems)
+            const newPoems = isFirstPage || isCacheUpdate ? incomingIds : [...(state.item || []), ...incomingIds]
+            return Object.assign({}, state, {
+                isFetching: false,
+                isError: false,
+                item: newPoems,
+                page,
+                hasMore,
+                total,
+                totalPages,
+                err: undefined,
+                abortController: undefined
+            })
+        }
+        case rejectedAction:
+            return Object.assign({}, state, {
+                isFetching: false,
+                isError: true,
+                err: action.payload,
+                abortController: undefined
+            })
+        case resetAction: {
+            if (state.abortController) {
+                state.abortController.abort()
+            }
+            return INITIAL
+        }
+        default:
+            return state
+    }
 }
 
 export function authorPoemsQuery(state: PaginatedStateItem = INITIAL, action: Action): PaginatedStateItem {

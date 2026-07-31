@@ -1,7 +1,10 @@
+const mongoose = require('mongoose')
 const commentsRouter = require('express').Router()
 const Comment = require('../models/Comment')
+const Poem = require('../models/Poem')
 const userExtractor = require('../middleware/userExtractor')
 const requireVerified = require('../middleware/requireVerified')
+const { isDraft } = require('../utils/poemVisibility')
 
 // `type` rides along so the UI can mark AI-authored comments as such.
 const AUTHOR_FIELDS = 'name slug picture type'
@@ -41,6 +44,17 @@ commentsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     return res.status(400).json({ error: 'targetType, targetId, and body are required' })
   }
   try {
+    // A draft has no public thread, so it cannot be commented on — not even by
+    // its author, whose comment would surface the moment it is published. Only
+    // an existing DRAFT is rejected: `targetId` is not constrained to poems that
+    // exist (profile comments share this route), so a missing poem is left alone.
+    if (targetType === 'poem' && mongoose.Types.ObjectId.isValid(targetId)) {
+      const target = await Poem.findById(targetId).select('status')
+      if (isDraft(target)) {
+        return res.status(404).json({ error: 'Poem not found' })
+      }
+    }
+
     const comment = new Comment({
       targetType,
       targetId,

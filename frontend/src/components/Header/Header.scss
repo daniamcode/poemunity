@@ -321,18 +321,30 @@
     text-decoration: none;
 }
 
-// The tagline is the one line of voice in the chrome, so it gets the literary
-// face rather than the UI one: EB Garamond italic, an old-style Renaissance
-// serif, against the logo's wordmark. Quattrocento here read as another label.
-.list__presentation {
+// The tagline is the one line of voice in the chrome, so it gets a display
+// script — formal connected calligraphy — rather than the UI face.
+//
+// SCOPED TO .header on purpose. `.list__presentation` is used twice: this
+// tagline, and the "Category: LOVE" label in ListHeader. Because _app.tsx
+// imports Header.scss AFTER List.scss, an unscoped rule here wins at equal
+// specificity and silently restyles that label too — which is exactly what the
+// previous (unscoped) version of this rule did to it.
+.header .list__presentation {
     display: none;
     margin-left: $space-7;
-    font-family: $font-body;
-    font-style: italic;
-    // Garamond has a small x-height, so it needs a size up to hold its own
-    // beside the logo — at $fs-md it looked shrunken next to the wordmark.
-    font-size: $fs-lg;
-    letter-spacing: 0.01em;
+    font-family: $font-display;
+    // Great Vibes is already slanted and ships no italic; asking for one makes
+    // the browser synthesise a second slant on top, smearing the thin strokes.
+    font-style: normal;
+    // Scripts carry a small x-height inside a tall em box, so they read far
+    // smaller than their nominal size — this needs roughly 1.4x what the serif
+    // did to sit level with the wordmark. Connected scripts also lose legibility
+    // quickly as they shrink, which is the reason not to go much below this.
+    font-size: 1.8rem;
+    // Letterforms are joined; extra tracking breaks the joins apart.
+    letter-spacing: 0;
+    // The tall em box would otherwise stretch the 70px header.
+    line-height: 1;
     color: $color-logo;
 
     // Baseline nudge, NOT centring. The flex row already centres both boxes
@@ -343,6 +355,9 @@
     // `align-items: baseline` cannot fix it: an <img>'s baseline is its bottom
     // edge, which would overshoot the other way. The offset scales with the
     // LOGO height, so it is set alongside each logo size below.
+    //
+    // Re-tuned for the script face: its baseline sits differently inside the em
+    // box than the serif's did, so the old 2px/3px no longer applied.
     position: relative;
 }
 
@@ -386,10 +401,10 @@
         display: block;
     }
 
-    .list__presentation {
+    .header .list__presentation {
         display: block;
-        // ~0.056 x the 40px logo — see the baseline note on the base rule.
-        top: 2px;
+        // See the baseline note on the base rule.
+        top: 5px;
     }
 }
 
@@ -402,9 +417,9 @@
         height: 48px;
     }
 
-    // Same 0.056 fraction against the larger logo.
-    .list__presentation {
-        top: 3px;
+    // Same proportion against the larger logo.
+    .header .list__presentation {
+        top: 6px;
     }
 
     .header__dropdown-categories-icon {

@@ -1,4 +1,5 @@
 const Poem = require('../models/Poem')
+const { publishedOnly } = require('./poemVisibility')
 
 // Default scoring weights and size for the author ranking. The ranking is the
 // single source of truth for author points; keeping the formula here means the
@@ -20,7 +21,9 @@ async function computeRanking ({
 } = {}) {
   const effectiveLimit = Math.min(limit, MAX_LIMIT)
 
-  const match = {}
+  // Drafts earn nothing. Points are 3×poems + 1×likes, so counting an unpublished
+  // poem would let anyone climb the public sidebar with writing nobody can read.
+  const match = publishedOnly({})
   if (origin) {
     match.origin = origin
   }

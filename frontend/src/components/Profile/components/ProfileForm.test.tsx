@@ -30,6 +30,7 @@ jest.mock('./form/FormButtons', () => {
 describe('ProfileForm', () => {
     const mockUpdatePoemField = jest.fn()
     const mockHandleSend = jest.fn()
+    const mockHandleSaveDraft = jest.fn()
     const mockHandleReset = jest.fn()
     const mockHandleCancel = jest.fn()
 
@@ -73,6 +74,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -93,6 +95,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -110,6 +113,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -127,6 +131,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -144,6 +149,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -161,6 +167,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />
@@ -178,6 +185,7 @@ describe('ProfileForm', () => {
                 updatePoemField={mockUpdatePoemField}
                 poemQuery={mockPoemQuery}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleReset={mockHandleReset}
                 handleCancel={mockHandleCancel}
             />

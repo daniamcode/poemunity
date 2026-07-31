@@ -5,6 +5,14 @@ const Author = require('../models/Author')
 const findPoemById = require('../middleware/findPoemById')
 const userExtractor = require('../middleware/userExtractor')
 const { computeRanking } = require('../utils/ranking')
+const { normalizeGenre } = require('../utils/genre')
+const {
+  POEM_STATUS,
+  publishedOnly,
+  isDraft,
+  normalizeStatus,
+  canReadPoem
+} = require('../utils/poemVisibility')
 
 const AUTHOR_FIELDS = 'name slug picture username'
 
@@ -87,16 +95,20 @@ function strictlyAfter (poem) {
   }
 }
 
+// Drafts are never destinations: the walk is the public reading path, and it is
+// applied here rather than at the three call sites so a new one cannot forget.
 function findNext (filter) {
-  return Poem.findOne(filter).sort(TOTAL_ORDER).populate('authorId', AUTHOR_FIELDS)
+  return Poem.findOne(publishedOnly(filter)).sort(TOTAL_ORDER).populate('authorId', AUTHOR_FIELDS)
 }
 
 // Authors that actually HAVE poems, walked alphabetically. Derived from the
 // poems rather than the authors collection, so an empty author cannot exist and
-// the walk can never stall on one.
+// the walk can never stall on one. Drafts do not count towards "has poems" — an
+// author with nothing but drafts is not a stop on the public walk, and including
+// them would hand every reader a step that findNext then refuses to fill.
 async function firstAuthorAfter (match) {
   const [row] = await Poem.aggregate([
-    { $match: { authorId: { $type: 'objectId' } } },
+    { $match: publishedOnly({ authorId: { $type: 'objectId' } }) },
     { $group: { _id: '$authorId' } },
     { $lookup: { from: 'authors', localField: '_id', foreignField: '_id', as: 'author' } },
     { $unwind: '$author' },
@@ -119,7 +131,7 @@ async function authorOf (poem) {
   }
 }
 
-poemRouter.get('/:poemId/next', async (req, res) => {
+poemRouter.get('/:poemId/next', userExtractor.optional, async (req, res) => {
   let current
   try {
     current = await findPoemByIdOrSlug(req.params.poemId, { populate: false })
@@ -127,7 +139,10 @@ poemRouter.get('/:poemId/next', async (req, res) => {
     current = null
   }
 
-  if (!current) {
+  // Same answer as GET /:poemId for a draft — 404 to everyone but its author.
+  // A different status here would turn this route into an oracle for whether a
+  // guessed draft slug exists.
+  if (!current || !canReadPoem(current, req.userId)) {
     return res.status(404).json({ error: 'poem not found' })
   }
 
@@ -178,11 +193,14 @@ poemRouter.get('/:poemId/next', async (req, res) => {
 
 // Declared after /:poemId/next so the single-segment param route can never
 // shadow it.
-poemRouter.get('/:poemId', async (req, res) => {
+poemRouter.get('/:poemId', userExtractor.optional, async (req, res) => {
   try {
     const poem = await findPoemByIdOrSlug(req.params.poemId)
 
-    if (!poem) {
+    // 404, not 403: a draft is invisible, and "forbidden" would confirm that a
+    // poem exists at that slug. The author (and the admin) still read it here —
+    // that is what makes the Drafts tab's edit/preview work.
+    if (!poem || !canReadPoem(poem, req.userId)) {
       return res.status(404).json({ error: 'poem not found' })
     }
     return res.json(poem)
@@ -194,6 +212,13 @@ poemRouter.get('/:poemId', async (req, res) => {
 // like poem
 poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   const { poem } = req
+
+  // Nobody can see a draft, so nobody can like one — including its author, whose
+  // own like would otherwise show up in the ranking before the poem is public.
+  if (isDraft(poem)) {
+    return res.status(404).json({ error: 'poem not found' })
+  }
+
   if (poem.likes.some((id) => id === req.userId)) {
     poem.likes.splice(poem.likes.indexOf(req.userId), 1)
   } else {
@@ -224,15 +249,36 @@ const isOwnerOrAdmin = (req, res, next) => {
   next()
 }
 
-const ALLOWED_PATCH_FIELDS = ['poem', 'title', 'genre', 'date', 'likes', 'origin', 'userId']
+const ALLOWED_PATCH_FIELDS = ['poem', 'title', 'genre', 'date', 'likes', 'origin', 'userId', 'status']
 
-// modify poem
+// modify poem — also the publish/unpublish route (`{ status }`), which is why it
+// is owner-gated and why it can return a ranking.
 poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async (req, res) => {
   const doc = req.poem
 
   const update = Object.fromEntries(
     Object.entries(req.body).filter(([key]) => ALLOWED_PATCH_FIELDS.includes(key))
   )
+
+  if (update.status !== undefined) {
+    update.status = normalizeStatus(update.status)
+  }
+
+  // Same rule as creation: an edit must not be a way around genre validation.
+  if (update.genre !== undefined) {
+    const genre = normalizeGenre(update.genre)
+    if (!genre.ok) {
+      return res.status(400).json({ error: genre.error })
+    }
+    update.genre = genre.genre
+  }
+
+  // Publishing and unpublishing move the author's poem count, so they move their
+  // ranking points — the same reason create/delete/like embed a fresh ranking
+  // (see AGENTS.md). An edit that does not cross that line still carries none.
+  const statusChanged =
+    update.status !== undefined &&
+    update.status !== (doc.status || POEM_STATUS.PUBLISHED)
 
   try {
     const updated = await Poem.findByIdAndUpdate(
@@ -241,7 +287,12 @@ poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async 
       { new: true }
     ).populate('authorId', AUTHOR_FIELDS)
 
-    res.json(updated)
+    if (!statusChanged) {
+      return res.json(updated)
+    }
+
+    const ranking = await computeRanking({ origin: 'user' })
+    res.json({ ...updated.toJSON(), ranking })
   } catch (error) {
     res.status(500).json({ error: 'Failed to update poem' })
   }

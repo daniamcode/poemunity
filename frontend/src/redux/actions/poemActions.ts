@@ -103,7 +103,9 @@ interface savePoemActionProps {
     params: {
         poemId: string
     }
-    data: Poem
+    // Partial: the same PATCH route is how a poem is published or withdrawn,
+    // and that sends nothing but `{ status }`.
+    data: Partial<Poem>
     context: Context
     options?: ReduxOptions
     callbacks: ReduxCallbacks

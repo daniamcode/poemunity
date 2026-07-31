@@ -563,6 +563,50 @@
     padding-top: $space-5;
 }
 
+// A poem card on one of the owner's own lists, with its publish/withdraw
+// control. The badge sits above the card rather than inside it, because the
+// card itself (ListItem) is the same one every public list renders.
+.owner-poem {
+    position: relative;
+}
+
+.owner-poem__badge {
+    display: inline-block;
+    margin: 0 0 (-$space-2) $space-md;
+    padding: 2px $space-2;
+    border-radius: $radius-sm;
+    background: $color-bg-subtle;
+    color: $color-text-secondary;
+    font-family: $font-heading;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.owner-poem__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 $space-md $space-4;
+}
+
+.owner-poem__status-button {
+    background: none;
+    border: 1px solid $color-border-subtle;
+    border-radius: $radius-sm;
+    padding: $space-2 $space-4;
+    font-family: $font-heading;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary;
+        border-color: $color-primary;
+    }
+}
+
 @media screen and (max-width: 699px) {
     .profile__intro {
         padding: 24px $space-md;

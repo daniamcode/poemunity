@@ -7,6 +7,8 @@ const userExtractor = require('../middleware/userExtractor')
 const requireVerified = require('../middleware/requireVerified')
 const { generatePoemSlug } = require('../utils/slugUtils')
 const { computeRanking } = require('../utils/ranking')
+const { normalizeGenre } = require('../utils/genre')
+const { POEM_STATUS, PUBLISHED_MATCH, publishedOnly, normalizeStatus } = require('../utils/poemVisibility')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
 const ORDER_BY_DATE = 'date'
@@ -171,7 +173,7 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
   try {
     // `origin` on the poem, not a join through the author: it is the same field
     // the list endpoint filters on, and it avoids an $in over 3,300 author ids.
-    const filter = { origin: 'famous' }
+    const filter = publishedOnly({ origin: 'famous' })
 
     const total = await Poem.countDocuments(filter)
     if (total === 0) return res.json({ poem: null })
@@ -214,16 +216,25 @@ poemsRouter.get('/poem-of-the-week', async (req, res) => {
   }
 })
 
-poemsRouter.get('/', async (req, res) => {
+// `userExtractor.optional` rather than the strict one: this route is public, but
+// it answers differently for a logged-in owner asking for their own drafts.
+poemsRouter.get('/', userExtractor.optional, async (req, res) => {
   try {
     const filter = {}
+
+    // The Drafts tab. Drafts are private, so this is the ONE way to read them
+    // and it is scoped to the caller by the session, never by a query param.
+    const wantsDrafts = String(req.query.status || '') === POEM_STATUS.DRAFT
+    if (wantsDrafts && !req.userId) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
 
     if (req.query.origin) {
       filter.origin = req.query.origin
     }
 
     // userId filter — check authorId (new) and legacy userId field (string or ObjectId)
-    if (req.query.userId) {
+    if (req.query.userId && !wantsDrafts) {
       const id = new mongoose.Types.ObjectId(req.query.userId)
       filter.$or = [{ authorId: id }, { userId: id }, { userId: req.query.userId }]
     }
@@ -251,6 +262,19 @@ poemsRouter.get('/', async (req, res) => {
     const q = String(req.query.q || '').trim()
     if (q) {
       filter.$and = [await buildSearchCondition(q)]
+    }
+
+    // Visibility is applied LAST, over the fully-composed filter, so no branch
+    // above can accidentally leave it off. Both the countDocuments (`total`) and
+    // the find below read this same object — a filtered total with an unfiltered
+    // count would advertise the drafts it refused to show.
+    if (wantsDrafts) {
+      // Deliberately overrides anything `?userId=` or `?author=` set: a draft is
+      // only ever readable by the author who wrote it.
+      filter.authorId = new mongoose.Types.ObjectId(req.userId)
+      filter.status = POEM_STATUS.DRAFT
+    } else {
+      Object.assign(filter, PUBLISHED_MATCH)
     }
 
     const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
@@ -317,10 +341,23 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
 
   const slug = await buildUniqueSlug(poemData.title, author.name || author.username)
 
+  // The dropdown constrains the UI only — this endpoint spreads the body into a
+  // `strict: false` model, so an unvalidated genre would be stored verbatim and
+  // the poem would land on a page with no category nav and no sitemap entry.
+  const genre = normalizeGenre(poemData.genre)
+  if (!genre.ok) {
+    return res.status(400).json({ error: genre.error })
+  }
+
   const newPoem = new Poem({
     ...poemData,
+    genre: genre.genre,
     authorId: author._id,
     origin: author.type || 'user',
+    // Normalized rather than passed through: an unrecognised value would fail
+    // schema validation as a 500, and "Save as draft" is the only caller that
+    // sends anything but the default.
+    status: normalizeStatus(poemData.status),
     slug
   })
 

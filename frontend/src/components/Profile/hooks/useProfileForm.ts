@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../../../redux/store'
 import { getPoemAction, savePoemAction } from '../../../redux/actions/poemActions'
-import { createPoemAction, insertPoemIntoCaches, setRanking } from '../../../redux/actions/poemsActions'
+import {
+    createPoemAction,
+    insertPoemIntoCaches,
+    movePoemBetweenDraftAndPublished,
+    setRanking
+} from '../../../redux/actions/poemsActions'
 import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
 import { manageError, manageSuccess } from '../../../utils/notifications'
 import { buildPoemData } from '../../../utils/poemUtils'
+import { PoemStatus } from '../../../typescript/interfaces'
 
 export interface PoemFormData {
     content: string
@@ -21,6 +27,7 @@ export interface UseProfileFormReturn {
     isEditing: boolean
     updatePoemField: <K extends keyof PoemFormData>(field: K, value: PoemFormData[K]) => void
     handleSend: (event: React.MouseEvent<HTMLButtonElement>) => void
+    handleSaveDraft: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleReset: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleCancel: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
@@ -200,10 +207,22 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                 context,
                 data: poemData,
                 callbacks: {
-                    success: () => {
+                    success: (response: any) => {
                         // Merge the edited fields into the ONE poem entity; every
                         // view re-reads it, so no per-cache patching is needed.
                         dispatch(poemUpdated({ id: elementToEdit, changes: poemData }))
+                        // An edit that also withdraws the poem is the one case
+                        // where membership changes: it leaves the public lists
+                        // for Drafts, and the author's points move with it.
+                        if (poemData.status) {
+                            dispatch(
+                                movePoemBetweenDraftAndPublished({
+                                    poemId: elementToEdit,
+                                    status: poemData.status
+                                })
+                            )
+                            dispatch(setRanking(response?.ranking))
+                        }
                         manageSuccess('Poem saved')
                         // Clear edit state by navigating to profile without query params
                         router.push('/profile')
@@ -217,16 +236,28 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
         )
     }
 
-    function handleSend(event: React.MouseEvent<HTMLButtonElement>) {
-        event.preventDefault()
-
-        const poemData = buildPoemData(poem, isAdmin)
+    // `status` is only ever sent when the poet explicitly asked for a draft.
+    // Omitting it on an edit is what makes editing status-preserving: the PATCH
+    // route leaves a field it was not given alone, so revising a draft keeps it
+    // a draft and revising a published poem keeps it published.
+    function submit(status?: PoemStatus) {
+        const poemData = { ...buildPoemData(poem, isAdmin), ...(status ? { status } : {}) }
 
         if (isEditing) {
             handleSavePoem(poemData)
         } else {
             handleCreatePoem(poemData)
         }
+    }
+
+    function handleSend(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault()
+        submit()
+    }
+
+    function handleSaveDraft(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault()
+        submit('draft')
     }
 
     function handleReset(event: React.MouseEvent<HTMLButtonElement>) {
@@ -247,6 +278,7 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
         isEditing,
         updatePoemField,
         handleSend,
+        handleSaveDraft,
         handleReset,
         handleCancel
     }

@@ -13,6 +13,7 @@ interface ProfileFormProps {
     updatePoemField: <K extends keyof PoemFormData>(field: K, value: PoemFormData[K]) => void
     poemQuery: any
     handleSend: (event: React.MouseEvent<HTMLButtonElement>) => void
+    handleSaveDraft: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleReset: (event: React.MouseEvent<HTMLButtonElement>) => void
     handleCancel: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
@@ -24,6 +25,7 @@ function ProfileForm({
     updatePoemField,
     poemQuery,
     handleSend,
+    handleSaveDraft,
     handleReset,
     handleCancel
 }: ProfileFormProps) {
@@ -47,6 +49,7 @@ function ProfileForm({
                         isEditing={isEditing}
                         handleReset={handleReset}
                         handleSend={handleSend}
+                        handleSaveDraft={handleSaveDraft}
                         handleCancel={handleCancel}
                     />
                 </form>

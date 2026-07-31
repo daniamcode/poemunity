@@ -5,7 +5,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react'
 import { Toaster } from 'react-hot-toast'
 import store from '../src/redux/store'
 import createEmotionCache from '../src/lib/emotionCache'
-import { fontBody, fontHeading } from '../src/lib/fonts'
+import { fontBody, fontHeading, fontDisplay } from '../src/lib/fonts'
 import { AppProvider } from '../src/App'
 import Header from '../src/components/Header/Header'
 import Footer from '../src/components/Footer/Footer'
@@ -46,6 +46,7 @@ export default function MyApp({ Component, pageProps, emotionCache = clientSideE
                 :root {
                     --font-body: ${fontBody.style.fontFamily};
                     --font-heading: ${fontHeading.style.fontFamily};
+                    --font-display: ${fontDisplay.style.fontFamily};
                 }
             `}</style>
             {process.env.NODE_ENV === 'production' && (

@@ -3,9 +3,10 @@ import { useTheme } from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import { PROFILE_POEMS, PROFILE_FAVOURITE_POEMS } from '../../../data/constants'
+import { PROFILE_POEMS, PROFILE_FAVOURITE_POEMS, PROFILE_DRAFTS } from '../../../data/constants'
 import MyPoems from '../../MyPoems/MyPoems'
 import MyFavouritePoems from '../../MyFavouritePoems/MyFavouritePoems'
+import MyDrafts from '../../MyDrafts/MyDrafts'
 import TabPanel, { a11yProps } from './TabPanel'
 
 interface ProfileTabsProps {
@@ -31,6 +32,11 @@ function ProfileTabs({ value, handleChange }: ProfileTabsProps) {
                     >
                         <Tab label={PROFILE_POEMS} {...a11yProps(0)} />
                         <Tab label={PROFILE_FAVOURITE_POEMS} {...a11yProps(1)} />
+                        {/* Drafts are private, and this whole section only ever
+                            renders for the signed-in owner of the profile (see
+                            Profile.jsx's context.user gate), so the tab needs no
+                            visibility check of its own. */}
+                        <Tab label={PROFILE_DRAFTS} {...a11yProps(2)} />
                     </Tabs>
                 </AppBar>
             </div>
@@ -40,6 +46,9 @@ function ProfileTabs({ value, handleChange }: ProfileTabsProps) {
                 </TabPanel>
                 <TabPanel className='profile__myPoems' value={value} index={1} dir={theme.direction}>
                     <MyFavouritePoems />
+                </TabPanel>
+                <TabPanel className='profile__myPoems' value={value} index={2} dir={theme.direction}>
+                    <MyDrafts />
                 </TabPanel>
             </div>
         </section>

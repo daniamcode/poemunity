@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const { POEM_STATUS } = require('../utils/poemVisibility')
 
 const poemSchema = new Schema({
   poem: String,
@@ -7,6 +8,15 @@ const poemSchema = new Schema({
   likes: [String],
   date: Date,
   origin: String,
+  // Draft vs published. Defaulted rather than backfilled: the ~16k existing
+  // poems carry no `status` at all, and every read path treats a missing status
+  // as published (see utils/poemVisibility), so shipping this needs no write to
+  // the production collection.
+  status: {
+    type: String,
+    enum: [POEM_STATUS.DRAFT, POEM_STATUS.PUBLISHED],
+    default: POEM_STATUS.PUBLISHED
+  },
   slug: { type: String, unique: true, sparse: true },
   // Slugs this poem used to have. Cleaning the scraped titles (see
   // scripts/clean-poem-titles.js) regenerates slugs, and the old ones are

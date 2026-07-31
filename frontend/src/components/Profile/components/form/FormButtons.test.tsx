@@ -7,6 +7,7 @@ describe('FormButtons', () => {
     const mockHandleReset = jest.fn()
     const mockHandleSend = jest.fn()
     const mockHandleCancel = jest.fn()
+    const mockHandleSaveDraft = jest.fn()
     const mockContext = {
         userId: 'user123',
         isAdmin: false
@@ -33,6 +34,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -50,6 +52,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -69,6 +72,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -89,6 +93,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -107,6 +112,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -125,6 +131,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -147,6 +154,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -163,6 +171,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -185,6 +194,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -210,6 +220,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -226,6 +237,7 @@ describe('FormButtons', () => {
                 isEditing={false}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -241,6 +253,7 @@ describe('FormButtons', () => {
                 isEditing={true}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )
@@ -257,6 +270,7 @@ describe('FormButtons', () => {
                 isEditing={true}
                 handleReset={mockHandleReset}
                 handleSend={mockHandleSend}
+                handleSaveDraft={mockHandleSaveDraft}
                 handleCancel={mockHandleCancel}
             />
         )

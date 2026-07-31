@@ -7,11 +7,21 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
+      # The backend mirrors the frontend's CATEGORIES list (src/data/categories.js
+      # — runtime backend code cannot read across workspaces). categoryDrift.test.js
+      # fails when the two disagree, so editing the frontend list has to run THIS
+      # workflow, or the guard is silent exactly when it is needed.
+      - 'frontend/src/data/constants.ts'
   pull_request:
     branches: [master, development]
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
+      # The backend mirrors the frontend's CATEGORIES list (src/data/categories.js
+      # — runtime backend code cannot read across workspaces). categoryDrift.test.js
+      # fails when the two disagree, so editing the frontend list has to run THIS
+      # workflow, or the guard is silent exactly when it is needed.
+      - 'frontend/src/data/constants.ts'
 
 jobs:
   backend:
