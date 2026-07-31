@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
 import Header from './Header'
+import { Provider } from 'react-redux'
+import configureStore from 'redux-mock-store'
 import { AppContext } from '../../App'
+
+const mockStore = configureStore([])
 
 // Mock child components
 jest.mock('../SimpleAccordion', () => {
@@ -21,6 +25,16 @@ jest.mock('./Logout', () => {
         return <button data-testid='logout-button'>Logout</button>
     }
 })
+
+// The bell dispatches a THUNK on mount to fetch its unread count, and
+// redux-mock-store carries no thunk middleware. Mocked down to plain actions so
+// these tests stay about the header; the bell's own dispatching is covered in
+// Notifications/NotificationBell.test.tsx.
+jest.mock('../../redux/actions/notificationsActions', () => ({
+    fetchUnreadCountAction: jest.fn(() => ({ type: 'FETCH_UNREAD_COUNT' })),
+    getNotificationsAction: jest.fn(() => ({ type: 'GET_NOTIFICATIONS' })),
+    markNotificationsReadAction: jest.fn(() => ({ type: 'MARK_READ' }))
+}))
 
 describe('Header', () => {
     const mockSetState = jest.fn()
@@ -59,11 +73,17 @@ describe('Header', () => {
         delete (global as any).fetch
     })
 
+    // The Provider is required because the header now carries the notification
+    // bell, which reads the unread count from the store. The bell's own
+    // behaviour is tested in Notifications/NotificationBell.test.tsx — here it
+    // is only a dependency the harness has to satisfy.
     const renderWithContext = (contextValue: any) => {
         return render(
-            <AppContext.Provider value={contextValue}>
-                <Header />
-            </AppContext.Provider>
+            <Provider store={mockStore({ unreadCount: { count: 0 }, notificationsQuery: {} })}>
+                <AppContext.Provider value={contextValue}>
+                    <Header />
+                </AppContext.Provider>
+            </Provider>
         )
     }
 

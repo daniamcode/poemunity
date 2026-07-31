@@ -222,9 +222,19 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
    exist to make. **Do followers affect ranking points?** → no. Currently
    `3×poems + 1×likes` in `computeRanking()`; follower counts are gameable and it
    would reshuffle everyone's rank overnight.
-3. 🚧 **Notifications.** IN PROGRESS (2026-07-31). In-app only this pass: header
-   bell with an unread count, a Notifications tab, per-notification read state
-   auto-marked on open. Four event types — likes, comments, new followers, and
+3. ✅ **Notifications.** SHIPPED (2026-07-31). In-app only this pass: header
+   bell with an unread count, a dropdown panel, per-notification read state
+   auto-marked on open, and four preference toggles in the profile.
+   **No sixth profile tab**, deliberately: the bell's panel already *is* the
+   notifications surface, so a tab showing the same list would add a tab without
+   adding a capability, and five is already crowded. Preferences went into the
+   settings column instead.
+   The badge is fetched once on mount and **not polled** — a poll on every open
+   tab is a request per user per interval forever, against a serverless backend
+   billed per invocation, to learn a number that is usually unchanged. If
+   freshness turns out to matter, the cheap upgrade is refetching on window
+   focus, not an interval.
+   **Not yet verified in a browser**, and no Cypress spec — same gap as follow. Four event types — likes, comments, new followers, and
    new poems from poets you follow — **all user-configurable, all on by
    default**. **Must collapse and batch** ("12 people liked your poem", not
    twelve rows) or it becomes noise; self-actions never notify.

@@ -18,5 +18,9 @@ export const API_ENDPOINTS = {
     AUTHOR_FOLLOW: (idOrSlug: string) => `/api/v1/authors/${encodeURIComponent(idOrSlug)}/follow`,
     AUTHOR_FOLLOWERS: (idOrSlug: string) => `/api/v1/authors/${encodeURIComponent(idOrSlug)}/followers`,
     AUTHOR_FOLLOWING: (idOrSlug: string) => `/api/v1/authors/${encodeURIComponent(idOrSlug)}/following`,
+    NOTIFICATIONS: '/api/v1/notifications',
+    NOTIFICATIONS_UNREAD_COUNT: '/api/v1/notifications/unread-count',
+    NOTIFICATIONS_READ: '/api/v1/notifications/read',
+    NOTIFICATION_PREFERENCES: '/api/v1/notifications/preferences',
     COMMENTS: '/api/v1/comments'
 }

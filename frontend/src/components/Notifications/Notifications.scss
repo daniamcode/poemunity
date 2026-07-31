@@ -1,0 +1,185 @@
+@use '../../styles/variables' as *;
+
+.notification-bell {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.notification-bell__button {
+    position: relative;
+    background: none;
+    border: none;
+    padding: $space-2;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: $radius-sm;
+
+    &:hover,
+    &:focus-visible {
+        background: $color-bg-subtle;
+    }
+}
+
+.notification-bell__badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: $color-error;
+    color: white;
+    font-family: $font-heading;
+    font-size: 0.7rem;
+    font-weight: $fw-bold;
+    line-height: 18px;
+    text-align: center;
+}
+
+.notifications-panel {
+    position: absolute;
+    top: calc(100% + #{$space-2});
+    // Anchored to the RIGHT edge: the bell sits in the right-hand actions
+    // group, so a left-anchored panel would hang off the side of the viewport.
+    right: 0;
+    z-index: 40;
+    width: 320px;
+    // Never taller than the viewport, and scrolls inside itself — the list
+    // pages and would otherwise grow past the bottom of the screen with no way
+    // back to the top of it.
+    max-height: min(70vh, 480px);
+    overflow-y: auto;
+    background: $color-bg-surface;
+    border: 1px solid $color-border-subtle;
+    border-radius: $radius-md;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: $space-3;
+
+    // On a narrow screen a fixed 320px panel anchored right can still overflow,
+    // so it becomes near-full-width instead.
+    @media screen and (max-width: 480px) {
+        width: calc(100vw - #{$space-6});
+        right: -$space-2;
+    }
+}
+
+.notifications-panel__title {
+    margin: 0 0 $space-2;
+    font-family: $font-heading;
+    font-size: $fs-base;
+    font-weight: $fw-bold;
+    color: $color-text-dark;
+}
+
+.notifications-panel__empty {
+    margin: $space-3 0;
+    color: $color-text-muted;
+    font-size: $fs-sm;
+}
+
+.notifications-panel__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.notifications-panel__item {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2;
+    border-radius: $radius-sm;
+
+    & + & {
+        border-top: 1px solid $color-border-subtle;
+    }
+}
+
+.notifications-panel__item--unread {
+    background: $color-bg-subtle;
+}
+
+.notifications-panel__link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+}
+
+.notifications-panel__message {
+    font-size: $fs-sm;
+    color: $color-text-dark;
+}
+
+.notifications-panel__poem {
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    // A poem title is arbitrary length and the panel is 320px wide.
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notifications-panel__more {
+    display: block;
+    width: 100%;
+    margin-top: $space-2;
+    padding: $space-2;
+    background: none;
+    border: 1px solid $color-border-subtle;
+    border-radius: $radius-sm;
+    font-family: $font-heading;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary;
+        border-color: $color-primary;
+    }
+}
+
+.notification-prefs {
+    margin-top: $space-xl;
+    padding-top: $space-lg;
+    border-top: 1px solid $color-border-subtle;
+}
+
+.notification-prefs__title {
+    margin: 0 0 $space-2;
+    font-family: $font-heading;
+    font-size: $fs-base;
+    font-weight: $fw-bold;
+    color: $color-text-dark;
+}
+
+.notification-prefs__intro {
+    margin: 0 0 $space-3;
+    color: $color-text-muted;
+    font-size: $fs-sm;
+}
+
+.notification-prefs__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.notification-prefs__item + .notification-prefs__item {
+    margin-top: $space-2;
+}
+
+.notification-prefs__label {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $fs-base-minus;
+    color: $color-text-secondary;
+    cursor: pointer;
+}

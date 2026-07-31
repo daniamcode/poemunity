@@ -302,3 +302,20 @@ export const AUTHORS_TITLE = 'Authors'
 export const AUTHORS_BROWSE_ALL = 'Browse all authors →'
 
 export const POEM_OF_THE_WEEK_TITLE = 'Poem of the week'
+
+// --- Notifications -------------------------------------------------------
+export const NOTIFICATIONS_TITLE = 'Notifications'
+export const NOTIFICATIONS_EMPTY = 'Nothing yet. Likes, comments and new followers will show up here.'
+export const NOTIFICATIONS_OPEN = 'Notifications'
+export const NOTIFICATIONS_LOAD_MORE = 'Show more'
+// "Notify me", not "Email me": this pass is in-app only and no email is sent,
+// so an email label would promise something the code does not do. Revisit when
+// the digest ships (TODO.md).
+export const NOTIFICATION_PREFS_TITLE = 'Notify me about'
+export const NOTIFICATION_PREFS_INTRO = 'Choose what you want to hear about. All are on by default.'
+export const NOTIFICATION_PREF_LABELS = {
+    like: 'Likes on my poems',
+    comment: 'Comments on my poems',
+    follow: 'New followers',
+    newPoem: 'New poems from poets I follow'
+}

@@ -8,6 +8,7 @@ import { WEB_SUBTITLE } from '../../data/constants'
 import { AppContext } from '../../App'
 import { useRouter } from 'next/router'
 import { getAvatarColor, getInitials } from '../ListItem/components/AuthorAvatar'
+import NotificationBell from '../Notifications/NotificationBell'
 
 function Header() {
     const context = useContext(AppContext)
@@ -52,6 +53,9 @@ function Header() {
             {/* Grouped so the avatar and the auth button space as one right-hand
                 unit, instead of each becoming its own space-between column. */}
             <div className='header__actions'>
+                {/* Before the avatar: the bell is the thing with news in it, and
+                    it renders nothing at all when signed out. */}
+                <NotificationBell />
                 {context?.user ? (
                     <Link href='/profile' className='header__profile-picture' aria-label='Your profile'>
                         {context?.picture ? (

@@ -6,6 +6,7 @@ import { selectPoemsListPoems } from '../../redux/selectors/poemCacheSelectors'
 import ProfileForm from './components/ProfileForm'
 import ProfilePicture from './components/ProfilePicture'
 import ProfileTabs from './components/ProfileTabs'
+import NotificationPreferences from '../Notifications/NotificationPreferences'
 import UserInfo from './components/UserInfo'
 
 export default function Profile() {
@@ -41,6 +42,13 @@ export default function Profile() {
                             <div className='profile__user-column'>
                                 <ProfilePicture context={context} />
                                 <UserInfo context={context} />
+                                {/* Preferences live here, in the settings
+                                    column, rather than behind a sixth tab. The
+                                    bell's panel already IS the notifications
+                                    surface — a tab showing the same list would
+                                    add a tab without adding a capability, and
+                                    five is already a lot (see TODO.md). */}
+                                <NotificationPreferences />
                             </div>
                             <ProfileForm
                                 context={context}

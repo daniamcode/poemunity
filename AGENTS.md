@@ -321,6 +321,61 @@ ordinary poet. Not merely wasted bytes — the edit success handler merges the
 *posted* fields into the Redux poem entity, so sending them would show a date and
 an origin the database never stored.
 
+## Notifications
+
+Four event types — `like`, `comment`, `follow`, `newPoem` — each with a
+per-author preference, **all on by default**.
+
+**Collapsing is a property of the storage, not the rendering.** Twelve likes on
+one poem is ONE row saying twelve. Grouping on read cannot work here: read state
+is per-row and a group has no single read state. `notify()` merges into an
+existing **unread** row of the same `(recipient, type, poem)`; a **read** row is
+never merged into, because you already saw it and a new like has to be able to
+raise a fresh unread one.
+
+`count` is deliberately **not** `actors.length`. The actor array is capped
+(`MAX_ACTORS`, so the UI can render "Ada, Milo and 10 others") and the count is
+not, so past the cap they disagree and the count is the honest one. Anything
+computing "and N others" from the array length is a bug —
+`notificationText.test.ts` pins it with a fixture where the two differ.
+
+Ordered by **`updatedAt`**, not `createdAt`: a collapse updates in place, and
+ordering by creation would leave a poem that gathered fifty likes this morning
+wherever its first like landed last week.
+
+`notify()` **never throws** — a notification is a side effect of somebody else's
+action and must not fail the like that caused it — but it **is awaited**, because
+an un-awaited write on a serverless function that may freeze at response time is
+a write that sometimes does not happen. Self-actions are dropped inside `notify()`
+rather than at the call sites, so a new trigger cannot forget.
+
+Trigger edges that are easy to get wrong: the like route **toggles**, so
+unliking must notify nobody; **withdrawing** a poem notifies nobody (a poet
+toggling status while they fiddle would otherwise spam their followers);
+**profile** comments share the comment route but their `targetId` is an author
+id, so they are dropped rather than misrouted; and the publish fan-out uses the
+**author** as actor, not the requester, which differ on the admin's
+post-on-behalf path. Seed scripts write the model directly rather than through
+the API, which is what stops bulk AI seeding fanning out thousands of rows —
+load-bearing, not incidental.
+
+Every route is scoped by `recipient: req.userId`, never a query parameter, and
+marking-read by id narrows that scope but cannot widen it.
+
+**Absent preference means ON.** Every author predates `notificationPrefs`, so
+nothing is stored for any of them. Mongoose fills schema defaults on
+*hydration*, so the model path survives a truthiness check today — but add
+`.lean()` to that lookup, an ordinary performance change, and the safety net
+vanishes. `isNotificationEnabled()` is the single place the rule lives, and it
+is unit-tested on a plain object for exactly that reason. (The end-to-end tests
+cannot prove this rule; a red-check established that.)
+
+The badge is fetched **once on mount and never polled** — a poll on every open
+tab is a request per user per interval, forever, to learn a number that is
+usually unchanged. If freshness matters later, refetch on window focus rather
+than on an interval. There is **no sixth profile tab**: the bell's panel is the
+notifications surface, and preferences live in the profile settings column.
+
 ## Follow / followers (the social graph)
 
 Stored as **edges** in a `Follow` collection (`follower`, `following`,
