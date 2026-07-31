@@ -25,6 +25,14 @@ async function buildUniqueSlug (title, authorName) {
   return slug
 }
 
+// `Poem.likes` is `[String]` (author ids as strings) and every like comparison
+// is strict, so a non-string entry would be a like nobody can ever remove.
+// Only reachable from the admin seeding path — see the create handler.
+function sanitizeLikes (likes) {
+  if (!Array.isArray(likes)) return []
+  return likes.filter(id => typeof id === 'string' && id.trim()).map(id => id.trim())
+}
+
 function normalizeOrderBy (orderBy) {
   return String(orderBy || ORDER_BY_DATE).trim().toLowerCase()
 }
@@ -324,8 +332,10 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     ? process.env.REACT_APP_ADMIN_PRE
     : process.env.REACT_APP_ADMIN
 
+  const isAdmin = userId === adminId
+
   // If admin posts with a userId override, use that author; otherwise use logged-in author
-  const authorId = (poemData.userId && userId === adminId)
+  const authorId = (poemData.userId && isAdmin)
     ? poemData.userId
     : userId
 
@@ -349,11 +359,36 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     return res.status(400).json({ error: genre.error })
   }
 
+  // An explicit allowlist, NOT `...poemData`. `Poem` is `strict: false`, so the
+  // spread this replaces persisted every field the client chose to send —
+  // including two that are supposed to be server-owned:
+  //
+  //   likes — the author ranking is `3×poems + 1×likes` (utils/ranking.js), so
+  //           `POST /poems { likes: [...] }` bought points in the public
+  //           sidebar directly, one request per fabricated like.
+  //   date  — the sort key for every list and for the next-poem walk, so a
+  //           future date pinned a poem to the top of the site indefinitely.
+  //
+  // The allowlist is the point: a field added to the form later is inert until
+  // someone deliberately makes it writable, whereas a delete-list silently
+  // admits whatever it was not updated to exclude.
   const newPoem = new Poem({
-    ...poemData,
+    poem: poemData.poem,
+    title: poemData.title,
     genre: genre.genre,
     authorId: author._id,
+    // Derived from the author, never the request — an ordinary poet must not be
+    // able to file their poem under `famous`.
     origin: author.type || 'user',
+    // Server clock for an ordinary poet: the form sends a client-formatted
+    // "now" anyway, so nothing legitimate is lost, and a wrong or hostile
+    // client clock no longer decides list order. The admin keeps the override
+    // because they backdate seeded fake-poet content.
+    date: isAdmin && poemData.date ? new Date(poemData.date) : new Date(),
+    // Admin-gated for the same reason as the `userId` override above: the admin
+    // seeds fake poems with a starting like count from this form. Everyone else
+    // creates an unliked poem, whatever they asked for.
+    likes: isAdmin ? sanitizeLikes(poemData.likes) : [],
     // Normalized rather than passed through: an unrecognised value would fail
     // schema validation as a 500, and "Save as draft" is the only caller that
     // sends anything but the default.

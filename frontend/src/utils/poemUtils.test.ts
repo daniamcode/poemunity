@@ -64,15 +64,14 @@ describe('poemUtils', () => {
         it('should build poem data for regular user', () => {
             const result = buildPoemData(mockPoemFormData, false)
 
-            expect(result).toMatchObject({
+            // An ordinary poet sends exactly the four fields the server will
+            // accept from one — nothing more. `toEqual`, not `toMatchObject`:
+            // the whole point is what is ABSENT.
+            expect(result).toEqual({
                 poem: 'Test poem content',
                 title: 'Test Title',
-                genre: 'love',
-                likes: [],
-                origin: 'user'
+                genre: 'love'
             })
-            expect(result.date).toMatch(/^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}$/)
-            expect(result.userId).toBeUndefined()
         })
 
         it('should build poem data for admin user', () => {
@@ -96,19 +95,29 @@ describe('poemUtils', () => {
             expect(result.likes).toEqual([])
         })
 
-        it('should include current date in result', () => {
-            const result = buildPoemData(mockPoemFormData, false)
+        it('should include current date for admin only', () => {
             const currentYear = new Date().getFullYear()
 
-            expect(result.date).toContain(currentYear.toString())
+            expect(buildPoemData(mockPoemFormData, true).date)
+                .toContain(currentYear.toString())
+            // A poet's date comes from the server clock, so sending one would
+            // only be a claim the database never honours.
+            expect(buildPoemData(mockPoemFormData, false).date).toBeUndefined()
         })
 
-        it('should not include admin-specific fields for regular user', () => {
+        it('should send no server-owned field for a regular user', () => {
+            // These four are dropped by `POST /poems` and by `PATCH /poem/:id`
+            // for anyone but the admin (see backend poemFieldAllowlist.test.js).
+            // Sending them anyway is not merely wasted bytes: the edit success
+            // handler merges the POSTED fields into the Redux poem entity, so
+            // the UI would display a date, an origin and a like count that the
+            // database never stored.
             const result = buildPoemData(mockPoemFormData, false)
 
             expect(result.userId).toBeUndefined()
-            expect(result.origin).toBe('user')
-            expect(result.likes).toEqual([])
+            expect(result.origin).toBeUndefined()
+            expect(result.likes).toBeUndefined()
+            expect(result.date).toBeUndefined()
         })
 
         it('should include all admin-specific fields for admin user', () => {

@@ -311,7 +311,12 @@ describe('Poems API - Create and Update', () => {
       expect(response.body.poem).toBe(specialContent)
     })
 
-    test('should preserve date when creating poem', async () => {
+    // NOTE: this whole file authenticates as the ADMIN (see beforeEach, which
+    // sets REACT_APP_ADMIN to testUser), and preserving a client-supplied date
+    // is an admin-only capability — an ordinary poet gets the server clock, so
+    // that they cannot pin a poem to the top of every list with a future date.
+    // The non-admin half of this rule lives in poemFieldAllowlist.test.js.
+    test('should preserve a date supplied by the admin', async () => {
       const testDate = new Date('2024-01-15T10:30:00.000Z')
       const newPoem = {
         title: 'Date Test',

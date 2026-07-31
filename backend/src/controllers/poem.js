@@ -249,15 +249,40 @@ const isOwnerOrAdmin = (req, res, next) => {
   next()
 }
 
-const ALLOWED_PATCH_FIELDS = ['poem', 'title', 'genre', 'date', 'likes', 'origin', 'userId', 'status']
+// What an author may change about their own poem: its words, its title, the
+// category it files under, and whether it is published.
+//
+// `likes`, `date`, `origin` and `userId` were on this list and are deliberately
+// off it. An edit is owner-gated, so every one of them was self-service: the
+// ranking is `3×poems + 1×likes`, which made `PATCH { likes: [...] }` a way to
+// buy a place in the public sidebar; `date` is the sort key for every list and
+// for the next-poem walk; `origin` decides whether a poem is presented as the
+// work of a famous poet; and `userId` would reassign authorship outright.
+// Liking has its own route (`PUT /poem/:poemId`), which appends exactly one id
+// and only the session's own.
+const ALLOWED_PATCH_FIELDS = ['poem', 'title', 'genre', 'status']
+
+// The admin seeds and repairs fake-poet content, so they keep the wider set.
+// Same split as `POST /poems`, which admin-gates `likes` for the same reason.
+const ADMIN_ONLY_PATCH_FIELDS = ['date', 'likes', 'origin', 'userId']
 
 // modify poem — also the publish/unpublish route (`{ status }`), which is why it
 // is owner-gated and why it can return a ranking.
 poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async (req, res) => {
   const doc = req.poem
 
+  const adminId = process.env.NODE_ENV === 'development'
+    ? process.env.REACT_APP_ADMIN_PRE
+    : process.env.REACT_APP_ADMIN
+  const allowed = req.userId === adminId
+    ? [...ALLOWED_PATCH_FIELDS, ...ADMIN_ONLY_PATCH_FIELDS]
+    : ALLOWED_PATCH_FIELDS
+
+  // Fields outside the list are dropped, not rejected: the profile form posts
+  // the whole poem object on every edit, so a 400 here would break ordinary
+  // saves rather than block an attack.
   const update = Object.fromEntries(
-    Object.entries(req.body).filter(([key]) => ALLOWED_PATCH_FIELDS.includes(key))
+    Object.entries(req.body).filter(([key]) => allowed.includes(key))
   )
 
   if (update.status !== undefined) {

@@ -366,19 +366,25 @@ investigation did surface three real things:
 
 ### Open after the 2026-07-31 session (drafts, genres, fonts)
 
-- 🤖 **`POST /poems` lets the client set `likes` and `date` directly.** The handler
-  spreads `...poemData` into the model and overrides only `genre`, `authorId`,
-  `origin`, `status` and `slug` — **`likes` is not overridden**, and `Poem` is
-  `strict: false`, so arbitrary extra fields persist too. A hand-made request
-  with `likes: [...]` therefore creates a poem that already has likes, and likes
-  are worth a ranking point each (`computeRanking`: `3×poems + 1×likes`), so this
-  is a direct self-promotion vector into the public sidebar; `date` is likewise
-  free, which moves list ordering and the next-poem walk. **Fix:** build the
-  document from an explicit allowlist rather than a spread (`title`, `poem`,
-  `genre`, `status` — nothing else), and force `likes: []` and a server-side
-  `date`. Genre validation shipped this session closed one field of this hole;
-  the rest is still open. Worth doing before the P2 security review, not as part
-  of it.
+- ✅ **Fixed — the poem write endpoints no longer take the client's word for
+  server-owned fields.** `POST /poems` spread `...poemData` into a
+  `strict: false` model and overrode only `genre`/`authorId`/`origin`/`status`/
+  `slug`, so `likes` and `date` were the client's to set; `PATCH /poem/:id` had
+  an allowlist, but it *included* `likes`, `date`, `origin` and `userId`, and
+  editing is owner-gated — so the same hole existed one hop later. Likes are
+  worth a ranking point each (`3×poems + 1×likes`), which made both routes a
+  one-request path into the public sidebar ranking. Create now builds the
+  document from an **explicit allowlist**, and PATCH's list narrows to
+  `poem`/`title`/`genre`/`status`. `date`, `likes`, `origin` and `userId` become
+  **admin-only** on both routes rather than disappearing — the admin seeds and
+  backdates fake-poet content from the same form, and the `userId` override was
+  already admin-gated. `buildPoemData` stops sending them for an ordinary poet,
+  because the edit success handler merges the *posted* fields into the Redux
+  entity and would otherwise show values the database never stored.
+  `poemFieldAllowlist.test.js` sends a hostile payload and asserts on what was
+  **persisted**, not on the status code — both routes answer 200/201 either way,
+  which is how this survived a green suite. 9 of its 14 tests fail against the
+  old code.
 - 👤 **Verify the drafts work against the live URL.** CI's `E2E (Cypress)` job
   went green on `7cf9127`, so the browser paths (including `create-poem.cy.ts`,
   which drives the form that gained "Save as draft") ARE covered, and Vercel's
