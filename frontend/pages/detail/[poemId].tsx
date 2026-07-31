@@ -3,7 +3,7 @@ import Detail from '../../src/components/Detail/Detail'
 import Accordion from '../../src/components/SimpleAccordion'
 import AuthorsAccordion from '../../src/components/AuthorsAccordion'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
+import { serverFetch, serverFetchResult, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
 import { JsonLd } from '../../src/components/JsonLd'
 import { Breadcrumbs } from '../../src/components/Breadcrumbs'
@@ -89,10 +89,29 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req }) =>
     // does not depend on the first call and must not add a hop to TTFB.
     // serverFetch swallows failures into null, so an absent next simply renders
     // nothing — it can never break the page.
-    const [poem, nextPoem, initialUser] = await Promise.all([
-        serverFetch<Poem>(`/api/v1/poem/${poemId}`, undefined, token),
+    const [poemResult, nextPoem, initialUser] = await Promise.all([
+        serverFetchResult<Poem>(`/api/v1/poem/${poemId}`, undefined, token),
         serverFetch<NextPoemResponse>(`/api/v1/poem/${poemId}/next`, undefined, token),
         fetchServerUser(token)
     ])
-    return { props: { initialPoem: poem, initialNextPoem: nextPoem, initialUser, baseUrl, poemId } }
+
+    // A poem the backend will not serve is a 404, not a 200 holding an empty
+    // page. This used to render the shell with `initialPoem: null` — HTTP 200,
+    // generic title, and a canonical pointing at itself — for anything the API
+    // refused: a poem that never existed, and a DRAFT belonging to someone else.
+    // The draft's words never leaked (the API 404s and there is no payload to
+    // render), but answering 200 still confirmed the slug, and let every guessed
+    // or withdrawn URL become an indexable page.
+    //
+    // Gated on the STATUS, not on `!poem`. The two are not the same: serverFetch
+    // returns null for a 500 or a dropped connection too, so a `!poem` check
+    // would hard-404 every poem on the site during a backend blip and invite
+    // Google to deindex the lot.
+    if (poemResult.status === 404) {
+        return { notFound: true }
+    }
+
+    return {
+        props: { initialPoem: poemResult.data, initialNextPoem: nextPoem, initialUser, baseUrl, poemId }
+    }
 }

@@ -82,11 +82,31 @@ export async function fetchServerUser(token?: string): Promise<ServerUser | null
     }
 }
 
-export async function serverFetch<T>(
+export interface ServerFetchResult<T> {
+    data: T | null
+    /**
+     * The HTTP status, or 0 when the request never completed at all (DNS,
+     * timeout, connection refused).
+     */
+    status: number
+}
+
+/**
+ * `serverFetch`, but keeping the status.
+ *
+ * The distinction matters for pages that want to answer 404: `serverFetch`
+ * collapses "this record does not exist" and "the backend is having a moment"
+ * into the same `null`, and a page that treats `null` as `notFound: true` will
+ * hard-404 its entire URL space during an outage — telling Google to deindex
+ * the site over a blip. A soft 404 is a bad day; a mass deindex is a bad month.
+ *
+ * So: 404 to `notFound`, anything else renders whatever it can.
+ */
+export async function serverFetchResult<T>(
     path: string,
     params?: Record<string, string | number>,
     token?: string
-): Promise<T | null> {
+): Promise<ServerFetchResult<T>> {
     try {
         const url = new URL(BASE_URL + path)
         if (params) {
@@ -96,9 +116,17 @@ export async function serverFetch<T>(
             ? { Authorization: `Bearer ${token}` }
             : {}
         const res = await fetch(url.toString(), { headers })
-        if (!res.ok) return null
-        return res.json()
+        if (!res.ok) return { data: null, status: res.status }
+        return { data: await res.json(), status: res.status }
     } catch {
-        return null
+        return { data: null, status: 0 }
     }
+}
+
+export async function serverFetch<T>(
+    path: string,
+    params?: Record<string, string | number>,
+    token?: string
+): Promise<T | null> {
+    return (await serverFetchResult<T>(path, params, token)).data
 }
