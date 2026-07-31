@@ -16,6 +16,7 @@ const poemRouter = require('./src/controllers/poem')
 const authorsRouter = require('./src/controllers/authors')
 const followsRouter = require('./src/controllers/follows')
 const commentsRouter = require('./src/controllers/comments')
+const notificationsRouter = require('./src/controllers/notifications')
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL env var must be set in production')
@@ -117,6 +118,7 @@ app.use('/api/v1/poem', poemRouter)
 app.use('/api/v1/authors', followsRouter)
 app.use('/api/v1/authors', authorsRouter)
 app.use('/api/v1/comments', commentsRouter)
+app.use('/api/v1/notifications', notificationsRouter)
 
 app.get('/', (req, res) => {
   res.send('Server is ok')

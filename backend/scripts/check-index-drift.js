@@ -46,7 +46,8 @@ const MODELS = [
   { name: 'Poem', path: '../src/models/Poem' },
   { name: 'Author', path: '../src/models/Author' },
   { name: 'Comment', path: '../src/models/Comment' },
-  { name: 'Follow', path: '../src/models/Follow' }
+  { name: 'Follow', path: '../src/models/Follow' },
+  { name: 'Notification', path: '../src/models/Notification' }
 ]
 
 // Mongo names an index by joining each key and direction with underscores.

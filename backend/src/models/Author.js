@@ -20,6 +20,18 @@ const authorSchema = new Schema({
   website: String,
   // fields the user has chosen to hide from their public profile page
   privateFields: [String],
+  // Which notifications this author wants. Every existing author predates the
+  // field and so carries NOTHING here, which is why the check is
+  // `pref !== false` rather than `pref === true` — absent means ON, the same
+  // equivalence that let `Poem.status` ship without backfilling 16k documents.
+  // Writing it as a truthiness test would silently switch every existing user's
+  // notifications off. Enforced in one place: isNotificationEnabled().
+  notificationPrefs: {
+    like: { type: Boolean, default: true },
+    comment: { type: Boolean, default: true },
+    follow: { type: Boolean, default: true },
+    newPoem: { type: Boolean, default: true }
+  },
   // auth fields — only populated for registered users, null for famous authors.
   // Uniqueness is enforced by the case-insensitive collation indexes declared
   // below (NOT inline `unique: true`), so 'Dani' and 'dani' collide and a race

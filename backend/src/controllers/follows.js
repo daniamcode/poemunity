@@ -1,6 +1,7 @@
 const followsRouter = require('express').Router()
 const Follow = require('../models/Follow')
 const userExtractor = require('../middleware/userExtractor')
+const { notify, NOTIFICATION_TYPE } = require('../utils/notifications')
 const {
   FOLLOW_AUTHOR_FIELDS,
   resolveAuthorRef,
@@ -115,6 +116,16 @@ followsRouter.post('/:idOrSlug/follow', userExtractor, async (req, res) => {
       // is your own.
       if (!err || err.code !== 11000) throw err
     }
+
+    // After the edge exists, so a follow that failed never announces itself.
+    // Safe on the idempotent path too: a repeat follow collapses into the same
+    // unread row rather than stacking another (see utils/notifications.js), so
+    // someone toggling follow cannot use it to poke you.
+    await notify({
+      recipientId: author._id,
+      actorId: req.userId,
+      type: NOTIFICATION_TYPE.FOLLOW
+    })
 
     res.json({ following: true, ...(await followCounts(author._id)) })
   } catch (err) {

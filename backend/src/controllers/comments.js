@@ -5,6 +5,7 @@ const Poem = require('../models/Poem')
 const userExtractor = require('../middleware/userExtractor')
 const requireVerified = require('../middleware/requireVerified')
 const { isDraft } = require('../utils/poemVisibility')
+const { notify, NOTIFICATION_TYPE } = require('../utils/notifications')
 
 // `type` rides along so the UI can mark AI-authored comments as such.
 const AUTHOR_FIELDS = 'name slug picture type'
@@ -64,6 +65,26 @@ commentsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     })
     await comment.save()
     await comment.populate('authorId', AUTHOR_FIELDS)
+
+    // Only poem comments notify, and only their poem's author.
+    //
+    // `targetType` also covers PROFILE comments, whose `targetId` is an author
+    // id, not a poem id — looking that up as a poem finds nothing and notifies
+    // nobody, so profile comments are silently dropped rather than misrouted.
+    // Telling an author somebody wrote on their profile is worth doing later;
+    // doing it by accident, addressed as a poem, is not.
+    if (targetType === 'poem' && mongoose.Types.ObjectId.isValid(targetId)) {
+      const poem = await Poem.findById(targetId).select('authorId')
+      if (poem) {
+        await notify({
+          recipientId: poem.authorId,
+          actorId: req.userId,
+          type: NOTIFICATION_TYPE.COMMENT,
+          poemId: poem._id
+        })
+      }
+    }
+
     res.status(201).json(comment)
   } catch (err) {
     if (err.name === 'ValidationError') {

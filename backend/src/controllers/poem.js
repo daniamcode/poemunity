@@ -11,8 +11,11 @@ const {
   publishedOnly,
   isDraft,
   normalizeStatus,
-  canReadPoem
+  canReadPoem,
+  authorIdOf
 } = require('../utils/poemVisibility')
+const { notify, notifyMany, NOTIFICATION_TYPE } = require('../utils/notifications')
+const Follow = require('../models/Follow')
 
 const AUTHOR_FIELDS = 'name slug picture username'
 
@@ -219,14 +222,32 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
     return res.status(404).json({ error: 'poem not found' })
   }
 
+  // This route TOGGLES, so which way it went decides whether anyone is told.
+  // Notifying unconditionally would send "someone liked your poem" when they
+  // took a like away — and repeated like/unlike would be a way to poke somebody.
+  let liked = false
   if (poem.likes.some((id) => id === req.userId)) {
     poem.likes.splice(poem.likes.indexOf(req.userId), 1)
   } else {
     poem.likes.push(req.userId)
+    liked = true
   }
 
   try {
     await poem.save()
+
+    if (liked) {
+      // Awaited, not fire-and-forget: this runs on a serverless function that
+      // may be frozen the moment the response is sent, so an un-awaited write
+      // is a write that sometimes does not happen. `notify` never throws and
+      // never notifies the actor about their own action.
+      await notify({
+        recipientId: authorIdOf(poem),
+        actorId: req.userId,
+        type: NOTIFICATION_TYPE.LIKE,
+        poemId: poem._id
+      })
+    }
     // Embed the recomputed ranking so the client refreshes the sidebar in the same
     // request — a like changes the poem author's points. Matches the sidebar's
     // origin:'user' view (see GET /ranking).
@@ -236,6 +257,34 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
     res.status(500).json({ error: 'Failed to update poem' })
   }
 })
+
+/**
+ * Tell an author's followers that they published something.
+ *
+ * Shared by PATCH (a draft going live) and POST /poems (published outright), so
+ * the two cannot drift into notifying on different conditions.
+ *
+ * The actor is the AUTHOR here, not the requester — on the admin's
+ * publish-on-behalf path those differ, and the notification is about whose poem
+ * it is, not who pressed the button.
+ *
+ * Seed scripts write the Poem model directly rather than through these routes,
+ * which is why bulk AI seeding cannot fan out thousands of notifications. That
+ * is load-bearing, not incidental: see AGENTS.md before moving seeding onto the
+ * API.
+ */
+async function notifyFollowersOfNewPoem (poem) {
+  const authorId = authorIdOf(poem)
+  if (!authorId) return
+
+  const followers = await Follow.find({ following: authorId }).select('follower')
+  await notifyMany({
+    recipientIds: followers.map(f => f.follower),
+    actorId: authorId,
+    type: NOTIFICATION_TYPE.NEW_POEM,
+    poemId: poem._id
+  })
+}
 
 const isOwnerOrAdmin = (req, res, next) => {
   const { poem, userId } = req
@@ -314,6 +363,15 @@ poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async 
 
     if (!statusChanged) {
       return res.json(updated)
+    }
+
+    // Publishing tells the author's followers. WITHDRAWING deliberately does
+    // not — there is no "never mind" notification, and a poet toggling a poem
+    // while they fiddle with it would otherwise spam everyone who follows them.
+    // The guard against re-notifying on a republish is that `statusChanged` is
+    // false unless the status actually crossed, so publish→publish is a no-op.
+    if (update.status === POEM_STATUS.PUBLISHED) {
+      await notifyFollowersOfNewPoem(updated)
     }
 
     const ranking = await computeRanking({ origin: 'user' })

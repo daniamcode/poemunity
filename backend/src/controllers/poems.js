@@ -9,6 +9,8 @@ const { generatePoemSlug } = require('../utils/slugUtils')
 const { computeRanking } = require('../utils/ranking')
 const { normalizeGenre } = require('../utils/genre')
 const { POEM_STATUS, PUBLISHED_MATCH, publishedOnly, normalizeStatus } = require('../utils/poemVisibility')
+const { notifyMany, NOTIFICATION_TYPE } = require('../utils/notifications')
+const Follow = require('../models/Follow')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
 const ORDER_BY_DATE = 'date'
@@ -401,6 +403,21 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
 
     author.poems = author.poems.concat(savedPoem._id)
     await author.save()
+
+    // A poem created straight to published tells the author's followers. One
+    // saved as a DRAFT does not — it tells them when it is published, from the
+    // PATCH route, which is the only other place this fan-out lives.
+    if (savedPoem.status !== POEM_STATUS.DRAFT) {
+      const followers = await Follow.find({ following: author._id }).select('follower')
+      await notifyMany({
+        recipientIds: followers.map(f => f.follower),
+        // The AUTHOR, not the requester: on the admin's post-on-behalf path
+        // those differ, and the notification is about whose poem it is.
+        actorId: author._id,
+        type: NOTIFICATION_TYPE.NEW_POEM,
+        poemId: savedPoem._id
+      })
+    }
 
     // Embed the freshly recomputed ranking so the client updates the sidebar in
     // the same round-trip (the new poem added POEM_POINTS to its author). Matches
