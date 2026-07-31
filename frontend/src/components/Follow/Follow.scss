@@ -73,6 +73,11 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        // Explicit, because the parent `.author-detail__header` sets
+        // `text-align: center` and that does NOT reach a flex container's
+        // items — they follow justify-content, which defaults to flex-start.
+        // Without this the name centres and the row beneath it sits hard left.
+        justify-content: center;
         gap: $space-md;
         margin: $space-sm 0 0;
     }

@@ -205,9 +205,9 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
    calls went as recommended — everyone followable, AI badge on every follow
    surface, ranking formula untouched. Logged-out visitors get a link to `/login`
    rather than a hidden control. See AGENTS.md → "Follow / followers".
-   **Not yet covered by tests:** `FollowList`, `MyFollows` and the profile-tab
-   wiring have no tests of their own (`FollowButton` and the whole backend do).
-   **Not yet verified:** nothing has been exercised in a browser, and the three
+   Fully covered by tests: backend, `FollowButton`, `FollowList`, `MyFollows`
+   and the profile-tab wiring, all red-checked.
+   **Not yet verified:** the three
    new indexes have not been checked against Atlas after deploy — run
    `node backend/scripts/check-index-drift.js`.
    *Original entry:* The reference's `Usuarios Seguidos` / `Seguidores`, and
