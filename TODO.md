@@ -403,8 +403,15 @@ investigation did surface three real things:
   Follows from the `HAS_POEMS` filter now excluding drafts. The alternative is a
   letter index that opens onto an empty author page. Raised by the drafts work;
   no action taken.
-- 🤖 **(Low) No search box on the Drafts tab** — deliberate for now: it would need
-  its own owner-scoped server query for a list that usually fits on one screen.
+- ✅ **Done — the Drafts tab has a search box.** The stated reason for leaving it
+  out ("it would need its own owner-scoped server query") turned out not to hold:
+  `GET /poems?status=draft` already composes `?q=` under `$and` like any other
+  list, and the session scoping is applied *last*, so it cannot be widened by a
+  query param. No backend change at all — `MyDrafts` now uses the same
+  `useSearchQuery` policy as the other three bars. It deliberately sends **no
+  `userId`** (the server ignores one here, and sending it would read as though
+  client-supplied scope were what keeps a private list private), and an empty
+  result under a query says "no results" rather than "you have no drafts".
 
 ### Housekeeping / follow-ups raised this session
 

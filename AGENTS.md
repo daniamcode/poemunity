@@ -266,6 +266,51 @@ ordinary edit still returns none. Client-side, publishing is purely a
 **membership move** between id-lists (`movePoemBetweenDraftAndPublished`); the
 poem is one entity that both sides resolve through.
 
+The Drafts tab searches like any other list — `?q=` composes under `$and` and
+the session scoping is applied *last*, so it cannot be widened by a query
+param. That ordering is the reason `MyDrafts` must send **no `userId`**: on this
+route the server ignores one, and a component that sent it would read as though
+client-supplied scope were what keeps a private list private.
+
+`PATCH /poem/:id` accepts only `poem`, `title`, `genre` and `status` from an
+author. `likes`, `date`, `origin` and `userId` are **admin-only** on both write
+routes — see "Server-owned poem fields" below.
+
+## Server-owned poem fields
+
+`Poem` is **`strict: false`**, so anything the handler passes to the model is
+persisted, declared in the schema or not. Both write routes therefore name what
+they accept instead of forwarding the request body:
+
+- `POST /poems` builds the document from an **explicit allowlist**. It used to
+  spread `...poemData` and override only a few keys.
+- `PATCH /poem/:id` allows `poem`, `title`, `genre`, `status` — and nothing
+  else. Its allowlist used to include the four fields below.
+
+**`likes`, `date`, `origin` and `userId` are admin-only on both routes.** Not
+style: the author ranking is `3×poems + 1×likes`, computed server-side and shown
+in the public sidebar, so a client that could set `likes` bought a place in it
+with one request and never touched the like endpoint. `date` is the sort key for
+every list and for the next-poem walk. `origin` decides whether a poem is
+presented as a famous poet's work. Editing is **owner-gated, not admin-gated**,
+which is why the PATCH allowlist was as exploitable as the create spread.
+
+An allowlist, not a delete-list, and it is the same choice as `PUBLISHED_MATCH`
+being an `$in` allowlist: a field added to the form later is inert until someone
+decides it should be writable, whereas a delete-list silently admits whatever it
+was not updated to exclude.
+
+Rejected fields are **dropped, not 400'd** — the profile form posts the whole
+poem object on every save, so rejecting would break ordinary editing rather than
+block anything. That is also why `poemFieldAllowlist.test.js` asserts on what
+was **persisted**: both routes answer 200/201 either way, and a test checking
+only the status code passes against the vulnerable version.
+
+`buildPoemData` mirrors the split client-side and sends none of the four for an
+ordinary poet. Not merely wasted bytes — the edit success handler merges the
+*posted* fields into the Redux poem entity, so sending them would show a date and
+an origin the database never stored.
+
 ## Search (server-backed)
 
 Search is a **server** query, not a client-side filter. `GET /api/v1/poems?q=`
@@ -283,8 +328,8 @@ term, so "love" stops finding "A Song of Love". `$text` is also not a substitute
 match nothing. The real upgrade path is **Atlas Search**.
 
 Client side, `useSearchQuery` (`frontend/src/hooks/`) owns the whole policy and
-is shared by all three search bars (dashboard/genre list, My Poems, My
-Favourites): 300ms debounce, a 2-character minimum, and a fresh AbortController
+is shared by all four search bars (dashboard/genre list, My Poems, My
+Favourites, Drafts): 300ms debounce, a 2-character minimum, and a fresh AbortController
 per fetch. `getAction` accepts that `signal` and treats `Axios.isCancel` as a
 non-event — without that, superseding a request would dispatch `rejected` and
 flash the list's error state on every keystroke. Aborting the request being
