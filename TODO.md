@@ -222,12 +222,33 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
    exist to make. **Do followers affect ranking points?** → no. Currently
    `3×poems + 1×likes` in `computeRanking()`; follower counts are gameable and it
    would reshuffle everyone's rank overnight.
-3. 🤖 **Notifications.** Nothing currently brings a user back to the site. The
-   likes/comments half works standalone and can ship before item 2. In-app first
-   (header bell + a Notifications tab), then an optional weekly email digest —
-   Resend is already wired up behind `src/utils/email.js`. **Must collapse and
-   batch** ("12 people liked your poem", not twelve rows) or it becomes noise;
-   self-actions never notify.
+3. 🚧 **Notifications.** IN PROGRESS (2026-07-31). In-app only this pass: header
+   bell with an unread count, a Notifications tab, per-notification read state
+   auto-marked on open. Four event types — likes, comments, new followers, and
+   new poems from poets you follow — **all user-configurable, all on by
+   default**. **Must collapse and batch** ("12 people liked your poem", not
+   twelve rows) or it becomes noise; self-actions never notify.
+   Note on the fourth type: it fires for people who did nothing to you, and
+   famous poets (~3,300 followable) never publish, so most follows will never
+   produce one. Shipping it anyway was a deliberate call — the preference
+   toggle is what makes it safe. Seed scripts write the model directly rather
+   than through the API, so bulk AI seeding must not fan out notifications.
+   - 🤖 **Deferred: weekly email digest.** Resend is already wired behind
+     `src/utils/email.js`, so sending is the easy part. The real dependency is a
+     **scheduler** — the current Vercel setup has no cron — plus an unsubscribe
+     route and a per-user frequency preference. Worth doing only once in-app
+     volume shows the digest would have anything in it.
+- 🤖 **Ranking will include 2 points per follower** (decided 2026-07-31,
+  reversing the earlier "followers do not affect ranking"). `computeRanking()`
+  becomes `3×poems + 1×likes + 2×followers`. Three things to handle when
+  implementing: it needs a `$lookup`/`$group` over `follows` on a query that runs
+  on every dashboard load, so measure it before shipping; the weights are already
+  client-supplied (`poemPoints`/`likePoints` query params) so `followerPoints`
+  should follow the same pattern; and every mutation that currently returns a
+  fresh `ranking` (like, create, delete, publish) is joined by **follow and
+  unfollow**, which now change points too. Accepted trade, stated once: follower
+  counts are cheaper to manufacture than poems or likes, and this reshuffles
+  every author's rank the day it ships.
 4. 🤖 **Your stats panel** (cheapest win). The reference's `Mis Estadísticas`, but
    honest: poems published, likes received, rank if in the top 10 — `computeRanking()`
    already computes this server-side, so it's mostly UI. **Deliberately drop the

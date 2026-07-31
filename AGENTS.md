@@ -353,9 +353,11 @@ Self-follow is rejected 400, and the comparison goes through `String()` on both
 sides because `req.userId` is a string from a JSON-serialized JWT while
 `author._id` is an ObjectId, so `===` between them is always false.
 
-**Followers deliberately do NOT affect ranking.** `computeRanking()` stays
-`3×poems + 1×likes`. Follower counts are gameable, and adding them would
-reshuffle every author's rank overnight.
+**Followers do not affect ranking — yet.** `computeRanking()` is
+`3×poems + 1×likes` as shipped. A change to `+ 2×followers` has since been
+decided and is pending in `TODO.md`; when it lands, `follow` and `unfollow`
+join the mutations that must return a freshly recomputed `ranking`, alongside
+like/create/delete/publish.
 
 `followerCount`, `followingCount` and `isFollowing` ride on
 **`GET /authors/:slug`** rather than a call of their own: a separate endpoint
