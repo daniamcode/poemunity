@@ -42,7 +42,17 @@ State is split: **server state** in Redux Toolkit caches, **client/auth state** 
   autoIndex only ever **creates**. Remove an index from a schema and it lives on
   in the database forever, costing writes for a query that no longer exists.
   After removing one, drop it explicitly; `node backend/scripts/check-index-drift.js`
-  reports both directions and is strictly read-only.
+  reports both directions and is read-only.
+- **`autoCreate` is a SEPARATE switch from `autoIndex`, and also defaults to
+  true.** Setting `autoIndex: false` does not imply it. It creates the
+  *collection* when a model compiles, so any script that merely `require`s a
+  model writes to the database — `check-index-drift.js` created an empty
+  `follows` collection in production while calling itself read-only. A script
+  that must not write needs **both** `mongoose.set('autoIndex', false)` and
+  `mongoose.set('autoCreate', false)`, before any model is required.
+- **Every model with declared indexes must be listed in `check-index-drift.js`.**
+  Its `MODELS` array is hardcoded, and a model left off is not reported as
+  clean — it is not reported at all, which prints identically ("No drift").
 - **`TODO.md` is the backlog's single source of truth**, including deliberately deferred
   decisions. Check it before proposing work.
 

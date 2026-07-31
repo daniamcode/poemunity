@@ -380,6 +380,20 @@ investigation did surface three real things:
 
 ### Open after the 2026-07-31 session (drafts, genres, fonts)
 
+- 🤖 **No Cypress coverage for follow.** The whole feature is unit-tested but has
+  never run in a browser, and the one bug that reached the screen — the follow
+  row sitting hard left under a centred name — was invisible to 1079 passing
+  tests, because `text-align` does not reach a flex container's items. That is
+  the standing lesson in AGENTS.md ("layout needs a browser"), and follow is now
+  the largest surface with no e2e spec. Worth one: follow a poet, see the count
+  change, find them in the Following tab, unfollow.
+- 🤖 **Audit the remaining dynamic routes for soft 404s.** `/[genre]`,
+  `/detail/[poemId]` and `/authors/[slug]` now answer 404 via `serverFetchResult`
+  (status-based, so a backend blip cannot 404 the whole site). Nothing else was
+  checked. Any page whose `getServerSideProps` swallows a failure into `null` and
+  renders a shell is the same bug — worth one pass over `pages/` to confirm the
+  list is complete.
+
 - ✅ **Fixed — the poem write endpoints no longer take the client's word for
   server-owned fields.** `POST /poems` spread `...poemData` into a
   `strict: false` model and overrode only `genre`/`authorId`/`origin`/`status`/
