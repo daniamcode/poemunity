@@ -4,6 +4,7 @@ import * as poemReducers from './poemReducers'
 import * as poemsReducers from './poemsReducers'
 import * as loginReducers from './loginReducers'
 import * as authorsReducers from './authorsReducers'
+import * as followsReducers from './followsReducers'
 import { authorEntitiesReducer } from './authorEntitiesReducers'
 import { poemEntitiesReducer } from './poemEntitiesReducers'
 
@@ -16,12 +17,15 @@ const { ACTIONS: _poemsReducersActions, ...restOfPoemsReducers } = poemsReducers
 const { ACTIONS: _loginReducersActions, ...restOfLoginReducers } = loginReducers
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const { ACTIONS: _authorsReducersActions, ...restOfAuthorsReducers } = authorsReducers
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const { ACTIONS: _followsReducersActions, ...restOfFollowsReducers } = followsReducers
 
 const rootReducer = combineReducers({
     ...restOfPoemReducers,
     ...restOfPoemsReducers,
     ...restOfLoginReducers,
     ...restOfAuthorsReducers,
+    ...restOfFollowsReducers,
     authorEntities: authorEntitiesReducer,
     poemEntities: poemEntitiesReducer
 })

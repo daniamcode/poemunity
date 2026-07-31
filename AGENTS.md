@@ -311,6 +311,70 @@ ordinary poet. Not merely wasted bytes — the edit success handler merges the
 *posted* fields into the Redux poem entity, so sending them would show a date and
 an origin the database never stored.
 
+## Follow / followers (the social graph)
+
+Stored as **edges** in a `Follow` collection (`follower`, `following`,
+`createdAt`), never as an array on `Author`. The array is fewer lines and wrong
+three ways: a document caps at 16MB so a popular poet's follower list has a hard
+ceiling; an array cannot be paginated without loading all of it; and "who
+follows X" would need a scan of every author's array, because an array only
+indexes the side that owns it.
+
+**Three indexes, none redundant.** `{ follower, following }` is **unique** and
+is the entire concurrency story: a read-then-write check ("do I already follow
+them?") loses to a double-clicked button, because both requests read *no* before
+either writes. The unique index makes the second insert impossible at the
+storage layer, and the controller maps `E11000` to **success, not 409** —
+double-clicking Follow is not an error, and the state you asked for is the state
+you got. (`register` maps E11000 to 409 because a taken username is genuinely
+somebody else's; a follow you already have is your own.) The other two,
+`{ following, createdAt: -1, _id: -1 }` and `{ follower, createdAt: -1, _id: -1 }`,
+serve one list direction each — a compound index is only usable from a prefix,
+so the unique index cannot answer "everyone who follows B" at all.
+
+The `_id` in those two is not decoration. Batch-created edges share a
+`createdAt` to the millisecond, and a paginated sort whose ties break
+arbitrarily can show the same follower on page 1 and page 2 while dropping
+another entirely. Same lesson as the next-poem walk.
+
+**`follower` always comes from the session**, never the request body — a
+body-supplied follower would let anyone forge follows in someone else's name.
+Self-follow is rejected 400, and the comparison goes through `String()` on both
+sides because `req.userId` is a string from a JSON-serialized JWT while
+`author._id` is an ObjectId, so `===` between them is always false.
+
+**Followers deliberately do NOT affect ranking.** `computeRanking()` stays
+`3×poems + 1×likes`. Follower counts are gameable, and adding them would
+reshuffle every author's rank overnight.
+
+`followerCount`, `followingCount` and `isFollowing` ride on
+**`GET /authors/:slug`** rather than a call of their own: a separate endpoint
+would cost a second round-trip to a possibly-cold serverless backend and land
+*after* first paint, so the button would render in a default state and then
+flip — briefly telling you that you do not follow someone you do. `isFollowing`
+is always present, never omitted for logged-out visitors, because `undefined`
+and `false` mean the same thing to the client but only one is a stated answer.
+
+**All three author kinds are followable** — real users, famous poets and AI
+personas. Famous poets never publish, so following one is a reading list rather
+than a feed; that is accepted. **AI personas keep the AI badge on every follow
+surface**, which is why `authorType` travels onto every list row: following a
+bot is in tension with the disclosure the footer and per-poem badges exist to
+make, and the badge is how that tension is managed.
+
+Logged out, the button is a **link to `/login`**, not a hidden or disabled
+control. Hiding it hides the affordance entirely, so a visitor never learns the
+site has following at all and the counts beside it read as decoration.
+
+One known limit, found by red-check and recorded so it is not rediscovered: the
+tie-break ordering test passes if you delete `_id` from the **sort spec** alone,
+because the index's own third key already returns ties in `_id` order. It fails
+only when both lose it. The sort spec is still where the guarantee lives — index
+order for an unspecified tie is an implementation detail MongoDB does not
+promise — so `follows.test.js` pins the **declared indexes** separately. That
+also guards what the ordering test cannot see: `autoIndex` only ever creates, so
+an index dropped from the schema lives on in Atlas forever.
+
 ## Search (server-backed)
 
 Search is a **server** query, not a client-side filter. `GET /api/v1/poems?q=`

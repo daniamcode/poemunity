@@ -22,17 +22,31 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
 
-// MUST come before any model is compiled. Mongoose builds a model's declared
-// indexes as soon as it has a live connection, so with the app's normal
-// autoIndex setting this "read-only" script would CREATE every index it was
-// supposed to report as missing — writing to production and hiding the very
-// drift it exists to find.
+// BOTH of these must come before any model is compiled, and they are separate
+// switches guarding separate writes.
+//
+// autoIndex: Mongoose builds a model's declared indexes as soon as it has a
+// live connection, so without this the "read-only" script would CREATE every
+// index it was supposed to report as missing — hiding the very drift it exists
+// to find.
+//
+// autoCreate: defaults to TRUE and is NOT implied by autoIndex:false. It
+// creates the COLLECTION on model compile. This was missed, and adding the
+// Follow model to the list below promptly created an empty `follows`
+// collection in production — no documents and no indexes, so no harm done, but
+// a script that calls itself read-only has to actually be read-only.
 mongoose.set('autoIndex', false)
+mongoose.set('autoCreate', false)
 
+// Every model with declared indexes belongs here. A model left off this list is
+// not reported as clean — it is not reported at all, which reads identically in
+// the output ("No drift") and is the one failure mode this script cannot
+// survive. Follow was missing for exactly as long as it took to notice.
 const MODELS = [
   { name: 'Poem', path: '../src/models/Poem' },
   { name: 'Author', path: '../src/models/Author' },
-  { name: 'Comment', path: '../src/models/Comment' }
+  { name: 'Comment', path: '../src/models/Comment' },
+  { name: 'Follow', path: '../src/models/Follow' }
 ]
 
 // Mongo names an index by joining each key and direction with underscores.
@@ -74,9 +88,20 @@ async function main () {
     const collection = model.collection.name
     const declared = declaredIndexes(model.schema)
 
-    const live = (await mongoose.connection.db.collection(collection).indexes())
-      .map(i => i.name)
-      .filter(i => i !== '_id_') // always present, never declared
+    // A collection that does not exist yet is not drift. Mongo raises
+    // "ns does not exist" rather than returning an empty list, and letting that
+    // escape would make a model whose first deploy has not landed look like a
+    // failure — indistinguishable, in a CI log, from a real orphaned index.
+    let live
+    try {
+      live = (await mongoose.connection.db.collection(collection).indexes())
+        .map(i => i.name)
+        .filter(i => i !== '_id_') // always present, never declared
+    } catch (err) {
+      if (!/ns does not exist/i.test(err.message)) throw err
+      console.log(`${collection} [PENDING] — collection not created yet (${declared.length} declared)`)
+      continue
+    }
 
     const missing = declared.filter(i => !live.includes(i))
     const orphaned = live.filter(i => !declared.includes(i))

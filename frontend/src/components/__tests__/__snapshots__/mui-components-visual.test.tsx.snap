@@ -520,6 +520,28 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
             >
               Drafts
             </button>
+            <button
+              aria-controls="full-width-tabpanel-3"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-fullWidth css-hmk518-MuiButtonBase-root-MuiTab-root"
+              id="full-width-tab-3"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              Following
+            </button>
+            <button
+              aria-controls="full-width-tabpanel-4"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-fullWidth css-hmk518-MuiButtonBase-root-MuiTab-root"
+              id="full-width-tab-4"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              Followers
+            </button>
           </div>
           <span
             class="MuiTabs-indicator css-1qltlow-MuiTabs-indicator"
@@ -599,6 +621,22 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
       dir="ltr"
       hidden=""
       id="full-width-tabpanel-2"
+      role="tabpanel"
+    />
+    <div
+      aria-labelledby="full-width-tab-3"
+      class="profile__myPoems"
+      dir="ltr"
+      hidden=""
+      id="full-width-tabpanel-3"
+      role="tabpanel"
+    />
+    <div
+      aria-labelledby="full-width-tab-4"
+      class="profile__myPoems"
+      dir="ltr"
+      hidden=""
+      id="full-width-tabpanel-4"
       role="tabpanel"
     />
   </div>

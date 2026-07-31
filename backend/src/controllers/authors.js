@@ -1,6 +1,8 @@
 const authorsRouter = require('express').Router()
 const Author = require('../models/Author')
+const userExtractor = require('../middleware/userExtractor')
 const { PUBLISHED_MATCH } = require('../utils/poemVisibility')
+const { followCounts, isFollowing } = require('../utils/follows')
 
 function buildFilter (query) {
   const filter = {}
@@ -95,7 +97,19 @@ authorsRouter.get('/', async (req, res) => {
 })
 
 // GET /api/authors/:slug — public author profile (personal fields filtered by privateFields)
-authorsRouter.get('/:slug', async (req, res) => {
+//
+// `userExtractor.optional` rather than the strict one: the page is public, but
+// it answers `isFollowing` differently for a signed-in viewer.
+//
+// The three follow fields ride on THIS response rather than on a call of their
+// own, deliberately. The author page already blocks on this document, and the
+// extra work is two countDocuments and one exists, each on the prefix of an
+// index built for exactly that. A separate endpoint would cost a second
+// round-trip to a serverless backend that may be cold — and, worse, it would
+// land AFTER first paint, so the Follow button would render in a default state
+// and then flip once the answer arrived. A control that briefly claims you do
+// not follow someone you do follow invites a click that undoes nothing.
+authorsRouter.get('/:slug', userExtractor.optional, async (req, res) => {
   try {
     const author = await Author.findOne(
       { slug: req.params.slug },
@@ -119,6 +133,17 @@ authorsRouter.get('/:slug', async (req, res) => {
     if (!priv.has('country')) result.country = author.country
     if (!priv.has('birthYear')) result.birthYear = author.birthYear
     if (!priv.has('gender')) result.gender = author.gender
+
+    const [counts, viewerFollows] = await Promise.all([
+      followCounts(author._id),
+      isFollowing(req.userId, author._id)
+    ])
+    result.followerCount = counts.followerCount
+    result.followingCount = counts.followingCount
+    // Always present, never omitted for logged-out visitors: `undefined` and
+    // `false` are the same thing to the client, but only one of them is a
+    // stated answer, and the button's whole job is to state the current state.
+    result.isFollowing = viewerFollows
 
     res.json(result)
   } catch {

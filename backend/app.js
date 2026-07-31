@@ -14,6 +14,7 @@ const usersRouter = require('./src/controllers/users')
 const poemsRouter = require('./src/controllers/poems')
 const poemRouter = require('./src/controllers/poem')
 const authorsRouter = require('./src/controllers/authors')
+const followsRouter = require('./src/controllers/follows')
 const commentsRouter = require('./src/controllers/comments')
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
@@ -110,6 +111,10 @@ app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/poems', poemsRouter)
 app.use('/api/v1/poem', poemRouter)
+// The follow routes share the /authors namespace because they are all "things
+// about this author". Mounted FIRST so `/:idOrSlug/follow` and the two list
+// paths are matched here before the authors router gets a chance at them.
+app.use('/api/v1/authors', followsRouter)
 app.use('/api/v1/authors', authorsRouter)
 app.use('/api/v1/comments', commentsRouter)
 

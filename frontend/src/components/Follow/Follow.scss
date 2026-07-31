@@ -1,0 +1,150 @@
+@use '../../styles/variables' as *;
+
+// The follow button carries two labels stacked in the same box: the resting one
+// states the CURRENT state ("Following"), the hover/focus one states what a
+// click DOES ("Unfollow"). Only one is ever visible, and the box is sized by
+// the wider of the two so the button does not resize under the cursor — a
+// control that changes width on hover is one the pointer can slide off.
+.follow-button {
+    position: relative;
+    display: inline-grid;
+    align-items: center;
+    justify-items: center;
+    padding: $space-xs $space-lg;
+    border: 1px solid $color-primary;
+    border-radius: $radius-lg;
+    background: $color-primary;
+    color: $color-bg-surface;
+    font-family: $font-body;
+    font-size: $fs-base;
+    font-weight: $fw-medium;
+    line-height: 1.4;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &__label,
+    &__hover-label {
+        // Both children occupy the SAME grid cell, so the button's width is the
+        // max of the two and neither reflows the other.
+        grid-area: 1 / 1;
+    }
+
+    &__hover-label {
+        opacity: 0;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: progress;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        background: $color-primary-hover;
+        border-color: $color-primary-hover;
+    }
+
+    // Already following: an outline button, so "Following" reads as a state
+    // rather than as a call to action sitting next to one.
+    &--following {
+        background: transparent;
+        color: $color-primary;
+
+        &:hover:not(:disabled),
+        &:focus-visible {
+            background: transparent;
+            border-color: $color-error;
+            color: $color-error;
+
+            .follow-button__label {
+                opacity: 0;
+            }
+
+            .follow-button__hover-label {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+.author-detail {
+    &__follow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: $space-md;
+        margin: $space-sm 0 0;
+    }
+
+    &__follow-counts {
+        display: flex;
+        gap: $space-md;
+        margin: 0;
+        color: $color-text-muted;
+        font-size: $fs-base;
+    }
+
+    &__follow-count strong {
+        color: $color-text-dark;
+        font-weight: $fw-bold;
+    }
+}
+
+.follow-list {
+    &__items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+        padding: $space-sm 0;
+        border-bottom: 1px solid $color-border;
+    }
+
+    &__link {
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+        text-decoration: none;
+        color: inherit;
+        min-width: 0;
+    }
+
+    &__name {
+        font-size: $fs-lg;
+        overflow-wrap: anywhere;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__empty {
+        color: $color-text-muted;
+        text-align: center;
+        padding: $space-xl 0;
+    }
+
+    &__more {
+        display: block;
+        margin: $space-lg auto 0;
+        padding: $space-xs $space-lg;
+        border: 1px solid $color-primary;
+        border-radius: $radius-lg;
+        background: transparent;
+        color: $color-primary;
+        font-family: $font-body;
+        font-size: $fs-base;
+        cursor: pointer;
+
+        &:hover {
+            background: $color-primary;
+            color: $color-bg-surface;
+        }
+    }
+}

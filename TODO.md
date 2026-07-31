@@ -196,7 +196,21 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
    Recently shipped. Remaining product decision: drafts are excluded from the
    author's public poem count, which means an author whose whole body of work is
    drafted disappears from the author index until they publish.
-2. 🤝 **Follow / followers.** The reference's `Usuarios Seguidos` / `Seguidores`, and
+2. ✅ **Follow / followers.** SHIPPED (2026-07-31). `Follow` edge collection with a
+   unique `{follower, following}` index (idempotent follow, E11000 → success not
+   409) plus one sort index per direction; `POST`/`DELETE
+   /api/v1/authors/:idOrSlug/follow` and paginated `/followers` + `/following`;
+   counts and `isFollowing` ride on `GET /authors/:slug` to avoid a post-paint
+   flip; Follow button on the author page, two new profile tabs. All three product
+   calls went as recommended — everyone followable, AI badge on every follow
+   surface, ranking formula untouched. Logged-out visitors get a link to `/login`
+   rather than a hidden control. See AGENTS.md → "Follow / followers".
+   **Not yet covered by tests:** `FollowList`, `MyFollows` and the profile-tab
+   wiring have no tests of their own (`FollowButton` and the whole backend do).
+   **Not yet verified:** nothing has been exercised in a browser, and the three
+   new indexes have not been checked against Atlas after deploy — run
+   `node backend/scripts/check-index-drift.js`.
+   *Original entry:* The reference's `Usuarios Seguidos` / `Seguidores`, and
    the thing that makes everything after it possible — there is currently no way to
    keep up with a poet you liked. A `Follow` collection (`follower`, `following`,
    compound unique index), **not** an array on `Author` (doesn't scale, can't

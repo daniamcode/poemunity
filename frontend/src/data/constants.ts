@@ -234,6 +234,24 @@ export const PROFILE_CANCEL_EDIT = 'Cancel'
 export const PROFILE_POEMS = 'My poems'
 export const PROFILE_FAVOURITE_POEMS = 'My favourite poems'
 export const PROFILE_DRAFTS = 'Drafts'
+export const PROFILE_FOLLOWING = 'Following'
+export const PROFILE_FOLLOWERS = 'Followers'
+// Follow / followers.
+// The button says "Following" while hovered/focused it says "Unfollow": the
+// resting label states the CURRENT state (which is what a reader needs), and
+// the hover label states what a click would do (which is what a clicker needs).
+// A button permanently labelled "Unfollow" reads as though you are not
+// following yet, and one permanently labelled "Following" gives no clue it is
+// clickable at all.
+export const FOLLOW = 'Follow'
+export const FOLLOWING_STATE = 'Following'
+export const UNFOLLOW = 'Unfollow'
+export const FOLLOWERS_LABEL = 'Followers'
+export const FOLLOWING_LABEL = 'Following'
+export const FOLLOW_LOGGED_OUT_TITLE = 'Log in to follow this poet'
+export const FOLLOWING_EMPTY = 'Not following anyone yet. Follow a poet and they will show up here.'
+export const FOLLOWERS_EMPTY = 'No followers yet.'
+export const FOLLOW_LIST_LOAD_MORE = 'Show more'
 // Drafts: private until published. The second button on the create form, and
 // the per-poem toggle on the owner's own lists.
 export const PROFILE_SAVE_DRAFT = 'Save as draft'
