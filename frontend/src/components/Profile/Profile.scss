@@ -590,6 +590,7 @@
     padding: 0 $space-md $space-4;
 }
 
+// The quiet base — this is "Move to drafts", a withdrawal.
 .owner-poem__status-button {
     background: none;
     border: 1px solid $color-border-subtle;
@@ -605,6 +606,36 @@
         color: $color-primary;
         border-color: $color-primary;
     }
+}
+
+// Publish — the primary action of the Drafts tab, styled to match the form's
+// own Publish button (`.profile__send-poem`) so the same word looks the same
+// wherever a poet meets it.
+//
+// The `&&` doubles the specificity so this wins over the base rule above
+// regardless of source order, since both are single classes on one element.
+.owner-poem__status-button.owner-poem__status-button--publish {
+    background-color: $color-primary;
+    border-color: $color-primary;
+    color: white;
+    font-size: $fs-base-minus;
+    font-weight: $fw-semibold;
+    padding: $space-3 $space-6;
+    transition: $transition-base;
+
+    &:hover,
+    &:focus-visible {
+        background-color: $color-primary-hover;
+        border-color: $color-primary-hover;
+        // The base rule turns the TEXT primary-coloured on hover, which on a
+        // primary-coloured fill would be invisible.
+        color: white;
+        transform: translateY(-1px);
+    }
+    // Deliberately no `outline: none` here. `$color-primary-focus-shadow` is
+    // 10% alpha, which reads as a faint halo against a filled blue button —
+    // swapping the browser's own focus ring for it would lose contrast rather
+    // than gain it. The form's Publish button relies on the default ring too.
 }
 
 @media screen and (max-width: 699px) {

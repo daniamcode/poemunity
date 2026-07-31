@@ -33,9 +33,16 @@ export default function OwnerPoemRow({ poem, context }: Props) {
             )}
             <ListItem poem={poem} context={context} />
             <div className='owner-poem__actions'>
+                {/* The two actions are not peers, so they do not look alike.
+                    Publishing is what the Drafts tab exists for — the last step
+                    of writing something — while withdrawing is a rare undo. A
+                    shared quiet style made the primary action of the page the
+                    same weight as its reversal. */}
                 <button
                     type='button'
-                    className='owner-poem__status-button'
+                    className={`owner-poem__status-button ${
+                        isDraft ? 'owner-poem__status-button--publish' : ''
+                    }`}
                     onClick={isDraft ? onPublish : onUnpublish}
                 >
                     {isDraft ? PUBLISH_POEM : UNPUBLISH_POEM}

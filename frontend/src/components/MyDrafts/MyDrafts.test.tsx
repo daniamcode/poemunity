@@ -105,6 +105,19 @@ describe('Drafts tab', () => {
         expect(screen.queryByRole('button', { name: UNPUBLISH_POEM })).not.toBeInTheDocument()
     })
 
+    // Publish is the primary action of this tab; withdrawing is its rare undo.
+    // They shared one quiet style, so the thing a poet came here to do carried
+    // the same visual weight as its reversal. Asserting on the class rather
+    // than on computed styles because jsdom does not load the SCSS — the class
+    // IS the contract between component and stylesheet, and a rename on either
+    // side breaks it silently otherwise.
+    test('the publish button is styled as the primary action', () => {
+        renderList(MyDrafts, 'myDraftsQuery', [draft])
+
+        expect(screen.getByRole('button', { name: PUBLISH_POEM }))
+            .toHaveClass('owner-poem__status-button--publish')
+    })
+
     test('publishing PATCHes status=published for that poem', async () => {
         const user = userEvent.setup()
         renderList(MyDrafts, 'myDraftsQuery', [draft])
@@ -128,6 +141,15 @@ describe('My poems tab — the way back to drafts', () => {
         expect(screen.getByRole('button', { name: UNPUBLISH_POEM })).toBeInTheDocument()
         expect(screen.queryByRole('button', { name: PUBLISH_POEM })).not.toBeInTheDocument()
         expect(screen.queryByText(DRAFT_BADGE)).not.toBeInTheDocument()
+    })
+
+    test('withdrawing stays the quiet action, not a second primary button', () => {
+        // The distractor half of the pair above: a modifier applied to both
+        // buttons would pass that test and lose the whole distinction.
+        renderList(MyPoems, 'myPoemsQuery', [published])
+
+        expect(screen.getByRole('button', { name: UNPUBLISH_POEM }))
+            .not.toHaveClass('owner-poem__status-button--publish')
     })
 
     test('a poem with NO status is treated as published, like the ~16k that predate the field', () => {
