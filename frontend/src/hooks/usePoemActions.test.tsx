@@ -4,6 +4,7 @@ import { usePoemActions } from './usePoemActions'
 import * as poemActions from '../redux/actions/poemActions'
 import * as poemsActions from '../redux/actions/poemsActions'
 import * as notifications from '../utils/notifications'
+import * as statsActions from '../redux/actions/statsActions'
 import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
 import { Poem, Context } from '../typescript/interfaces'
 
@@ -11,6 +12,7 @@ import { Poem, Context } from '../typescript/interfaces'
 jest.mock('../redux/actions/poemActions')
 jest.mock('../redux/actions/poemsActions')
 jest.mock('../utils/notifications')
+jest.mock('../redux/actions/statsActions')
 
 const mockDispatch = jest.fn()
 
@@ -44,6 +46,8 @@ describe('usePoemActions', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        ;(statsActions.getUserStatsAction as jest.Mock).mockReturnValue({ type: 'GET_USER_STATS' })
+        ;(poemActions.savePoemAction as jest.Mock).mockReturnValue({ type: 'SAVE_POEM' })
         ;(poemActions.deletePoemAction as jest.Mock).mockReturnValue({ type: 'DELETE_POEM' })
         ;(poemActions.likePoemAction as jest.Mock).mockReturnValue({ type: 'LIKE_POEM' })
         ;(poemsActions.dropPoemFromCaches as jest.Mock).mockReturnValue({ type: 'DROP_POEM_FROM_CACHES' })
@@ -194,6 +198,67 @@ describe('usePoemActions', () => {
         expect(poemsActions.dropPoemFromFavouritesCache).not.toHaveBeenCalled()
         // Ranking: adopt the server-recomputed list from the response verbatim.
         expect(poemsActions.setRanking).toHaveBeenCalledWith(likeRanking)
+    })
+
+    // -----------------------------------------------------------------------
+    // The stats panel showed mount-time numbers until a reload — reported the
+    // day it shipped: publishing a poem left "Poems published" on its old value.
+    //
+    // The rule these pin: THE MUTATIONS THAT ADOPT A FRESH RANKING ARE THE
+    // MUTATIONS THAT CHANGE YOUR STATS. Liking is the deliberate exception —
+    // it changes the stats of the poem's author, who is somebody else.
+    // -----------------------------------------------------------------------
+    describe('keeping the stats panel current', () => {
+        test('deleting a poem refetches your stats', () => {
+            const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+            const mockEvent = { preventDefault: jest.fn() } as any
+
+            result.current.onDelete(mockEvent)
+            const successCallback = (poemActions.deletePoemAction as jest.Mock).mock.calls[0][0].callbacks.success
+            successCallback({ ranking: [] })
+
+            expect(statsActions.getUserStatsAction).toHaveBeenCalledTimes(1)
+        })
+
+        test('publishing a draft refetches your stats', () => {
+            const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+            const mockEvent = { preventDefault: jest.fn() } as any
+
+            result.current.onPublish(mockEvent)
+            const successCallback = (poemActions.savePoemAction as jest.Mock).mock.calls[0][0].callbacks.success
+            successCallback({ ranking: [] })
+
+            expect(statsActions.getUserStatsAction).toHaveBeenCalledTimes(1)
+        })
+
+        test('withdrawing a poem refetches your stats too', () => {
+            // Not symmetry for its own sake: withdrawing also removes that
+            // poem's likes from `likesReceived`, and the client has no idea how
+            // many it had — which is why this refetches rather than adjusting
+            // the count by one.
+            const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+            const mockEvent = { preventDefault: jest.fn() } as any
+
+            result.current.onUnpublish(mockEvent)
+            const successCallback = (poemActions.savePoemAction as jest.Mock).mock.calls[0][0].callbacks.success
+            successCallback({ ranking: [] })
+
+            expect(statsActions.getUserStatsAction).toHaveBeenCalledTimes(1)
+        })
+
+        test('liking somebody else’s poem does NOT refetch your stats', () => {
+            // The distractor. A like changes the POEM AUTHOR's likesReceived,
+            // not the liker's — refetching here would be a request per like
+            // that can only ever return the same two numbers.
+            const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+            const mockEvent = { preventDefault: jest.fn() } as any
+
+            result.current.onLike(mockEvent)
+            const successCallback = (poemActions.likePoemAction as jest.Mock).mock.calls[0][0].callbacks.success
+            successCallback({ likes: ['user-1'], ranking: [] })
+
+            expect(statsActions.getUserStatsAction).not.toHaveBeenCalled()
+        })
     })
 
     test('onEdit should navigate to profile with edit query param', () => {

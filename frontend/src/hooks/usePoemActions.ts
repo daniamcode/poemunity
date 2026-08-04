@@ -2,6 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { useAppDispatch } from '../redux/store'
 import { deletePoemAction, likePoemAction, savePoemAction } from '../redux/actions/poemActions'
+import { getUserStatsAction } from '../redux/actions/statsActions'
 import {
     dropPoemFromCaches,
     dropPoemFromFavouritesCache,
@@ -84,6 +85,13 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         // The delete response carries the recomputed ranking (the
                         // author lost this poem's points) — adopt it verbatim.
                         dispatch(setRanking(response?.ranking))
+                        // ...and your own stats panel counted that poem. The rule
+                        // is one line: THE MUTATIONS THAT ADOPT A FRESH RANKING
+                        // ARE THE MUTATIONS THAT CHANGE YOUR STATS — create,
+                        // delete, publish/withdraw. Liking is the one exception,
+                        // because it changes the stats of the poem's author, who
+                        // is somebody else and is not looking at this session.
+                        dispatch(getUserStatsAction())
 
                         // Show success notification
                         manageSuccess('Poem deleted')
@@ -126,6 +134,12 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         // Publishing/withdrawing changes the author's poem count,
                         // so the server recomputes the ranking and sends it back.
                         dispatch(setRanking(response?.ranking))
+                        // And the poem moved into or out of the published count
+                        // the stats panel shows. Refetched rather than adjusted
+                        // by ±1 locally: withdrawing also removes that poem's
+                        // likes from `likesReceived`, and the client does not
+                        // know how many it had.
+                        dispatch(getUserStatsAction())
                         manageSuccess(status === 'published' ? 'Poem published' : 'Poem moved to drafts')
                     },
                     error: () => {

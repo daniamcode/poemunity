@@ -9,6 +9,7 @@ import {
     setRanking
 } from '../../../redux/actions/poemsActions'
 import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
+import { getUserStatsAction } from '../../../redux/actions/statsActions'
 import { manageError, manageSuccess } from '../../../utils/notifications'
 import { buildPoemData } from '../../../utils/poemUtils'
 import { PoemStatus } from '../../../typescript/interfaces'
@@ -189,6 +190,11 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         // Adopt the server's authoritative ranking (author gained this
                         // poem's points) — no client-side scoring.
                         dispatch(setRanking(ranking))
+                        // The stats panel is on this very page and counted the
+                        // poem you just published. Without this it keeps its
+                        // mount-time numbers until a reload — which is exactly
+                        // how it shipped, and was reported straight away.
+                        dispatch(getUserStatsAction())
                         manageSuccess('Poem created successfully')
                     },
                     error: () => {
@@ -222,6 +228,12 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                                 })
                             )
                             dispatch(setRanking(response?.ranking))
+                            // Same rule as the other two: an edit that also
+                            // withdraws or publishes moves the poem in or out of
+                            // the counted set. An ordinary edit changes neither
+                            // the ranking nor the stats, which is why both live
+                            // inside this `if`.
+                            dispatch(getUserStatsAction())
                         }
                         manageSuccess('Poem saved')
                         // Clear edit state by navigating to profile without query params
