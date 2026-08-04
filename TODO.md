@@ -94,7 +94,12 @@ Ordered by impact. Seeded by a competitor review (Yavendras' "Zona Privada": tab
 
 ## 🟢 P3 — Frontend quality & refactors (code)
 
-- SEO: Add a section with links to online poetry contests in english. Then write them to let them know that they are on my web, so a backlink would be appreciated
+- 🤝 **Backlinks / off-site SEO (raised 2026-08-04).** Ordered by what is actually worth the effort. **First, the constraint that decides where to point any of this:** ~16,000 of the poems here are famous ones that exist verbatim on hundreds of other sites, so those pages cannot rank however many links they get — the content is not unique. Aim every link at what only Poemunity has: community poems, author pages, and the AI experiment.
+  - 🤝 **Write up the AI-poets experiment.** The highest-value item, and it is writing rather than SEO work: "I seeded a poetry community with 50 labelled AI poets — here's what happened" is a story a small tech or writing newsletter would cover, and it is genuinely novel. Everything else on this list is a link; this one is a reason for somebody to link.
+  - 🤝 **Poetry contest / resource page** (the original note). Add a section listing online poetry contests in English, then tell those sites they are featured. It works because it gives them something first, which is the only reliable form of outreach.
+  - 👤 **Own profiles** — GitHub, personal site, Bluesky/Twitter bio, Reddit profile. Low weight but legitimate and immediate.
+  - 👤 **Poetry communities** (`r/OCPoetry`, `r/poetry`, poetry Discords) — only with genuine participation. A drive-by link gets removed and can get the account banned, which costs more than the link was worth.
+  - ⛔ **Not worth doing:** directory submissions, comment links, paid "free backlink" services. Search engines discount them and some are actively harmful.
 - 🤖 **Finish the TypeScript migration** — `MyPoems.jsx`, `Register.jsx`, `Profile.jsx`, `MyFavouritePoems.jsx`, plus util files (`parseJWT.js`, `notifications.js`, `sortPoems.js`, `axiosInstance.js`). (`frontend/CLEANUP.md` §1)
 - 🤖 **Split `AppContext`** into `AuthContext` + a separate context so consumers only re-render on fields they use; remove the now-unused `elementToEdit` from the `Context` interface (and its ~20 test mocks). Finishes the `ListItem` memo work and the checklist's "AppContext re-renders all consumers" item.
 - 🤖 **Duplicate links on poem list items** — accessibility/UX bug from the checklist (`docs/PRODUCTION_CHECKLIST.md` → Frontend UI). Verify and fix.
