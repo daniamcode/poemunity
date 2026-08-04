@@ -67,6 +67,16 @@ describe('JoinPanel', () => {
         expect(screen.getByRole('region', { name: JOIN_TITLE })).toBeInTheDocument()
     })
 
+    test('promises only things that actually need an account', () => {
+        // A draft listed "Browse by category, or by author from A to Z" — free
+        // to everyone, and contradicted by the intro one line above it.
+        // Promising what the reader already has invites them to discount the
+        // rest of the list.
+        renderPanel()
+
+        expect(JOIN_ITEMS.join(' ')).not.toMatch(/\bbrowse\b|\bread\b|\bsearch\b|\bdiscover\b/i)
+    })
+
     test('the copy says what you GET, not what the site has', () => {
         // The whole reason this is not a feature list. Guards against a later
         // edit turning it back into one.

@@ -10,6 +10,16 @@
 export const JOIN_TITLE = 'Join Poemunity'
 export const JOIN_INTRO = 'Reading is free. An account also lets you:'
 
+// EVERY ITEM MUST GENUINELY NEED AN ACCOUNT.
+//
+// A draft of this listed "Browse by category, or by author from A to Z", which
+// needs no account at all — the whole site is readable signed out, which the
+// intro says one line above. Promising something you already have is worse than
+// promising nothing: it invites the reader to discount the rest of the list.
+//
+// Checked against the gates: follow answers /login when signed out; comment,
+// reply, like and publish are behind userExtractor (and requireVerified); every
+// notification route is scoped by req.userId.
 export const JOIN_ITEMS = [
     'Follow poets and see what they publish',
     'Comment, reply and like',
