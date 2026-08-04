@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { AppContext } from '../../App'
 import { useAppDispatch } from '../../redux/store'
@@ -19,16 +19,35 @@ const TYPES: (keyof Prefs)[] = ['like', 'comment', 'follow', 'newPoem']
 /**
  * The four toggles.
  *
- * Defaults to every box CHECKED while the request is in flight, not unchecked.
- * The server's rule is that an absent preference means on, so an unchecked
- * initial render would tell a user their notifications are off and then flip —
- * and anyone who toggled during that window would be acting on a false picture.
+ * Defaults to every box CHECKED while the initial request is in flight, not
+ * unchecked. The server's rule is that an absent preference means on, so an
+ * unchecked initial render would tell a user their notifications are off and
+ * then flip — and anyone who toggled during that window would be acting on a
+ * false picture. They are also DISABLED until that request lands, for the same
+ * reason: you should not be able to toggle a value you have not been shown yet.
+ *
+ * THE BOXES ARE INDEPENDENT. They did not used to be: every input carried
+ * `disabled={query.isFetching}`, and `isFetching` is one flag for the whole
+ * query — so toggling "Likes" greyed out and restored all four, which is
+ * exactly what it looked like. Saving now disables nothing, and the box flips
+ * IMMEDIATELY from local state rather than waiting for the round-trip. On a
+ * cold serverless backend that wait was long enough to read as a dead control.
  */
 export default function NotificationPreferences() {
     const context = useContext(AppContext)
     const dispatch = useAppDispatch()
     const query = useSelector((state: RootState) => state.notificationPreferencesQuery)
     const prefs = query?.item as Prefs | undefined
+
+    // Optimistic overrides, per type. A key lives here only between the click
+    // and its own response.
+    const [pending, setPending] = useState<Partial<Record<keyof Prefs, boolean>>>({})
+
+    // One ticket counter per type, so a response can tell whether it is the
+    // LATEST word on that box. Toggle twice quickly and the first response must
+    // not clear an override the second one is still relying on — that would
+    // snap the box back to the older server value mid-flight.
+    const tickets = useRef<Partial<Record<keyof Prefs, number>>>({})
 
     useEffect(() => {
         if (context?.user) {
@@ -38,12 +57,38 @@ export default function NotificationPreferences() {
 
     if (!context?.user) return null
 
-    const isOn = (type: keyof Prefs) => prefs?.[type] !== false
+    const isOn = (type: keyof Prefs) => pending[type] ?? prefs?.[type] !== false
+
+    const settle = (type: keyof Prefs, ticket: number) => {
+        if (tickets.current[type] !== ticket) return
+        setPending(previous => {
+            const rest = { ...previous }
+            delete rest[type]
+            return rest
+        })
+    }
 
     const handleToggle = (type: keyof Prefs) => {
+        const next = !isOn(type)
+        const ticket = (tickets.current[type] ?? 0) + 1
+        tickets.current[type] = ticket
+
+        setPending(previous => ({ ...previous, [type]: next }))
+
         // Sends only the field that changed. A full-object PATCH would race two
         // quick toggles and write back a stale value for the other three.
-        dispatch(saveNotificationPreferencesAction({ data: { [type]: !isOn(type) } }))
+        dispatch(saveNotificationPreferencesAction({
+            data: { [type]: next },
+            callbacks: {
+                // Clearing the override reveals the server's value, which now
+                // agrees with it.
+                success: () => settle(type, ticket),
+                // And on failure it reveals the value that is actually stored,
+                // which un-flips the box. A toggle that silently did nothing
+                // while still looking set is the worst outcome here.
+                error: () => settle(type, ticket)
+            }
+        }))
     }
 
     return (
@@ -58,7 +103,9 @@ export default function NotificationPreferences() {
                                 type='checkbox'
                                 checked={isOn(type)}
                                 onChange={() => handleToggle(type)}
-                                disabled={query?.isFetching}
+                                // Only until the initial values have arrived —
+                                // never while saving. See the note above.
+                                disabled={!prefs}
                             />
                             <span>{NOTIFICATION_PREF_LABELS[type]}</span>
                         </label>
