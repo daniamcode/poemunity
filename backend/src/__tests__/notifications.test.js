@@ -588,6 +588,87 @@ describe('Notifications — every type carries what its row needs to link', () =
   })
 })
 
+describe('Notifications — different event types never merge', () => {
+  // Reported: "somebody commented on my poem and liked it, and I only received
+  // one notification, about the like."
+  //
+  // Collapsing merges into an existing UNREAD row of the same
+  // (recipient, TYPE, poem) — the type is part of that key precisely so a
+  // comment and a like on one poem stay two rows. This pins that, because the
+  // failure is silent: one row is a plausible-looking inbox, and the missing
+  // event is one a poet would want most.
+
+  test('a comment and a like from the SAME person on the SAME poem are two rows', async () => {
+    const { poet, ada, poem } = await seed()
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+    await like(poem._id, ada._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(2)
+    expect(rows.map(r => r.type).sort()).toEqual(['comment', 'like'])
+    // And each counts one actor, rather than one row counting two events.
+    expect(rows.every(r => r.count === 1)).toBe(true)
+  })
+
+  test('the API returns both, and the badge counts both', async () => {
+    const { poet, ada, poem } = await seed()
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+    await like(poem._id, ada._id).expect(200)
+
+    const list = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
+    const badge = await auth(request(app).get('/api/v1/notifications/unread-count'), poet._id).expect(200)
+
+    expect(list.body.notifications.map(n => n.type).sort()).toEqual(['comment', 'like'])
+    expect(list.body.total).toBe(2)
+    expect(badge.body.count).toBe(2)
+  })
+
+  test('order does not matter — like first, then comment', async () => {
+    const { poet, ada, poem } = await seed()
+
+    await like(poem._id, ada._id).expect(200)
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+
+    expect(await inbox(poet._id)).toHaveLength(2)
+  })
+
+  test('a follow and a poem event stay separate too', async () => {
+    // The follow row has `poem: null`, which is the other half of the same key.
+    const { poet, ada, poem } = await seed()
+
+    await auth(request(app).post('/api/v1/authors/nadia-novak/follow'), ada._id).expect(200)
+    await like(poem._id, ada._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows.map(r => r.type).sort()).toEqual(['follow', 'like'])
+  })
+
+  test('turning OFF one type silences only that type', async () => {
+    // The most likely explanation for a real inbox showing one of two: the
+    // preference. Pinned so the behaviour is unambiguous — comment off must
+    // still leave the like.
+    const { poet, ada, poem } = await seed()
+    await Author.findByIdAndUpdate(poet._id, { $set: { 'notificationPrefs.comment': false } })
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+    await like(poem._id, ada._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].type).toBe('like')
+  })
+})
+
 describe('Notifications — declared indexes', () => {
   test('the indexes the queries need are declared', () => {
     const declared = Notification.schema.indexes().map(([keys]) => JSON.stringify(keys))
