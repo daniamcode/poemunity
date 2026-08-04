@@ -537,7 +537,10 @@ investigation did surface three real things:
   aggregation, so confirm the real 3,300-author collection returns the same
   letters and counts it did before.
 
-- 🤖 **Drop the redundant `recipient_1` index** once `8283b88` has deployed.
+- 🤖 **Drop the redundant `recipient_1` index** — the schema change shipped in
+  `8283b88`, so nothing recreates it, but `autoIndex` only ever CREATES and the
+  index built in Atlas is still there, costing a write on every notification
+  insert and collapse.
   `node backend/scripts/check-index-drift.js` will now report it as orphaned;
   `node backend/scripts/drop-redundant-notification-index.js` (dry-run by
   default, `--apply` to act) drops it. `mongodump` first — same rule as every
@@ -555,6 +558,43 @@ investigation did surface three real things:
   deployed despite green CI. **A feature is verified when it has been seen
   working on the live URL, never when CI is green.** The real fix is the
   deploy-gate item below, which stays deferred.
+
+### Raised 2026-08-04 (notifications, stats, perf)
+
+- 🤖 **A read notification is never retracted.** Unliking removes the row while
+  it is unread, deliberately stopping there: a notification you have already
+  seen is part of what happened to you, and deleting it rewrites something you
+  witnessed. The visible consequence is a row saying "X liked your poem" next to
+  a poem whose like count no longer includes them, and a stats panel showing the
+  lower number. Accepted, not forgotten — if it ever reads as a bug rather than
+  as history, the alternative is marking the row as withdrawn rather than
+  deleting it, never a silent delete.
+
+- 🤖 **The `actors` array is best-effort after a retraction.** It is capped at
+  `MAX_ACTORS` (5) and holds the most recent actors; when a listed actor
+  unlikes, the array shrinks and cannot be refilled, because the older ids were
+  never stored. `count` stays correct, and all the rendered text derives from
+  `count`, so nothing is wrong today. It matters only if something ever tries to
+  use `actors` as a complete list — for that, use the poem's `likes`.
+
+- 🤖 **`GET /notifications` no longer returns `total`.** It asks for one row more
+  than the page instead of running a second `countDocuments` per open, so
+  "is there another page" is known and "how many are there" is not. If a
+  "37 notifications" display is ever wanted, bring the count query back rather
+  than inferring one from the page count.
+
+- 👤 **The preference that would not persist.** During the 2026-08-04 session a
+  notification preference read as ON in the UI while comment notifications were
+  not arriving; it resolved on its own and was never root-caused. The toggle at
+  the time gave NO feedback either way — it sent the PATCH and waited, so a
+  failed save looked exactly like a successful one. The current version reverts
+  the box when the save fails, so a recurrence is visible rather than silent. If
+  it happens again, capture the network response before anything else.
+
+- 🤖 **No browser coverage for the stats panel or the notification timestamps.**
+  Both are new, both are layout, and layout is the one thing the 1177 frontend
+  tests provably cannot see — two of this session's bugs were pure geometry
+  found by looking at a screenshot. Fold into the Cypress work above.
 
 ### Housekeeping / follow-ups raised this session
 
@@ -628,6 +668,64 @@ investigation did surface three real things:
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **Notification and performance work** (2026-08-04). A day of fixes on top of
+  the notifications feature, most of them found by looking at the running site
+  rather than by the suite.
+  - **Mark-read never sent its request.** `markNotificationsReadAction` passed
+    `options: { fetch: false }` to `postAction`, meaning "run the request but
+    keep the response out of the LIST reducer". That flag skips the entire
+    `if (options.fetch)` block — the axios call included — so nothing was ever
+    marked read and the badge never cleared, for anyone, for every notification
+    type. Now a bare request, like `fetchUnreadCountAction`. On failure the
+    badge is left showing its real number rather than zeroed.
+  - **Mark-read is now chained to the list's success callback.** Both were
+    dispatched together, so once the request actually fired the mark-read could
+    land first and the list would return every row already `read: true`,
+    erasing the what's-new distinction the panel is opened to see.
+  - **Unliking retracts its notification**, while the row is still unread.
+  - **Timestamps on every row**, from `updatedAt` (not `createdAt` — a collapse
+    updates in place and the list is ordered by `updatedAt`).
+  - **Page size 10, and one query instead of two.** The list ran a
+    `countDocuments` beside the `find` purely to compute `hasMore`. It now asks
+    for one row more than the page. `total`/`totalPages` are gone from the
+    response and the client state.
+  - **Fan-out preferences fetched once**, not per follower: publishing went from
+    3 serial round trips per follower to 1 + 2N.
+  - **Redundant `recipient_1` index removed from the schema** — a strict prefix
+    of both compound indexes. Still present in Atlas; see Verification debt.
+  - **Author listings count by grouping poems**, on the two unfiltered paths:
+    98ms → 43ms and 99ms → 46ms at 3,300 authors / 16,000 poems. `?letter=`
+    deliberately keeps the per-author `$lookup`, where it is 8x FASTER — do not
+    unify them.
+  - **Preference checkboxes are independent and optimistic.** Every input
+    carried `disabled={query.isFetching}`, one flag for the whole query, so
+    saving one greyed out all four; and the tick waited for the round-trip.
+  - **The stats panel refreshes** after create / delete / publish / withdraw —
+    the mutations that adopt a fresh ranking are the ones that change your
+    stats. Liking is the deliberate exception.
+  - **Email announced as coming**, disabled and bound to no state, with the
+    in-app intro stating outright that nothing is emailed.
+  - **`?letter=` regex escaped** — see the Security section note.
+  - **Layout**: the stats grid was collapsing to one column because
+    `.profile__user-column` is `align-items: flex-start` and the section had no
+    width; checkboxes were the only unstyled form controls on the site.
+
+  **Test lessons from that day, worth more than the fixes.** Seven tests were
+  hollow and found by red-check, all the same mistake: asserting the ABSENCE of
+  something, when absence is also what the bug produces. Asserting the presence
+  of a specific otherwise-impossible result is what distinguishes. Also:
+  `redux-mock-store` runs no reducers, so a test that clicks and then asserts on
+  a query flag can never see that flag change; `Author.create` persists schema
+  defaults, so "no preferences stored" fixtures must go through the raw driver;
+  and a destructuring default fires on an explicit `undefined`, silently
+  restoring the populated fixture.
+
+  Two new guards for the class of bug, not the instance:
+  `src/__tests__/notificationsFlow.integration.test.tsx` (real thunks and
+  reducers, only axios mocked, assertions about THE WIRE) and
+  `src/redux/actions/fetchFlagUsage.test.ts` (`fetch: false` must always be
+  paired with `reset: true`).
 
 - **Drafts — private poems before publishing** (2026-07-31, P2.5 item 1).
   `Poem.status: 'draft' | 'published'`, **defaulted, never backfilled**: the
