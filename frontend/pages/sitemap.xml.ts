@@ -3,8 +3,16 @@ import { CATEGORIES, categoryToSlug } from '../src/data/constants'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4200'
 
-async function fetchAllPoems(): Promise<{ id: string; slug?: string }[]> {
-    const poems: { id: string; slug?: string }[] = []
+interface SitemapPoem {
+    id: string
+    slug?: string
+    /** ISO string. Drives `<lastmod>` for the poem, its genre and the homepage. */
+    date?: string
+    genre?: string
+}
+
+async function fetchAllPoems(): Promise<SitemapPoem[]> {
+    const poems: SitemapPoem[] = []
     let page = 1
     let hasMore = true
 
@@ -14,7 +22,7 @@ async function fetchAllPoems(): Promise<{ id: string; slug?: string }[]> {
             if (!res.ok) break
             const data = await res.json()
             if (!data.poems?.length) break
-            poems.push(...data.poems.map((p: any) => ({ id: p.id, slug: p.slug })))
+            poems.push(...data.poems.map((p: any) => ({ id: p.id, slug: p.slug, date: p.date, genre: p.genre })))
             hasMore = data.hasMore
             page++
         } catch {
@@ -43,45 +51,88 @@ async function fetchAllAuthors(): Promise<{ slug: string }[]> {
     }
 }
 
-function buildSitemap(
+/** The later of two ISO strings, ignoring anything unparseable. */
+function newer(a?: string, b?: string): string | undefined {
+    const ta = a ? Date.parse(a) : NaN
+    const tb = b ? Date.parse(b) : NaN
+    if (Number.isNaN(ta)) return Number.isNaN(tb) ? undefined : b
+    if (Number.isNaN(tb)) return a
+    return ta >= tb ? a : b
+}
+
+/** W3C date, which is what the sitemap spec asks for. */
+function asLastmod(iso?: string): string | undefined {
+    if (!iso) return undefined
+    const t = Date.parse(iso)
+    return Number.isNaN(t) ? undefined : new Date(t).toISOString().slice(0, 10)
+}
+
+export function buildSitemap(
     baseUrl: string,
-    poems: { id: string; slug?: string }[],
+    poems: SitemapPoem[],
     authors: { slug: string }[]
 ): string {
+    // `lastmod` IS ONLY EMITTED WHERE IT IS TRUE.
+    //
+    // The temptation is to stamp everything with today's date. That is worse
+    // than omitting it: a sitemap whose every entry claims to have changed today
+    // tells Google nothing, and it learns to ignore the field — so the one page
+    // that really did change loses its signal too. Author pages get none,
+    // because the authors endpoint carries no date and inventing one would be
+    // exactly that lie. Privacy and Terms get none for the same reason.
+    //
+    // Everything else comes free from the poems already in memory: each poem
+    // knows its own date, a genre is as fresh as its newest poem, and the
+    // homepage as fresh as the newest poem anywhere.
+    const newestOverall = poems.reduce<string | undefined>((acc, p) => newer(acc, p.date), undefined)
+
+    const newestByGenre = new Map<string, string | undefined>()
+    for (const poem of poems) {
+        if (!poem.genre) continue
+        // Through categoryToSlug, which lowercases — the database holds mixed
+        // spellings ("Love", "love"), and bucketing on the raw value would split
+        // one genre into several and hand each a too-old date.
+        const slug = categoryToSlug(poem.genre)
+        newestByGenre.set(slug, newer(newestByGenre.get(slug), poem.date))
+    }
     const staticPages = [
-        { path: '/', priority: '1.0', changefreq: 'daily' },
-        { path: '/authors', priority: '0.8', changefreq: 'daily' },
-        { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
-        { path: '/terms', priority: '0.3', changefreq: 'yearly' }
+        { path: '/', priority: '1.0', changefreq: 'daily', lastmod: newestOverall },
+        { path: '/authors', priority: '0.8', changefreq: 'daily', lastmod: newestOverall },
+        { path: '/privacy', priority: '0.3', changefreq: 'yearly', lastmod: undefined },
+        { path: '/terms', priority: '0.3', changefreq: 'yearly', lastmod: undefined }
     ]
 
-    const genrePages = CATEGORIES.map(cat => ({
-        path: `/${categoryToSlug(cat)}`,
-        priority: '0.7',
-        changefreq: 'weekly'
-    }))
+    const genrePages = CATEGORIES.map(cat => {
+        const slug = categoryToSlug(cat)
+        return { path: `/${slug}`, priority: '0.7', changefreq: 'weekly', lastmod: newestByGenre.get(slug) }
+    })
 
     const poemPages = poems.map(p => ({
         path: `/detail/${p.slug || p.id}`,
         priority: '0.6',
-        changefreq: 'monthly'
+        changefreq: 'monthly',
+        lastmod: p.date
     }))
 
     const authorPages = authors.map(a => ({
         path: `/authors/${a.slug}`,
         priority: '0.6',
-        changefreq: 'weekly'
+        changefreq: 'weekly',
+        lastmod: undefined as string | undefined
     }))
 
     const all = [...staticPages, ...genrePages, ...poemPages, ...authorPages]
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${all.map(p => `  <url>
-    <loc>${baseUrl}${p.path}</loc>
+${all.map(p => {
+    const lastmod = asLastmod(p.lastmod)
+    return `  <url>
+    <loc>${baseUrl}${p.path}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''}
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>
-  </url>`).join('\n')}
+  </url>`
+}).join('\n')}
 </urlset>`
 }
 
