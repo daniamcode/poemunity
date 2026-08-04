@@ -102,10 +102,27 @@ export function buildSitemap(
         { path: '/terms', priority: '0.3', changefreq: 'yearly', lastmod: undefined }
     ]
 
-    const genrePages = CATEGORIES.map(cat => {
-        const slug = categoryToSlug(cat)
-        return { path: `/${slug}`, priority: '0.7', changefreq: 'weekly', lastmod: newestByGenre.get(slug) }
-    })
+    // ONLY genres that actually hold a poem.
+    //
+    // Eleven categories currently hold none — Easter, Graduation, Wedding — and
+    // listing them told Google to go and crawl eleven pages with a heading and
+    // nothing under it. That is the shape it files as a soft 404, and a sitemap
+    // that advertises empty pages spends crawl budget teaching Google the site
+    // has thin ones. The pages still answer 200 for anyone who follows a
+    // category link; they are simply not advertised until they have something
+    // to show, at which point they reappear here on their own.
+    //
+    // `newestByGenre` already knows: it is built from the poems themselves, so
+    // a genre absent from it has no poems by construction.
+    const genrePages = CATEGORIES
+        .map(cat => categoryToSlug(cat))
+        .filter(slug => newestByGenre.has(slug))
+        .map(slug => ({
+            path: `/${slug}`,
+            priority: '0.7',
+            changefreq: 'weekly',
+            lastmod: newestByGenre.get(slug)
+        }))
 
     const poemPages = poems.map(p => ({
         path: `/detail/${p.slug || p.id}`,

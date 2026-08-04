@@ -61,10 +61,15 @@ describe('sitemap <lastmod>', () => {
         expect(entries(xml).get('/love')).toBe('2026-08-08')
     })
 
-    test('a genre with no poems gets NO lastmod rather than a guess', () => {
+    test('a genre with no poems is not listed at all', () => {
+        // It used to be listed with no lastmod. Worse than that: eleven
+        // categories hold no poems, and advertising them sent Google to crawl
+        // eleven pages with a heading and nothing under it — the shape it files
+        // as a soft 404. They reappear on their own once they have a poem.
         const xml = buildSitemap(BASE, [poem('p1', '2026-01-01T00:00:00.000Z', 'Love')], [])
 
-        expect(entries(xml).get('/death')).toBeNull()
+        expect(entries(xml).has('/death')).toBe(false)
+        expect(entries(xml).has('/love')).toBe(true)
     })
 
     test('the homepage is as fresh as the newest poem anywhere', () => {

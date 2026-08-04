@@ -22,6 +22,9 @@ interface PageProps {
 export default function GenrePage({ initialData, genre, baseUrl, isSearch }: PageProps) {
     const label = capitalizeFirstLetter(genre.replace(/-/g, ' '))
     const total = initialData?.total ?? 0
+    // A known category that simply has nothing in it yet — not an unknown one,
+    // which getServerSideProps already answers 404 for.
+    const isEmpty = total === 0
     const url = `${baseUrl}/${genre}`
     const description = genreDescription(label, total, initialData?.poems)
 
@@ -34,12 +37,23 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
                 onto /love. The count would be wrong on them anyway — `total` is
                 the FILTERED total, so an indexed ?q= page would claim the genre
                 holds 3 poems. */}
+            {/* An EMPTY genre is noindex too. Eleven categories currently hold
+                no poems at all — Easter, Graduation, Wedding and so on — and
+                each rendered a 200 with a heading and nothing under it. That is
+                the shape Google files as a soft 404, and it is the same shape
+                that got `/authors/[slug]` indexed before it started answering
+                404 properly.
+
+                `follow` rather than `nofollow`: the page is worthless to a
+                searcher today but its navigation is not, and the moment somebody
+                publishes a Wedding poem the tag disappears on its own. Nothing
+                to remember, nothing to undo. */}
             <SeoHead
                 title={genreTitle(label, total)}
                 description={description}
                 url={url}
-                noIndex={isSearch}
-                followLinks={isSearch}
+                noIndex={isSearch || isEmpty}
+                followLinks={isSearch || isEmpty}
             />
             {/* Not on search results: the markup would describe a filtered
                 subset while claiming to be the genre's collection page, and the

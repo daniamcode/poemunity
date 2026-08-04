@@ -145,6 +145,31 @@ describe('genre page metadata', () => {
         })
     })
 
+    // Eleven categories currently hold no poems — Easter, Graduation, Wedding.
+    // Each rendered a 200 with a heading and nothing under it, WHILE being
+    // listed in the sitemap: a page Google files as a soft 404, which the site
+    // was actively asking it to crawl. The same shape got `/authors/[slug]`
+    // indexed before that route started answering 404 properly.
+    describe('a genre with no poems yet', () => {
+        test('is noindex, but still followed', () => {
+            // `follow` because the page is worthless to a searcher today and
+            // its navigation is not — and the tag disappears on its own the
+            // moment somebody publishes into that category.
+            renderGenre({ initialData: { poems: [], page: 1, hasMore: false, total: 0 } })
+
+            expect(metaOf('robots')).toBe('noindex,follow')
+        })
+
+        test('a genre with even ONE poem stays indexable', () => {
+            // The distractor: a rule keyed on the rendered list rather than the
+            // total would noindex every genre, since `poems` is empty in this
+            // fixture. It is the TOTAL that says whether the category is empty.
+            renderGenre({ initialData: { poems: [], page: 1, hasMore: false, total: 1 } })
+
+            expect(metaOf('robots')).toBeUndefined()
+        })
+    })
+
     describe('getServerSideProps', () => {
         const ctx = (query: Record<string, string>) =>
             ({
