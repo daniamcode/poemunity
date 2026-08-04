@@ -1,4 +1,5 @@
 export const WEB_SUBTITLE = 'Your poem community!'
+
 export const CATEGORIES_TITLE = 'Categories'
 export const CATEGORIES_BROWSE_ALL = 'Browse all categories →'
 export const MUST_HAVE_CATEGORIES = [

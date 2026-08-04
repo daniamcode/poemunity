@@ -1,0 +1,131 @@
+@use '../../styles/variables' as *;
+
+// The signed-out "what you get" panel, last in the left column.
+//
+// Quiet on purpose: it sits under the navigation a reader actually came for,
+// and a boxed, coloured call-to-action beside a poem would compete with the
+// poem. A rule above it and one filled button is the whole treatment.
+.join-panel {
+    margin-top: $space-6;
+    padding-top: $space-4;
+    border-top: 1px solid $color-border-subtle;
+}
+
+.join-panel__title {
+    margin: 0 0 $space-2;
+    font-family: $font-heading;
+    font-size: $fs-base;
+    font-weight: $fw-bold;
+    color: $color-text-dark;
+}
+
+.join-panel__intro {
+    margin: 0 0 $space-3;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+}
+
+.join-panel__list {
+    margin: 0 0 $space-4;
+    padding: 0;
+    list-style: none;
+}
+
+// A rule-based marker rather than a bullet glyph: the list items wrap to two
+// lines at this width, and a `list-style` bullet leaves the second line hanging
+// under the marker instead of under the text.
+.join-panel__item {
+    position: relative;
+    padding-left: $space-4;
+    margin-bottom: $space-2;
+    font-size: $fs-sm;
+    line-height: 1.45;
+    color: $color-text-secondary;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        // Aligns the dot to the first line's optical centre rather than its box.
+        top: 0.55em;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: $color-primary;
+    }
+}
+
+.join-panel__cta {
+    display: block;
+    padding: $space-2 $space-3;
+    border-radius: $radius-sm;
+    background-color: $color-primary;
+    color: white;
+    font-size: $fs-sm;
+    font-weight: $fw-bold;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        background-color: $color-primary-hover;
+        // Stated explicitly: the global link hover sets a colour, and without
+        // this the label would go dark blue on a blue button.
+        color: white;
+    }
+}
+
+.join-panel__signin {
+    display: block;
+    margin-top: $space-2;
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    text-align: center;
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary;
+    }
+}
+
+.join-panel__group {
+    margin-bottom: $space-4;
+}
+
+.join-panel__group-title {
+    margin: 0 0 $space-2;
+    font-family: $font-body;
+    font-size: $fs-sm;
+    font-weight: $fw-bold;
+    color: $color-text-dark;
+}
+
+// The AI note. Set apart from the benefits — it is not something an account
+// unlocks — but styled as a highlight rather than small print, because it is
+// the most distinctive thing here.
+.join-panel__ai {
+    margin-top: $space-5;
+    padding: $space-3;
+    border-radius: $radius-sm;
+    background-color: $color-primary-bg;
+}
+
+.join-panel__ai-title {
+    margin: 0 0 $space-1;
+    font-family: $font-heading;
+    font-size: $fs-sm;
+    font-weight: $fw-bold;
+    color: $color-primary-dark;
+}
+
+.join-panel__ai-text {
+    margin: 0 0 $space-1;
+    font-size: $fs-xs;
+    line-height: 1.5;
+    color: $color-text-secondary;
+}
+
+.join-panel__ai-link {
+    font-size: $fs-xs;
+    color: $color-primary;
+}

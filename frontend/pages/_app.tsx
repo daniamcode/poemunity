@@ -27,6 +27,7 @@ import '../src/components/Ranking/Ranking.scss'
 import '../src/components/PoemOfTheWeek/PoemOfTheWeek.scss'
 import '../src/components/Register/Register.scss'
 import '../src/components/Auth/VerifyBanner.scss'
+import '../src/components/Join/Join.scss'
 
 const clientSideEmotionCache = createEmotionCache()
 

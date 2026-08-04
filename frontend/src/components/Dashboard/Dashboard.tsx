@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import Accordion from '../SimpleAccordion'
+import JoinPanel from '../Join/JoinPanel'
 import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
 import PoemOfTheWeek from '../PoemOfTheWeek/PoemOfTheWeek'
@@ -40,6 +41,8 @@ function Dashboard({ initialData, match }: DashboardProps) {
             <div className='dashboard__accordion'>
                 <Accordion genre={genre} />
                 <AuthorsAccordion />
+                {/* Last, and signed-out only — see JoinPanel. */}
+                <JoinPanel />
             </div>
             <div className='dashboard__list'>
                 {/* These pages had NO h1 at all — the top-level heading was
