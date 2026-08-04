@@ -492,6 +492,102 @@ describe('Notifications — reading them', () => {
   })
 })
 
+describe('Notifications — every type carries what its row needs to link', () => {
+  // The client turns a row into a destination in `notificationHref`:
+  //   follow  -> /authors/<actor slug or id>
+  //   others  -> /detail/<poem slug or id>
+  // and renders NOTHING clickable when neither is present. So a row that omits
+  // the field its own type needs is a dead notification — visible, but going
+  // nowhere. This asserts the contract for all four types in one place, since
+  // only `like` was covered before.
+
+  const hrefFieldsFor = (row) => ({
+    type: row.type,
+    poemSlug: row.poem?.slug ?? null,
+    actorSlug: row.actors?.[0]?.slug ?? null,
+    actorName: row.actors?.[0]?.name ?? null
+  })
+
+  test('a LIKE row carries the poem slug', async () => {
+    const { poet, ada, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
+
+    expect(hrefFieldsFor(res.body.notifications[0])).toEqual({
+      type: 'like', poemSlug: 'aubade-nadia', actorSlug: 'ada-brine', actorName: 'Ada Brine'
+    })
+  })
+
+  test('a COMMENT row carries the poem slug', async () => {
+    const { poet, ada, poem } = await seed()
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
+
+    expect(hrefFieldsFor(res.body.notifications[0])).toEqual({
+      type: 'comment', poemSlug: 'aubade-nadia', actorSlug: 'ada-brine', actorName: 'Ada Brine'
+    })
+  })
+
+  test('a FOLLOW row carries the actor slug and NO poem', async () => {
+    // The one type that routes to an author. A poem field here would send the
+    // reader to a poem that has nothing to do with the notification.
+    const { poet, ada } = await seed()
+    await auth(request(app).post(`/api/v1/authors/${ada._id}/follow`), poet._id).expect(200)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), ada._id).expect(200)
+
+    expect(hrefFieldsFor(res.body.notifications[0])).toEqual({
+      type: 'follow', poemSlug: null, actorSlug: 'nadia-novak', actorName: 'Nadia Novak'
+    })
+    expect(res.body.notifications[0].poem).toBeFalsy()
+  })
+
+  test('a NEW POEM row carries the newly published poem slug', async () => {
+    // The type the report came from. The actor is the POET, and the poem must
+    // be the one just published — not the draft's old identity.
+    const { poet, ada } = await seed()
+    await auth(request(app).post(`/api/v1/authors/${poet._id}/follow`), ada._id).expect(200)
+
+    const draft = await Poem.create({
+      title: 'Second Light',
+      slug: 'second-light',
+      poem: 'words',
+      genre: 'love',
+      authorId: poet._id,
+      origin: 'user',
+      status: 'draft',
+      date: new Date()
+    })
+
+    await auth(request(app).patch(`/api/v1/poem/${draft._id}`), poet._id)
+      .send({ status: 'published' })
+      .expect(200)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), ada._id).expect(200)
+    const row = res.body.notifications.find(n => n.type === 'newPoem')
+
+    expect(hrefFieldsFor(row)).toEqual({
+      type: 'newPoem', poemSlug: 'second-light', actorSlug: 'nadia-novak', actorName: 'Nadia Novak'
+    })
+  })
+
+  test('every row exposes an `id`, which read-marking needs', async () => {
+    // `POST /notifications/read { ids }` takes row ids. A row serialized
+    // without one cannot be marked read individually.
+    const { poet, ada, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
+
+    expect(res.body.notifications[0].id).toEqual(expect.any(String))
+    expect(res.body.notifications[0]._id).toBeUndefined()
+  })
+})
+
 describe('Notifications — declared indexes', () => {
   test('the indexes the queries need are declared', () => {
     const declared = Notification.schema.indexes().map(([keys]) => JSON.stringify(keys))

@@ -92,7 +92,7 @@ describe('NotificationBell', () => {
     })
 
     describe('opening the panel', () => {
-        test('loads the list and marks everything read', async () => {
+        test('loads the list', async () => {
             const user = userEvent.setup()
             renderBell({ count: 2 })
 
@@ -100,9 +100,27 @@ describe('NotificationBell', () => {
 
             expect(screen.getByRole('dialog')).toBeInTheDocument()
             expect(mockGetList).toHaveBeenCalledTimes(1)
-            expect(mockMarkRead).toHaveBeenCalledTimes(1)
             // Page 1, replacing whatever was cached.
             expect(mockGetList.mock.calls[0][0].options).toEqual({ reset: true, fetch: true })
+        })
+
+        test('marks everything read only AFTER the list has landed', async () => {
+            // The order is load-bearing. Both were dispatched together before,
+            // so the mark-read could reach the server first and the list would
+            // come back with every row already read — erasing exactly the
+            // what's-new distinction the panel is opened to see.
+            const user = userEvent.setup()
+            renderBell({ count: 2 })
+
+            await user.click(screen.getByRole('button'))
+
+            // Nothing marked yet: the list request has not resolved.
+            expect(mockMarkRead).not.toHaveBeenCalled()
+
+            // Now let it land.
+            mockGetList.mock.calls[0][0].callbacks.success({ notifications: [] })
+
+            expect(mockMarkRead).toHaveBeenCalledTimes(1)
         })
 
         test('does nothing but close on the second click', async () => {
@@ -112,6 +130,7 @@ describe('NotificationBell', () => {
 
             const button = screen.getByRole('button')
             await user.click(button)
+            mockGetList.mock.calls[0][0].callbacks.success({ notifications: [] })
             await user.click(button)
 
             expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

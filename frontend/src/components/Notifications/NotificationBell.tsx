@@ -70,13 +70,22 @@ export default function NotificationBell() {
         setOpen(next)
         if (!next) return
 
-        // Opening does three things in this order: load the list, then mark
-        // everything read, then let the response set the badge. Marking read is
-        // NOT optimistic — the server owns which rows were unread, and a client
-        // that zeroed its own badge would be wrong the moment a second tab had
-        // already read them.
-        dispatch(getNotificationsAction({ params: { page: 1 }, options: { reset: true, fetch: true } }))
-        dispatch(markNotificationsReadAction({}))
+        // Opening loads the list, and marks everything read ONLY ONCE THAT HAS
+        // LANDED. The order is load-bearing, not tidiness: both were dispatched
+        // together before, so the mark-read could reach the server first and the
+        // list would come back with every row already `read: true` — erasing
+        // exactly the what's-new distinction the panel is opened to see. Chained
+        // through the success callback rather than awaited, because that is the
+        // one thing guaranteed to run after the rows are in the store.
+        //
+        // Marking read is NOT optimistic — the server owns which rows were
+        // unread, and a client that zeroed its own badge would be wrong the
+        // moment a second tab had already read them.
+        dispatch(getNotificationsAction({
+            params: { page: 1 },
+            options: { reset: true, fetch: true },
+            callbacks: { success: () => dispatch(markNotificationsReadAction({})) }
+        }))
     }
 
     return (

@@ -1,4 +1,4 @@
-import { getAction, postAction, patchAction } from './commonActions'
+import { getAction, patchAction } from './commonActions'
 import { API_ENDPOINTS } from '../../data/API_ENDPOINTS'
 import { ACTIONS, unreadCountSet, NotificationRow } from '../reducers/notificationsReducers'
 import { AppDispatch } from '../store'
@@ -88,34 +88,51 @@ interface MarkReadProps {
     callbacks?: ReduxCallbacks
 }
 
+/** The request itself, so a caller can await it without a thunk. */
+export async function markNotificationsReadActionAsync(
+    dispatch: AppDispatch,
+    { ids, callbacks }: MarkReadProps = {}
+) {
+    try {
+        const api = API({}, {})
+        const res = await api.post(
+            API_ENDPOINTS.NOTIFICATIONS_READ,
+            ids && ids.length > 0 ? { ids } : {}
+        )
+        dispatch(unreadCountSet(res?.data?.unreadCount ?? 0))
+        callbacks?.success?.(res?.data)
+        return res?.data
+    } catch (error) {
+        // The badge is deliberately left alone on failure: it currently shows a
+        // real number, and zeroing it because a write failed would claim the
+        // notifications were read when they were not.
+        callbacks?.error?.(error)
+        return null
+    }
+}
+
 /**
  * Mark notifications read.
  *
+ * A BARE REQUEST, not `postAction`. This used to pass
+ * `options: { fetch: false }` meaning "run the request but keep its response
+ * out of the notifications reducer, which holds a LIST and would be blanked by
+ * a `{ updated, unreadCount }` body". That is not what the flag does: `fetch:
+ * false` skips the entire `if (options.fetch)` block in `postAction` — the
+ * axios call included — so THE REQUEST WAS NEVER SENT. Nothing was ever marked
+ * read, the badge never cleared, and the success callback that clears it never
+ * ran. Reported from production. The four other `fetch: false` call sites in
+ * the app pair it with `reset: true` and genuinely do mean "clear the cache
+ * without fetching", which is why the flag exists.
+ *
  * The badge is updated from the RESPONSE's `unreadCount`, not decremented
  * locally: the server is the only thing that knows what was actually unread,
- * and a client that subtracted its own guess would drift the moment two tabs
- * were open.
+ * and a client subtracting its own guess would drift the moment two tabs were
+ * open.
  */
 export function markNotificationsReadAction({ ids, callbacks }: MarkReadProps = {}) {
     return function dispatcher(dispatch: AppDispatch) {
-        return postAction({
-            type: ACTIONS.NOTIFICATIONS,
-            url: API_ENDPOINTS.NOTIFICATIONS_READ,
-            dispatch,
-            data: ids && ids.length > 0 ? { ids } : {},
-            // No reducer listens to this action's lifecycle — the notifications
-            // cache holds a LIST, and feeding it a `{ updated, unreadCount }`
-            // body would blank the rows on screen. The callback owns the state
-            // change, exactly as the follow mutation does.
-            options: { fetch: false } as ReduxOptions,
-            callbacks: {
-                ...callbacks,
-                success: (responseData: any) => {
-                    dispatch(unreadCountSet(responseData?.unreadCount ?? 0))
-                    callbacks?.success?.(responseData)
-                }
-            }
-        })
+        return markNotificationsReadActionAsync(dispatch, { ids, callbacks })
     }
 }
 
