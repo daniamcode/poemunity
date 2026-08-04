@@ -5,14 +5,11 @@ import { AppContext } from '../../App'
 import { AI_DISCLOSURE_HREF } from '../../data/constants'
 import {
     JOIN_TITLE,
-    JOIN_GROUPS,
-    JOIN_AI_TITLE,
+    JOIN_ITEMS,
     JOIN_AI_LINK,
     JOIN_CTA,
     JOIN_SIGNIN
 } from '../../data/joinCopy'
-
-const ALL_ITEMS = JOIN_GROUPS.flatMap(g => g.items)
 
 const signedIn = { user: 'token', userId: 'me-1', username: 'me', config: {} }
 const signedOut = { user: '', userId: '', username: '', config: {} }
@@ -39,31 +36,20 @@ describe('JoinPanel', () => {
         expect(screen.getByText(JOIN_TITLE)).toBeInTheDocument()
     })
 
-    test('lists every benefit, under its group heading', () => {
-        // Pinned as a whole list so adding a feature to the site and forgetting
-        // this panel is visible, rather than a silent omission.
+    test('lists every benefit', () => {
         renderPanel()
 
         const items = screen.getAllByRole('listitem').map(li => li.textContent)
-        expect(items).toEqual(ALL_ITEMS)
-
-        for (const group of JOIN_GROUPS) {
-            expect(screen.getByText(group.title)).toBeInTheDocument()
-        }
+        expect(items).toEqual(JOIN_ITEMS)
     })
 
-    test('names the three things that make it a community, not a library', () => {
-        // Discovery, conversation, and publishing — in that order, because it
-        // is the order a visitor moves through. A panel that led with
-        // "publish your poems" would be selling to someone who has not yet
-        // decided they like the place.
+    test('stays SHORT — it is a note in a navigation column, not a landing page', () => {
+        // The first version had nine bulleted lines and ran longer than the
+        // category list above it. This is the guard against it creeping back.
         renderPanel()
 
-        expect(JOIN_GROUPS.map(g => g.title)).toEqual([
-            'Find poets worth following',
-            'Join the conversation',
-            'Write and be read'
-        ])
+        expect(screen.getAllByRole('listitem')).toHaveLength(4)
+        expect(JOIN_ITEMS.every(item => item.length <= 45)).toBe(true)
     })
 
     test('sends you to register, and offers log in for people who have an account', () => {
@@ -86,17 +72,16 @@ describe('JoinPanel', () => {
         // edit turning it back into one.
         renderPanel()
 
-        expect(ALL_ITEMS.join(' ')).toMatch(/Follow anyone/)
-        expect(ALL_ITEMS.join(' ')).not.toMatch(/system|feature|module/i)
+        expect(JOIN_ITEMS.join(' ')).toMatch(/Follow poets/)
+        expect(JOIN_ITEMS.join(' ')).not.toMatch(/system|feature|module/i)
     })
 
     describe('the AI poets', () => {
-        test('are present, and link to the full explanation', () => {
+        test('are mentioned, and link to the full explanation', () => {
             // Signed-out visitors are exactly the people who have not seen the
             // footer or a per-poem badge yet.
             renderPanel()
 
-            expect(screen.getByText(JOIN_AI_TITLE)).toBeInTheDocument()
             expect(screen.getByRole('link', { name: JOIN_AI_LINK }))
                 .toHaveAttribute('href', AI_DISCLOSURE_HREF)
         })
@@ -109,8 +94,19 @@ describe('JoinPanel', () => {
             // by it. Rewrite the copy freely — this assertion stays.
             renderPanel()
 
-            const text = screen.getByText(/AI poets who write/).textContent || ''
+            const text = screen.getByText(/AI poets/).textContent || ''
             expect(text).toMatch(/badge/i)
+        })
+
+        test('claim nothing about other sites', () => {
+            // An earlier draft was headed "Something you will not find
+            // elsewhere" — a claim about every other poetry site, which nobody
+            // here has checked and nobody could. Describe this site; leave the
+            // rest of the internet out of it.
+            renderPanel()
+
+            const text = screen.getByText(/AI poets/).textContent || ''
+            expect(text).not.toMatch(/elsewhere|other sites|only place|unique|no other/i)
         })
 
         test('are not listed as something an account unlocks', () => {
@@ -118,15 +114,15 @@ describe('JoinPanel', () => {
             // of registering would be false.
             renderPanel()
 
-            expect(ALL_ITEMS.join(' ')).not.toMatch(/\bAI\b/)
+            expect(JOIN_ITEMS.join(' ')).not.toMatch(/\bAI\b/)
         })
 
-        test('sits outside the benefit groups', () => {
+        test('sit outside the benefit list', () => {
             const { container } = renderPanel()
 
             const ai = container.querySelector('.join-panel__ai')
             expect(ai).not.toBeNull()
-            expect(ai!.closest('.join-panel__group')).toBeNull()
+            expect(ai!.closest('.join-panel__list')).toBeNull()
         })
     })
 })

@@ -1,55 +1,62 @@
 @use '../../styles/variables' as *;
 
-// The signed-out "what you get" panel, last in the left column.
+// The signed-out "what you get" note, last in the left column.
 //
-// Quiet on purpose: it sits under the navigation a reader actually came for,
-// and a boxed, coloured call-to-action beside a poem would compete with the
-// poem. A rule above it and one filled button is the whole treatment.
+// QUIET AND NARROW. It sits under the navigation a reader actually came for, so
+// it is sized like a footnote to that column rather than like a banner: a
+// measure capped well below the column width, small type, and one filled
+// button as the only strong element. The first version ran full width at body
+// size with nine bulleted lines, which is longer than the category list above
+// it and reads as an advertisement.
 .join-panel {
-    margin-top: $space-6;
-    padding-top: $space-4;
+    // Narrower than the column on purpose — a short measure is what makes this
+    // scan as a note. The column is ~250px; this keeps the text off both edges.
+    max-width: 210px;
+    margin-top: $space-5;
+    padding-top: $space-3;
     border-top: 1px solid $color-border-subtle;
 }
 
 .join-panel__title {
-    margin: 0 0 $space-2;
+    margin: 0 0 $space-1;
     font-family: $font-heading;
-    font-size: $fs-base;
+    font-size: $fs-base-minus;
     font-weight: $fw-bold;
     color: $color-text-dark;
 }
 
 .join-panel__intro {
-    margin: 0 0 $space-3;
-    font-size: $fs-sm;
+    margin: 0 0 $space-2;
+    font-size: $fs-xs;
+    line-height: 1.4;
     color: $color-text-muted;
 }
 
 .join-panel__list {
-    margin: 0 0 $space-4;
+    margin: 0 0 $space-3;
     padding: 0;
     list-style: none;
 }
 
-// A rule-based marker rather than a bullet glyph: the list items wrap to two
-// lines at this width, and a `list-style` bullet leaves the second line hanging
-// under the marker instead of under the text.
+// A small rule rather than a bullet glyph: these wrap to two lines at this
+// measure, and `list-style` leaves the second line hanging under the marker
+// instead of under the text.
 .join-panel__item {
     position: relative;
-    padding-left: $space-4;
-    margin-bottom: $space-2;
-    font-size: $fs-sm;
-    line-height: 1.45;
+    padding-left: $space-3;
+    margin-bottom: $space-1;
+    font-size: $fs-xs;
+    line-height: 1.4;
     color: $color-text-secondary;
 
     &::before {
         content: '';
         position: absolute;
         left: 0;
-        // Aligns the dot to the first line's optical centre rather than its box.
-        top: 0.55em;
-        width: 5px;
-        height: 5px;
+        // The first line's optical centre, not its box.
+        top: 0.5em;
+        width: 4px;
+        height: 4px;
         border-radius: 50%;
         background-color: $color-primary;
     }
@@ -57,11 +64,11 @@
 
 .join-panel__cta {
     display: block;
-    padding: $space-2 $space-3;
+    padding: 6px $space-2;
     border-radius: $radius-sm;
     background-color: $color-primary;
     color: white;
-    font-size: $fs-sm;
+    font-size: $fs-xs;
     font-weight: $fw-bold;
     text-align: center;
     text-decoration: none;
@@ -69,15 +76,15 @@
     &:hover,
     &:focus-visible {
         background-color: $color-primary-hover;
-        // Stated explicitly: the global link hover sets a colour, and without
-        // this the label would go dark blue on a blue button.
+        // Stated: the global link hover sets a colour, and without this the
+        // label would go dark blue on a blue button.
         color: white;
     }
 }
 
 .join-panel__signin {
     display: block;
-    margin-top: $space-2;
+    margin-top: $space-1;
     font-size: $fs-xs;
     color: $color-text-muted;
     text-align: center;
@@ -88,44 +95,16 @@
     }
 }
 
-.join-panel__group {
-    margin-bottom: $space-4;
-}
-
-.join-panel__group-title {
-    margin: 0 0 $space-2;
-    font-family: $font-body;
-    font-size: $fs-sm;
-    font-weight: $fw-bold;
-    color: $color-text-dark;
-}
-
-// The AI note. Set apart from the benefits — it is not something an account
-// unlocks — but styled as a highlight rather than small print, because it is
-// the most distinctive thing here.
+// One line, and the quietest thing here. It is a disclosure, not a pitch, so it
+// gets no tint, no box and no heading of its own.
 .join-panel__ai {
-    margin-top: $space-5;
-    padding: $space-3;
-    border-radius: $radius-sm;
-    background-color: $color-primary-bg;
-}
-
-.join-panel__ai-title {
-    margin: 0 0 $space-1;
-    font-family: $font-heading;
-    font-size: $fs-sm;
-    font-weight: $fw-bold;
-    color: $color-primary-dark;
-}
-
-.join-panel__ai-text {
-    margin: 0 0 $space-1;
-    font-size: $fs-xs;
-    line-height: 1.5;
-    color: $color-text-secondary;
+    margin: $space-3 0 0;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: $color-text-muted;
 }
 
 .join-panel__ai-link {
-    font-size: $fs-xs;
     color: $color-primary;
+    white-space: nowrap;
 }
