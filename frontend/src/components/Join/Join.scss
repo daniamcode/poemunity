@@ -11,7 +11,9 @@
 .join-panel {
     // Narrower than the column on purpose — a short measure is what makes this
     // scan as a note. The column is ~250px; this keeps the text off both edges.
-    max-width: 210px;
+    // Widened with the type below: at 210px the longer items were wrapping to
+    // three lines, which undoes the compactness the measure exists for.
+    max-width: 225px;
     // A clear gap from the Authors accordion above. The MUI accordions sit
     // flush against each other by design — they are one control group — so this
     // panel needs to visibly leave that group rather than read as a third
@@ -24,14 +26,14 @@
 .join-panel__title {
     margin: 0 0 $space-1;
     font-family: $font-heading;
-    font-size: $fs-base-minus;
+    font-size: $fs-base;
     font-weight: $fw-bold;
     color: $color-text-dark;
 }
 
 .join-panel__intro {
     margin: 0 0 $space-2;
-    font-size: $fs-xs;
+    font-size: $fs-sm;
     line-height: 1.4;
     color: $color-text-muted;
 }
@@ -49,8 +51,8 @@
     position: relative;
     padding-left: $space-3;
     margin-bottom: $space-1;
-    font-size: $fs-xs;
-    line-height: 1.4;
+    font-size: $fs-sm;
+    line-height: 1.45;
     color: $color-text-secondary;
 
     &::before {
@@ -72,7 +74,7 @@
     border-radius: $radius-sm;
     background-color: $color-primary;
     color: white;
-    font-size: $fs-xs;
+    font-size: $fs-sm;
     font-weight: $fw-bold;
     text-align: center;
     text-decoration: none;
@@ -89,7 +91,7 @@
 .join-panel__signin {
     display: block;
     margin-top: $space-1;
-    font-size: $fs-xs;
+    font-size: $fs-sm;
     color: $color-text-muted;
     text-align: center;
 
@@ -103,8 +105,8 @@
 // gets no tint, no box and no heading of its own.
 .join-panel__ai {
     margin: $space-3 0 0;
-    font-size: 0.7rem;
-    line-height: 1.4;
+    font-size: $fs-xs;
+    line-height: 1.45;
     color: $color-text-muted;
 }
 
