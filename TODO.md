@@ -259,7 +259,21 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
   unfollow**, which now change points too. Accepted trade, stated once: follower
   counts are cheaper to manufacture than poems or likes, and this reshuffles
   every author's rank the day it ships.
-4. 🤖 **Your stats panel** (cheapest win). The reference's `Mis Estadísticas`, but
+4. ✅ **Your stats panel.** SHIPPED (2026-08-04). Three figures in the profile's
+   settings column: poems published, likes received, and rank when in the top 10.
+   `GET /api/v1/users/stats` returns only the two counted numbers; the **rank is
+   read from the ranking already cached client-side** for the public sidebar, so
+   the panel and the sidebar cannot disagree, and `computeRanking()`'s
+   full-collection aggregation does not run on every profile load. Both figures
+   count published poems only — the edge that makes that a real choice is a poem
+   liked while public and later withdrawn to a draft, whose likes would otherwise
+   be shown to its author but findable by nobody. Outside the top 10 it says so
+   rather than inventing a position (the endpoint returns ten rows, so 11th is
+   genuinely unknown). Renders nothing while loading or on error — a supporting
+   panel is not worth three empty boxes. The day/week/month/year breakdown was
+   dropped as planned.
+   **Not yet verified in a browser.**
+   *Original entry:* The reference's `Mis Estadísticas`, but
    honest: poems published, likes received, rank if in the top 10 — `computeRanking()`
    already computes this server-side, so it's mostly UI. **Deliberately drop the
    day/week/month/year breakdown** from the reference: four unexplained decimals
@@ -471,6 +485,49 @@ investigation did surface three real things:
   `userId`** (the server ignores one here, and sending it would read as though
   client-supplied scope were what keeps a private list private), and an empty
   result under a query says "no results" rather than "you have no drafts".
+
+### Verification debt (raised 2026-08-03/04)
+
+- 🤖 **Cypress specs for notifications and follow.** Neither feature has ever run
+  in a browser — both are covered only by unit and API tests, which is precisely
+  the gap that produced the misaligned follow row. Specs worth having, in order:
+  **notifications** — sign in as a poet, have a second account like their poem,
+  reload, assert the bell shows a badge; open the panel and assert the row text
+  and that the badge clears; assert the row links to the poem; toggle a
+  preference off and assert no new badge. **follow** — follow from an author
+  page, assert the count increments and the button flips, reload and assert it
+  persisted, unfollow. Two things to respect: the suite runs `next dev` (not a
+  production build) so hydration mismatches actually throw, and it must point at
+  `NEXT_PUBLIC_API_URL=http://localhost:4201` — :4200 is a real backend and the
+  specs write data. Note the bell fetches its count **once on mount**, so a spec
+  that expects the badge to update without a reload will fail correctly.
+
+- 👤 **Verify the recent deploys against the live URL.** `d3adb85` (notifications
+  UI), `8283b88` (notification fan-out + index) and `8d113ba` (author listing
+  aggregation) are all CI-green and none has been looked at in production.
+  `8d113ba` is the one that matters most: it changed a **public read path** —
+  `/authors` and `/authors/letters` now count poems through a different
+  aggregation, so confirm the real 3,300-author collection returns the same
+  letters and counts it did before.
+
+- 🤖 **Drop the redundant `recipient_1` index** once `8283b88` has deployed.
+  `node backend/scripts/check-index-drift.js` will now report it as orphaned;
+  `node backend/scripts/drop-redundant-notification-index.js` (dry-run by
+  default, `--apply` to act) drops it. `mongodump` first — same rule as every
+  script here. The same run also confirms the 3 follow + 2 notification indexes
+  actually built in Atlas, which has not been checked since either feature
+  shipped.
+
+- 🤖 **Standing rule: green CI is not a deploy.** Worth stating here because it
+  keeps being assumed otherwise. Pushes go straight to `master` and Vercel
+  deploys on push, so CI and the deploy **race** — CI cannot block a bad deploy,
+  it can only tell you afterwards. The backend is not gated on tests at all
+  (`backend/vercel.json` only routes traffic). And each app builds only when its
+  own directory changes, so a commit touching only root files deploys neither.
+  This has bitten before: a commit adding a needed backend fallback never
+  deployed despite green CI. **A feature is verified when it has been seen
+  working on the live URL, never when CI is green.** The real fix is the
+  deploy-gate item below, which stays deferred.
 
 ### Housekeeping / follow-ups raised this session
 

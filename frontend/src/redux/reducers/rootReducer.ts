@@ -6,6 +6,7 @@ import * as loginReducers from './loginReducers'
 import * as authorsReducers from './authorsReducers'
 import * as followsReducers from './followsReducers'
 import * as notificationsReducers from './notificationsReducers'
+import * as statsReducers from './statsReducers'
 import { authorEntitiesReducer } from './authorEntitiesReducers'
 import { poemEntitiesReducer } from './poemEntitiesReducers'
 
@@ -32,6 +33,8 @@ const {
     ...restOfNotificationsReducers
 } = notificationsReducers
 /* eslint-enable @typescript-eslint/no-unused-vars, no-unused-vars */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const { ACTIONS: _statsActions, ...restOfStatsReducers } = statsReducers
 
 const rootReducer = combineReducers({
     ...restOfPoemReducers,
@@ -40,6 +43,7 @@ const rootReducer = combineReducers({
     ...restOfAuthorsReducers,
     ...restOfFollowsReducers,
     ...restOfNotificationsReducers,
+    ...restOfStatsReducers,
     authorEntities: authorEntitiesReducer,
     poemEntities: poemEntitiesReducer
 })

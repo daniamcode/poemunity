@@ -22,5 +22,9 @@ export const API_ENDPOINTS = {
     NOTIFICATIONS_UNREAD_COUNT: '/api/v1/notifications/unread-count',
     NOTIFICATIONS_READ: '/api/v1/notifications/read',
     NOTIFICATION_PREFERENCES: '/api/v1/notifications/preferences',
-    COMMENTS: '/api/v1/comments'
+    COMMENTS: '/api/v1/comments',
+    // Two numbers for the profile stats panel. The RANK it shows is not here —
+    // it comes from POEMS_RANKING, already fetched once app-wide, so the panel
+    // and the public sidebar cannot disagree.
+    USER_STATS: '/api/v1/users/stats'
 }

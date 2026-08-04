@@ -7,6 +7,7 @@ import ProfileForm from './components/ProfileForm'
 import ProfilePicture from './components/ProfilePicture'
 import ProfileTabs from './components/ProfileTabs'
 import NotificationPreferences from '../Notifications/NotificationPreferences'
+import ProfileStats from './ProfileStats'
 import UserInfo from './components/UserInfo'
 
 export default function Profile() {
@@ -42,6 +43,7 @@ export default function Profile() {
                             <div className='profile__user-column'>
                                 <ProfilePicture context={context} />
                                 <UserInfo context={context} />
+                                <ProfileStats />
                                 {/* Preferences live here, in the settings
                                     column, rather than behind a sixth tab. The
                                     bell's panel already IS the notifications

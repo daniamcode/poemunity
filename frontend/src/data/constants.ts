@@ -311,6 +311,16 @@ export const NOTIFICATIONS_LOAD_MORE = 'Show more'
 // "Notify me", not "Email me": this pass is in-app only and no email is sent,
 // so an email label would promise something the code does not do. Revisit when
 // the digest ships (TODO.md).
+export const STATS_TITLE = 'Your stats'
+export const STATS_POEMS_LABEL = 'Poems published'
+export const STATS_LIKES_LABEL = 'Likes received'
+export const STATS_RANK_LABEL = 'Rank'
+// Shown instead of a position when the poet is outside the top 10. The ranking
+// endpoint returns ten rows, so a place outside them is genuinely not known —
+// "11th or lower" would be a guess and "—" alone reads as an error.
+export const STATS_RANK_UNRANKED = 'Outside the top 10'
+export const STATS_EMPTY = 'Publish your first poem and your stats will appear here.'
+
 export const NOTIFICATION_PREFS_TITLE = 'Notify me about'
 export const NOTIFICATION_PREFS_INTRO = 'Choose what you want to hear about. All are on by default.'
 export const NOTIFICATION_PREF_LABELS = {

@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
+const mongoose = require('mongoose')
 const usersRouter = require('express').Router()
 const Author = require('../models/Author')
+const Poem = require('../models/Poem')
 const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 const { signAuthorToken, buildAuthorProfile } = require('../utils/authToken')
@@ -74,6 +76,46 @@ usersRouter.post('/', async (req, res) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'User creation failed' })
+  }
+})
+
+// GET /api/v1/users/stats — the profile stats panel.
+//
+// Deliberately returns TWO numbers and no rank. The rank the panel shows comes
+// from the ranking already cached client-side (`GET /poems/ranking`, fetched
+// once app-wide), because that is the only way the number can be guaranteed to
+// agree with the public sidebar — computing "your rank" here from a second
+// aggregation would let the two disagree after any mutation, and would put
+// computeRanking()'s full-collection $group on every profile load. See TODO.md.
+//
+// Both numbers count PUBLISHED poems only, matching the ranking's basis and the
+// public poem count on the author page. The edge that makes this a real choice
+// rather than a formality: a poem can be liked while public and then withdrawn
+// to a draft, so its likes exist but are no longer part of anything visible.
+// Counting them would show a poet likes that no reader can find.
+usersRouter.get('/stats', userExtractor, async (req, res) => {
+  try {
+    const [stats] = await Poem.aggregate([
+      { $match: { authorId: new mongoose.Types.ObjectId(String(req.userId)), ...PUBLISHED_MATCH } },
+      {
+        $group: {
+          _id: null,
+          poemsPublished: { $sum: 1 },
+          // $ifNull because `likes` is absent on older poems, and $size throws
+          // on a missing field rather than treating it as empty.
+          likesReceived: { $sum: { $size: { $ifNull: ['$likes', []] } } }
+        }
+      }
+    ])
+
+    // A poet with nothing published aggregates to NO rows, not a row of zeroes.
+    res.json({
+      poemsPublished: stats?.poemsPublished ?? 0,
+      likesReceived: stats?.likesReceived ?? 0
+    })
+  } catch (error) {
+    console.error('Stats error:', error)
+    res.status(500).json({ error: 'Failed to load stats' })
   }
 })
 
