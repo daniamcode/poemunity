@@ -37,7 +37,6 @@ const loggedInCtx: Context = {
     privateFields: [],
     config: {},
     isAdmin: false,
-    elementToEdit: '',
     setState: jest.fn()
 }
 

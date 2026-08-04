@@ -107,7 +107,6 @@ describe('MUI Components Visual Regression Tests', () => {
                     Authorization: 'Bearer test-token'
                 }
             },
-            elementToEdit: ''
         }
 
         test('should render poem footer correctly', () => {
@@ -158,7 +157,6 @@ describe('MUI Components Visual Regression Tests', () => {
                     Authorization: 'Bearer test-token'
                 }
             },
-            elementToEdit: ''
         }
 
         test('should render list item correctly', () => {
@@ -190,7 +188,6 @@ describe('MUI Components Visual Regression Tests', () => {
                     Authorization: 'Bearer test-token'
                 }
             },
-            elementToEdit: ''
         }
 
         test('should render MyPoems component correctly', () => {
@@ -217,7 +214,6 @@ describe('MUI Components Visual Regression Tests', () => {
                     Authorization: 'Bearer test-token'
                 }
             },
-            elementToEdit: ''
         }
 
         test('should render MyFavouritePoems component correctly', () => {
@@ -244,7 +240,6 @@ describe('MUI Components Visual Regression Tests', () => {
                     Authorization: 'Bearer test-token'
                 }
             },
-            elementToEdit: ''
         }
 
         test('should render List component correctly without genre', () => {

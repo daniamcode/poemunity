@@ -1,20 +1,26 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import Profile from './Profile'
 import store from '../../redux/store'
 import { AppContext } from '../../App'
+import { NOTIFICATION_PREFS_BUTTON } from '../../data/constants'
 
 /**
  * WHERE things sit on the profile, which is not cosmetic.
  *
- * The notification preferences used to live in the settings column beside the
- * poem form. Six toggles plus the email section made that column roughly twice
- * the height of the form, which left a long band of dead space down the right
- * of the page — and pushed the TABS below the fold.
+ * The notification preferences open from a button beside "Edit profile".
  *
- * The tabs are the profile: your poems, drafts, follows, comments. Settings you
- * change once a year must not outrank them, and nothing about that column
- * suggested there was anything below it worth scrolling to.
+ * Three wrong versions preceded this. Expanded in the settings column, six
+ * toggles plus the email section made it twice the height of the poem form
+ * beside it — dead space down the page, and the profile TABS pushed below the
+ * fold. Moving it BELOW the tabs was worse: those panels hold
+ * infinitely-scrolling poem lists, so nothing under them can be reached. A
+ * self-collapsing block was closer, but its trigger was a heading, which reads
+ * as a section label rather than something to press.
+ *
+ * Now it is a peer action next to "Edit profile", and the panel renders
+ * nothing until asked.
  */
 const mockContext = {
     user: 'test-user',
@@ -22,7 +28,6 @@ const mockContext = {
     username: 'Test User',
     picture: 'test.jpg',
     isAdmin: false,
-    elementToEdit: '',
     setState: jest.fn(),
     config: { headers: { Authorization: 'Bearer test-token' } }
 }
@@ -37,27 +42,37 @@ const renderProfile = () =>
     )
 
 describe('Profile — order of the page', () => {
-    test('the tabs come BEFORE the notification preferences', () => {
+    test('nothing is rendered until the button is pressed', () => {
+        // Expanded by default, six toggles plus the email section made this
+        // column twice the height of the poem form beside it.
         const { container } = renderProfile()
 
-        const tabs = container.querySelector('.profile__outro')
-        const prefs = container.querySelector('.notification-prefs')
-
-        expect(tabs).not.toBeNull()
-        expect(prefs).not.toBeNull()
-        // DOCUMENT_POSITION_FOLLOWING: prefs comes after tabs in the DOM.
-        expect(tabs!.compareDocumentPosition(prefs!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+        expect(container.querySelector('.notification-prefs')).toBeNull()
+        expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(0)
     })
 
-    test('the preferences are NOT inside the settings column', () => {
-        // The distractor for the test above: a preferences block still nested
-        // in `.profile__user-column` would also "follow" the intro section, but
-        // would put the column back to twice the form's height.
+    test('the trigger sits beside Edit profile, as a peer action', () => {
         const { container } = renderProfile()
 
-        const prefs = container.querySelector('.notification-prefs')
+        const actions = container.querySelector('.user-info__actions')
 
-        expect(prefs!.closest('.profile__user-column')).toBeNull()
+        expect(actions).not.toBeNull()
+        const labels = Array.from(actions!.querySelectorAll('button')).map(b => b.textContent)
+        expect(labels).toEqual(['Edit profile', NOTIFICATION_PREFS_BUTTON])
+    })
+
+    test('pressing it opens the panel, in the column and above the tabs', async () => {
+        const user = userEvent.setup()
+        const { container } = renderProfile()
+
+        await user.click(screen.getByRole('button', { name: NOTIFICATION_PREFS_BUTTON }))
+
+        const prefs = container.querySelector('.notification-prefs')
+        expect(prefs).not.toBeNull()
+        expect(prefs!.closest('.profile__user-column')).not.toBeNull()
+
+        const tabs = container.querySelector('.profile__outro')
+        expect(tabs!.compareDocumentPosition(prefs!) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy()
     })
 
     test('the settings column keeps the short things — picture and name', () => {

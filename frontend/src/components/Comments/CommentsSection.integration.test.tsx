@@ -46,7 +46,6 @@ const buildCtx = (overrides: Partial<Context> = {}): Context => ({
     privateFields: [],
     config: { headers: { Authorization: 'Bearer jwt-token' } },
     isAdmin: false,
-    elementToEdit: '',
     setState: jest.fn(),
     ...overrides
 })

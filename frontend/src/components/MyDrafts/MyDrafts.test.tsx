@@ -38,7 +38,6 @@ const context = {
     username: 'testuser',
     picture: '',
     isAdmin: false,
-    elementToEdit: '',
     setState: jest.fn(),
     config: { headers: { Authorization: 'Bearer token' } }
 }

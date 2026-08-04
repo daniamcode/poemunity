@@ -24,7 +24,6 @@ jest.mock('axios', () => {
 })
 
 const mockContext = {
-    elementToEdit: '',
     user: 'user123',
     userId: 'user123',
     username: 'testuser',

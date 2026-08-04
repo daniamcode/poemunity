@@ -33,7 +33,6 @@ const signedIn = {
     username: 'viewer',
     picture: '',
     isAdmin: false,
-    elementToEdit: '',
     setState: jest.fn(),
     config: { headers: { Authorization: 'Bearer token' } }
 }

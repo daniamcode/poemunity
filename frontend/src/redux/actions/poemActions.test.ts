@@ -27,7 +27,6 @@ describe('poemActions', () => {
         username: 'testuser',
         picture: 'pic.jpg',
         isAdmin: false,
-        elementToEdit: '',
         setState: jest.fn(),
         config: {
             headers: {

@@ -9,9 +9,14 @@ import ProfileTabs from './components/ProfileTabs'
 import NotificationPreferences from '../Notifications/NotificationPreferences'
 import ProfileStats from './ProfileStats'
 import UserInfo from './components/UserInfo'
+import { NOTIFICATION_PREFS_BUTTON } from '../../data/constants'
 
 export default function Profile() {
     const [value, setValue] = useState(0)
+    // Owned here rather than inside the panel, because the button that toggles
+    // it sits beside "Edit profile" in UserInfo — two components, one piece of
+    // state, so it belongs to their nearest common parent.
+    const [notificationsOpen, setNotificationsOpen] = useState(false)
     const context = useContext(AppContext)
     const poemQuery = useSelector(state => state.poemQuery)
     const poemsListQueryRaw = useSelector(state => state.poemsListQuery)
@@ -42,8 +47,21 @@ export default function Profile() {
                         <div className='profile__intro'>
                             <div className='profile__user-column'>
                                 <ProfilePicture context={context} />
-                                <UserInfo context={context} />
+                                <UserInfo
+                                    context={context}
+                                    actions={
+                                        <button
+                                            type='button'
+                                            className='user-info__btn user-info__btn--edit'
+                                            aria-expanded={notificationsOpen}
+                                            onClick={() => setNotificationsOpen(value => !value)}
+                                        >
+                                            {NOTIFICATION_PREFS_BUTTON}
+                                        </button>
+                                    }
+                                />
                                 <ProfileStats />
+                                <NotificationPreferences open={notificationsOpen} />
                             </div>
                             <ProfileForm
                                 context={context}
@@ -59,23 +77,6 @@ export default function Profile() {
                         </div>
                     </section>
                     <ProfileTabs value={value} handleChange={handleChange} handleChangeIndex={handleChangeIndex} />
-                    {/* BELOW the tabs, not in the settings column beside the
-                        form.
-                        
-                        Six toggles plus the email section made that column
-                        roughly twice the height of the poem form next to it —
-                        a long band of dead space down the right of the page —
-                        and worse, it pushed the TABS below the fold. The tabs
-                        are the profile: your poems, drafts, follows, comments.
-                        Settings you change once a year should not outrank
-                        them, and a reader had no reason to expect anything
-                        below that column at all.
-                        
-                        Still not behind a tab of its own: the bell's panel is
-                        already the notifications surface, and a tab showing
-                        the same list would add a tab without adding a
-                        capability. */}
-                    <NotificationPreferences />
                 </div>
             ) : null}
         </main>

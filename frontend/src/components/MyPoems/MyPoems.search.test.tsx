@@ -28,7 +28,6 @@ describe('MyPoems - server-backed search', () => {
         username: 'testuser',
         picture: '',
         isAdmin: false,
-        elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }
     }

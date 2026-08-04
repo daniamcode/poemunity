@@ -342,6 +342,12 @@ export const STATS_RANK_UNRANKED = 'Outside the top 10'
 export const STATS_EMPTY = 'Publish your first poem and your stats will appear here.'
 
 export const NOTIFICATION_PREFS_TITLE = 'Notify me about'
+// The button beside "Edit profile".
+//
+// "Notifications", not "Edit notifications": you are not editing notifications,
+// you are choosing which ones to receive. It reads as a peer of the button next
+// to it without claiming something it does not do.
+export const NOTIFICATION_PREFS_BUTTON = 'Notifications'
 // The intro NAMES the bell. Four toggles under "Notify me about" read as
 // "notify me however you notify people", and most sites mean email by that —
 // so without this sentence a poet could reasonably believe these subscribe them

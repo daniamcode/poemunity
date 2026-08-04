@@ -146,14 +146,12 @@
 }
 
 .notification-prefs {
-    // Full-page-width now that it sits under the tabs rather than in the
-    // narrow settings column, so it needs its own measure: six short toggles
-    // stretched across 1400px would put the checkbox and its label at opposite
-    // ends of the screen.
+    // Back in the settings column, and collapsed — see the component. The
+    // parent column is `align-items: flex-start`, so without an explicit width
+    // this is sized to its content rather than to the column.
     width: 100%;
-    max-width: 640px;
-    margin: $space-8 auto 0;
-    padding: $space-5 $space-4 0;
+    margin-top: $space-lg;
+    padding-top: $space-4;
     border-top: 1px solid $color-border-subtle;
 }
 
@@ -279,4 +277,29 @@
     font-size: $fs-xs;
     color: $color-text-muted;
     font-variant-numeric: tabular-nums;
+}
+
+// The disclosure row. A button, not a heading with a click handler: it toggles
+// content, so it needs the keyboard behaviour and the `aria-expanded` a button
+// carries for free.
+.notification-prefs__summary {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover .notification-prefs__title {
+        color: $color-primary;
+    }
+}
+
+.notification-prefs__chevron {
+    margin-left: auto;
+    font-size: $fs-xs;
+    color: $color-text-muted;
 }

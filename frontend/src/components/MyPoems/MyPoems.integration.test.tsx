@@ -32,7 +32,6 @@ describe('MyPoems - Delete Integration Tests', () => {
         username: 'testuser',
         picture: 'avatar.jpg',
         isAdmin: false,
-        elementToEdit: '',
         setState: jest.fn(),
         config: { headers: { Authorization: 'Bearer token' } }
     }

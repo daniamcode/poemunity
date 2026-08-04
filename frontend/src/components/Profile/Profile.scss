@@ -910,3 +910,13 @@
         color: white;
     }
 }
+
+// The two peer actions in the settings column: "Edit profile" and
+// "Notifications". A row rather than stacked, so neither reads as the primary
+// one and the column stays short.
+.user-info__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    align-items: center;
+}

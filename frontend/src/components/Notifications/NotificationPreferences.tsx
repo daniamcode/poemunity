@@ -38,7 +38,25 @@ const TYPES: (keyof Prefs)[] = ['like', 'comment', 'profileComment', 'reply', 'f
  * IMMEDIATELY from local state rather than waiting for the round-trip. On a
  * cold serverless backend that wait was long enough to read as a dead control.
  */
-export default function NotificationPreferences() {
+interface NotificationPreferencesProps {
+    /**
+     * CONTROLLED, and closed by default.
+     *
+     * The panel owns no trigger of its own because its trigger belongs beside
+     * "Edit profile" — the two are peer actions on the same column, and a
+     * heading that happens to be clickable is not a peer of a button.
+     *
+     * Three arrangements preceded this. Expanded in the column, six toggles
+     * plus the email section made it twice the height of the poem form beside
+     * it and pushed the profile TABS below the fold. Below the tabs was worse:
+     * those panels hold infinitely-scrolling poem lists, so nothing under them
+     * can be reached. A self-collapsing block was closer, but its trigger was
+     * a heading, which reads as a section label rather than something to press.
+     */
+    open?: boolean
+}
+
+export default function NotificationPreferences({ open = false }: NotificationPreferencesProps) {
     const context = useContext(AppContext)
     const dispatch = useAppDispatch()
     const query = useSelector((state: RootState) => state.notificationPreferencesQuery)
@@ -95,6 +113,8 @@ export default function NotificationPreferences() {
             }
         }))
     }
+
+    if (!open) return null
 
     return (
         <section className='notification-prefs'>

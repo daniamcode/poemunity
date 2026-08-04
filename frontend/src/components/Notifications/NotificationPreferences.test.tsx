@@ -35,7 +35,7 @@ const renderPrefs = (opts: any = {}) => {
     return render(
         <Provider store={mockStore({ notificationPreferencesQuery: { item, isFetching, isError: false } })}>
             <AppContext.Provider value={context as never}>
-                <NotificationPreferences />
+                <NotificationPreferences open />
             </AppContext.Provider>
         </Provider>
     )
@@ -43,6 +43,12 @@ const renderPrefs = (opts: any = {}) => {
 
 const box = (type: keyof typeof NOTIFICATION_PREF_LABELS) =>
     screen.getByRole('checkbox', { name: NOTIFICATION_PREF_LABELS[type] })
+
+/**
+ * The panel is CONTROLLED and closed by default — its trigger lives beside
+ * "Edit profile" in the settings column, because the two are peer actions.
+ * These tests render it already open; `renderPrefs` passes `open`.
+ */
 
 /**
  * Fire the success/error callback the component handed to the save action.
@@ -76,6 +82,7 @@ describe('NotificationPreferences', () => {
             // notifications are off and then flip.
             renderPrefs({ item: undefined, isFetching: true })
 
+    
             expect(box('like')).toBeChecked()
             expect(box('newPoem')).toBeChecked()
         })
@@ -83,6 +90,7 @@ describe('NotificationPreferences', () => {
         test('but disables them, so nobody toggles a value they have not seen', () => {
             renderPrefs({ item: undefined, isFetching: true })
 
+    
             expect(box('like')).toBeDisabled()
         })
     })
@@ -100,6 +108,7 @@ describe('NotificationPreferences', () => {
         test('every box stays enabled while a save is in flight', () => {
             renderPrefs({ item: allOn, isFetching: true })
 
+    
             expect(box('like')).toBeEnabled()
             expect(box('comment')).toBeEnabled()
             expect(box('follow')).toBeEnabled()
@@ -183,6 +192,7 @@ describe('NotificationPreferences', () => {
             const user = userEvent.setup()
             renderPrefs({ item: { ...allOn, follow: false } })
 
+    
             await user.click(box('follow'))
 
             expect(mockSave.mock.calls[0][0].data).toEqual({ follow: true })
@@ -235,6 +245,7 @@ describe('NotificationPreferences', () => {
             // query would show a subscription that does not exist.
             renderPrefs({ item: allOn })
 
+    
             expect(emailBox()).not.toBeChecked()
         })
 

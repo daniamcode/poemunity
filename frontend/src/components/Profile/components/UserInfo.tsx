@@ -10,6 +10,14 @@ import { authorUpdated } from '../../../redux/reducers/authorEntitiesReducers'
 
 interface Props {
     context: Context
+    /**
+     * Rendered beside "Edit profile" as a peer action.
+     *
+     * Passed in rather than owned here: it toggles a panel this component knows
+     * nothing about, and the two buttons only need to share a row, not a
+     * concern.
+     */
+    actions?: React.ReactNode
 }
 
 const CURRENT_YEAR = new Date().getFullYear()
@@ -36,7 +44,7 @@ function PrivacyToggle({ field, privateFields, onToggle }: {
     )
 }
 
-export default function UserInfo({ context }: Props) {
+export default function UserInfo({ context, actions }: Props) {
     const [editing, setEditing] = useState(false)
     const [form, setForm] = useState({
         bio: context.bio || '',
@@ -338,9 +346,16 @@ export default function UserInfo({ context }: Props) {
                         </div>
                     )}
 
-                    <button className='user-info__btn user-info__btn--edit' onClick={handleEdit}>
-                        Edit profile
-                    </button>
+                    {/* One row of peer actions. The notifications trigger is
+                        passed in rather than owned here: it toggles a panel
+                        this component knows nothing about, and the pair only
+                        needs to share a row, not a concern. */}
+                    <div className='user-info__actions'>
+                        <button className='user-info__btn user-info__btn--edit' onClick={handleEdit}>
+                            Edit profile
+                        </button>
+                        {actions}
+                    </div>
                 </div>
             )}
         </div>

@@ -24,7 +24,6 @@ describe('useProfileForm', () => {
     const mockContext = {
         userId: 'user-123',
         isAdmin: false,
-        elementToEdit: '',
         setState: jest.fn()
     }
 

@@ -27,7 +27,6 @@ describe('PoemFooter', () => {
         picture: 'default.jpg',
         config: {},
         isAdmin: false,
-        elementToEdit: '',
         setState: jest.fn()
     }
 

@@ -9,7 +9,6 @@ import { slugify } from './utils/urlUtils'
 import type { ServerUser } from './lib/serverApi'
 
 export const AppContext = React.createContext<Context>({
-    elementToEdit: '',
     user: '',
     userId: '',
     username: '',
@@ -26,7 +25,7 @@ interface AppProviderProps {
     initialUser?: ServerUser | null
 }
 
-function getAuthState(user?: ServerUser | null): Omit<Context, 'elementToEdit' | 'setState'> {
+function getAuthState(user?: ServerUser | null): Omit<Context, 'setState'> {
     return {
         user: user?.user ?? '',
         userId: user?.userId ?? '',
@@ -62,8 +61,7 @@ export function AppProvider({ children, initialUser }: AppProviderProps) {
     }, [dispatch])
 
     const [contextState, setContextState] = useState<Context>({
-        elementToEdit: '',
-        ...getAuthState(initialUser),
+            ...getAuthState(initialUser),
         setState(data: Context) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars, unused-imports/no-unused-vars
             const { setState: _setState, ...res } = data

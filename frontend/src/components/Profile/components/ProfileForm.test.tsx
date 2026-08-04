@@ -52,13 +52,11 @@ describe('ProfileForm', () => {
     const regularUserContext = {
         userId: 'user123',
         isAdmin: false,
-        elementToEdit: ''
     }
 
     const adminUserContext = {
         userId: 'admin456',
         isAdmin: true,
-        elementToEdit: ''
     }
 
     beforeEach(() => {

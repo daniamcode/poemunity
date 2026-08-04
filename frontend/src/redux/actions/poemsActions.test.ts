@@ -220,7 +220,6 @@ describe('createPoemAction', () => {
     let dispatch: AppDispatch
 
     const context = {
-        elementToEdit: '1',
         user: 'whatever',
         userId: '2',
         username: 'username',
