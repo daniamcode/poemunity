@@ -192,127 +192,14 @@ no notifications, and `Poem` has no `status` field — publishing is all-or-noth
 production write — `mongodump` snapshot first, dry-run first. `autoIndex` is on in
 prod, so new indexes build themselves on deploy but are never dropped when removed.
 
-1. ✅ **Drafts — private poems before publishing.** SHIPPED (2026-07-31) — see
-   Recently shipped. Remaining product decision: drafts are excluded from the
-   author's public poem count, which means an author whose whole body of work is
-   drafted disappears from the author index until they publish.
-2. ✅ **Follow / followers.** SHIPPED (2026-07-31). `Follow` edge collection with a
-   unique `{follower, following}` index (idempotent follow, E11000 → success not
-   409) plus one sort index per direction; `POST`/`DELETE
-   /api/v1/authors/:idOrSlug/follow` and paginated `/followers` + `/following`;
-   counts and `isFollowing` ride on `GET /authors/:slug` to avoid a post-paint
-   flip; Follow button on the author page, two new profile tabs. All three product
-   calls went as recommended — everyone followable, AI badge on every follow
-   surface, ranking formula untouched. Logged-out visitors get a link to `/login`
-   rather than a hidden control. See AGENTS.md → "Follow / followers".
-   Fully covered by tests: backend, `FollowButton`, `FollowList`, `MyFollows`
-   and the profile-tab wiring, all red-checked.
-   **Not yet verified:** the three
-   new indexes have not been checked against Atlas after deploy — run
-   `node backend/scripts/check-index-drift.js`.
-   *Original entry:* The reference's `Usuarios Seguidos` / `Seguidores`, and
-   the thing that makes everything after it possible — there is currently no way to
-   keep up with a poet you liked. A `Follow` collection (`follower`, `following`,
-   compound unique index), **not** an array on `Author` (doesn't scale, can't
-   paginate). Follow button on `/authors/[slug]`, counts + two tabs on the profile.
-   Three product calls (👤), with recommendations: **famous poets** (~3,300)
-   followable? → yes, but they never publish so it's a reading list, not a feed.
-   **AI personas** followable? → yes, but keep the AI badge on every follow surface;
-   following a bot is in tension with the disclosure the footer and per-poem badges
-   exist to make. **Do followers affect ranking points?** → no. Currently
-   `3×poems + 1×likes` in `computeRanking()`; follower counts are gameable and it
-   would reshuffle everyone's rank overnight.
-3. ✅ **Notifications.** SHIPPED (2026-07-31). In-app only this pass: header
-   bell with an unread count, a dropdown panel, per-notification read state
-   auto-marked on open, and four preference toggles in the profile.
-   **No sixth profile tab**, deliberately: the bell's panel already *is* the
-   notifications surface, so a tab showing the same list would add a tab without
-   adding a capability, and five is already crowded. Preferences went into the
-   settings column instead.
-   The badge is fetched once on mount and **not polled** — a poll on every open
-   tab is a request per user per interval forever, against a serverless backend
-   billed per invocation, to learn a number that is usually unchanged. If
-   freshness turns out to matter, the cheap upgrade is refetching on window
-   focus, not an interval.
-   **Not yet verified in a browser**, and no Cypress spec — same gap as follow. Four event types — likes, comments, new followers, and
-   new poems from poets you follow — **all user-configurable, all on by
-   default**. **Must collapse and batch** ("12 people liked your poem", not
-   twelve rows) or it becomes noise; self-actions never notify.
-   Note on the fourth type: it fires for people who did nothing to you, and
-   famous poets (~3,300 followable) never publish, so most follows will never
-   produce one. Shipping it anyway was a deliberate call — the preference
-   toggle is what makes it safe. Seed scripts write the model directly rather
-   than through the API, so bulk AI seeding must not fan out notifications.
-   - 🤖 **Deferred: weekly email digest — now ANNOUNCED IN THE UI (2026-08-04).**
-     Resend is already wired behind `src/utils/email.js` and sends password
-     resets and verification today, so sending is the easy part. The real
-     dependency is a **scheduler** — the current Vercel setup has no cron — plus
-     an unsubscribe route and a per-user frequency preference. Worth doing only
-     once in-app volume shows the digest would have anything in it.
-
-     The profile now shows a **disabled "Weekly summary of your notifications"**
-     control under an `Email` heading with a `Soon` badge, and the in-app intro
-     states outright that nothing is emailed. That was a real gap: four toggles
-     headed "Notify me about" read as "notify me however you notify people", and
-     on most sites that means email — a poet could reasonably have believed they
-     were subscribed to something.
-
-     **Three things that must stay true until this actually ships**, each pinned
-     by a test in `NotificationPreferences.test.tsx`:
-     - the control is **disabled and permanently unchecked**, and is bound to no
-       state. Do NOT add a `notificationPrefs.emailDigest` field "ready for
-       later" — a stored preference that no sender reads is a promise the
-       system does not keep, and it will be read back as a subscription.
-     - "coming soon" lives in the **accessible name**, not only in the badge. A
-       disabled input is skipped by keyboard navigation and a purely visual
-       badge is never announced.
-     - the intro copy keeps saying **you are not subscribed**.
-
-     **Scope decision when building it:** the UI deliberately promises ONE
-     digest, not per-type email toggles. An email column beside all four event
-     types would be a different, larger feature (four preferences × a sender
-     that must respect each) and nothing has scoped it. If per-type email is
-     wanted, decide that first — the current UI can grow into it, but shipping
-     the digest against a UI that implied granular control would be a
-     downgrade.
-- 🤖 **Ranking will include 2 points per follower** (decided 2026-07-31,
-  reversing the earlier "followers do not affect ranking"). `computeRanking()`
-  becomes `3×poems + 1×likes + 2×followers`. Three things to handle when
-  implementing: it needs a `$lookup`/`$group` over `follows` on a query that runs
-  on every dashboard load, so measure it before shipping; the weights are already
-  client-supplied (`poemPoints`/`likePoints` query params) so `followerPoints`
-  should follow the same pattern; and every mutation that currently returns a
-  fresh `ranking` (like, create, delete, publish) is joined by **follow and
-  unfollow**, which now change points too. Accepted trade, stated once: follower
-  counts are cheaper to manufacture than poems or likes, and this reshuffles
-  every author's rank the day it ships.
-4. ✅ **Your stats panel.** SHIPPED (2026-08-04). Three figures in the profile's
-   settings column: poems published, likes received, and rank when in the top 10.
-   `GET /api/v1/users/stats` returns only the two counted numbers; the **rank is
-   read from the ranking already cached client-side** for the public sidebar, so
-   the panel and the sidebar cannot disagree, and `computeRanking()`'s
-   full-collection aggregation does not run on every profile load. Both figures
-   count published poems only — the edge that makes that a real choice is a poem
-   liked while public and later withdrawn to a draft, whose likes would otherwise
-   be shown to its author but findable by nobody. Outside the top 10 it says so
-   rather than inventing a position (the endpoint returns ten rows, so 11th is
-   genuinely unknown). Renders nothing while loading or on error — a supporting
-   panel is not worth three empty boxes. The day/week/month/year breakdown was
-   dropped as planned.
-   **Not yet verified in a browser.**
-   *Original entry:* The reference's `Mis Estadísticas`, but
-   honest: poems published, likes received, rank if in the top 10 — `computeRanking()`
-   already computes this server-side, so it's mostly UI. **Deliberately drop the
-   day/week/month/year breakdown** from the reference: four unexplained decimals
-   (`2.12`, `2.10`, `64.54`) are decoration pretending to be feedback, and would
-   need time-bucketed aggregation that doesn't exist.
+1. ✅ **Drafts** (2026-07-31). Open product decision: an author whose whole body of work is drafted disappears from the author index until they publish.
+2. ✅ **Follow / followers** (2026-07-31). All three product calls went as recommended — everyone followable, AI badge on every follow surface, ranking formula untouched at the time.
+3. ✅ **Notifications** (2026-07-31, fixed and extended 2026-08-04). In-app only; **no sixth tab for it**, deliberately — the bell's panel already is the surface, and preferences live in the profile settings column.
+4. ✅ **Your stats panel** (2026-08-04). Poems, likes, and rank when in the top 10.
 5. 🤖 **Pinned poem.** One `featuredPoemId` on `Author`, rendered first on the public
    author page. Poets have a piece they want read first; today the newest wins.
-6. 🤖 **Activity tab** — the reference's `Mi Actividad`: merged timeline of your
-   poems, comments and likes given. Mostly a query over data already stored.
-   (Supersedes the older P4 note about showing commented-on poems in the profile —
-   including its open question about whether the MUI tabs component handles a third
-   tab well, or should be swapped for something more modern and reusable.)
+6. ✅ **"My comments" tab** (2026-08-04), **narrowed from "Activity"**. The original item wanted a merged timeline of your poems, comments and likes — but poems and likes already have their own tabs, so that would repeat two tabs to deliver one capability. Comments were the only unreachable part. If a chronological cross-type feed is ever genuinely wanted, it is a NEW decision, not this item being finished.
+
 7. 🤖 **Free-form tags.** Genres are a fixed `CATEGORIES` list; tags (`#grief`,
    `#sonnet`, `#villanelle`) allow discovery by form and subject. Needs guardrails or
    the namespace becomes noise: lowercase, deduped, capped per poem, autocomplete
@@ -591,10 +478,25 @@ investigation did surface three real things:
   the box when the save fails, so a recurrence is visible rather than silent. If
   it happens again, capture the network response before anything else.
 
-- 🤖 **No browser coverage for the stats panel or the notification timestamps.**
-  Both are new, both are layout, and layout is the one thing the 1177 frontend
-  tests provably cannot see — two of this session's bugs were pure geometry
+- 🤖 **No browser coverage for anything shipped on 2026-08-04** — the stats
+  panel, the notification timestamps, the email "Soon" section, or the new
+  **My comments** tab. All are layout, and layout is the one thing the 1190
+  frontend tests provably cannot see: two of that day's bugs were pure geometry,
   found by looking at a screenshot. Fold into the Cypress work above.
+
+- 🤖 **The new `Comment` index has not been checked against Atlas.**
+  `{ authorId: 1, createdAt: -1, _id: -1 }` was added for the My comments tab
+  and builds itself on deploy (`autoIndex` is ON), but that has never been
+  confirmed — and without it the query scans every comment. Run
+  `node backend/scripts/check-index-drift.js` on the same pass as the
+  `recipient_1` drop below; `Comment` is already in its `MODELS` list.
+
+- 🤖 **My comments has no behavioural tie-break test, on purpose.** One was
+  written and deleted: it passed with `_id` removed from BOTH the sort spec and
+  the index, because at fixture size the driver returns ties in a stable order
+  anyway. A test that cannot fail is worse than none. The declared-index test
+  carries the guarantee. Same known limit as the follow lists — do not "restore"
+  it without making it actually fail first.
 
 ### Housekeeping / follow-ups raised this session
 
