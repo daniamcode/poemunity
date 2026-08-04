@@ -59,13 +59,27 @@
         border-left: 2px solid $color-border-subtle;
     }
 
+    // THE TWO RAILS MUST TOTAL THE SAME, or the content column between them is
+    // not page-centred — and then anything centred on the PAGE disagrees with
+    // anything centred on the COLUMN. That was a real, visible defect: the
+    // breadcrumb (page-centred, `max-width: 800px; margin: auto`) sat 9px left
+    // of the `h1` (column-centred, same 800px), which reads as "off" without
+    // looking obviously wrong.
+    //
+    // Left rail: 3% + 15% + 3% = 21%. This one was 16% + 4% = 20%, so the
+    // column sat half the 1% difference off centre. Balanced to 21% here rather
+    // than nudging the breadcrumb by a magic number: the offset cannot be
+    // expressed as a stable percentage anyway, because these columns SHRINK
+    // (the declared widths exceed 100%, so flex redistributes them and the real
+    // geometry depends on the viewport).
     .dashboard__ranking {
         display: block;
         position: sticky;
         top: 100px;
         align-self: flex-start;
-        width: 16%;
-        margin-right: 4%;
+        width: 15%;
+        margin-left: 3%;
+        margin-right: 3%;
         // Both are REQUIRED, not polish — the accordion rail already has them.
         // A sticky element taller than the viewport pins its top and travels
         // down the page with the reader, so anything below the fold inside it
