@@ -30,3 +30,21 @@ export function getMyCommentsAction({ params, options, callbacks }: GetMyComment
         })
     }
 }
+
+/**
+ * Fetch the comments the signed-in author RECEIVED — on their poems, on their
+ * page, and replies to them anywhere. Sends no author id, for the same reason
+ * the written half does not.
+ */
+export function getReceivedCommentsAction({ params, options, callbacks }: GetMyCommentsProps = {}) {
+    return function dispatcher(dispatch: AppDispatch) {
+        return getAction({
+            type: ACTIONS.RECEIVED_COMMENTS,
+            url: API_ENDPOINTS.COMMENTS_RECEIVED,
+            dispatch,
+            params,
+            options,
+            callbacks
+        })
+    }
+}

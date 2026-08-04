@@ -871,3 +871,42 @@
         background-color: $color-primary-bg;
     }
 }
+
+// The Written / Received switch inside the My comments tab. A toggle rather
+// than a seventh profile tab: the bar is at six already, and the two halves are
+// the same thing seen from opposite ends.
+.my-comments__toggle {
+    display: flex;
+    gap: $space-2;
+    margin-bottom: $space-3;
+}
+
+.my-comments__toggle-button {
+    padding: 4px $space-3;
+    border: 1px solid $color-border-subtle;
+    border-radius: 999px;
+    background: none;
+    font-family: $font-body;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+
+    &:hover {
+        border-color: $color-primary;
+        color: $color-primary;
+    }
+}
+
+// The selected half is stated by colour AND by aria-selected — a pill that
+// differs only in tint says nothing to a screen reader.
+.my-comments__toggle-button--active {
+    border-color: $color-primary;
+    background-color: $color-primary;
+    color: white;
+
+    &:hover {
+        background-color: $color-primary-hover;
+        border-color: $color-primary-hover;
+        color: white;
+    }
+}

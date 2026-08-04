@@ -6,13 +6,31 @@ import configureStore from 'redux-mock-store'
 import MyComments from './MyComments'
 import { AppContext } from '../../../App'
 import * as actions from '../../../redux/actions/myCommentsActions'
-import { MY_COMMENTS_EMPTY, MY_COMMENTS_LOAD_MORE } from '../../../data/constants'
+import {
+    MY_COMMENTS_EMPTY,
+    MY_COMMENTS_LOAD_MORE,
+    MY_COMMENTS_RECEIVED,
+    MY_COMMENTS_WRITTEN,
+    MY_COMMENTS_RECEIVED_EMPTY
+} from '../../../data/constants'
 
 jest.mock('../../../redux/actions/myCommentsActions', () => ({
-    getMyCommentsAction: jest.fn(() => ({ type: 'GET_MY_COMMENTS' }))
+    getMyCommentsAction: jest.fn(() => ({ type: 'GET_MY_COMMENTS' })),
+    getReceivedCommentsAction: jest.fn(() => ({ type: 'GET_RECEIVED_COMMENTS' }))
 }))
 
 const mockGet = actions.getMyCommentsAction as jest.Mock
+const mockGetReceived = actions.getReceivedCommentsAction as jest.Mock
+
+const receivedRow = {
+    id: 'r1',
+    body: 'answering you',
+    createdAt: '2026-08-02T10:00:00.000Z',
+    targetType: 'poem',
+    isReply: true,
+    poem: { id: 'p9', title: 'Theirs', slug: 'theirs-nadia' },
+    author: { id: 'a9', name: 'Nadia Novak', slug: 'nadia-novak', type: 'user' }
+}
 const mockStore = configureStore([])
 
 const signedIn = { user: 'token', userId: 'me-1', username: 'me', config: {} }
@@ -41,9 +59,13 @@ const renderComments = (opts: any = {}) => {
     const isFetching = opts.isFetching ?? false
     const hasMore = opts.hasMore ?? false
     const page = opts.page ?? 1
+    const received = 'received' in opts ? opts.received : [receivedRow]
 
     return render(
-        <Provider store={mockStore({ myCommentsQuery: { item, isFetching, isError: false, hasMore, page } })}>
+        <Provider store={mockStore({
+            myCommentsQuery: { item, isFetching, isError: false, hasMore, page },
+            receivedCommentsQuery: { item: received, isFetching: false, isError: false, hasMore: false, page: 1 }
+        })}>
             <AppContext.Provider value={context as never}>
                 <MyComments />
             </AppContext.Provider>
@@ -162,5 +184,93 @@ describe('MyComments', () => {
             expect(screen.queryByRole('button', { name: MY_COMMENTS_LOAD_MORE })).not.toBeInTheDocument()
             void user
         })
+    })
+})
+
+describe('MyComments — the Written / Received toggle', () => {
+    // A toggle rather than a seventh profile tab: the bar is at six already,
+    // and the two halves are the same thing from opposite ends.
+    const switchTo = async (label: string) => {
+        const user = userEvent.setup()
+        await user.click(screen.getByRole('tab', { name: label }))
+    }
+
+    beforeEach(() => jest.clearAllMocks())
+
+    test('opens on Written, and fetches only that half', () => {
+        renderComments()
+
+        expect(screen.getByRole('tab', { name: MY_COMMENTS_WRITTEN })).toHaveAttribute('aria-selected', 'true')
+        expect(mockGet).toHaveBeenCalledTimes(1)
+        expect(mockGetReceived).not.toHaveBeenCalled()
+    })
+
+    test('switching to Received fetches the other half', async () => {
+        renderComments()
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(mockGetReceived).toHaveBeenCalledTimes(1)
+        expect(mockGetReceived.mock.calls[0][0]).toEqual({
+            params: { page: 1 },
+            options: { reset: true, fetch: true }
+        })
+    })
+
+    test('a received row names WHO, and calls a reply a reply', async () => {
+        // "Commented on your poem" is true of a reply too, but loses that it
+        // answered YOU — which is the reason the row is worth surfacing.
+        renderComments()
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.getByText('answering you')).toBeInTheDocument()
+        expect(screen.getByRole('link', { name: 'Nadia Novak' })).toHaveAttribute('href', '/authors/nadia-novak')
+        expect(screen.getByText(/replied to you on/)).toBeInTheDocument()
+    })
+
+    test('a received row links to the poem it is on', async () => {
+        renderComments()
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.getByRole('link', { name: 'Theirs' })).toHaveAttribute('href', '/detail/theirs-nadia')
+    })
+
+    test('a plain comment on your poem is NOT called a reply', async () => {
+        // The distractor for the test above.
+        renderComments({ received: [{ ...receivedRow, isReply: false }] })
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.queryByText(/replied to you/)).not.toBeInTheDocument()
+        expect(screen.getByText(/commented on/)).toBeInTheDocument()
+    })
+
+    test('the empty state is the RECEIVED one, not the written one', async () => {
+        renderComments({ received: [] })
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.getByText(MY_COMMENTS_RECEIVED_EMPTY)).toBeInTheDocument()
+        expect(screen.queryByText(MY_COMMENTS_EMPTY)).not.toBeInTheDocument()
+    })
+
+    test('the toggle survives an empty list', async () => {
+        // Without it, switching to an empty half removes the control you just
+        // used and strands you there.
+        renderComments({ received: [] })
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.getByRole('tab', { name: MY_COMMENTS_WRITTEN })).toBeInTheDocument()
+    })
+
+    test('an AI commenter keeps its badge here too', async () => {
+        renderComments({ received: [{ ...receivedRow, author: { ...receivedRow.author, type: 'ai' } }] })
+
+        await switchTo(MY_COMMENTS_RECEIVED)
+
+        expect(screen.getByText('AI')).toBeInTheDocument()
     })
 })

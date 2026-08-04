@@ -243,6 +243,16 @@ export const PROFILE_FOLLOWERS = 'Followers'
 // could write and then never find again.
 export const PROFILE_COMMENTS = 'My comments'
 export const MY_COMMENTS_EMPTY = 'You have not commented on anything yet.'
+// The two halves of the tab. A toggle rather than a seventh tab: the bar is at
+// six already, and these are the same thing from opposite ends.
+export const MY_COMMENTS_WRITTEN = 'Written'
+export const MY_COMMENTS_RECEIVED = 'Received'
+export const MY_COMMENTS_RECEIVED_EMPTY = 'Nobody has commented on your poems or replied to you yet.'
+// Received rows say who and where. A reply is called a reply — "commented on
+// your poem" is true but weaker, and loses the fact that it answered YOU.
+export const MY_COMMENTS_REPLIED = 'replied to you on'
+export const MY_COMMENTS_ON_YOUR_POEM = 'commented on'
+export const MY_COMMENTS_ON_YOUR_PAGE = 'commented on your page'
 export const MY_COMMENTS_LOAD_MORE = 'Show more'
 export const MY_COMMENTS_ON_POEM = 'on'
 export const MY_COMMENTS_ON_PROFILE = 'on the profile of'

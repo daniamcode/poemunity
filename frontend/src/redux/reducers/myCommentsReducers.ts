@@ -3,7 +3,27 @@ import { INITIAL } from './commonReducers'
 import { getTypes } from '../actions/commonActions'
 
 export const ACTIONS = {
-    MY_COMMENTS: 'my-comments'
+    MY_COMMENTS: 'my-comments',
+    RECEIVED_COMMENTS: 'received-comments'
+}
+
+/** A comment somebody else left, on your poem or page, or in reply to you. */
+export interface ReceivedCommentRow {
+    id: string
+    body: string
+    createdAt: string
+    targetType: 'poem' | 'profile'
+    /** Answered a comment YOU wrote — the UI says "replied to you", not "commented". */
+    isReply: boolean
+    poem?: { id: string; title?: string; slug?: string }
+    author?: {
+        id: string
+        name?: string
+        slug?: string
+        picture?: string
+        /** Carried so an AI commenter keeps its badge here as everywhere else. */
+        type?: 'famous' | 'user' | 'ai'
+    } | null
 }
 
 export interface MyCommentRow {
@@ -70,6 +90,42 @@ export function myCommentsQuery(
                 page,
                 hasMore,
                 err: undefined
+            })
+        }
+
+        case rejectedAction:
+            return Object.assign({}, state, { isFetching: false, isError: true, err: action.payload })
+
+        case resetAction:
+            return INITIAL
+
+        default:
+            return state
+    }
+}
+
+/**
+ * Comments you RECEIVED. A separate cache from the ones you wrote, not a flag
+ * on the same one: the two halves of the tab are switched between freely, and
+ * sharing a cache would refetch the other half on every toggle.
+ */
+export function receivedCommentsQuery(
+    state: MyCommentsState = INITIAL,
+    action: Action = { type: '' }
+): MyCommentsState {
+    const { rejectedAction, requestAction, fulfilledAction, resetAction } =
+        getTypes(ACTIONS.RECEIVED_COMMENTS)
+
+    switch (action.type) {
+        case requestAction:
+            return Object.assign({}, state, { isFetching: true })
+
+        case fulfilledAction: {
+            const { comments, page, hasMore } = action.payload || {}
+            const incoming = comments || []
+            const item = page === 1 || !state.item ? incoming : [...state.item, ...incoming]
+            return Object.assign({}, state, {
+                isFetching: false, isError: false, item, page, hasMore, err: undefined
             })
         }
 

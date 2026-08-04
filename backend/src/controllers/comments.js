@@ -116,6 +116,94 @@ commentsRouter.get('/mine', userExtractor, async (req, res) => {
   }
 })
 
+// GET /api/v1/comments/received — the "Received" half of the My comments tab.
+//
+// THREE SOURCES, and none of them is "comments I wrote":
+//   - comments on poems I authored;
+//   - comments on my author page;
+//   - replies to comments I wrote, anywhere — including on a stranger's poem.
+//
+// The third is the one people mean by "replies", and it is why this cannot be a
+// single indexed query: the first two are found from the TARGET, the third from
+// the parent's author. So the ids are gathered first and the comments fetched
+// with one `$or`, rather than three round trips or a scan.
+//
+// MY OWN comments are excluded throughout. Commenting on my own poem, or
+// replying to myself, is not something I "received", and the Written tab
+// already has it.
+commentsRouter.get('/received', userExtractor, async (req, res) => {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1)
+    const limit = Math.min(parseInt(req.query.limit) || MY_COMMENTS_DEFAULT_LIMIT, MY_COMMENTS_MAX_LIMIT)
+    const me = new mongoose.Types.ObjectId(String(req.userId))
+
+    // Only PUBLISHED poems: a comment on a poem I have since withdrawn is on
+    // something no reader can reach, and the row would link to a 404.
+    const myPoems = await Poem.find({ authorId: me, ...PUBLISHED_MATCH }).select('_id')
+    const myPoemIds = myPoems.map(p => p._id)
+
+    const myCommentIds = (await Comment.find({ authorId: me }).select('_id')).map(c => c._id)
+
+    const or = [{ targetType: 'profile', targetId: me }]
+    if (myPoemIds.length) or.push({ targetType: 'poem', targetId: { $in: myPoemIds } })
+    if (myCommentIds.length) or.push({ parentId: { $in: myCommentIds } })
+
+    const rows = await Comment.find({ $or: or, authorId: { $ne: me } })
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit + 1)
+      .populate('authorId', AUTHOR_FIELDS)
+
+    const hasMore = rows.length > limit
+    const pageRows = hasMore ? rows.slice(0, limit) : rows
+
+    // Resolve targets the same way /mine does — `targetId` has no `ref`,
+    // because `targetType` decides which collection it points at.
+    const poemIds = pageRows.filter(c => c.targetType === 'poem').map(c => c.targetId)
+    const poems = poemIds.length
+      ? await Poem.find({ _id: { $in: poemIds }, ...PUBLISHED_MATCH }).select('title slug')
+      : []
+    const poemById = new Map(poems.map(p => [String(p._id), p]))
+
+    const myCommentIdSet = new Set(myCommentIds.map(String))
+
+    const comments = pageRows
+      .map(comment => {
+        const base = {
+          id: String(comment._id),
+          body: comment.body,
+          createdAt: comment.createdAt,
+          // Whether this answered something I wrote, which is what lets the UI
+          // say "replied to you" rather than "commented on your poem".
+          isReply: Boolean(comment.parentId && myCommentIdSet.has(String(comment.parentId))),
+          author: comment.authorId
+            ? {
+                id: String(comment.authorId._id),
+                name: comment.authorId.name || comment.authorId.username,
+                slug: comment.authorId.slug,
+                picture: comment.authorId.picture,
+                // Travels so an AI commenter keeps its badge here too.
+                type: comment.authorId.type
+              }
+            : null
+        }
+
+        if (comment.targetType === 'poem') {
+          const poem = poemById.get(String(comment.targetId))
+          if (!poem) return null
+          return { ...base, targetType: 'poem', poem: { id: String(poem._id), title: poem.title, slug: poem.slug } }
+        }
+        return { ...base, targetType: 'profile' }
+      })
+      .filter(Boolean)
+
+    res.json({ comments, page, limit, hasMore })
+  } catch (error) {
+    console.error('Received comments error:', error)
+    res.status(500).json({ error: 'Failed to load comments' })
+  }
+})
+
 // GET /api/v1/comments?targetType=poem&targetId=xxx
 // GET /api/v1/comments?since=<ISO timestamp>  (simulation script use)
 commentsRouter.get('/', async (req, res) => {
