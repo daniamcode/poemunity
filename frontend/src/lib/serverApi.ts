@@ -46,22 +46,61 @@ export function buildServerUser(token: string): ServerUser | null {
         birthYear: jwt.birthYear ?? null,
         gender: jwt.gender ?? '',
         privateFields: jwt.privateFields ?? [],
-        isAdmin: jwt.isAdmin ?? false,
-        // The JWT is identity-only and carries no verification state; default to
-        // false. The DB-backed profile (fetchServerUser) is the source of truth.
+        // NEVER from the token. This function decodes WITHOUT verifying the
+        // signature — it cannot verify, the signing secret lives on the backend
+        // — so every field here is attacker-controlled for anyone who can set a
+        // cookie. Reading `jwt.isAdmin` handed the admin UI to whoever asked for
+        // it. Privilege comes from the DB-backed profile or not at all.
+        isAdmin: false,
+        // Same reasoning, and the same answer the original comment gave: the
+        // DB-backed profile (fetchServerUser) is the source of truth.
         emailVerified: false,
         config: { withCredentials: true }
     }
 }
 
-// Fetch the authenticated user's full profile from the DB (source of truth).
-// The JWT carries identity only, so display fields (picture, birthYear, …)
-// must come from here — never from the token — to avoid stale/oversized-cookie
-// problems. Falls back to token identity if the profile fetch fails.
+/**
+ * Fetch the authenticated user's full profile from the DB (source of truth).
+ *
+ * The JWT carries identity only, so display fields (picture, birthYear, …) come
+ * from here — never from the token — to avoid stale and oversized-cookie
+ * problems.
+ *
+ * THE FALLBACK IS NOT ALLOWED TO RESCUE A REJECTED TOKEN. It used to run on any
+ * failure at all, and `serverFetch` collapses every failure into `null` — so a
+ * 401 fell through to decoding the very token the backend had just refused. A
+ * structurally valid JWT signed with the wrong secret therefore rendered the
+ * page as signed in, under whatever username and `isAdmin` flag its payload
+ * asked for. The API still rejected every subsequent call, so nothing leaked,
+ * but the UI asserted a session that did not exist.
+ *
+ * So the status is now read, not discarded: 401 and 403 are the backend saying
+ * this token is no good, and the only correct answer to that is "not signed
+ * in". The fallback survives only for the case it was written for — the backend
+ * being unreachable or broken (status 0 or 5xx) — where a signed-in reader
+ * keeps their identity on screen through a blip. Even then the identity is
+ * unverified, which is why `buildServerUser` grants no privilege.
+ */
 export async function fetchServerUser(token?: string): Promise<ServerUser | null> {
     if (!token) return null
-    const profile = await serverFetch<Record<string, any>>('/api/v1/users/profile', undefined, token)
-    if (!profile) return buildServerUser(token)
+    const { data: profile, status } = await serverFetchResult<Record<string, any>>(
+        '/api/v1/users/profile', undefined, token
+    )
+    if (!profile) {
+        // AN ALLOWLIST, not a list of statuses to refuse. The fallback exists
+        // for one situation — the backend being unreachable or broken — so it
+        // runs for exactly that: a request that never completed (0) or a server
+        // error (5xx). Everything else, 401 and 403 included, means the backend
+        // answered and did not give us a profile, and the honest reading of
+        // that is "not signed in".
+        //
+        // The denylist version (`if 401 or 403 return null`) let a 404 through
+        // to the fallback — and a 404 here is a renamed route, i.e. deploy skew,
+        // not an outage. Same reasoning as PUBLISHED_MATCH and the poem field
+        // allowlist: a status nobody thought about should be inert, not trusted.
+        const backendUnavailable = status === 0 || status >= 500
+        return backendUnavailable ? buildServerUser(token) : null
+    }
     return {
         user: 'authenticated',
         userId: profile.id ?? '',
