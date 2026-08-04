@@ -6,7 +6,13 @@ import CircularProgress from '../CircularIndeterminate'
 import { AiBadge } from '../common/AiBadge'
 import { getNotificationsAction } from '../../redux/actions/notificationsActions'
 import { NotificationRow } from '../../redux/reducers/notificationsReducers'
-import { notificationMessage, notificationHref } from './notificationText'
+import {
+    notificationMessage,
+    notificationHref,
+    notificationTimestamp,
+    notificationExactTime,
+    notificationDateTimeAttr
+} from './notificationText'
 import {
     NOTIFICATIONS_TITLE,
     NOTIFICATIONS_EMPTY,
@@ -64,6 +70,21 @@ export default function NotificationsPanel({ onClose }: Props) {
                                 {row.poem?.title && (
                                     <span className='notifications-panel__poem'>{row.poem.title}</span>
                                 )}
+                                {/*
+                                    `updatedAt`, matching the list's own
+                                    ordering — see notificationTimestamp. A
+                                    real <time> so the precise moment is
+                                    machine-readable and available on hover,
+                                    while the visible text stays the readable
+                                    relative form.
+                                */}
+                                <time
+                                    className='notifications-panel__time'
+                                    dateTime={notificationDateTimeAttr(row)}
+                                    title={notificationExactTime(row)}
+                                >
+                                    {notificationTimestamp(row)}
+                                </time>
                             </>
                         )
 

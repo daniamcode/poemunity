@@ -268,3 +268,13 @@
         cursor: not-allowed;
     }
 }
+
+// The relative timestamp on each row. Smallest and quietest thing in the row:
+// it is the answer to a question you only ask after reading the message.
+.notifications-panel__time {
+    display: block;
+    margin-top: 2px;
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    font-variant-numeric: tabular-nums;
+}

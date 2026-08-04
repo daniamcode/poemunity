@@ -1,4 +1,11 @@
-import { actorSummary, notificationMessage, notificationHref } from './notificationText'
+import {
+    actorSummary,
+    notificationMessage,
+    notificationHref,
+    notificationTimestamp,
+    notificationExactTime,
+    notificationDateTimeAttr
+} from './notificationText'
 import { NotificationRow } from '../../redux/reducers/notificationsReducers'
 
 const actor = (id: string, name: string, extra: any = {}) => ({ id, name, ...extra })
@@ -112,5 +119,93 @@ describe('notificationHref', () => {
         // A deleted poem must not become a link to /detail/undefined.
         expect(notificationHref(row({ poem: null }))).toBeNull()
         expect(notificationHref(row({ type: 'follow', poem: null, actors: [] }))).toBeNull()
+    })
+})
+
+
+// ---------------------------------------------------------------------------
+// Timestamps.
+//
+// `now` is injected in every case. A relative timestamp read from the system
+// clock is untestable by construction — the value changes between building the
+// fixture and asserting on it, so a test written that way is either flaky or
+// asserts nothing.
+// ---------------------------------------------------------------------------
+describe('notificationTimestamp', () => {
+    const NOW = new Date('2026-08-04T12:00:00.000Z')
+    const at = (iso: string) => ({ updatedAt: iso, createdAt: '2020-01-01T00:00:00.000Z' })
+
+    test('uses updatedAt, NOT createdAt', () => {
+        // The whole point. A collapse updates the row in place and the list is
+        // ordered by updatedAt, so labelling with createdAt would put "6 years
+        // ago" at the top of the list on a row that just moved there.
+        const value = notificationTimestamp(at('2026-08-04T11:00:00.000Z'), NOW)
+
+        expect(value).toBe('1 hour ago')
+    })
+
+    test('falls back to createdAt when updatedAt is missing', () => {
+        const value = notificationTimestamp(
+            { createdAt: '2026-08-04T10:00:00.000Z' } as never,
+            NOW
+        )
+
+        expect(value).toBe('2 hours ago')
+    })
+
+    test('says "Just now" under a minute, rather than "0 seconds ago"', () => {
+        expect(notificationTimestamp(at('2026-08-04T11:59:30.000Z'), NOW)).toBe('Just now')
+    })
+
+    test('says "Just now" for a future timestamp, not "in 4 seconds"', () => {
+        // Server and browser clocks disagree by seconds routinely.
+        expect(notificationTimestamp(at('2026-08-04T12:00:04.000Z'), NOW)).toBe('Just now')
+    })
+
+    test('uses a relative distance within the week', () => {
+        expect(notificationTimestamp(at('2026-08-04T11:55:00.000Z'), NOW)).toBe('5 minutes ago')
+        expect(notificationTimestamp(at('2026-08-02T12:00:00.000Z'), NOW)).toBe('2 days ago')
+        expect(notificationTimestamp(at('2026-07-29T12:00:00.000Z'), NOW)).toBe('6 days ago')
+    })
+
+    test('switches to a calendar date past a week', () => {
+        // "3 months ago" is a worse answer than the date — past a week nobody
+        // is counting, they want to know when.
+        expect(notificationTimestamp(at('2026-05-12T09:30:00.000Z'), NOW)).toBe('05/12/2026')
+    })
+
+    test('the boundary is the week itself, not a whole number of days', () => {
+        // Distractor either side of the same threshold: a wrong comparison
+        // gives a different answer for exactly one of these two.
+        expect(notificationTimestamp(at('2026-07-28T12:00:01.000Z'), NOW)).toBe('7 days ago')
+        expect(notificationTimestamp(at('2026-07-28T11:59:59.000Z'), NOW)).toBe('07/28/2026')
+    })
+
+    test('returns an empty string rather than "Invalid Date"', () => {
+        expect(notificationTimestamp({ updatedAt: 'not-a-date' } as never, NOW)).toBe('')
+        expect(notificationTimestamp({} as never, NOW)).toBe('')
+    })
+})
+
+describe('notificationExactTime', () => {
+    test('is the precise moment, in the site’s own date format', () => {
+        expect(notificationExactTime({ updatedAt: '2026-08-04T09:05:00.000Z' } as never))
+            .toBe('08/04/2026 09:05h')
+    })
+
+    test('is empty for an unusable date', () => {
+        expect(notificationExactTime({ updatedAt: 'nope' } as never)).toBe('')
+    })
+})
+
+describe('notificationDateTimeAttr', () => {
+    test('is machine-readable ISO, for the <time> element', () => {
+        expect(notificationDateTimeAttr({ updatedAt: '2026-08-04T09:05:00.000Z' } as never))
+            .toBe('2026-08-04T09:05:00.000Z')
+    })
+
+    test('is undefined rather than an empty attribute when unusable', () => {
+        // `dateTime=""` is invalid HTML; omitting the attribute is not.
+        expect(notificationDateTimeAttr({ updatedAt: 'nope' } as never)).toBeUndefined()
     })
 })

@@ -1,3 +1,4 @@
+import { format, formatDistanceStrict } from 'date-fns'
 import { NotificationRow } from '../../redux/reducers/notificationsReducers'
 
 /**
@@ -70,4 +71,69 @@ export function notificationHref(row: NotificationRow): string | null {
     }
     const target = row.poem?.slug || row.poem?.id
     return target ? `/detail/${target}` : null
+}
+
+// Anything older than this shows a calendar date instead of a distance.
+// "3 months ago" is a worse answer than "05/12/2025" — past a week nobody is
+// counting, they want to know when.
+const RELATIVE_LIMIT_SECONDS = 7 * 24 * 60 * 60
+
+/** Below this, distance formatting says "0 seconds", which reads as broken. */
+const JUST_NOW_SECONDS = 60
+
+/**
+ * WHICH timestamp a row carries is a real decision, not a detail.
+ *
+ * `updatedAt`, never `createdAt`. A collapse updates the row IN PLACE — twelve
+ * likes on one poem is one row — and the list is ordered by `updatedAt` for
+ * exactly that reason. Labelling with `createdAt` would put "last week" at the
+ * top of the list on a row that gathered its latest like a minute ago, so the
+ * timestamp would contradict the ordering it sits in.
+ *
+ * `now` is injectable so tests are deterministic. A relative timestamp read
+ * from the system clock is untestable by construction — it changes between the
+ * fixture and the assertion.
+ */
+function rowDate(row: Pick<NotificationRow, 'updatedAt' | 'createdAt'>): Date | null {
+    const iso = row.updatedAt || row.createdAt
+    if (!iso) return null
+    const date = new Date(iso)
+    return Number.isNaN(date.getTime()) ? null : date
+}
+
+export function notificationTimestamp(
+    row: Pick<NotificationRow, 'updatedAt' | 'createdAt'>,
+    now: Date = new Date()
+): string {
+    const date = rowDate(row)
+    if (!date) return ''
+
+    const seconds = (now.getTime() - date.getTime()) / 1000
+
+    // Negative covers clock skew between the server's timestamp and the
+    // browser's clock. "in 4 seconds" on a notification is worse than nothing.
+    if (seconds < JUST_NOW_SECONDS) return 'Just now'
+    if (seconds < RELATIVE_LIMIT_SECONDS) return formatDistanceStrict(date, now, { addSuffix: true })
+
+    return format(date, 'MM/dd/yyyy')
+}
+
+/**
+ * The full timestamp, for the `title` and the `<time>` element's own value.
+ * The relative form is the readable one; this is the precise one, and it uses
+ * the same format the poem dates elsewhere on the site use.
+ */
+export function notificationExactTime(
+    row: Pick<NotificationRow, 'updatedAt' | 'createdAt'>
+): string {
+    const date = rowDate(row)
+    return date ? format(date, "MM/dd/yyyy HH:mm'h'") : ''
+}
+
+/** The machine-readable value for `<time dateTime>`. */
+export function notificationDateTimeAttr(
+    row: Pick<NotificationRow, 'updatedAt' | 'createdAt'>
+): string | undefined {
+    const date = rowDate(row)
+    return date ? date.toISOString() : undefined
 }
