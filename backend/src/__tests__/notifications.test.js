@@ -920,7 +920,7 @@ describe('Notifications — replies', () => {
       .send({ targetType, targetId, body, parentId: parentId || null })
 
   test('replying to a comment tells its author', async () => {
-    const { poet, ada, milo, poem } = await seed()
+    const { ada, milo, poem } = await seed()
     const first = await commentOn(ada._id, 'poem', String(poem._id), 'lovely').expect(201)
 
     await commentOn(milo._id, 'poem', String(poem._id), 'agreed', first.body.id).expect(201)
@@ -929,7 +929,6 @@ describe('Notifications — replies', () => {
     expect(rows).toHaveLength(1)
     expect(rows[0].type).toBe('reply')
     expect(String(rows[0].poem)).toBe(String(poem._id))
-    void poet
   })
 
   test('the poem author is told separately, as a comment', async () => {
