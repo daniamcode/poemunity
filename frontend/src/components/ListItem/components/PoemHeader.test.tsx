@@ -33,7 +33,14 @@ describe('PoemHeader', () => {
 
         const img = screen.getByAltText('Test Author')
         expect(img).toBeInTheDocument()
-        expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg')
+        // Routed through Next's optimizer, not straight at the source file.
+        // That is the point: a 550x412 portrait used to be downloaded whole to
+        // be drawn at 44x44. The `w=` proves a resize was requested — 88 for
+        // the 44px avatar at 2x, rounded up to the next configured width.
+        const src = img.getAttribute('src') || ''
+        expect(src).toContain('/_next/image')
+        expect(src).toContain(encodeURIComponent('https://example.com/avatar.jpg'))
+        expect(src).toMatch(/[?&]w=\d+/)
     })
 
     test('should render formatted date', () => {

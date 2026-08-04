@@ -99,12 +99,13 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         <a
           href="/authors/testuser"
         >
-          <img
-            alt="testuser"
-            class="poem__picture"
-            loading="lazy"
-            src="test-pic.jpg"
-          />
+          <span
+            aria-label="testuser"
+            class="poem__picture poem__picture--initials"
+            style="background-color: rgb(171, 71, 188);"
+          >
+            T
+          </span>
         </a>
         <a
           class="poem__author"
@@ -230,12 +231,13 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         <a
           href="/authors/testuser"
         >
-          <img
-            alt="testuser"
-            class="poem__picture"
-            loading="lazy"
-            src="test-pic.jpg"
-          />
+          <span
+            aria-label="testuser"
+            class="poem__picture poem__picture--initials"
+            style="background-color: rgb(171, 71, 188);"
+          >
+            T
+          </span>
         </a>
         <a
           class="poem__author"

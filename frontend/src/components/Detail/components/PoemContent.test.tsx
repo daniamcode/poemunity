@@ -29,7 +29,11 @@ describe('PoemContent', () => {
         render(<PoemContent poem={mockPoem} />)
         const image = screen.getByAltText('John Doe')
         expect(image).toBeInTheDocument()
-        expect(image).toHaveAttribute('src', 'https://example.com/avatar.jpg')
+        // Through Next's optimizer now — a 550x412 portrait is no longer
+        // downloaded whole to be drawn at 44x44.
+        const src = image.getAttribute('src') || ''
+        expect(src).toContain('/_next/image')
+        expect(src).toContain(encodeURIComponent('https://example.com/avatar.jpg'))
     })
 
     test('should render poem content', () => {

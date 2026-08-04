@@ -64,7 +64,8 @@ export function PoemOfTheWeek() {
                     name, and the name is already the next thing in this link —
                     without it the link announces the name twice. */}
                 <span aria-hidden='true'>
-                    <AuthorAvatar name={poem.author} picture={poem.picture} />
+                    {/* 28px here, not the 44px default — see PoemOfTheWeek.scss. */}
+                    <AuthorAvatar name={poem.author} picture={poem.picture} size={28} />
                 </span>
                 <span className='potw__author-name'>{poem.author}</span>
             </Link>

@@ -110,7 +110,7 @@ describe('Ranking Component - Top 10', () => {
             authorEntities: {
                 ids: ['user-1'],
                 entities: {
-                    'user-1': { id: 'user-1', name: 'Renamed Poet', picture: 'new-avatar.jpg', slug: 'renamed-poet' }
+                    'user-1': { id: 'user-1', name: 'Renamed Poet', picture: 'https://example.com/new-avatar.jpg', slug: 'renamed-poet' }
                 }
             }
         })
@@ -118,8 +118,10 @@ describe('Ranking Component - Top 10', () => {
         renderRanking(store)
 
         const avatar = screen.getByAltText('Renamed Poet') as HTMLImageElement
-        expect(avatar.src).toContain('new-avatar.jpg')
-        expect(avatar.src).not.toContain('pic-1.jpg')
+        // The src is routed through Next's optimizer, so the source URL is
+        // encoded inside it rather than being the attribute itself.
+        expect(decodeURIComponent(avatar.src)).toContain('https://example.com/new-avatar.jpg')
+        expect(decodeURIComponent(avatar.src)).not.toContain('pic-1.jpg')
         expect(screen.getByText('Renamed Poet')).toBeInTheDocument()
         expect(screen.queryByText('Author 1')).not.toBeInTheDocument()
     })
