@@ -29,6 +29,7 @@ const authorSchema = new Schema({
   notificationPrefs: {
     like: { type: Boolean, default: true },
     comment: { type: Boolean, default: true },
+    profileComment: { type: Boolean, default: true },
     follow: { type: Boolean, default: true },
     newPoem: { type: Boolean, default: true }
   },

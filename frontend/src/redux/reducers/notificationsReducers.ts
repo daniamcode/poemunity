@@ -21,12 +21,19 @@ export interface NotificationActor {
 
 export interface NotificationRow {
     id: string
-    type: 'like' | 'comment' | 'follow' | 'newPoem'
+    type: 'like' | 'comment' | 'profileComment' | 'follow' | 'newPoem'
     actors: NotificationActor[]
     /** DISTINCT actors, which is NOT actors.length once the array hits its cap. */
     count: number
     poem?: { id: string; title?: string; slug?: string } | null
     read: boolean
+    /**
+     * YOUR OWN author page, served rather than derived. The client builds a
+     * slug from the username, but the real one comes from the display name and
+     * gains a numeric suffix on collision — a guessed URL 404s for anyone whose
+     * slug was ever contested. Only profileComment rows need it.
+     */
+    recipient?: { slug?: string }
     updatedAt: string
     createdAt: string
 }
@@ -129,6 +136,7 @@ export function unreadCountSet(count: number) {
 export interface NotificationPreferences {
     like: boolean
     comment: boolean
+    profileComment: boolean
     follow: boolean
     newPoem: boolean
 }

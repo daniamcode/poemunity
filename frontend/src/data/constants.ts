@@ -352,6 +352,9 @@ export const EMAIL_PREFS_SOON_HINT = 'coming soon, not available yet'
 export const NOTIFICATION_PREF_LABELS = {
     like: 'Likes on my poems',
     comment: 'Comments on my poems',
+    // "my page", not "my profile": /profile is the private settings screen, and
+    // the comment appears on the PUBLIC author page. Two different places.
+    profileComment: 'Comments on my author page',
     follow: 'New followers',
     newPoem: 'New poems from poets I follow'
 }

@@ -115,17 +115,113 @@ describe('Notifications — triggers', () => {
     expect(rows[0].type).toBe('comment')
   })
 
-  test('a PROFILE comment notifies nobody', async () => {
-    // Profile comments share the route but their targetId is an AUTHOR id.
-    // Looked up as a poem it finds nothing — the point is that it must not
-    // notify the author whose id happens to sit in that field.
+  test('a PROFILE comment tells the author whose page it is', async () => {
+    // This notified NOBODY until 2026-08-04 — reported from the live site,
+    // where a comment left on an author page produced silence. The target is
+    // an author id, so it is a different event from a poem comment with a
+    // different recipient, not the same one routed differently.
     const { poet, ada } = await seed()
 
     await auth(request(app).post('/api/v1/comments'), ada._id)
       .send({ targetType: 'profile', targetId: String(poet._id), body: 'hi' })
       .expect(201)
 
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].type).toBe('profileComment')
+    // No poem — which is also what makes profile comments collapse with each
+    // other and never with a poem event.
+    expect(rows[0].poem).toBeFalsy()
+  })
+
+  test('a profile comment is NOT misrouted as a poem comment', async () => {
+    // The original reason it was dropped: `targetId` is an author id, and a
+    // handler that treated it as a poem id would address the event wrongly.
+    const { poet, ada } = await seed()
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'hi' })
+      .expect(201)
+
+    expect((await inbox(poet._id)).map(r => r.type)).toEqual(['profileComment'])
+  })
+
+  test('commenting on your OWN profile tells nobody', async () => {
+    const { poet } = await seed()
+
+    await auth(request(app).post('/api/v1/comments'), poet._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'hi' })
+      .expect(201)
+
     expect(await inbox(poet._id)).toHaveLength(0)
+  })
+
+  test('a profile comment on a non-existent author notifies nobody', async () => {
+    const { ada } = await seed()
+    const ghost = new mongoose.Types.ObjectId()
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(ghost), body: 'hi' })
+      .expect(201)
+
+    expect(await Notification.countDocuments({ type: 'profileComment' })).toBe(0)
+  })
+
+  test('a profile comment and a poem comment stay separate rows', async () => {
+    // They differ only by type and by the absence of a poem. Merging them would
+    // report "2 comments on your poem" for one comment that was not on it.
+    const { poet, ada, poem } = await seed()
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'on the poem' })
+      .expect(201)
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'on the profile' })
+      .expect(201)
+
+    const rows = await inbox(poet._id)
+    expect(rows.map(r => r.type).sort()).toEqual(['comment', 'profileComment'])
+  })
+
+  test('a profile comment and a follow stay separate too', async () => {
+    // Both carry `poem: null`, so type is the only thing keeping them apart.
+    const { poet, ada } = await seed()
+
+    await auth(request(app).post('/api/v1/authors/nadia-novak/follow'), ada._id).expect(200)
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'hi' })
+      .expect(201)
+
+    const rows = await inbox(poet._id)
+    expect(rows.map(r => r.type).sort()).toEqual(['follow', 'profileComment'])
+  })
+
+  test('turning profileComment off silences it and nothing else', async () => {
+    const { poet, ada, poem } = await seed()
+    await Author.findByIdAndUpdate(poet._id, { $set: { 'notificationPrefs.profileComment': false } })
+
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'on the profile' })
+      .expect(201)
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'on the poem' })
+      .expect(201)
+
+    expect((await inbox(poet._id)).map(r => r.type)).toEqual(['comment'])
+  })
+
+  test('the row carries the recipient slug, so the client need not guess it', async () => {
+    // The client derives a slug from the USERNAME; the real one comes from the
+    // display name and gains a numeric suffix on collision. A guessed URL is a
+    // 404 for anyone whose slug was ever contested.
+    const { poet, ada } = await seed()
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'profile', targetId: String(poet._id), body: 'hi' })
+      .expect(201)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
+
+    expect(res.body.notifications[0].recipient.slug).toBe('nadia-novak')
   })
 
   test('a follow tells the followed author', async () => {
@@ -335,7 +431,7 @@ describe('Notifications — preferences', () => {
 
     const res = await auth(request(app).get('/api/v1/notifications/preferences'), insertedId).expect(200)
 
-    expect(res.body).toEqual({ like: true, comment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, follow: true, newPoem: true })
   })
 
   test('GET /preferences reports every type as on for an author with none stored', async () => {
@@ -343,7 +439,7 @@ describe('Notifications — preferences', () => {
 
     const res = await auth(request(app).get('/api/v1/notifications/preferences'), poet._id).expect(200)
 
-    expect(res.body).toEqual({ like: true, comment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, follow: true, newPoem: true })
   })
 
   test('turning one off silences only that type', async () => {
@@ -381,7 +477,7 @@ describe('Notifications — preferences', () => {
     const res = await auth(request(app).patch('/api/v1/notifications/preferences'), poet._id)
       .send({ like: false, isAdmin: true, nonsense: false }).expect(200)
 
-    expect(res.body).toEqual({ like: false, comment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: false, comment: true, profileComment: true, follow: true, newPoem: true })
     const fresh = await Author.findById(poet._id)
     expect(fresh.isAdmin).toBeUndefined()
   })

@@ -167,22 +167,43 @@ commentsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     await comment.save()
     await comment.populate('authorId', AUTHOR_FIELDS)
 
-    // Only poem comments notify, and only their poem's author.
+    // Both kinds of comment notify, but they are DIFFERENT events with
+    // different recipients: a poem comment goes to the poem's author, a profile
+    // comment to the author whose page it is.
     //
-    // `targetType` also covers PROFILE comments, whose `targetId` is an author
-    // id, not a poem id — looking that up as a poem finds nothing and notifies
-    // nobody, so profile comments are silently dropped rather than misrouted.
-    // Telling an author somebody wrote on their profile is worth doing later;
-    // doing it by accident, addressed as a poem, is not.
-    if (targetType === 'poem' && mongoose.Types.ObjectId.isValid(targetId)) {
-      const poem = await Poem.findById(targetId).select('authorId')
-      if (poem) {
-        await notify({
-          recipientId: poem.authorId,
-          actorId: req.userId,
-          type: NOTIFICATION_TYPE.COMMENT,
-          poemId: poem._id
-        })
+    // Profile comments notified nobody until 2026-08-04. `targetId` is an
+    // author id, not a poem id, so looking it up as a poem found nothing — the
+    // event was dropped rather than misrouted, which was right, but the "tell
+    // them properly later" half never happened. Somebody wrote on your profile
+    // and you never learned. Reported from the live site.
+    if (mongoose.Types.ObjectId.isValid(targetId)) {
+      if (targetType === 'poem') {
+        const poem = await Poem.findById(targetId).select('authorId')
+        if (poem) {
+          await notify({
+            recipientId: poem.authorId,
+            actorId: req.userId,
+            type: NOTIFICATION_TYPE.COMMENT,
+            poemId: poem._id
+          })
+        }
+      } else if (targetType === 'profile') {
+        // The target IS the recipient: a profile comment is addressed to the
+        // author whose page it is on. It carries no `poemId`, which is also
+        // what makes profile comments collapse with each other and never with
+        // a poem event — the same shape as a follow.
+        //
+        // `exists` rather than a full read: nothing about the author is needed
+        // beyond "is this a real one", and notify() loads their preferences
+        // itself.
+        const target = await Author.exists({ _id: targetId })
+        if (target) {
+          await notify({
+            recipientId: targetId,
+            actorId: req.userId,
+            type: NOTIFICATION_TYPE.PROFILE_COMMENT
+          })
+        }
       }
     }
 

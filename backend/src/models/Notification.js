@@ -6,7 +6,13 @@ const NOTIFICATION_TYPE = {
   LIKE: 'like',
   COMMENT: 'comment',
   FOLLOW: 'follow',
-  NEW_POEM: 'newPoem'
+  NEW_POEM: 'newPoem',
+  // A comment on your AUTHOR PAGE, which is a different event from a comment on
+  // a poem: it shares the comments route but its target is an author, so it was
+  // dropped rather than misrouted as a poem comment. That left it notifying
+  // NOBODY — somebody writes on your profile and you never learn. Reported from
+  // production, 2026-08-04.
+  PROFILE_COMMENT: 'profileComment'
 }
 
 const NOTIFICATION_TYPES = Object.values(NOTIFICATION_TYPE)

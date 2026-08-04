@@ -209,3 +209,44 @@ describe('notificationDateTimeAttr', () => {
         expect(notificationDateTimeAttr({ updatedAt: 'nope' } as never)).toBeUndefined()
     })
 })
+
+
+describe('profile comments', () => {
+    const profileRow = (over: any = {}) => row({
+        type: 'profileComment',
+        poem: undefined,
+        recipient: { slug: 'nadia-novak' },
+        ...over
+    } as never)
+
+    test('says "your page", not "your profile"', () => {
+        // /profile is the private settings screen; this comment is on the
+        // PUBLIC author page. Naming the wrong one sends the reader somewhere
+        // the comment is not.
+        expect(notificationMessage(profileRow())).toBe('Ada Brine commented on your page')
+    })
+
+    test('reads plural once several people have written', () => {
+        expect(notificationMessage(profileRow({ count: 3 })))
+            .toMatch(/left comments on your page$/)
+    })
+
+    test('links to YOUR author page, using the served slug', () => {
+        expect(notificationHref(profileRow())).toBe('/authors/nadia-novak')
+    })
+
+    test('does NOT link to the commenter', () => {
+        // The distractor: a follow row links to the actor, and these two are
+        // the only types with no poem, so the wrong branch is easy to fall into.
+        const href = notificationHref(profileRow({
+            actors: [{ id: 'a1', name: 'Ada Brine', slug: 'ada-brine' }]
+        }))
+
+        expect(href).toBe('/authors/nadia-novak')
+        expect(href).not.toContain('ada-brine')
+    })
+
+    test('renders inert rather than guessing a URL when no slug was served', () => {
+        expect(notificationHref(profileRow({ recipient: undefined }))).toBeNull()
+    })
+})

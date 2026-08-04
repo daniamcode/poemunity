@@ -19,7 +19,7 @@ import {
     EMAIL_DIGEST_LABEL
 } from '../../data/constants'
 
-const TYPES: (keyof Prefs)[] = ['like', 'comment', 'follow', 'newPoem']
+const TYPES: (keyof Prefs)[] = ['like', 'comment', 'profileComment', 'follow', 'newPoem']
 
 /**
  * The four toggles.

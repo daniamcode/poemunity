@@ -49,6 +49,10 @@ export function notificationMessage(row: NotificationRow): string {
         case 'comment':
             // "commented on" reads wrong for a group; "left comments on" does not.
             return plural ? `${who} left comments on your poem` : `${who} commented on your poem`
+        case 'profileComment':
+            // "your page", not "your profile": /profile is the private settings
+            // screen, and this comment is on the PUBLIC author page.
+            return plural ? `${who} left comments on your page` : `${who} commented on your page`
         case 'follow':
             return plural ? `${who} started following you` : `${who} started following you`
         case 'newPoem':
@@ -62,6 +66,13 @@ export function notificationMessage(row: NotificationRow): string {
 
 /** Where the row links. A follow goes to the follower; everything else to the poem. */
 export function notificationHref(row: NotificationRow): string | null {
+    // Your OWN author page. The slug is served on the row rather than derived
+    // from the username, because the real one comes from the display name and
+    // gains a numeric suffix on collision — a guess 404s for anyone whose slug
+    // was ever contested.
+    if (row.type === 'profileComment') {
+        return row.recipient?.slug ? `/authors/${row.recipient.slug}` : null
+    }
     if (row.type === 'follow') {
         const actor = (row.actors || [])[0]
         // Falls back to the id because a slug is not guaranteed, and a link to
