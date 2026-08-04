@@ -34,8 +34,6 @@ export interface NotificationRow {
 export interface NotificationsState extends StateItem<NotificationRow[]> {
     page?: number
     hasMore?: boolean
-    total?: number
-    totalPages?: number
 }
 
 interface Action {
@@ -66,7 +64,10 @@ export function notificationsQuery(
             return Object.assign({}, state, { isFetching: true })
 
         case fulfilledAction: {
-            const { notifications, page, hasMore, total, totalPages } = action.payload || {}
+            // No `total`. The list endpoint asks for one row more than the
+            // page instead of running a second `countDocuments` per open, so
+            // "is there another page" is known and "how many are there" is not.
+            const { notifications, page, hasMore } = action.payload || {}
             const incoming: NotificationRow[] = notifications || []
             // Page 1 replaces, later pages append — the same rule every other
             // paginated cache here uses.
@@ -78,8 +79,6 @@ export function notificationsQuery(
                 item,
                 page,
                 hasMore,
-                total,
-                totalPages,
                 err: undefined
             })
         }

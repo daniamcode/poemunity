@@ -14,7 +14,7 @@ const {
   canReadPoem,
   authorIdOf
 } = require('../utils/poemVisibility')
-const { notify, notifyMany, NOTIFICATION_TYPE } = require('../utils/notifications')
+const { notify, notifyMany, retract, NOTIFICATION_TYPE } = require('../utils/notifications')
 const Follow = require('../models/Follow')
 
 const AUTHOR_FIELDS = 'name slug picture username'
@@ -236,12 +236,22 @@ poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
   try {
     await poem.save()
 
+    // Awaited, not fire-and-forget: this runs on a serverless function that may
+    // be frozen the moment the response is sent, so an un-awaited write is a
+    // write that sometimes does not happen. Neither call throws, and neither
+    // touches the actor's own poem.
     if (liked) {
-      // Awaited, not fire-and-forget: this runs on a serverless function that
-      // may be frozen the moment the response is sent, so an un-awaited write
-      // is a write that sometimes does not happen. `notify` never throws and
-      // never notifies the actor about their own action.
       await notify({
+        recipientId: authorIdOf(poem),
+        actorId: req.userId,
+        type: NOTIFICATION_TYPE.LIKE,
+        poemId: poem._id
+      })
+    } else {
+      // Taking a like back takes its notification back — but only while it is
+      // still UNREAD. Once the poet has seen it, removing it would rewrite
+      // something they witnessed. See `retract`.
+      await retract({
         recipientId: authorIdOf(poem),
         actorId: req.userId,
         type: NOTIFICATION_TYPE.LIKE,

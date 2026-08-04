@@ -10,7 +10,10 @@ const { NOTIFICATION_TYPES } = require('../models/Notification')
 // a query parameter. Same rule as the Drafts tab: a private list scoped by
 // anything the client can name is not private.
 
-const DEFAULT_LIMIT = 20
+// The panel is a dropdown, not a page: ten rows fill it without turning it into
+// something you scroll. "Show more" pages through the rest, so nothing is
+// hidden — only fewer things are loaded before you ask.
+const DEFAULT_LIMIT = 10
 const MAX_LIMIT = 50
 
 const ACTOR_FIELDS = 'name username slug picture type'
@@ -27,27 +30,32 @@ notificationsRouter.get('/', userExtractor, async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || DEFAULT_LIMIT, MAX_LIMIT)
 
     const filter = { recipient: recipientId(req) }
-    const total = await Notification.countDocuments(filter)
 
-    const notifications = await Notification.find(filter)
+    // ONE query, not two. This used to run a `countDocuments` alongside the
+    // find, purely to compute `hasMore` — a second round trip on every panel
+    // open, on a serverless backend, for a total nothing renders. Asking for
+    // one row MORE than the page size answers the same question: if it comes
+    // back, there is another page.
+    //
+    // The cost of that choice is that `total` is no longer known, so there is
+    // no "37 notifications" to display. Nothing wants one; if something ever
+    // does, bring the count back rather than guessing from the page count.
+    const rows = await Notification.find(filter)
       // updatedAt, not createdAt: a collapse updates in place, and ordering by
       // creation would leave a poem that gathered fifty likes this morning
       // wherever its first like landed last week.
       .sort({ updatedAt: -1, _id: -1 })
       .skip((page - 1) * limit)
-      .limit(limit)
+      .limit(limit + 1)
       .populate('actors', ACTOR_FIELDS)
       .populate('poem', POEM_FIELDS)
 
-    const totalPages = Math.ceil(total / limit)
-    res.json({
-      notifications,
-      total,
-      page,
-      limit,
-      totalPages,
-      hasMore: page < totalPages
-    })
+    const hasMore = rows.length > limit
+    // The probe row is NOT part of the page — returning it would render an
+    // eleventh row on a ten-row page and then show it again on page two.
+    const notifications = hasMore ? rows.slice(0, limit) : rows
+
+    res.json({ notifications, page, limit, hasMore })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Internal server error' })

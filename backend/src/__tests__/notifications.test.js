@@ -6,7 +6,7 @@ const Author = require('../models/Author')
 const Poem = require('../models/Poem')
 const Follow = require('../models/Follow')
 const Notification = require('../models/Notification')
-const { isNotificationEnabled } = require('../utils/notifications')
+const { isNotificationEnabled, retract } = require('../utils/notifications')
 
 // ---------------------------------------------------------------------------
 // Notifications.
@@ -399,7 +399,7 @@ describe('Notifications — reading them', () => {
     ).expect(200)
 
     expect(res.body.notifications).toHaveLength(0)
-    expect(res.body.total).toBe(0)
+    expect(res.body.notifications).toEqual([])
   })
 
   test('401 without a session', async () => {
@@ -441,6 +441,44 @@ describe('Notifications — reading them', () => {
 
     expect(res.body.notifications[0].actors[0].name).toBe('Ada Brine')
     expect(res.body.notifications[0].poem.slug).toBe('aubade-nadia')
+  })
+
+  test('pages without a count query, and without leaking the probe row', async () => {
+    // `hasMore` comes from asking for ONE row more than the page, so the probe
+    // must not be rendered as an eleventh row and must not reappear on page 2.
+    const { poet, poem } = await seed()
+    for (let i = 0; i < 12; i++) {
+      const author = await Author.create({ username: `u${i}`, name: `Liker ${i}`, slug: `l-${i}`, type: 'user' })
+      await like(poem._id, author._id).expect(200)
+      await auth(request(app).post('/api/v1/notifications/read'), poet._id).send({}).expect(200)
+    }
+
+    const p1 = await auth(request(app).get('/api/v1/notifications?page=1'), poet._id).expect(200)
+    const p2 = await auth(request(app).get('/api/v1/notifications?page=2'), poet._id).expect(200)
+
+    expect(p1.body.notifications).toHaveLength(10)
+    expect(p1.body.hasMore).toBe(true)
+    expect(p2.body.notifications).toHaveLength(2)
+    expect(p2.body.hasMore).toBe(false)
+
+    const ids = [...p1.body.notifications, ...p2.body.notifications].map(n => n.id)
+    expect(new Set(ids).size).toBe(12)
+  })
+
+  test('an exactly-full page does not claim there is more', async () => {
+    // The off-by-one the probe row invites: with exactly `limit` rows, the
+    // extra find returns nothing and hasMore must be false.
+    const { poet, poem } = await seed()
+    for (let i = 0; i < 10; i++) {
+      const author = await Author.create({ username: `x${i}`, name: `X ${i}`, slug: `x-${i}`, type: 'user' })
+      await like(poem._id, author._id).expect(200)
+      await auth(request(app).post('/api/v1/notifications/read'), poet._id).send({}).expect(200)
+    }
+
+    const res = await auth(request(app).get('/api/v1/notifications?page=1'), poet._id).expect(200)
+
+    expect(res.body.notifications).toHaveLength(10)
+    expect(res.body.hasMore).toBe(false)
   })
 
   test('unread-count counts only unread', async () => {
@@ -625,7 +663,7 @@ describe('Notifications — different event types never merge', () => {
     const badge = await auth(request(app).get('/api/v1/notifications/unread-count'), poet._id).expect(200)
 
     expect(list.body.notifications.map(n => n.type).sort()).toEqual(['comment', 'like'])
-    expect(list.body.total).toBe(2)
+    expect(list.body.notifications).toHaveLength(2)
     expect(badge.body.count).toBe(2)
   })
 
@@ -666,6 +704,112 @@ describe('Notifications — different event types never merge', () => {
     const rows = await inbox(poet._id)
     expect(rows).toHaveLength(1)
     expect(rows[0].type).toBe('like')
+  })
+})
+
+describe('Notifications — taking a like back takes its notification back', () => {
+  // "The notification of the like should be removed in that case."
+  //
+  // Bounded by READ state, not by age or list position: an unread row is one
+  // nobody has looked at, so removing it costs no one a memory. A row the poet
+  // has already seen stays, because deleting it would rewrite something they
+  // witnessed.
+
+  test('unliking removes the notification entirely when it was the only like', async () => {
+    const { poet, ada, poem } = await seed()
+
+    await like(poem._id, ada._id).expect(200)
+    expect(await inbox(poet._id)).toHaveLength(1)
+
+    await like(poem._id, ada._id).expect(200) // toggles off
+
+    expect(await inbox(poet._id)).toHaveLength(0)
+  })
+
+  test('the badge goes back down', async () => {
+    const { poet, ada, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+
+    await like(poem._id, ada._id).expect(200)
+
+    const badge = await auth(request(app).get('/api/v1/notifications/unread-count'), poet._id).expect(200)
+    expect(badge.body.count).toBe(0)
+  })
+
+  test('one person unliking leaves everybody else’s like intact', async () => {
+    // The distractor that matters: with two likers, unliking must decrement to
+    // one, not delete the row and not leave it saying two.
+    const { poet, ada, milo, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+    await like(poem._id, milo._id).expect(200)
+
+    const before = await inbox(poet._id)
+    expect(before[0].count).toBe(2)
+
+    await like(poem._id, ada._id).expect(200) // ada takes hers back
+
+    const after = await inbox(poet._id)
+    expect(after).toHaveLength(1)
+    expect(after[0].count).toBe(1)
+    expect(after[0].actors.map(String)).toEqual([String(milo._id)])
+  })
+
+  test('a notification the poet has ALREADY READ is left alone', async () => {
+    // The boundary. You saw it; the site does not get to un-tell you.
+    const { poet, ada, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+    await auth(request(app).post('/api/v1/notifications/read'), poet._id).send({}).expect(200)
+
+    await like(poem._id, ada._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].read).toBe(true)
+    expect(rows[0].count).toBe(1)
+  })
+
+  test('unliking touches no other notification type', async () => {
+    // The comment row shares (recipient, poem) and differs only by type.
+    const { poet, ada, poem } = await seed()
+    await auth(request(app).post('/api/v1/comments'), ada._id)
+      .send({ targetType: 'poem', targetId: String(poem._id), body: 'lovely' })
+      .expect(201)
+    await like(poem._id, ada._id).expect(200)
+
+    await like(poem._id, ada._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows.map(r => r.type)).toEqual(['comment'])
+  })
+
+  test('unliking someone else’s poem does not touch YOUR notifications', async () => {
+    const { poet, ada, milo, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+
+    // Milo never liked it; his toggle adds a like, it does not retract Ada's.
+    await like(poem._id, milo._id).expect(200)
+
+    const rows = await inbox(poet._id)
+    expect(rows[0].count).toBe(2)
+  })
+
+  test('unliking a poem you never liked is a no-op, not a decrement', async () => {
+    // `retract` must not subtract a like that was never counted. The like route
+    // toggles, so milo's first press ADDS — this drives retract directly to
+    // cover the case where the actor is simply not in the row.
+    const { poet, ada, milo, poem } = await seed()
+    await like(poem._id, ada._id).expect(200)
+
+    await retract({
+      recipientId: poet._id,
+      actorId: milo._id,
+      type: 'like',
+      poemId: poem._id
+    })
+
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].count).toBe(1)
   })
 })
 

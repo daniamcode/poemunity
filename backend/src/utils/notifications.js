@@ -138,4 +138,68 @@ async function notifyMany ({ recipientIds, actorId, type, poemId }) {
   }
 }
 
-module.exports = { notify, notifyMany, isNotificationEnabled, MAX_ACTORS, NOTIFICATION_TYPE }
+/**
+ * Undo a notification, when the thing it announced is undone.
+ *
+ * Only ever UNREAD rows. That boundary is the whole design: a notification you
+ * have already seen is part of what happened to you, and deleting it rewrites
+ * something you witnessed — you would remember a like that the site then
+ * claims never existed. Unread means nobody has looked yet, so removing it
+ * costs no one a memory. It also happens to be free: the same
+ * `{ recipient, read, type, poem }` index the collapse uses answers this.
+ *
+ * The actor bookkeeping has one subtlety. `count` tracks DISTINCT actors and is
+ * uncapped, while `actors` is capped at MAX_ACTORS, so past the cap a real
+ * actor may not appear in the array at all. Three cases, and the third is the
+ * one that keeps this honest:
+ *   - in the array  -> remove them and decrement;
+ *   - not in the array but `count > actors.length` -> they are one of the
+ *     unlisted ones, so decrement without removing;
+ *   - not in the array and `count === actors.length` -> they are not one of
+ *     the actors. Do NOTHING. Decrementing here would silently eat somebody
+ *     else's like.
+ *
+ * The row is deleted when the last actor leaves, rather than left at zero: a
+ * row saying "0 people liked your poem" is worse than no row.
+ *
+ * NEVER THROWS, for the same reason `notify` does not — this runs inside the
+ * request that unliked the poem, and failing to tidy a notification must not
+ * fail the unlike.
+ */
+async function retract ({ recipientId, actorId, type, poemId }) {
+  try {
+    if (!recipientId || !actorId || !NOTIFICATION_TYPES.includes(type)) return null
+    if (String(recipientId) === String(actorId)) return null
+
+    const existing = await Notification.findOne({
+      recipient: new mongoose.Types.ObjectId(String(recipientId)),
+      type,
+      read: false,
+      poem: poemId ? new mongoose.Types.ObjectId(String(poemId)) : null
+    })
+    if (!existing) return null
+
+    const index = existing.actors.findIndex(id => String(id) === String(actorId))
+
+    if (index >= 0) {
+      existing.actors.splice(index, 1)
+      existing.count = Math.max(existing.count - 1, 0)
+    } else if (existing.count > existing.actors.length) {
+      existing.count -= 1
+    } else {
+      return null
+    }
+
+    if (existing.count === 0) {
+      await existing.deleteOne()
+      return null
+    }
+
+    return await existing.save()
+  } catch (error) {
+    console.error('retract failed:', error.message)
+    return null
+  }
+}
+
+module.exports = { notify, notifyMany, retract, isNotificationEnabled, MAX_ACTORS, NOTIFICATION_TYPE }

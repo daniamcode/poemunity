@@ -349,6 +349,16 @@ an un-awaited write on a serverless function that may freeze at response time is
 a write that sometimes does not happen. Self-actions are dropped inside `notify()`
 rather than at the call sites, so a new trigger cannot forget.
 
+**Unliking RETRACTS the notification it raised** — but only while that row is
+still **unread**. A notification you have already seen is part of what happened
+to you, and deleting it rewrites something you witnessed; unread means nobody
+has looked, so removing it costs no one a memory. The actor bookkeeping has one
+trap: `count` is uncapped while `actors` is capped, so an actor absent from the
+array may still be counted. Decrement without removing only when
+`count > actors.length`; if they are absent and the two agree, they are not one
+of the actors and touching the count would silently eat somebody else's like.
+The row is deleted when the last actor leaves, rather than left saying zero.
+
 Trigger edges that are easy to get wrong: the like route **toggles**, so
 unliking must notify nobody; **withdrawing** a poem notifies nobody (a poet
 toggling status while they fiddle would otherwise spam their followers);
@@ -369,6 +379,12 @@ nothing is stored for any of them. Mongoose fills schema defaults on
 vanishes. `isNotificationEnabled()` is the single place the rule lives, and it
 is unit-tested on a plain object for exactly that reason. (The end-to-end tests
 cannot prove this rule; a red-check established that.)
+
+The list is **10 per page** with a "Show more" button, and `hasMore` comes from
+asking for one row MORE than the page rather than a second `countDocuments` per
+open — so `total` is deliberately not known and nothing displays one. The probe
+row is sliced off before responding, or it renders an eleventh row and then
+reappears on page two.
 
 The badge is fetched **once on mount and never polled** — a poll on every open
 tab is a request per user per interval, forever, to learn a number that is

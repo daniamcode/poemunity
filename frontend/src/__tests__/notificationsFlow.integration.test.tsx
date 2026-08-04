@@ -68,7 +68,7 @@ describe('opening the notification bell', () => {
                 return Promise.resolve({ data: { count: 1 } })
             }
             return Promise.resolve({
-                data: { notifications: ROWS, total: 1, page: 1, totalPages: 1, hasMore: false }
+                data: { notifications: ROWS, page: 1, limit: 10, hasMore: false }
             })
         })
         post = jest.fn(() => Promise.resolve({ data: { updated: 1, unreadCount: 0 } }))
