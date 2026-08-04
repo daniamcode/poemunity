@@ -43,7 +43,7 @@ function isNotificationEnabled (author, type) {
  * cannot forget: liking your own poem, commenting on it, and the publish fan-out
  * reaching a poet who follows themselves all resolve to the same no-op.
  */
-async function notify ({ recipientId, actorId, type, poemId }) {
+async function notify ({ recipientId, actorId, type, poemId, recipient: preloaded }) {
   try {
     if (!recipientId || !actorId || !NOTIFICATION_TYPES.includes(type)) return null
 
@@ -53,7 +53,11 @@ async function notify ({ recipientId, actorId, type, poemId }) {
     // notify after all.
     if (String(recipientId) === String(actorId)) return null
 
-    const recipient = await Author.findById(recipientId).select('notificationPrefs')
+    // `preloaded` is supplied by notifyMany, which fetches every recipient's
+    // preferences in ONE query rather than one per recipient. The preference
+    // CHECK still happens here either way, so the rule has a single home no
+    // matter which path got us the author.
+    const recipient = preloaded ?? await Author.findById(recipientId).select('notificationPrefs')
     if (!recipient || !isNotificationEnabled(recipient, type)) return null
 
     const actor = new mongoose.Types.ObjectId(String(actorId))
@@ -98,10 +102,39 @@ async function notify ({ recipientId, actorId, type, poemId }) {
  * the write-amplification ceiling of the whole design — at a few thousand
  * followers it should become a queue, or the event should move to fan-out ON
  * READ (query poems by followed authors since last seen) instead.
+ *
+ * PREFERENCES ARE FETCHED ONCE for the whole fan-out. Letting each notify() do
+ * its own lookup made publishing cost 3 round trips per follower instead of 2,
+ * all of them serial and all inside the request that the poet is waiting on;
+ * for a poet with 200 followers that is 200 identical-shaped queries. This
+ * lowers the slope, not the ceiling — the queue is still the answer past a few
+ * thousand.
+ *
+ * `.lean()` is safe here for one specific reason: Mongoose fills schema
+ * defaults on HYDRATION, so a lean author has no `notificationPrefs` at all —
+ * and `isNotificationEnabled` reads absent as ON rather than testing `=== true`.
+ * That is the whole reason it is written that way. Do not "tighten" it.
  */
 async function notifyMany ({ recipientIds, actorId, type, poemId }) {
-  for (const recipientId of recipientIds) {
-    await notify({ recipientId, actorId, type, poemId })
+  // Deduped: a fan-out list is assembled from follow edges, and one duplicate
+  // would otherwise pay for the same recipient twice.
+  const ids = [...new Set((recipientIds || []).map(id => String(id)))]
+  if (ids.length === 0) return
+
+  let recipients = []
+  try {
+    recipients = await Author.find({ _id: { $in: ids } }).select('notificationPrefs').lean()
+  } catch (error) {
+    // Same contract as notify(): a notification must never fail the action that
+    // caused it, so a failed fan-out is logged and the publish still succeeds.
+    console.error('notifyMany failed to load recipients:', error.message)
+    return
+  }
+
+  // Iterating the FOUND authors rather than the requested ids also preserves
+  // notify()'s old behaviour of skipping a recipient who no longer exists.
+  for (const recipient of recipients) {
+    await notify({ recipientId: recipient._id, actorId, type, poemId, recipient })
   }
 }
 

@@ -25,9 +25,13 @@ const NOTIFICATION_TYPES = Object.values(NOTIFICATION_TYPE)
 // every id would grow a document unboundedly for a popular poem to render two
 // names from it.
 const notificationSchema = new Schema({
-  // Who is being told. Every query is scoped by this and nothing else, which is
-  // what makes the compound index below the only one needed for the list.
-  recipient: { type: Schema.Types.ObjectId, ref: 'Author', required: true, index: true },
+  // Who is being told. Every query is scoped by this and nothing else.
+  //
+  // Deliberately NOT `index: true`. A standalone `{ recipient: 1 }` is a strict
+  // PREFIX of both compound indexes below, and MongoDB uses a compound index
+  // from any prefix of its keys — so it would answer no query that they cannot,
+  // while costing an extra index write on every insert and every collapse.
+  recipient: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
 
   type: { type: String, enum: NOTIFICATION_TYPES, required: true },
 

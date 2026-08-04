@@ -1,5 +1,6 @@
 const request = require('supertest')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 const { app } = require('../../app')
 const Author = require('../models/Author')
 const Poem = require('../models/Poem')
@@ -499,5 +500,161 @@ describe('Notifications — declared indexes', () => {
     expect(declared).toContain(JSON.stringify({ recipient: 1, updatedAt: -1, _id: -1 }))
     // The badge count and the collapse lookup.
     expect(declared).toContain(JSON.stringify({ recipient: 1, read: 1, type: 1, poem: 1 }))
+  })
+
+  test('and nothing else — a standalone recipient index is a redundant write', () => {
+    // `{ recipient: 1 }` is a strict PREFIX of both indexes above, and MongoDB
+    // uses a compound index from any prefix of its keys. So it can answer no
+    // query they cannot, while costing an extra index write on every insert
+    // and every collapse — pure overhead on the write path.
+    //
+    // Pinned rather than merely deleted because `autoIndex` is ON in
+    // production and only ever CREATES: dropping this from the schema does not
+    // drop it from Atlas (see scripts/drop-redundant-notification-index.js),
+    // and re-adding `index: true` here would silently reinstate the cost.
+    const declared = Notification.schema.indexes().map(([keys]) => JSON.stringify(keys))
+
+    expect(declared).not.toContain(JSON.stringify({ recipient: 1 }))
+    expect(declared).toHaveLength(2)
+  })
+})
+
+describe('Notifications — the publish fan-out', () => {
+  // The fan-out is the one path whose cost scales with somebody else's
+  // popularity, and it runs INSIDE the request the poet is waiting on. These
+  // tests are about how many round trips it takes, not only about what it
+  // writes — a correct-but-quadratic fan-out passes every other test in this
+  // file.
+  const { notifyMany } = require('../utils/notifications')
+
+  test('fetches every recipient preference in ONE query, not one per recipient', async () => {
+    const { poet, ada, milo } = await seed()
+    const zora = await Author.create({ username: 'zora', name: 'Zora Quist', slug: 'zora-q', type: 'user' })
+    const poem = await Poem.create({
+      title: 'Fanout', slug: 'fanout-x', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+
+    const findSpy = jest.spyOn(Author, 'find')
+    const findByIdSpy = jest.spyOn(Author, 'findById')
+
+    await notifyMany({
+      recipientIds: [ada._id, milo._id, zora._id],
+      actorId: poet._id,
+      type: 'newPoem',
+      poemId: poem._id
+    })
+
+    // One batched lookup for three recipients...
+    expect(findSpy).toHaveBeenCalledTimes(1)
+    // ...and crucially NOT the per-recipient lookup notify() would do alone.
+    expect(findByIdSpy).not.toHaveBeenCalled()
+
+    // Still actually notified all three — the point is fewer queries, not less work.
+    expect(await Notification.countDocuments({ type: 'newPoem' })).toBe(3)
+
+    findSpy.mockRestore()
+    findByIdSpy.mockRestore()
+  })
+
+  test('still honours an opt-out when batched', async () => {
+    // The distractor for the test above: batching the lookup is only correct if
+    // the preference CHECK survives it. Skipping the check would make this the
+    // only failing assertion in the file.
+    const { poet, ada, milo } = await seed()
+    await Author.findByIdAndUpdate(ada._id, { $set: { 'notificationPrefs.newPoem': false } })
+    const poem = await Poem.create({
+      title: 'Optout', slug: 'optout-x', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+
+    await notifyMany({
+      recipientIds: [ada._id, milo._id],
+      actorId: poet._id,
+      type: 'newPoem',
+      poemId: poem._id
+    })
+
+    expect(await inbox(ada._id)).toHaveLength(0)
+    expect(await inbox(milo._id)).toHaveLength(1)
+  })
+
+  test('absent preferences still mean ON when batched', async () => {
+    // The recipient is inserted through the RAW DRIVER, with no
+    // `notificationPrefs` key at all. That is not a contrivance — it is the
+    // shape of every author who predates the field, i.e. all of them.
+    //
+    // `Author.create` would NOT reproduce it: Mongoose applies schema defaults
+    // on creation and persists them, so a created author really does carry
+    // `notificationPrefs: { like: true, ... }` in the database and this test
+    // passed against a deliberately broken `=== true` check. A red-check caught
+    // that; the driver insert is what makes the assertion mean anything.
+    //
+    // This is the path where it matters, because notifyMany reads with
+    // `.lean()` and so gets no hydration defaults to fall back on either.
+    const { poet } = await seed()
+    const legacyId = new mongoose.Types.ObjectId()
+    await Author.collection.insertOne({
+      _id: legacyId, username: 'legacy', name: 'Legacy Reader', slug: 'legacy-reader', type: 'user'
+    })
+    const poem = await Poem.create({
+      title: 'Absent', slug: 'absent-x', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+
+    const stored = await Author.collection.findOne({ _id: legacyId })
+    expect(stored.notificationPrefs).toBeUndefined() // the premise of the test
+
+    await notifyMany({ recipientIds: [legacyId], actorId: poet._id, type: 'newPoem', poemId: poem._id })
+
+    expect(await inbox(legacyId)).toHaveLength(1)
+  })
+
+  test('a duplicated recipient is paid for once', async () => {
+    const { poet, ada } = await seed()
+    const poem = await Poem.create({
+      title: 'Dupe', slug: 'dupe-x', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+
+    const findSpy = jest.spyOn(Author, 'find')
+    await notifyMany({
+      recipientIds: [ada._id, String(ada._id), ada._id],
+      actorId: poet._id,
+      type: 'newPoem',
+      poemId: poem._id
+    })
+
+    expect(findSpy.mock.calls[0][0]._id.$in).toHaveLength(1)
+    // And collapsing would have hidden a repeat anyway — assert the count too,
+    // which is what a second delivery would actually have bumped.
+    const rows = await inbox(ada._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].count).toBe(1)
+
+    findSpy.mockRestore()
+  })
+
+  test('skips a recipient who no longer exists', async () => {
+    const { poet, ada } = await seed()
+    const deleted = new mongoose.Types.ObjectId()
+    const poem = await Poem.create({
+      title: 'Gone', slug: 'gone-x', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+
+    await notifyMany({
+      recipientIds: [ada._id, deleted],
+      actorId: poet._id,
+      type: 'newPoem',
+      poemId: poem._id
+    })
+
+    expect(await Notification.countDocuments({ type: 'newPoem' })).toBe(1)
+    expect(await inbox(ada._id)).toHaveLength(1)
+  })
+
+  test('an empty follower list costs no queries at all', async () => {
+    const findSpy = jest.spyOn(Author, 'find')
+
+    await notifyMany({ recipientIds: [], actorId: new mongoose.Types.ObjectId(), type: 'newPoem' })
+
+    expect(findSpy).not.toHaveBeenCalled()
+    findSpy.mockRestore()
   })
 })
