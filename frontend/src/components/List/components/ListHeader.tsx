@@ -1,11 +1,9 @@
 import React from 'react'
-import { CATEGORIES_TITLE_LABEL } from '../../../data/constants'
 import { SearchBar } from './SearchBar'
 import { OriginFilter } from './OriginFilter'
 import { SortFilter } from './SortFilter'
 
 interface ListHeaderProps {
-    genre?: string
     origin: string
     orderBy: string
     searchValue: string
@@ -16,7 +14,6 @@ interface ListHeaderProps {
 }
 
 export function ListHeader({
-    genre,
     origin,
     orderBy,
     searchValue,
@@ -27,12 +24,11 @@ export function ListHeader({
 }: ListHeaderProps) {
     return (
         <div className='list__intro'>
-            {genre && (
-                <p className='list__presentation'>
-                    {CATEGORIES_TITLE_LABEL}
-                    {genre.toUpperCase()}
-                </p>
-            )}
+            {/* "Category: BEAUTY" used to sit here. Removed: the page already
+                says it twice — the `h1` reads "52 Beauty poems" and the
+                breadcrumb ends on "Beauty" — and a third copy in the filter row
+                competed with the search box and the two dropdowns beside it,
+                which are the controls somebody is actually reaching for. */}
             <SearchBar value={searchValue} onChange={onSearchChange} resultCount={resultCount} />
             {/* Grouped so the two dropdowns share one row on phones instead of
                 costing two lines of a sticky header. */}

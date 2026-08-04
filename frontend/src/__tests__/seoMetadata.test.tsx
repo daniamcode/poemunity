@@ -252,7 +252,7 @@ describe('breadcrumbs on the listing pages', () => {
 
     const trail = () => screen.getAllByRole('listitem').map(li => li.textContent)
 
-    test('a genre page reads Poemunity > <genre> poems', () => {
+    test('a genre page reads Poemunity > <genre>, not repeating the word poems', () => {
         render(
             <GenrePage
                 initialData={{ poems: [], page: 1, hasMore: false, total: 46 }}
@@ -263,7 +263,7 @@ describe('breadcrumbs on the listing pages', () => {
             />
         )
 
-        expect(trail()).toEqual(['Poemunity', 'Love poems'])
+        expect(trail()).toEqual(['Poemunity', 'Love'])
     })
 
     test('an author page reads Poemunity > Authors > <name>', () => {
@@ -350,8 +350,8 @@ describe('poem page metadata', () => {
         renderPoem()
 
         expect(screen.getAllByRole('listitem').map(li => li.textContent))
-            .toEqual(['Poemunity', 'Love poems', 'The moon and the sun'])
-        expect(screen.getByRole('link', { name: 'Love poems' })).toHaveAttribute('href', '/love')
+            .toEqual(['Poemunity', 'Love', 'The moon and the sun'])
+        expect(screen.getByRole('link', { name: 'Love' })).toHaveAttribute('href', '/love')
     })
 
     test('the trail skips the genre crumb when the poem has none', () => {

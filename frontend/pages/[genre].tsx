@@ -58,7 +58,7 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
             )}
             <Breadcrumbs
                 baseUrl={baseUrl}
-                crumbs={[{ name: 'Poemunity', path: '/' }, { name: `${label} poems` }]}
+                crumbs={[{ name: 'Poemunity', path: '/' }, { name: label }]}
             />
             <Dashboard initialData={initialData ?? undefined} />
         </>

@@ -226,15 +226,17 @@ describe('List', () => {
         expect(screen.getByTestId('list-item-poem-1')).toBeInTheDocument()
     })
 
-    test('Should display genre title when genre is provided', () => {
+    test('does NOT print the category label — the h1 and breadcrumb say it', () => {
+        // "Category: LOVE" used to sit in the filter row. Removed as a third
+        // copy of what the heading and the breadcrumb already state, competing
+        // with the search box and dropdowns beside it.
         render(
             <Provider store={store}>
                     <List genre='love' />
             </Provider>
         )
 
-        expect(screen.getByText(/Category:/i)).toBeInTheDocument()
-        expect(screen.getByText(/LOVE/i)).toBeInTheDocument()
+        expect(screen.queryByText(/Category:/i)).not.toBeInTheDocument()
     })
 
     test('Should NOT display genre title when genre is not provided', () => {

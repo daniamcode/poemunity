@@ -66,7 +66,7 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
                             { name: 'Poemunity', path: '/' },
                             ...(initialPoem?.genre
                                 ? [{
-                                    name: `${capitalizeFirstLetter(initialPoem.genre)} poems`,
+                                    name: capitalizeFirstLetter(initialPoem.genre),
                                     path: `/${categoryToSlug(initialPoem.genre)}`
                                 }]
                                 : []),

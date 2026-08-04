@@ -20,23 +20,15 @@ describe('ListHeader', () => {
         expect(screen.getByTestId('order-select')).toBeInTheDocument()
     })
 
-    test('should display genre title when genre prop is provided', () => {
-        render(<ListHeader {...mockProps} genre='love' />)
-
-        expect(screen.getByText(/love/i)).toBeInTheDocument()
-        expect(screen.getByText(new RegExp(CATEGORIES_TITLE_LABEL, 'i'))).toBeInTheDocument()
-    })
-
-    test('should not display genre title when genre prop is not provided', () => {
+    test('does NOT print the category — the page already says it twice', () => {
+        // "Category: BEAUTY" used to sit in this row. The `h1` above reads
+        // "52 Beauty poems" and the breadcrumb ends on "Beauty", so a third
+        // copy competed with the search box and the two dropdowns beside it,
+        // which are the controls somebody is actually reaching for.
         render(<ListHeader {...mockProps} />)
 
         expect(screen.queryByText(new RegExp(CATEGORIES_TITLE_LABEL, 'i'))).not.toBeInTheDocument()
-    })
-
-    test('should display genre in uppercase', () => {
-        render(<ListHeader {...mockProps} genre='sad' />)
-
-        expect(screen.getByText(/SAD/)).toBeInTheDocument()
+        expect(screen.queryByText(/^Category:/i)).not.toBeInTheDocument()
     })
 
     test('should pass correct props to sub-components', () => {

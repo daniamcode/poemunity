@@ -103,9 +103,19 @@ textarea:focus-visible,
 // Breadcrumb trail. Muted on purpose — it is orientation, not content, and it
 // sits above page titles that should stay the loudest thing on screen.
 .breadcrumbs {
-    max-width: 800px;
-    margin: $space-3 auto 0;
-    padding: 0 $space-4;
+    // TOP-LEFT of the page, not a centred 800px box.
+    //
+    // Centred, it lined up with the `h1` but sat 118px inside the poem cards
+    // and the filter row, so it related to nothing on screen — it read as
+    // floating. A breadcrumb is page-level navigation; anchoring it to the
+    // page's own gutter, under the logo, is what gives it something to belong
+    // to. It also stops depending on the dashboard's column geometry, which
+    // shrinks with the viewport.
+    //
+    // $space-5 matches the header's own padding, so the first crumb starts on
+    // the same vertical as the wordmark.
+    margin: $space-3 0 0;
+    padding: 0 $space-5;
     font-size: $fs-sm;
     color: $color-text-secondary;
 }

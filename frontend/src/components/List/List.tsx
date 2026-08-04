@@ -110,7 +110,6 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
         <>
             <div className='list__container'>
                 <ListHeader
-                    genre={genre}
                     origin={paramsData.origin}
                     orderBy={paramsData.orderBy}
                     searchValue={searchInput}
