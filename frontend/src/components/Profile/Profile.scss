@@ -746,24 +746,37 @@
     font-size: $fs-sm;
 }
 
+// `auto-fit` rather than a fixed three columns: this lives in a sidebar whose
+// width varies, and three figures forced side by side would break their labels
+// onto three lines each. Below the min they wrap to one per row on their own.
 .profile-stats__list {
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: $space-2;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: $space-3;
 }
 
+// Figure ABOVE label. `column-reverse` rather than reordering the markup,
+// because a <dl> requires its <dt> before its <dd> — so the DOM keeps reading
+// "Poems published, 4" while the eye gets the number first.
 .profile-stats__item {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: $space-3;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+// "Outside the top 10" is a sentence, and a sentence in a 92px cell is four
+// ragged lines. When the rank is unranked the item takes the full width.
+.profile-stats__item--wide {
+    grid-column: 1 / -1;
 }
 
 .profile-stats__label {
     margin: 0;
-    font-size: $fs-base-minus;
+    font-size: $fs-sm;
+    line-height: 1.25;
     color: $color-text-secondary;
 }
 
@@ -772,17 +785,19 @@
     font-family: $font-heading;
     font-size: $fs-lg;
     font-weight: $fw-bold;
+    line-height: 1.1;
     color: $color-text-dark;
-    // Tabular figures so the column of numbers lines up rather than jittering
-    // with the width of each digit.
+    // Still worth keeping for a figure that changes: without it a count going
+    // from 9 to 10 shifts the label under it.
     font-variant-numeric: tabular-nums;
 }
 
-// "Outside the top 10" is a sentence, not a figure — it must not inherit the
-// large bold treatment the numbers get, or it reads as the loudest thing here.
+// The unranked case is prose, not a figure, and must not inherit the figure
+// treatment or it becomes the loudest thing in the panel.
 .profile-stats__value--muted {
     font-family: $font-body;
     font-size: $fs-sm;
     font-weight: $fw-regular;
+    line-height: 1.35;
     color: $color-text-muted;
 }

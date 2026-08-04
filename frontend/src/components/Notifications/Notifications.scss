@@ -183,3 +183,24 @@
     color: $color-text-secondary;
     cursor: pointer;
 }
+
+// The preference checkboxes were the only unstyled form controls on the site:
+// with no rules at all they render in the OS default (a slate-blue square on
+// macOS, something else everywhere else), matching neither the palette nor the
+// MUI controls beside them.
+//
+// `accent-color` rather than a custom control built from a hidden input and a
+// pseudo-element. The native checkbox already carries keyboard behaviour, the
+// indeterminate state, forced-colors/high-contrast support and every
+// platform's own focus ring — a hand-rolled replacement re-implements all of
+// that to change one colour, and usually gets the focus ring wrong.
+.notification-prefs__label input[type='checkbox'] {
+    accent-color: $color-primary;
+    width: 16px;
+    height: 16px;
+    // Nudges the box onto the text's optical centre; without it a 16px square
+    // sits slightly high against the label's x-height.
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}

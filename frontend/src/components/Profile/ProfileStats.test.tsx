@@ -109,7 +109,7 @@ describe('ProfileStats', () => {
             renderStats({ rank: ranking })
 
             expect(screen.getByText(STATS_RANK_LABEL)).toBeInTheDocument()
-            expect(screen.getByText('#2')).toBeInTheDocument()
+            expect(screen.getByText('2')).toBeInTheDocument()
         })
 
         test('states that the poet is outside the top 10 rather than guessing', () => {
@@ -118,7 +118,6 @@ describe('ProfileStats', () => {
             renderStats({ rank: [{ userId: 'someone-else', author: 'Ada', picture: '', points: 40 }] })
 
             expect(screen.getByText(STATS_RANK_UNRANKED)).toBeInTheDocument()
-            expect(screen.queryByText(/^#/)).not.toBeInTheDocument()
         })
 
         test('is unranked, not crashed, when the ranking has not loaded', () => {
@@ -141,7 +140,7 @@ describe('ProfileStats', () => {
                 rank: [{ userId: 7, author: 'Me', picture: '', points: 5 }]
             })
 
-            expect(screen.getByText('#1')).toBeInTheDocument()
+            expect(screen.getByText('1')).toBeInTheDocument()
         })
 
         test('does not claim somebody else’s rank', () => {
@@ -174,11 +173,32 @@ describe('ProfileStats', () => {
         })
     })
 
-    test('the rank is announced as words, not as a bare hash', () => {
-        // "#2" is read out as "number 2" by some screen readers and as "hash 2"
-        // or skipped entirely by others.
-        renderStats({ rank: ranking })
+    test('each figure keeps its own label, in valid <dl> order', () => {
+        // The figure sits ABOVE its label visually, but a <dl> requires its
+        // <dt> before its <dd> — so the flip has to come from CSS
+        // (column-reverse), never from reordering the markup. This asserts both
+        // halves: the pairing, and the source order that makes it valid.
+        //
+        // An earlier version of this test compared getAllByRole('term') against
+        // getAllByRole('definition') and was hollow: those are two separate
+        // lists, so swapping a dt and dd inside one item left both orders
+        // untouched. Red-check caught it.
+        const { container } = renderStats({ rank: ranking })
 
-        expect(screen.getByText('Number 2')).toBeInTheDocument()
+        const items = Array.from(container.querySelectorAll('.profile-stats__item'))
+        const pairs = items.map(item => {
+            const children = Array.from(item.children)
+            return {
+                label: item.querySelector('dt')?.textContent,
+                value: item.querySelector('dd')?.textContent,
+                termComesFirst: children[0]?.tagName === 'DT'
+            }
+        })
+
+        expect(pairs).toEqual([
+            { label: STATS_POEMS_LABEL, value: '4', termComesFirst: true },
+            { label: STATS_LIKES_LABEL, value: '11', termComesFirst: true },
+            { label: STATS_RANK_LABEL, value: '2', termComesFirst: true }
+        ])
     })
 })

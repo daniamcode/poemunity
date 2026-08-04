@@ -27,6 +27,14 @@ import {
  * NOT from a second request — the two numbers are then the same number by
  * construction, instead of two aggregations that agree until one of them is
  * refetched.
+ *
+ * Each figure sits ABOVE its label rather than across a row from it. The first
+ * version put label and value at opposite ends of the column with
+ * `space-between`, which in a sidebar this narrow reads as a layout fault
+ * rather than a table — and no amount of `tabular-nums` could align a rank
+ * against two plain integers, because `#` is not a digit. Stacking removes the
+ * column that had to be aligned at all, which is why the rank no longer needs
+ * its `#`: the label directly beneath it says what the number is.
  */
 export default function ProfileStats() {
     const context = useContext(AppContext)
@@ -80,16 +88,16 @@ export default function ProfileStats() {
                         <dt className='profile-stats__label'>{STATS_LIKES_LABEL}</dt>
                         <dd className='profile-stats__value'>{stats.likesReceived}</dd>
                     </div>
-                    <div className='profile-stats__item'>
+                    {/* The rank is the one item whose value may be a SENTENCE
+                        rather than a figure, so it carries a modifier that
+                        undoes the large numeric treatment. Without it,
+                        "Outside the top 10" renders at figure size and becomes
+                        the loudest thing in the panel. */}
+                    <div className={`profile-stats__item${rank === null ? ' profile-stats__item--wide' : ''}`}>
                         <dt className='profile-stats__label'>{STATS_RANK_LABEL}</dt>
                         <dd className='profile-stats__value'>
                             {rank !== null
-                                ? (
-                                    <>
-                                        <span aria-hidden='true'>#{rank}</span>
-                                        <span className='sr-only'>{`Number ${rank}`}</span>
-                                    </>
-                                )
+                                ? rank
                                 : (
                                     <span className='profile-stats__value--muted'>
                                         {STATS_RANK_UNRANKED}
