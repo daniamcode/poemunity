@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { useContext } from 'react'
 import Link from 'next/link'
 import Accordion from '../SimpleAccordion'
@@ -36,11 +37,22 @@ function Header() {
             )}
             <div className='header__brand'>
                 <Link href='/' className='header__logo' aria-label='Poemunity home'>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    {/* `next/image`, not `<img>`: the source PNG is 547x120 and
+                        the header draws it at 91x20, so the whole 37 KiB file
+                        was downloaded for about 3% of its pixels, on every page.
+                        Optimised it is a couple of KiB in WebP/AVIF.
+
+                        `priority` because this is in the header and always above
+                        the fold — lazy-loading it would delay the one image a
+                        visitor sees first. Width/height are the intrinsic ratio;
+                        the CSS still sets the drawn height. */}
+                    <Image
                         src='/poemunity-logo.png'
                         alt='Poemunity'
                         className='header__logo-img'
+                        width={274}
+                        height={60}
+                        priority
                     />
                 </Link>
                 <p className='list__presentation'>{getSubtitle()}</p>
@@ -59,11 +71,12 @@ function Header() {
                 {context?.user ? (
                     <Link href='/profile' className='header__profile-picture' aria-label='Your profile'>
                         {context?.picture ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                                 src={context.picture}
                                 alt={context.username}
                                 className='header__profile-img'
+                                width={32}
+                                height={32}
                                 loading='lazy'
                             />
                         ) : (

@@ -161,7 +161,12 @@ describe('Header', () => {
         expect(logoLink).toHaveAttribute('href', '/')
 
         const logoImg = screen.getByRole('img', { name: 'Poemunity' })
-        expect(logoImg).toHaveAttribute('src', '/poemunity-logo.png')
+        // Optimised, not the raw PNG: the source is 547x120 and the header
+        // draws it at 91x20, so shipping the file whole cost 37 KiB on every
+        // page. The old assertion would have forbidden the fix.
+        const logoSrc = logoImg.getAttribute('src') || ''
+        expect(logoSrc).toContain('/_next/image')
+        expect(logoSrc).toContain(encodeURIComponent('/poemunity-logo.png'))
         expect(logoImg).toHaveClass('header__logo-img')
         // The image lives inside the single home link
         expect(logoLink).toContainElement(logoImg)
