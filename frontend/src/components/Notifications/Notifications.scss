@@ -146,8 +146,12 @@
 }
 
 .notification-prefs {
-    margin-top: $space-xl;
-    padding-top: $space-lg;
+    // Same reason as .profile-stats: the parent column is `align-items:
+    // flex-start`, so a section without an explicit width is sized to its
+    // content rather than to the column.
+    width: 100%;
+    margin-top: $space-lg;
+    padding-top: $space-4;
     border-top: 1px solid $color-border-subtle;
 }
 
@@ -160,7 +164,7 @@
 }
 
 .notification-prefs__intro {
-    margin: 0 0 $space-3;
+    margin: 0 0 $space-2;
     color: $color-text-muted;
     font-size: $fs-sm;
 }
@@ -226,7 +230,7 @@
 // by a rule and by muted text: it must not read as another row of controls you
 // simply have not clicked yet.
 .notification-prefs__email {
-    margin-top: $space-4;
+    margin-top: $space-3;
     padding-top: $space-3;
     border-top: 1px dashed $color-border-subtle;
 }

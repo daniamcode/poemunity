@@ -326,9 +326,7 @@ export const NOTIFICATION_PREFS_TITLE = 'Notify me about'
 // "notify me however you notify people", and most sites mean email by that —
 // so without this sentence a poet could reasonably believe these subscribe them
 // to something. They do not: nothing here sends mail.
-export const NOTIFICATION_PREFS_INTRO =
-    'Choose what you want to hear about. These appear in the bell at the top of the page — ' +
-    'nothing is emailed. All are on by default.'
+export const NOTIFICATION_PREFS_INTRO = 'These appear in the bell — nothing is emailed. All on by default.'
 
 // --- Email notifications (not built yet) ---------------------------------
 // Shown as a disabled control rather than omitted, so the absence of email is
@@ -337,8 +335,7 @@ export const NOTIFICATION_PREFS_INTRO =
 // disabled input is skipped by keyboard navigation and a purely visual badge
 // beside it would never be announced.
 export const EMAIL_PREFS_TITLE = 'Email'
-export const EMAIL_PREFS_INTRO =
-    'Not available yet. You are not subscribed to any email, and when this arrives it will be off until you turn it on.'
+export const EMAIL_PREFS_INTRO = 'Not built yet — you are not subscribed to anything.'
 export const EMAIL_PREFS_SOON_BADGE = 'Soon'
 export const EMAIL_DIGEST_LABEL = 'Weekly summary of your notifications'
 /** Appended to the accessible name of every not-yet-built email control. */

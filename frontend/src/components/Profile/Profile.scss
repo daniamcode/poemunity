@@ -727,13 +727,18 @@
 // site's four-way points breakdown was dropped on purpose (see TODO.md), and
 // dressing three integers up as a dashboard would re-import the same problem.
 .profile-stats {
-    margin-top: $space-xl;
-    padding-top: $space-lg;
+    // WIDTH IS LOAD-BEARING. `.profile__user-column` is a flex column with
+    // `align-items: flex-start`, so without this the section is sized to its
+    // content — and the grid below then has ~100px to work with and collapses
+    // to a single column, turning three short figures into three full rows.
+    width: 100%;
+    margin-top: $space-lg;
+    padding-top: $space-4;
     border-top: 1px solid $color-border-subtle;
 }
 
 .profile-stats__title {
-    margin: 0 0 $space-3;
+    margin: 0 0 $space-2;
     font-family: $font-heading;
     font-size: $fs-base;
     font-weight: $fw-bold;
@@ -753,8 +758,8 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
-    gap: $space-3;
+    grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+    gap: $space-3 $space-2;
 }
 
 // Figure ABOVE label. `column-reverse` rather than reordering the markup,
