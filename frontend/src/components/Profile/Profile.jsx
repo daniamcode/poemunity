@@ -44,13 +44,6 @@ export default function Profile() {
                                 <ProfilePicture context={context} />
                                 <UserInfo context={context} />
                                 <ProfileStats />
-                                {/* Preferences live here, in the settings
-                                    column, rather than behind a sixth tab. The
-                                    bell's panel already IS the notifications
-                                    surface — a tab showing the same list would
-                                    add a tab without adding a capability, and
-                                    five is already a lot (see TODO.md). */}
-                                <NotificationPreferences />
                             </div>
                             <ProfileForm
                                 context={context}
@@ -66,6 +59,23 @@ export default function Profile() {
                         </div>
                     </section>
                     <ProfileTabs value={value} handleChange={handleChange} handleChangeIndex={handleChangeIndex} />
+                    {/* BELOW the tabs, not in the settings column beside the
+                        form.
+                        
+                        Six toggles plus the email section made that column
+                        roughly twice the height of the poem form next to it —
+                        a long band of dead space down the right of the page —
+                        and worse, it pushed the TABS below the fold. The tabs
+                        are the profile: your poems, drafts, follows, comments.
+                        Settings you change once a year should not outrank
+                        them, and a reader had no reason to expect anything
+                        below that column at all.
+                        
+                        Still not behind a tab of its own: the bell's panel is
+                        already the notifications surface, and a tab showing
+                        the same list would add a tab without adding a
+                        capability. */}
+                    <NotificationPreferences />
                 </div>
             ) : null}
         </main>
