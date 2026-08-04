@@ -49,7 +49,12 @@ const DEFAULT_AVATAR_SIZE = 44
  * no-picture case and needs no network at all.
  */
 function isRenderableSrc(src: string): boolean {
-    return /^https?:\/\//.test(src) || src.startsWith('/')
+    if (/^https?:\/\//.test(src)) return true
+    // A single leading slash is a root-relative path and is fine. TWO is a
+    // protocol-relative URL, which next/image rejects by name — and
+    // `startsWith('/')` alone happily let those through. Caught by a test, not
+    // by reading the docs.
+    return src.startsWith('/') && !src.startsWith('//')
 }
 
 export function AuthorAvatar({ name, picture, size = DEFAULT_AVATAR_SIZE }: AuthorAvatarProps) {
