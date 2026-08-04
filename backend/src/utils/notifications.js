@@ -43,7 +43,7 @@ function isNotificationEnabled (author, type) {
  * cannot forget: liking your own poem, commenting on it, and the publish fan-out
  * reaching a poet who follows themselves all resolve to the same no-op.
  */
-async function notify ({ recipientId, actorId, type, poemId, recipient: preloaded }) {
+async function notify ({ recipientId, actorId, type, poemId, profileId, recipient: preloaded }) {
   try {
     if (!recipientId || !actorId || !NOTIFICATION_TYPES.includes(type)) return null
 
@@ -67,7 +67,11 @@ async function notify ({ recipientId, actorId, type, poemId, recipient: preloade
       read: false,
       // `poem: null` for a follow, which is what makes follows collapse with
       // each other and never with a poem event.
-      poem: poemId ? new mongoose.Types.ObjectId(String(poemId)) : null
+      poem: poemId ? new mongoose.Types.ObjectId(String(poemId)) : null,
+      // Part of the collapse key for the same reason `poem` is: replies you
+      // receive on two different author pages are two conversations, and
+      // merging them would produce one row pointing at only one of them.
+      profile: profileId ? new mongoose.Types.ObjectId(String(profileId)) : null
     }
 
     const existing = await Notification.findOne(filter)
@@ -166,7 +170,7 @@ async function notifyMany ({ recipientIds, actorId, type, poemId }) {
  * request that unliked the poem, and failing to tidy a notification must not
  * fail the unlike.
  */
-async function retract ({ recipientId, actorId, type, poemId }) {
+async function retract ({ recipientId, actorId, type, poemId, profileId }) {
   try {
     if (!recipientId || !actorId || !NOTIFICATION_TYPES.includes(type)) return null
     if (String(recipientId) === String(actorId)) return null
@@ -175,7 +179,8 @@ async function retract ({ recipientId, actorId, type, poemId }) {
       recipient: new mongoose.Types.ObjectId(String(recipientId)),
       type,
       read: false,
-      poem: poemId ? new mongoose.Types.ObjectId(String(poemId)) : null
+      poem: poemId ? new mongoose.Types.ObjectId(String(poemId)) : null,
+      profile: profileId ? new mongoose.Types.ObjectId(String(profileId)) : null
     })
     if (!existing) return null
 

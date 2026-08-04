@@ -18,7 +18,7 @@ const MAX_LIMIT = 50
 
 const ACTOR_FIELDS = 'name username slug picture type'
 const POEM_FIELDS = 'title slug'
-const RECIPIENT_FIELDS = 'slug'
+const PROFILE_FIELDS = 'slug name username'
 
 function recipientId (req) {
   return new mongoose.Types.ObjectId(String(req.userId))
@@ -50,12 +50,13 @@ notificationsRouter.get('/', userExtractor, async (req, res) => {
       .limit(limit + 1)
       .populate('actors', ACTOR_FIELDS)
       .populate('poem', POEM_FIELDS)
-      // A profile-comment row points at YOUR OWN author page, and the client
-      // cannot work out that URL: it derives a slug from the username, while
-      // the real one comes from the display NAME and carries a numeric suffix
-      // on collision. So the destination is served, not guessed. One extra
-      // populate for the whole page — every row has the same recipient.
-      .populate('recipient', RECIPIENT_FIELDS)
+      // The author page a profile comment or reply happened on. Served, not
+      // derived: the client builds a slug from the username, while the real one
+      // comes from the display NAME and gains a numeric suffix on collision, so
+      // a guessed URL 404s for anyone whose slug was ever contested. It is a
+      // field of its own rather than the recipient, because a reply on somebody
+      // else's page is addressed to you but LIVES on theirs.
+      .populate('profile', PROFILE_FIELDS)
 
     const hasMore = rows.length > limit
     // The probe row is NOT part of the page — returning it would render an

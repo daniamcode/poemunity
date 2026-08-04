@@ -221,7 +221,7 @@ describe('Notifications — triggers', () => {
 
     const res = await auth(request(app).get('/api/v1/notifications'), poet._id).expect(200)
 
-    expect(res.body.notifications[0].recipient.slug).toBe('nadia-novak')
+    expect(res.body.notifications[0].profile.slug).toBe('nadia-novak')
   })
 
   test('a follow tells the followed author', async () => {
@@ -431,7 +431,7 @@ describe('Notifications — preferences', () => {
 
     const res = await auth(request(app).get('/api/v1/notifications/preferences'), insertedId).expect(200)
 
-    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, reply: true, follow: true, newPoem: true })
   })
 
   test('GET /preferences reports every type as on for an author with none stored', async () => {
@@ -439,7 +439,7 @@ describe('Notifications — preferences', () => {
 
     const res = await auth(request(app).get('/api/v1/notifications/preferences'), poet._id).expect(200)
 
-    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: true, comment: true, profileComment: true, reply: true, follow: true, newPoem: true })
   })
 
   test('turning one off silences only that type', async () => {
@@ -477,7 +477,7 @@ describe('Notifications — preferences', () => {
     const res = await auth(request(app).patch('/api/v1/notifications/preferences'), poet._id)
       .send({ like: false, isAdmin: true, nonsense: false }).expect(200)
 
-    expect(res.body).toEqual({ like: false, comment: true, profileComment: true, follow: true, newPoem: true })
+    expect(res.body).toEqual({ like: false, comment: true, profileComment: true, reply: true, follow: true, newPoem: true })
     const fresh = await Author.findById(poet._id)
     expect(fresh.isAdmin).toBeUndefined()
   })
@@ -906,6 +906,117 @@ describe('Notifications — taking a like back takes its notification back', () 
     const rows = await inbox(poet._id)
     expect(rows).toHaveLength(1)
     expect(rows[0].count).toBe(1)
+  })
+})
+
+describe('Notifications — replies', () => {
+  // `parentId` was stored from the very beginning and never read, so a reply to
+  // your comment told you nothing — the same silent shape profile comments had.
+  // These also pin the DEDUPE rule, which is the part that is easy to get wrong:
+  // one comment must never produce two notifications for one person.
+
+  const commentOn = (actorId, targetType, targetId, body, parentId) =>
+    auth(request(app).post('/api/v1/comments'), actorId)
+      .send({ targetType, targetId, body, parentId: parentId || null })
+
+  test('replying to a comment tells its author', async () => {
+    const { poet, ada, milo, poem } = await seed()
+    const first = await commentOn(ada._id, 'poem', String(poem._id), 'lovely').expect(201)
+
+    await commentOn(milo._id, 'poem', String(poem._id), 'agreed', first.body.id).expect(201)
+
+    const rows = await inbox(ada._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].type).toBe('reply')
+    expect(String(rows[0].poem)).toBe(String(poem._id))
+    void poet
+  })
+
+  test('the poem author is told separately, as a comment', async () => {
+    const { poet, ada, milo, poem } = await seed()
+    const first = await commentOn(ada._id, 'poem', String(poem._id), 'lovely').expect(201)
+
+    await commentOn(milo._id, 'poem', String(poem._id), 'agreed', first.body.id).expect(201)
+
+    expect((await inbox(poet._id)).map(r => r.type)).toEqual(['comment'])
+    expect((await inbox(ada._id)).map(r => r.type)).toEqual(['reply'])
+  })
+
+  test('ONE person is never told twice about one comment', async () => {
+    // Replying to the poet on the poet's own poem: they are both the thread
+    // owner and the parent author. Two notifications for one comment is the
+    // bug this rule exists to prevent; the reply is the more specific one.
+    const { poet, ada, poem } = await seed()
+    const own = await commentOn(poet._id, 'poem', String(poem._id), 'a note on my own poem').expect(201)
+
+    await commentOn(ada._id, 'poem', String(poem._id), 'replying to you', own.body.id).expect(201)
+
+    const rows = await inbox(poet._id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].type).toBe('reply')
+  })
+
+  test('replying to yourself tells nobody', async () => {
+    const { poet, ada, poem } = await seed()
+    const first = await commentOn(ada._id, 'poem', String(poem._id), 'lovely').expect(201)
+    await auth(request(app).post('/api/v1/notifications/read'), poet._id).send({}).expect(200)
+
+    await commentOn(ada._id, 'poem', String(poem._id), 'and another thing', first.body.id).expect(201)
+
+    expect(await inbox(ada._id)).toHaveLength(0)
+  })
+
+  test('a parentId from ANOTHER thread notifies nobody about it', async () => {
+    // Otherwise a crafted parentId pulls a stranger into a conversation they
+    // are not in — the comment equivalent of a client-supplied scope.
+    const { poet, ada, milo, poem } = await seed()
+    const other = await Poem.create({
+      title: 'Elsewhere', slug: 'elsewhere', poem: 'w', genre: 'love', authorId: poet._id, origin: 'user', date: new Date()
+    })
+    const strangerComment = await commentOn(ada._id, 'poem', String(other._id), 'over here').expect(201)
+    await auth(request(app).post('/api/v1/notifications/read'), ada._id).send({}).expect(200)
+
+    await commentOn(milo._id, 'poem', String(poem._id), 'forged parent', strangerComment.body.id).expect(201)
+
+    expect(await inbox(ada._id)).toHaveLength(0)
+  })
+
+  test('a reply on an author page links to THAT page, not to yours', async () => {
+    // The reason `profile` is a field of its own: the thread is on the page
+    // owner's profile, and the recipient is only in it.
+    const { poet, ada, milo } = await seed()
+    const first = await commentOn(ada._id, 'profile', String(poet._id), 'hello').expect(201)
+
+    await commentOn(milo._id, 'profile', String(poet._id), 'hi back', first.body.id).expect(201)
+
+    const res = await auth(request(app).get('/api/v1/notifications'), ada._id).expect(200)
+    const row = res.body.notifications.find(n => n.type === 'reply')
+    expect(row.profile.slug).toBe('nadia-novak')
+  })
+
+  test('replies on two different pages do not collapse into one row', async () => {
+    // They are two conversations. Merged, one row would point at only one page.
+    const { poet, ada, milo } = await seed()
+    const onPoet = await commentOn(ada._id, 'profile', String(poet._id), 'hello').expect(201)
+    const onMilo = await commentOn(ada._id, 'profile', String(milo._id), 'hello there').expect(201)
+
+    await commentOn(milo._id, 'profile', String(poet._id), 'reply A', onPoet.body.id).expect(201)
+    await commentOn(poet._id, 'profile', String(milo._id), 'reply B', onMilo.body.id).expect(201)
+
+    const rows = (await inbox(ada._id)).filter(r => r.type === 'reply')
+    expect(rows).toHaveLength(2)
+  })
+
+  test('turning replies off silences them and nothing else', async () => {
+    const { poet, ada, milo, poem } = await seed()
+    await Author.findByIdAndUpdate(ada._id, { $set: { 'notificationPrefs.reply': false } })
+    const first = await commentOn(ada._id, 'poem', String(poem._id), 'lovely').expect(201)
+
+    await commentOn(milo._id, 'poem', String(poem._id), 'agreed', first.body.id).expect(201)
+
+    expect(await inbox(ada._id)).toHaveLength(0)
+    // The poem author still hears about it.
+    expect((await inbox(poet._id)).map(r => r.type)).toEqual(['comment'])
   })
 })
 

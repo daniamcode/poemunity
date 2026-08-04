@@ -355,6 +355,7 @@ export const NOTIFICATION_PREF_LABELS = {
     // "my page", not "my profile": /profile is the private settings screen, and
     // the comment appears on the PUBLIC author page. Two different places.
     profileComment: 'Comments on my author page',
+    reply: 'Replies to my comments',
     follow: 'New followers',
     newPoem: 'New poems from poets I follow'
 }

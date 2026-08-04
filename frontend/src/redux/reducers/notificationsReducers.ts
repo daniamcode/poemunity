@@ -21,19 +21,20 @@ export interface NotificationActor {
 
 export interface NotificationRow {
     id: string
-    type: 'like' | 'comment' | 'profileComment' | 'follow' | 'newPoem'
+    type: 'like' | 'comment' | 'profileComment' | 'reply' | 'follow' | 'newPoem'
     actors: NotificationActor[]
     /** DISTINCT actors, which is NOT actors.length once the array hits its cap. */
     count: number
     poem?: { id: string; title?: string; slug?: string } | null
     read: boolean
     /**
-     * YOUR OWN author page, served rather than derived. The client builds a
-     * slug from the username, but the real one comes from the display name and
-     * gains a numeric suffix on collision — a guessed URL 404s for anyone whose
-     * slug was ever contested. Only profileComment rows need it.
+     * The author page a profile comment or reply happened on. Served rather
+     * than derived: the client builds a slug from the username, but the real
+     * one comes from the display name and gains a numeric suffix on collision.
+     * NOT the recipient — a reply on somebody else's page is addressed to you
+     * but lives on theirs.
      */
-    recipient?: { slug?: string }
+    profile?: { slug?: string; name?: string; username?: string }
     updatedAt: string
     createdAt: string
 }
@@ -137,6 +138,7 @@ export interface NotificationPreferences {
     like: boolean
     comment: boolean
     profileComment: boolean
+    reply: boolean
     follow: boolean
     newPoem: boolean
 }

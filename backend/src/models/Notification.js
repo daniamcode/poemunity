@@ -12,7 +12,11 @@ const NOTIFICATION_TYPE = {
   // dropped rather than misrouted as a poem comment. That left it notifying
   // NOBODY — somebody writes on your profile and you never learn. Reported from
   // production, 2026-08-04.
-  PROFILE_COMMENT: 'profileComment'
+  PROFILE_COMMENT: 'profileComment',
+  // Somebody answered a comment YOU wrote, anywhere — including on a poem that
+  // is not yours. `parentId` was stored from the beginning and never used to
+  // notify, so this was silent in exactly the way profile comments were.
+  REPLY: 'reply'
 }
 
 const NOTIFICATION_TYPES = Object.values(NOTIFICATION_TYPE)
@@ -49,8 +53,16 @@ const notificationSchema = new Schema({
   // two deliberately disagree and the count is the honest one.
   count: { type: Number, default: 1 },
 
-  // The poem this is about, for every type except `follow`.
+  // The poem this is about, for every type except `follow` and the profile ones.
   poem: { type: Schema.Types.ObjectId, ref: 'Poem' },
+
+  // The AUTHOR PAGE this is about, for comments and replies on a profile.
+  //
+  // Not derivable from `recipient`: for a profileComment the target and the
+  // recipient are the same author, but for a REPLY on somebody else's page they
+  // are not — the thread is on their page, and you are only in it. Storing the
+  // destination is the only way the row can link where the conversation is.
+  profile: { type: Schema.Types.ObjectId, ref: 'Author' },
 
   read: { type: Boolean, default: false },
 

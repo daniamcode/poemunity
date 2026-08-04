@@ -30,6 +30,7 @@ const authorSchema = new Schema({
     like: { type: Boolean, default: true },
     comment: { type: Boolean, default: true },
     profileComment: { type: Boolean, default: true },
+    reply: { type: Boolean, default: true },
     follow: { type: Boolean, default: true },
     newPoem: { type: Boolean, default: true }
   },

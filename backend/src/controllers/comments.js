@@ -167,44 +167,70 @@ commentsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     await comment.save()
     await comment.populate('authorId', AUTHOR_FIELDS)
 
-    // Both kinds of comment notify, but they are DIFFERENT events with
-    // different recipients: a poem comment goes to the poem's author, a profile
-    // comment to the author whose page it is.
+    // WHO GETS TOLD ABOUT ONE COMMENT.
     //
-    // Profile comments notified nobody until 2026-08-04. `targetId` is an
-    // author id, not a poem id, so looking it up as a poem found nothing — the
-    // event was dropped rather than misrouted, which was right, but the "tell
-    // them properly later" half never happened. Somebody wrote on your profile
-    // and you never learned. Reported from the live site.
+    // Up to two people, never the same person twice:
+    //   - the OWNER of the thing commented on (poem author, or page owner);
+    //   - the author of the comment being REPLIED to, if there is one.
+    //
+    // When those are the same person — you reply to somebody on their own poem
+    // — they get the reply notification only. Sending both would be two rows
+    // for one comment, and the reply is the more specific of the two.
+    //
+    // Profile comments notified nobody until 2026-08-04, and replies until
+    // shortly after: `targetId` is an author id and `parentId` was stored but
+    // never read, so both were silent rather than wrong.
+    let ownerId = null
+    let poemId = null
+    let profileId = null
+
     if (mongoose.Types.ObjectId.isValid(targetId)) {
       if (targetType === 'poem') {
         const poem = await Poem.findById(targetId).select('authorId')
         if (poem) {
-          await notify({
-            recipientId: poem.authorId,
-            actorId: req.userId,
-            type: NOTIFICATION_TYPE.COMMENT,
-            poemId: poem._id
-          })
+          ownerId = poem.authorId
+          poemId = poem._id
         }
       } else if (targetType === 'profile') {
-        // The target IS the recipient: a profile comment is addressed to the
-        // author whose page it is on. It carries no `poemId`, which is also
-        // what makes profile comments collapse with each other and never with
-        // a poem event — the same shape as a follow.
-        //
         // `exists` rather than a full read: nothing about the author is needed
-        // beyond "is this a real one", and notify() loads their preferences
-        // itself.
+        // beyond "is this a real one", and notify() loads preferences itself.
         const target = await Author.exists({ _id: targetId })
         if (target) {
-          await notify({
-            recipientId: targetId,
-            actorId: req.userId,
-            type: NOTIFICATION_TYPE.PROFILE_COMMENT
-          })
+          ownerId = targetId
+          profileId = targetId
         }
       }
+    }
+
+    // The parent must belong to the SAME thread. A `parentId` naming a comment
+    // on another poem would otherwise notify a stranger about a conversation
+    // they are not in.
+    let parentAuthorId = null
+    if (parentId && mongoose.Types.ObjectId.isValid(parentId)) {
+      const parent = await Comment.findById(parentId).select('authorId targetId targetType')
+      if (parent && String(parent.targetId) === String(targetId) && parent.targetType === targetType) {
+        parentAuthorId = parent.authorId
+      }
+    }
+
+    if (parentAuthorId) {
+      await notify({
+        recipientId: parentAuthorId,
+        actorId: req.userId,
+        type: NOTIFICATION_TYPE.REPLY,
+        poemId,
+        profileId
+      })
+    }
+
+    if (ownerId && String(ownerId) !== String(parentAuthorId)) {
+      await notify({
+        recipientId: ownerId,
+        actorId: req.userId,
+        type: targetType === 'poem' ? NOTIFICATION_TYPE.COMMENT : NOTIFICATION_TYPE.PROFILE_COMMENT,
+        poemId,
+        profileId
+      })
     }
 
     res.status(201).json(comment)

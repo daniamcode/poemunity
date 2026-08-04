@@ -49,6 +49,11 @@ export function notificationMessage(row: NotificationRow): string {
         case 'comment':
             // "commented on" reads wrong for a group; "left comments on" does not.
             return plural ? `${who} left comments on your poem` : `${who} commented on your poem`
+        case 'reply':
+            // "replied to you", not "replied to your comment" — shorter, and a
+            // reply can only be to a comment here. No plural form: "Ada and 2
+            // others replied to you" is already what `who` produces.
+            return `${who} replied to you`
         case 'profileComment':
             // "your page", not "your profile": /profile is the private settings
             // screen, and this comment is on the PUBLIC author page.
@@ -70,8 +75,11 @@ export function notificationHref(row: NotificationRow): string | null {
     // from the username, because the real one comes from the display name and
     // gains a numeric suffix on collision — a guess 404s for anyone whose slug
     // was ever contested.
-    if (row.type === 'profileComment') {
-        return row.recipient?.slug ? `/authors/${row.recipient.slug}` : null
+    // A profile comment, or a reply in a thread on somebody's author page.
+    // `profile` is the page the conversation is ON, which for a reply is not
+    // necessarily yours.
+    if (row.type === 'profileComment' || (row.type === 'reply' && !row.poem)) {
+        return row.profile?.slug ? `/authors/${row.profile.slug}` : null
     }
     if (row.type === 'follow') {
         const actor = (row.actors || [])[0]

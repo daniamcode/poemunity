@@ -215,7 +215,7 @@ describe('profile comments', () => {
     const profileRow = (over: any = {}) => row({
         type: 'profileComment',
         poem: undefined,
-        recipient: { slug: 'nadia-novak' },
+        profile: { slug: 'nadia-novak' },
         ...over
     } as never)
 
@@ -247,6 +247,45 @@ describe('profile comments', () => {
     })
 
     test('renders inert rather than guessing a URL when no slug was served', () => {
-        expect(notificationHref(profileRow({ recipient: undefined }))).toBeNull()
+        expect(notificationHref(profileRow({ profile: undefined }))).toBeNull()
+    })
+})
+
+
+describe('replies', () => {
+    const replyRow = (over: any = {}) => row({ type: 'reply', ...over } as never)
+
+    test('says who replied, without naming what they replied to', () => {
+        expect(notificationMessage(replyRow())).toBe('Ada Brine replied to you')
+    })
+
+    test('several repliers read naturally without a plural form', () => {
+        // `actorSummary` already carries the plurality — a separate plural
+        // sentence would say "and 2 others replied to you" twice over.
+        expect(notificationMessage(replyRow({
+            actors: [actor('a1', 'Ada Brine'), actor('a2', 'Milo Vex')],
+            count: 4
+        }))).toBe('Ada Brine, Milo Vex and 2 others replied to you')
+    })
+
+    test('a reply on a POEM links to the poem', () => {
+        expect(notificationHref(replyRow())).toBe('/detail/aubade-nadia')
+    })
+
+    test('a reply on an AUTHOR PAGE links to that page, not to the replier', () => {
+        // The distractor: it is the only row type with both a possible profile
+        // and an actor, and linking to the actor sends you to the wrong page.
+        const href = notificationHref(replyRow({
+            poem: undefined,
+            profile: { slug: 'nadia-novak' },
+            actors: [actor('a1', 'Milo Vex', { slug: 'milo-vex' })]
+        }))
+
+        expect(href).toBe('/authors/nadia-novak')
+        expect(href).not.toContain('milo-vex')
+    })
+
+    test('a reply with neither poem nor profile renders inert', () => {
+        expect(notificationHref(replyRow({ poem: undefined, profile: undefined }))).toBeNull()
     })
 })

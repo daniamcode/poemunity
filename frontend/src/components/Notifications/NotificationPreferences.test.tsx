@@ -262,8 +262,8 @@ describe('NotificationPreferences', () => {
         test('does not disturb the working toggles', () => {
             renderPrefs()
 
-            // Five real preferences plus the disabled email one.
-            expect(screen.getAllByRole('checkbox')).toHaveLength(6)
+            // Six real preferences plus the disabled email one.
+            expect(screen.getAllByRole('checkbox')).toHaveLength(7)
             expect(box('like')).toBeEnabled()
             expect(box('like')).toBeChecked()
         })
