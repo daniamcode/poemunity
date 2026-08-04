@@ -236,6 +236,15 @@ export const PROFILE_FAVOURITE_POEMS = 'My favourite poems'
 export const PROFILE_DRAFTS = 'Drafts'
 export const PROFILE_FOLLOWING = 'Following'
 export const PROFILE_FOLLOWERS = 'Followers'
+// "My comments", the sixth tab. Named for what it holds rather than "Activity":
+// your poems and the poems you liked already have tabs of their own, so a tab
+// promising activity would mostly repeat them. Comments were the one thing you
+// could write and then never find again.
+export const PROFILE_COMMENTS = 'My comments'
+export const MY_COMMENTS_EMPTY = 'You have not commented on anything yet.'
+export const MY_COMMENTS_LOAD_MORE = 'Show more'
+export const MY_COMMENTS_ON_POEM = 'on'
+export const MY_COMMENTS_ON_PROFILE = 'on the profile of'
 // Follow / followers.
 // The button says "Following" while hovered/focused it says "Unfollow": the
 // resting label states the CURRENT state (which is what a reader needs), and

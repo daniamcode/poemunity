@@ -4,7 +4,8 @@ const Comment = require('../models/Comment')
 const Poem = require('../models/Poem')
 const userExtractor = require('../middleware/userExtractor')
 const requireVerified = require('../middleware/requireVerified')
-const { isDraft } = require('../utils/poemVisibility')
+const { isDraft, PUBLISHED_MATCH } = require('../utils/poemVisibility')
+const Author = require('../models/Author')
 const { notify, NOTIFICATION_TYPE } = require('../utils/notifications')
 
 // `type` rides along so the UI can mark AI-authored comments as such.
@@ -14,6 +15,106 @@ const getAdminId = () =>
   process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_ADMIN_PRE
     : process.env.REACT_APP_ADMIN
+
+const MY_COMMENTS_DEFAULT_LIMIT = 10
+const MY_COMMENTS_MAX_LIMIT = 50
+
+// GET /api/v1/comments/mine — the profile's "My comments" tab.
+//
+// Declared before any parameterised route so the literal path wins the match.
+//
+// Scoped by `req.userId`, never by a query parameter. Comments are public
+// content, so this is not hiding anything — but "my comments" scoped by
+// something the client names is the shape of a list that later becomes
+// "anyone's comments" by accident.
+//
+// WHY THE TARGETS ARE RESOLVED BY HAND. `targetId` is a bare ObjectId with no
+// `ref`, because `targetType` decides which collection it points at — so
+// `.populate()` cannot follow it. Two extra queries, one per collection,
+// batched by id: not one per comment.
+//
+// A comment whose target is GONE OR NO LONGER PUBLIC is dropped rather than
+// listed. Its poem may have been deleted or withdrawn to a draft, and a row
+// linking to a 404 is worse than no row — the same reason `PUBLISHED_MATCH`
+// composes into every other public read.
+commentsRouter.get('/mine', userExtractor, async (req, res) => {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1)
+    const limit = Math.min(parseInt(req.query.limit) || MY_COMMENTS_DEFAULT_LIMIT, MY_COMMENTS_MAX_LIMIT)
+
+    // One row more than the page answers "is there another page" without a
+    // second countDocuments — same trade as the notifications list.
+    const rows = await Comment.find({ authorId: req.userId })
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit + 1)
+
+    const hasMore = rows.length > limit
+    const page_ = hasMore ? rows.slice(0, limit) : rows
+
+    const poemIds = page_.filter(c => c.targetType === 'poem').map(c => c.targetId)
+    const authorIds = page_.filter(c => c.targetType === 'profile').map(c => c.targetId)
+
+    const [poems, authors] = await Promise.all([
+      poemIds.length
+        ? Poem.find({ _id: { $in: poemIds }, ...PUBLISHED_MATCH })
+            .select('title slug authorId')
+            .populate('authorId', 'name username slug')
+        : [],
+      authorIds.length
+        ? Author.find({ _id: { $in: authorIds } }).select('name username slug')
+        : []
+    ])
+
+    const poemById = new Map(poems.map(p => [String(p._id), p]))
+    const authorById = new Map(authors.map(a => [String(a._id), a]))
+
+    const comments = page_
+      .map(comment => {
+        const key = String(comment.targetId)
+        if (comment.targetType === 'poem') {
+          const poem = poemById.get(key)
+          if (!poem) return null
+          return {
+            id: String(comment._id),
+            body: comment.body,
+            createdAt: comment.createdAt,
+            targetType: 'poem',
+            poem: {
+              id: String(poem._id),
+              title: poem.title,
+              slug: poem.slug,
+              author: poem.authorId
+                ? {
+                    name: poem.authorId.name || poem.authorId.username,
+                    slug: poem.authorId.slug
+                  }
+                : null
+            }
+          }
+        }
+
+        const author = authorById.get(key)
+        if (!author) return null
+        return {
+          id: String(comment._id),
+          body: comment.body,
+          createdAt: comment.createdAt,
+          targetType: 'profile',
+          author: {
+            name: author.name || author.username,
+            slug: author.slug
+          }
+        }
+      })
+      .filter(Boolean)
+
+    res.json({ comments, page, limit, hasMore })
+  } catch (error) {
+    console.error('My comments error:', error)
+    res.status(500).json({ error: 'Failed to load comments' })
+  }
+})
 
 // GET /api/v1/comments?targetType=poem&targetId=xxx
 // GET /api/v1/comments?since=<ISO timestamp>  (simulation script use)

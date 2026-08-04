@@ -10,7 +10,8 @@ import {
     PROFILE_FAVOURITE_POEMS,
     PROFILE_DRAFTS,
     PROFILE_FOLLOWING,
-    PROFILE_FOLLOWERS
+    PROFILE_FOLLOWERS,
+    PROFILE_COMMENTS
 } from '../../../data/constants'
 
 jest.mock('../../../utils/notifications')
@@ -71,9 +72,11 @@ const renderTabs = (value: number) =>
 describe('Profile follow tabs', () => {
     beforeEach(() => jest.clearAllMocks())
 
-    test('renders all five tabs, Following before Followers', () => {
-        // Following is the list you curated and act on; Followers is the one
-        // that happens to you.
+    test('renders all six tabs, in order', () => {
+        // Following before Followers: the first is the list you curated and act
+        // on, the second is one that happens to you. My comments LAST — it is
+        // the newest and the least often wanted, and the order of the five
+        // before it is muscle memory for anyone already using the site.
         renderTabs(0)
 
         expect(screen.getAllByRole('tab').map(t => t.textContent)).toEqual([
@@ -81,7 +84,8 @@ describe('Profile follow tabs', () => {
             PROFILE_FAVOURITE_POEMS,
             PROFILE_DRAFTS,
             PROFILE_FOLLOWING,
-            PROFILE_FOLLOWERS
+            PROFILE_FOLLOWERS,
+            PROFILE_COMMENTS
         ])
     })
 

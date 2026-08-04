@@ -8,12 +8,14 @@ import {
     PROFILE_FAVOURITE_POEMS,
     PROFILE_DRAFTS,
     PROFILE_FOLLOWING,
-    PROFILE_FOLLOWERS
+    PROFILE_FOLLOWERS,
+    PROFILE_COMMENTS
 } from '../../../data/constants'
 import MyPoems from '../../MyPoems/MyPoems'
 import MyFavouritePoems from '../../MyFavouritePoems/MyFavouritePoems'
 import MyDrafts from '../../MyDrafts/MyDrafts'
 import { MyFollowing, MyFollowers } from '../../Follow/MyFollows'
+import MyComments from './MyComments'
 import TabPanel, { a11yProps } from './TabPanel'
 
 interface ProfileTabsProps {
@@ -49,6 +51,12 @@ function ProfileTabs({ value, handleChange }: ProfileTabsProps) {
                             to you. */}
                         <Tab label={PROFILE_FOLLOWING} {...a11yProps(3)} />
                         <Tab label={PROFILE_FOLLOWERS} {...a11yProps(4)} />
+                        {/* LAST, and named for what it holds. Your poems and
+                            the poems you liked already have tabs, so an
+                            "Activity" tab would mostly repeat them; comments
+                            were the one thing you could write and then never
+                            find again. */}
+                        <Tab label={PROFILE_COMMENTS} {...a11yProps(5)} />
                     </Tabs>
                 </AppBar>
             </div>
@@ -70,6 +78,9 @@ function ProfileTabs({ value, handleChange }: ProfileTabsProps) {
                 </TabPanel>
                 <TabPanel className='profile__myPoems' value={value} index={4} dir={theme.direction}>
                     <MyFollowers />
+                </TabPanel>
+                <TabPanel className='profile__myPoems' value={value} index={5} dir={theme.direction}>
+                    <MyComments />
                 </TabPanel>
             </div>
         </section>

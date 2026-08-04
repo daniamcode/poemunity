@@ -23,6 +23,8 @@ export const API_ENDPOINTS = {
     NOTIFICATIONS_READ: '/api/v1/notifications/read',
     NOTIFICATION_PREFERENCES: '/api/v1/notifications/preferences',
     COMMENTS: '/api/v1/comments',
+    // The "My comments" tab. Session-scoped, so it takes no author parameter.
+    COMMENTS_MINE: '/api/v1/comments/mine',
     // Two numbers for the profile stats panel. The RANK it shows is not here —
     // it comes from POEMS_RANKING, already fetched once app-wide, so the panel
     // and the public sidebar cannot disagree.

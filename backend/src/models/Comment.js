@@ -14,6 +14,16 @@ const commentSchema = new Schema({
   }
 }, { timestamps: true })
 
+// The "My comments" tab: one author's comments, newest first.
+//
+// `createdAt` and not `updatedAt` — a comment has no collapse behaviour and an
+// edit should not jump it to the top of your own history. `_id` tie-breaks for
+// the reason it does everywhere else here: comments written in one batch (the
+// AI seed writes hundreds) share a timestamp to the millisecond, and a
+// paginated sort with arbitrary ties repeats rows across page boundaries while
+// dropping others.
+commentSchema.index({ authorId: 1, createdAt: -1, _id: -1 })
+
 commentSchema.set('toJSON', {
   transform: (doc, ret) => {
     ret.id = ret._id

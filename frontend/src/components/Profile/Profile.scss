@@ -806,3 +806,68 @@
     line-height: 1.35;
     color: $color-text-muted;
 }
+
+// "My comments". The comment body leads and the target follows in smaller
+// muted text: you recognise your own words faster than a poem title, and the
+// title is what you click once you have.
+.my-comments__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.my-comments__item {
+    padding: $space-3 0;
+    border-bottom: 1px solid $color-border-subtle;
+}
+
+.my-comments__body {
+    margin: 0 0 $space-1;
+    color: $color-text-dark;
+    // Comments are free text and can be a single unbroken string.
+    overflow-wrap: anywhere;
+}
+
+.my-comments__meta {
+    margin: 0;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+}
+
+.my-comments__target {
+    color: $color-primary;
+    font-weight: $fw-bold;
+
+    &:hover,
+    &:focus-visible {
+        text-decoration: underline;
+    }
+}
+
+.my-comments__time {
+    display: block;
+    margin-top: 2px;
+    font-size: $fs-xs;
+    color: $color-text-muted;
+}
+
+.my-comments__empty {
+    margin: $space-4 0;
+    color: $color-text-muted;
+    text-align: center;
+}
+
+.my-comments__more {
+    display: block;
+    margin: $space-4 auto 0;
+    padding: $space-2 $space-4;
+    border: 1px solid $color-border-subtle;
+    border-radius: $radius-sm;
+    background: none;
+    color: $color-primary;
+    cursor: pointer;
+
+    &:hover {
+        background-color: $color-primary-bg;
+    }
+}

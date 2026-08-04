@@ -669,247 +669,46 @@ investigation did surface three real things:
 
 ## ✅ Recently shipped (context — do not re-add)
 
-- **Notification and performance work** (2026-08-04). A day of fixes on top of
-  the notifications feature, most of them found by looking at the running site
-  rather than by the suite.
-  - **Mark-read never sent its request.** `markNotificationsReadAction` passed
-    `options: { fetch: false }` to `postAction`, meaning "run the request but
-    keep the response out of the LIST reducer". That flag skips the entire
-    `if (options.fetch)` block — the axios call included — so nothing was ever
-    marked read and the badge never cleared, for anyone, for every notification
-    type. Now a bare request, like `fetchUnreadCountAction`. On failure the
-    badge is left showing its real number rather than zeroed.
-  - **Mark-read is now chained to the list's success callback.** Both were
-    dispatched together, so once the request actually fired the mark-read could
-    land first and the list would return every row already `read: true`,
-    erasing the what's-new distinction the panel is opened to see.
-  - **Unliking retracts its notification**, while the row is still unread.
-  - **Timestamps on every row**, from `updatedAt` (not `createdAt` — a collapse
-    updates in place and the list is ordered by `updatedAt`).
-  - **Page size 10, and one query instead of two.** The list ran a
-    `countDocuments` beside the `find` purely to compute `hasMore`. It now asks
-    for one row more than the page. `total`/`totalPages` are gone from the
-    response and the client state.
-  - **Fan-out preferences fetched once**, not per follower: publishing went from
-    3 serial round trips per follower to 1 + 2N.
-  - **Redundant `recipient_1` index removed from the schema** — a strict prefix
-    of both compound indexes. Still present in Atlas; see Verification debt.
-  - **Author listings count by grouping poems**, on the two unfiltered paths:
-    98ms → 43ms and 99ms → 46ms at 3,300 authors / 16,000 poems. `?letter=`
-    deliberately keeps the per-author `$lookup`, where it is 8x FASTER — do not
-    unify them.
-  - **Preference checkboxes are independent and optimistic.** Every input
-    carried `disabled={query.isFetching}`, one flag for the whole query, so
-    saving one greyed out all four; and the tick waited for the round-trip.
-  - **The stats panel refreshes** after create / delete / publish / withdraw —
-    the mutations that adopt a fresh ranking are the ones that change your
-    stats. Liking is the deliberate exception.
-  - **Email announced as coming**, disabled and bound to no state, with the
-    in-app intro stating outright that nothing is emailed.
-  - **`?letter=` regex escaped** — see the Security section note.
-  - **Layout**: the stats grid was collapsing to one column because
-    `.profile__user-column` is `align-items: flex-start` and the section had no
-    width; checkboxes were the only unstyled form controls on the site.
+**One line each, by design.** The reasoning that outlives the change lives in
+`AGENTS.md`; this list exists only so nobody proposes the work again.
 
-  **Test lessons from that day, worth more than the fixes.** Seven tests were
-  hollow and found by red-check, all the same mistake: asserting the ABSENCE of
-  something, when absence is also what the bug produces. Asserting the presence
-  of a specific otherwise-impossible result is what distinguishes. Also:
-  `redux-mock-store` runs no reducers, so a test that clicks and then asserts on
-  a query flag can never see that flag change; `Author.create` persists schema
-  defaults, so "no preferences stored" fixtures must go through the raw driver;
-  and a destructuring default fires on an explicit `undefined`, silently
-  restoring the populated fixture.
-
-  Two new guards for the class of bug, not the instance:
-  `src/__tests__/notificationsFlow.integration.test.tsx` (real thunks and
-  reducers, only axios mocked, assertions about THE WIRE) and
-  `src/redux/actions/fetchFlagUsage.test.ts` (`fetch: false` must always be
-  paired with `reset: true`).
-
-- **Drafts — private poems before publishing** (2026-07-31, P2.5 item 1).
-  `Poem.status: 'draft' | 'published'`, **defaulted, never backfilled**: the
-  ~16k existing poems carry no `status` at all, and every read treats a missing
-  one as published, so shipping this required no production write. Visibility is
-  ONE fragment — `PUBLISHED_MATCH` / `publishedOnly()` in
-  `backend/src/utils/poemVisibility.js` — composed by every public read path, an
-  allowlist (`$in: ['published', null]`) rather than `$ne: 'draft'` so a status
-  added later is invisible by default. `src/__tests__/drafts.test.js` enumerates
-  the public endpoints in a table, so a route that forgets the filter fails a
-  test instead of leaking. A **Drafts** tab on the profile (`?status=draft`,
-  scoped by the SESSION, never by a query param), "Save as draft" on the create
-  form, and publish/withdraw as a `PATCH { status }` that returns a recomputed
-  ranking (publishing changes the author's poem count, so it changes points).
-
-- **Cypress suite repaired: 34/34, five consecutive clean runs** (2026-07-30),
-  up from 1 passing. Three root causes, none of them a stale assertion:
-  the `window.Cypress` branch in `axiosInstance` that made the suite test an app
-  that does not ship; an E2E environment inherited from a developer's `.env`; and
-  two genuine app bugs (below). Now runs in CI as its own workflow,
-  `.github/workflows/e2e.yml`.
-
-- **Hydration mismatch on `/profile`** (2026-07-30). Every load threw "Hydration
-  failed because the initial UI does not match what was rendered on the server"
-  and re-rendered the whole page client-side, losing the SSR benefit. Cause:
-  `TabPanel` wrapped its children in MUI `<Typography>`, which renders a `<p>` —
-  and the children are the poem list: divs, sections, an `<svg>`. The HTML parser
-  closes an open `<p>` when it meets flow content, so the DOM the browser built
-  from the SSR html could not match the tree React was hydrating. Fixed by
-  dropping the wrapper (`Typography` is for text).
-  **Correction to an earlier note in this file:** invalid nesting *was* the cause.
-  It had been "ruled out" by re-parsing the server HTML with `DOMParser` and
-  comparing tag+class+depth against the live DOM — that comparison is worthless
-  here, because by the time you run it React has already recovered by
-  **client-rendering the whole page**, and a client render builds div-inside-p
-  happily through the DOM API. Both trees end up identical. What actually found it
-  was bisection against a 1-second Cypress probe: delete half the tree, re-run,
-  repeat. `TabPanel.test.tsx` now guards the shape (no `<p>` ancestor around
-  flow content) — jsdom can never catch the symptom, since it does not parse
-  server HTML.
-
-- **Comment delete "×" was unclickable on wide screens** (2026-07-30). Between
-  `$bp-xl` (1200px) and ~1310px the comments section — `width: 90vw`, capped at
-  800px — was wider than the poem page's centre column (~58vw once the rail and
-  its counterweight take their share), so it overflowed to the right and slid
-  UNDER `.poem-page::after`. That pseudo-element is the empty counterweight that
-  keeps the poem centred, it paints after its siblings, and it swallowed the
-  click. Nobody could delete their own comment at those widths. Fixed both ends:
-  `width: min(90vw, 100%)` keeps the section inside its column, and the
-  counterweight is now `pointer-events: none` because presentational space should
-  never be able to take a click. **Found by `comments.cy.ts`** — lint, typecheck
-  and 990 jest tests were all green through it, which is the whole argument for
-  having a browser in CI.
-
-- **Poem text cleanup** (2026-07-30): scraper artifacts removed from production —
-  **1,962 titles** cleaned (trailing "Launch Audio in a New Window", raw newlines,
-  double spaces), **885 bodies** and 69 titles had HTML entities decoded
-  (`&amp;` 5,418 · `&gt;` 49 · `&lt;` 24), **1,433 slugs** regenerated with 14
-  collisions suffixed. Old slugs live on in `Poem.slugHistory` and
-  `GET /poem/:idOrSlug` falls back to them, so nothing 404s; the page
-  canonicalises to the new slug. Re-runnable: `backend/scripts/clean-poem-text.js`
-  is dry-run by default. The sitemap needed no change — it is generated from the
-  API and picks up new slugs within its 24h CDN cache.
-  **Lesson worth keeping:** the migration was canaried with `--commit --limit 1`
-  first, which caught that the commit adding the `slugHistory` fallback had never
-  deployed (Vercel showed the previous commit as the latest backend build). Had
-  the full run gone ahead, 1,433 live URLs would have 404'd at once.
-
-- **Next-poem index + orphan cleanup** (2026-07-30): `{ authorId: 1, date: -1,
-  _id: -1 }` on `poems` was **already live** — `autoIndex` is on (`mongo.js` sets
-  no `autoIndex: false`), so it built itself on deploy. The earlier TODO claiming
-  it was schema-only and that autoIndex could not be relied on was wrong. The
-  check also found two **orphans** left by the next-poem simplification
-  (`genre_1_date_-1__id_-1`, `date_-1__id_-1`): autoIndex only ever CREATES, so
-  indexes removed from a schema live on, costing writes for queries that no
-  longer exist. Both dropped after a `mongodump`. `backend/scripts/check-index-drift.js`
-  now reports this class of drift (read-only, never creates or drops).
-  **autoIndex stays ON deliberately** — at ~16k documents builds take seconds, and
-  the failure mode it guards against is a large-collection problem. The discipline
-  it needs instead: when you remove an index from a schema, drop it explicitly.
-
-- **Own comments system, replacing Disqus**: comments were once a third-party
-  Disqus embed. They are now first-party end to end — `Comment` model, the
-  `/api/v1/comments` routes, and `CommentsSection` on both poems and profiles —
-  which is what made AI-authored comments and profile comments possible at all.
-  The provider question is closed; do not reopen it.
-- **Server-backed search** (2026-07-28): search was a client-side filter over the
-  poems already on screen, matching **author name only** (`ListItem` returned
-  `null` for non-matches), so anything past the first page was unreachable and
-  infinite scroll had to be frozen while filtering to avoid fetching the whole
-  dataset. Now `GET /api/v1/poems?q=` searches poem **titles and author names**
-  across the collection, composed with the existing genre/origin/userId/likedBy
-  filters and paginated normally. Client side: `useSearchQuery` (300ms debounce,
-  2-character minimum, one AbortController per fetch) feeds `q` to all three
-  search bars — dashboard/genre list, My Poems, My Favourites. `getAction` now
-  accepts a `signal` and treats a cancellation as a non-event rather than an
-  error. Design notes:
-  - The regex is **unanchored** and therefore cannot use an index — deliberate.
-    An indexable `^term` regex would only match titles *starting* with the term
-    ("love" would miss "A Song of Love"), and `$text` stems whole words so the
-    partial words of search-as-you-type match nothing. The upgrade path when the
-    collection outgrows a scan is **Atlas Search**, not an index on this query.
-  - Poem **body text is deliberately not searched** — every result becomes a
-    partial-text hit that needs snippet highlighting to be scannable. Revisit
-    together with highlighting.
-  - The search box is **not** an ARIA combobox: there is no popup listbox, the
-    results replace page content. It is a `searchbox` plus a polite `role=status`
-    region announcing the result count and the minimum-length hint.
-
-- **Fixed the flaky backend test suite** (2026-07-28): ~25% of runs failed on a
-  random test with a bogus status (302/404/401) or a bare `socket hang up`.
-  Root cause was **not** in our code: supertest opens a new `http.Server` per
-  request via `app.listen(0)`, which binds the **wildcard** address. With
-  `SO_REUSEADDR` the OS hands out an ephemeral port even though another local
-  process already holds it on `127.0.0.1` (the allocator sees a different bind
-  address) — then supertest points its client at `127.0.0.1:<port>` and the
-  kernel routes to the *more specific* binding. The suite was literally talking
-  to other apps on the machine (a stray Cypress runner answering `302 -> /__/`,
-  Chrome answering `404`). `jest.setup.js` now listens **once per test file on
-  loopback** and hands supertest that server, so it never opens its own. Guarded
-  by `src/__tests__/test-harness.test.js`. Measured 0/30 failures after the fix
-  (vs 3/12 before) with the colliding processes still running.
-
-- **Backend lint is clean** (2026-07-27): fixed the 6 pre-existing `standard`
-  errors — `poem.js` like-toggle `==`→`===` (safe: `likes` is `[String]` and the
-  JWT `id` deserialises to a string, and the adjacent `indexOf` already relied on
-  strict equality), unused `jwt`/`mongoose`/`user2` bindings, and a real latent bug
-  in `migrate-to-authors.js` where a duplicate `$ne` key (`{ $ne: null, $ne: '' }`)
-  silently dropped the null check — now `$nin: [null, '']`.
-
-- **Backend lint gated in CI** (2026-07-28): both workflows now run `pnpm lint` in the
-  backend job before tests. Backend scripts were realigned with the frontend convention
-  — `lint` **checks**, `lint:fix` auto-fixes — because the old `lint` was
-  `standard --fix`, which in CI would have silently repaired errors in the runner and
-  passed a hollow gate. Verified: the step exits non-zero on bad code and leaves the file
-  unmodified.
-
-- Email/auth: transactional email infra (Resend), password reset (forgot + reset),
-  email verification + admin test accounts (`POST /api/v1/admin/test-users`),
-  `passwordChangedAt` session revocation on reset.
-- **Email turned on in prod** (2026-07-27): Resend domain verified + keys set;
-  confirmed by receiving a live send. Sending pipeline is active.
-- **Prod deployment verified** (2026-07-27): SSR pages, static assets (new logo +
-  og-image), backend API, CORS (allows apex, rejects others), Vercel env vars, and
-  login all confirmed live. og:image made absolute so social cards render.
-- **Database backup + restore drill** (2026-07-27): full prod `mongodump` archived
-  off-repo; verified it restores cleanly into an ephemeral MongoDB with all six
-  collection counts matching prod. Backup is proven restorable.
-- **`REQUIRE_EMAIL_VERIFICATION=true` in prod** (2026-07-27): publishing/commenting
-  now require a verified email. Verified end-to-end — an unverified account is
-  blocked from `POST /poems` with `403 EMAIL_UNVERIFIED`. AI seed is unaffected
-  (it writes via direct DB, not the gated routes).
-- **Admin bypasses the publish gate** (2026-07-27): `requireVerified` now exempts
-  the admin (`REACT_APP_ADMIN`), and the admin account `daniamcode` was marked
-  `emailVerified:true` in prod (it was the lone unverified real user). Code + test.
-- **Single-step AI generator** (2026-07-27): `scripts/lib/aiSeed.js` +
-  `scripts/seed-ai-community.js` create schema-correct AI authors/poems in one
-  place (idempotent, email-uniqueness-safe, dry-run by default); 7 regression
-  tests. `add-ai-personalities.js` now also stamps `emailVerified`/`testAccount`,
-  and all 50 existing AI authors were backfilled `emailVerified:true`.
-- **Prod email migration run** (`verify-existing-users.js`, 2026-07-27): backfilled
-  11 users `emailVerified:true` + 3,370 authors `testAccount:false`, and rebuilt
-  `email_1` as the partial **unique** index (`{ email exists, testAccount:false }`).
-  Real-account email uniqueness is now enforced at the DB level (closing the
-  concurrent-signup race) and the multi-account-per-email exemption is live.
-  Pre-migration backup archived off-repo via `mongodump`.
-- Ranking sidebar drift fix (server returns fresh ranking in mutation responses).
-- E2E registration flow test (`frontend/cypress/e2e/register.cy.ts`).
-- CI: backend installs with `pnpm --frozen-lockfile` (dropped `package-lock.json`),
-  so lockfile drift fails CI before deploy; removed dead `buildCommand` from
-  `backend/vercel.json`.
-- Branch protection on `master`: force-push + deletion blocked (no PRs required).
-- `ListItem` context memoization, responsive display typography via `clamp()`,
-  `manageError` toast guard.
-- Brand refresh: header now uses the `lg-1` wordmark image (`public/poemunity-logo.png`);
-  favicon/PWA icon set + `og-image.png` recolored to the wordmark red `#e90913`.
-  Also fixed a latent bug — `og-image.png` was caught by the blanket `*.png`
-  gitignore and had never actually deployed (social card 404'd); now whitelisted.
-- `backend/scripts/set-account-password.js` — securely set an account's password
-  from a hidden terminal prompt (for accounts unreachable via the email reset flow,
-  e.g. test accounts sharing an inbox).
-- Absolute `og:image`/`twitter:image` in `SeoHead.tsx` (relative paths are ignored
-  by social scrapers, so the card rendered blank) + regression test. Stopped
-  tracking `frontend/tsconfig.tsbuildinfo` (incremental-build cache; now gitignored).
+- **My comments tab** (2026-08-04) — `GET /comments/mine`, session-scoped, sixth profile tab; comments whose poem was deleted or withdrawn are dropped rather than linked to a 404. Deliberately NOT the merged "Activity" timeline: poems and likes already have tabs.
+- **Notifications: mark-read never sent its request** (2026-08-04) — `options: { fetch: false }` skips the axios call in `postAction`, so nothing was ever marked read and the badge never cleared; now a bare request, chained after the list fetch so rows still show what was new.
+- **Notifications: unlike retracts its notification** (2026-08-04), while the row is unread only.
+- **Notifications: per-row timestamps** (2026-08-04) from `updatedAt`, matching the list's own ordering.
+- **Notifications: 10 per page, one query instead of two** (2026-08-04) — asks for one row more than the page instead of a second `countDocuments`; `total` is gone from the response.
+- **Notification preference checkboxes are independent and optimistic** (2026-08-04) — every input had shared `disabled={query.isFetching}`, so saving one greyed out all four.
+- **Email announced as "Soon"** (2026-08-04) — disabled, bound to no state, with the in-app intro stating that nothing is emailed.
+- **Profile stats panel** (2026-08-04, P2.5 item 4) — poems, likes, rank when in the top 10; rank read from the ranking already cached for the sidebar, so the two cannot disagree.
+- **Perf: notification fan-out fetches preferences once** (2026-08-04) — 3 serial round trips per follower became 1 + 2N.
+- **Perf: author listings count by grouping poems** (2026-08-04) — 98ms → 43ms on `?limit=`, 99ms → 46ms on `/letters`; `?letter=` keeps the per-author `$lookup`, where it is 8x faster.
+- **Security: `?letter=` regex escaped** (2026-08-04) — raw interpolation on a public endpoint was a ReDoS vector; `escapeRegex` moved to `utils/` and shared with `?q=`.
+- **Follow / followers** (2026-07-31, P2.5 item 2) — `Follow` edge collection, unique `{follower, following}` index mapping E11000 to success, counts and `isFollowing` riding on `GET /authors/:slug`.
+- **Notifications** (2026-07-31, P2.5 item 3) — four event types, collapsed in storage, four preference toggles, header bell with an unpolled badge.
+- **Drafts** (2026-07-31, P2.5 item 1) — `Poem.status` defaulted and never backfilled, so "published" means published OR ABSENT; one visibility fragment composed by every public read.
+- **Server-owned poem fields** (2026-07-31) — `likes`/`date`/`origin`/`userId` are admin-only on both write routes; `Poem` is `strict: false`, so a spread persisted anything sent.
+- **Cypress suite repaired: 34/34** (2026-07-30), up from 1 passing, now its own CI workflow; root causes were a `window.Cypress` branch in `axiosInstance`, an inherited `.env`, and two real app bugs.
+- **Hydration mismatch on `/profile`** (2026-07-30) — `TabPanel` wrapped flow content in a `<p>` via MUI `Typography`; found by bisection, not by DOM comparison, which cannot see it after React has recovered.
+- **Comment delete "×" unclickable between 1200–1310px** (2026-07-30) — the comments section overflowed under `.poem-page::after`; found by Cypress with lint, typecheck and 990 jest tests green.
+- **Poem text cleanup** (2026-07-30) — 1,962 titles, 885 bodies, 1,433 slugs; old slugs live on in `slugHistory`. Canarying with `--limit 1` caught that the fallback commit had never deployed.
+- **Next-poem index + orphan cleanup** (2026-07-30) — `autoIndex` is ON and only ever CREATES; two orphaned indexes dropped, and `check-index-drift.js` now reports the drift.
+- **Poem of the week** (2026-07-29) — derived from the week number, no cron and no stored state; a large prime stride stops consecutive picks reading as broken curation.
+- **Own comments system, replacing Disqus** — first-party end to end, which is what made AI-authored and profile comments possible. Closed; do not reopen.
+- **Server-backed search** (2026-07-28) — `?q=` over titles and author names, unanchored on purpose; `useSearchQuery` owns debounce, minimum length and abort.
+- **Fixed the flaky backend suite** (2026-07-28) — supertest's per-request `app.listen(0)` binds the wildcard address, so the suite talked to other processes; `jest.setup.js` now listens once on loopback.
+- **Backend lint clean and gated in CI** (2026-07-27/28) — `lint` checks, `lint:fix` fixes; the old `--fix` default would have passed a hollow gate.
+- **Email + auth** (2026-07-27) — Resend infra, password reset, verification, `passwordChangedAt` session revocation, admin test accounts.
+- **Email on in prod, `REQUIRE_EMAIL_VERIFICATION=true`** (2026-07-27), with the admin exempt from the publish gate.
+- **Prod deployment verified** (2026-07-27) — SSR, assets, API, CORS, env vars and login confirmed live; `og:image` made absolute.
+- **Database backup + restore drill** (2026-07-27) — full `mongodump` archived off-repo and proven to restore with matching collection counts.
+- **Prod email migration** (2026-07-27) — 11 users verified, 3,370 authors stamped `testAccount:false`, `email_1` rebuilt as a partial unique index.
+- **Single-step AI generator** (2026-07-27) — `scripts/lib/aiSeed.js` + `seed-ai-community.js`, idempotent and dry-run by default.
+- **Normalized Redux store** — authors and poems live once in `createEntityAdapter` stores; list caches hold ids. The `updateXCacheAfterY` thunk family is gone.
+- **Ranking is server-computed** and returned fresh by every mutation that changes points, so the sidebar cannot drift.
+- **CI installs with `pnpm --frozen-lockfile`**, so lockfile drift fails before deploy; branch protection blocks force-push and deletion on `master`.
+- **Brand refresh** — `lg-1` wordmark, recoloured icon set; fixed `og-image.png` being caught by a blanket `*.png` gitignore and never deploying.
+- **`set-account-password.js`** — sets a password from a hidden prompt, for accounts unreachable via the email reset flow.
+- **Absolute `og:image`/`twitter:image`** in `SeoHead.tsx`; relative paths are ignored by social scrapers.
 
 ## 📚 Reference docs
 

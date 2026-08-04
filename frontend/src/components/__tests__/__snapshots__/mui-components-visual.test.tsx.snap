@@ -542,6 +542,17 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
             >
               Followers
             </button>
+            <button
+              aria-controls="full-width-tabpanel-5"
+              aria-selected="false"
+              class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-fullWidth css-hmk518-MuiButtonBase-root-MuiTab-root"
+              id="full-width-tab-5"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              My comments
+            </button>
           </div>
           <span
             class="MuiTabs-indicator css-1qltlow-MuiTabs-indicator"
@@ -637,6 +648,14 @@ exports[`MUI Components Visual Regression Tests ProfileTabs should render profil
       dir="ltr"
       hidden=""
       id="full-width-tabpanel-4"
+      role="tabpanel"
+    />
+    <div
+      aria-labelledby="full-width-tab-5"
+      class="profile__myPoems"
+      dir="ltr"
+      hidden=""
+      id="full-width-tabpanel-5"
       role="tabpanel"
     />
   </div>
