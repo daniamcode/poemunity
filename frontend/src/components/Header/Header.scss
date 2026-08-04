@@ -340,7 +340,14 @@
     // smaller than their nominal size — this needs roughly 1.4x what the serif
     // did to sit level with the wordmark. Connected scripts also lose legibility
     // quickly as they shrink, which is the reason not to go much below this.
-    font-size: 1.8rem;
+    //
+    // Reduced from 1.8rem: at that size the tagline was a SECOND display element
+    // beside the wordmark rather than support for it, and a header carrying a
+    // logotype, a calligraphic script and two UI serifs reads as four voices
+    // talking at once. Smaller restores the hierarchy — the wordmark is the
+    // brand, this is the line under it — without dropping the script, which is
+    // the one piece of voice in the chrome.
+    font-size: 1.35rem;
     // Letterforms are joined; extra tracking breaks the joins apart.
     letter-spacing: 0;
     // The tall em box would otherwise stretch the 70px header.

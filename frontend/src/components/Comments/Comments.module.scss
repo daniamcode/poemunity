@@ -14,6 +14,21 @@
     margin: 0 auto $space-xl;
 }
 
+// At $bp-xl the poem and the Next poem card BOTH switch to `width: 40vw`
+// (Detail.scss, the rule that also names .next-poem). This section was left out
+// of it, so the three stacked blocks ended up on two different widths — the
+// comments 80px narrower, aligning to the poem's TEXT column rather than to its
+// card edges, which is what made the stack look ragged.
+//
+// Kept here rather than added to that rule because this is a CSS module and its
+// class name is hashed — Detail.scss cannot reach it. If the 40vw ever changes,
+// it has to change in both places; the comment in Detail.scss says so too.
+@media screen and (min-width: $bp-xl) {
+    .comments {
+        width: 40vw;
+    }
+}
+
 .commentsTitle {
     font-size: $fs-lg;
     color: $color-text-dark;

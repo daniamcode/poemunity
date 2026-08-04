@@ -382,6 +382,9 @@
     // Unchanged from before the rail existed. It has to stay a VIEWPORT
     // fraction: the base rule is width: 90vw, which would overflow the ~58vw
     // column left between the rail and its counterweight.
+    // Comments.module.scss carries the SAME 40vw for the comments section, so
+    // all three stacked blocks share one width. It cannot be added here: that
+    // file is a CSS module and its class name is hashed. Change one, change both.
     .poem__block,
     .next-poem {
         width: 40vw;
