@@ -157,14 +157,33 @@ describe('Follow / followers', () => {
             // could not see.
             cy.visit(`/authors/${OTHER_SLUG}`)
 
+            // Measured on the row's CONTENTS, not on the row itself. The row is
+            // a block-level flex container, so it spans the full width whatever
+            // `justify-content` says — comparing its own box to its parent's is
+            // an identity that holds under the exact bug this test exists for.
+            // A red-check caught that: with `justify-content: flex-start` put
+            // back, the box-vs-parent version still passed.
+            // Wait for both children to be laid out before measuring. Without
+            // this the row is matched while it still has ZERO width, and every
+            // geometry assertion compares 0 to 0 and passes — the second half of
+            // why the original version of this test had no teeth.
+            cy.get('.author-detail__follow-counts').should('be.visible')
+            cy.get('.follow-button').should('be.visible')
+
             cy.get('.author-detail__follow').then($row => {
-                const row = $row[0].getBoundingClientRect()
-                const parent = $row[0].parentElement!.getBoundingClientRect()
+                const container = $row[0].getBoundingClientRect()
+                expect(container.width).to.be.greaterThan(0)
+                const children = Array.from($row[0].children)
+                    .map(child => child.getBoundingClientRect())
+                expect(children.length).to.be.greaterThan(0)
 
-                const rowCentre = row.left + row.width / 2
-                const parentCentre = parent.left + parent.width / 2
+                const contentLeft = Math.min(...children.map(r => r.left))
+                const contentRight = Math.max(...children.map(r => r.right))
 
-                expect(Math.abs(rowCentre - parentCentre)).to.be.lessThan(2)
+                const contentCentre = (contentLeft + contentRight) / 2
+                const containerCentre = container.left + container.width / 2
+
+                expect(Math.abs(contentCentre - containerCentre)).to.be.lessThan(2)
             })
         })
     })
