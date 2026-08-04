@@ -243,11 +243,38 @@ prod, so new indexes build themselves on deploy but are never dropped when remov
    produce one. Shipping it anyway was a deliberate call — the preference
    toggle is what makes it safe. Seed scripts write the model directly rather
    than through the API, so bulk AI seeding must not fan out notifications.
-   - 🤖 **Deferred: weekly email digest.** Resend is already wired behind
-     `src/utils/email.js`, so sending is the easy part. The real dependency is a
-     **scheduler** — the current Vercel setup has no cron — plus an unsubscribe
-     route and a per-user frequency preference. Worth doing only once in-app
-     volume shows the digest would have anything in it.
+   - 🤖 **Deferred: weekly email digest — now ANNOUNCED IN THE UI (2026-08-04).**
+     Resend is already wired behind `src/utils/email.js` and sends password
+     resets and verification today, so sending is the easy part. The real
+     dependency is a **scheduler** — the current Vercel setup has no cron — plus
+     an unsubscribe route and a per-user frequency preference. Worth doing only
+     once in-app volume shows the digest would have anything in it.
+
+     The profile now shows a **disabled "Weekly summary of your notifications"**
+     control under an `Email` heading with a `Soon` badge, and the in-app intro
+     states outright that nothing is emailed. That was a real gap: four toggles
+     headed "Notify me about" read as "notify me however you notify people", and
+     on most sites that means email — a poet could reasonably have believed they
+     were subscribed to something.
+
+     **Three things that must stay true until this actually ships**, each pinned
+     by a test in `NotificationPreferences.test.tsx`:
+     - the control is **disabled and permanently unchecked**, and is bound to no
+       state. Do NOT add a `notificationPrefs.emailDigest` field "ready for
+       later" — a stored preference that no sender reads is a promise the
+       system does not keep, and it will be read back as a subscription.
+     - "coming soon" lives in the **accessible name**, not only in the badge. A
+       disabled input is skipped by keyboard navigation and a purely visual
+       badge is never announced.
+     - the intro copy keeps saying **you are not subscribed**.
+
+     **Scope decision when building it:** the UI deliberately promises ONE
+     digest, not per-type email toggles. An email column beside all four event
+     types would be a different, larger feature (four preferences × a sender
+     that must respect each) and nothing has scoped it. If per-type email is
+     wanted, decide that first — the current UI can grow into it, but shipping
+     the digest against a UI that implied granular control would be a
+     downgrade.
 - 🤖 **Ranking will include 2 points per follower** (decided 2026-07-31,
   reversing the earlier "followers do not affect ranking"). `computeRanking()`
   becomes `3×poems + 1×likes + 2×followers`. Three things to handle when

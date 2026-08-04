@@ -11,7 +11,12 @@ import { NotificationPreferences as Prefs } from '../../redux/reducers/notificat
 import {
     NOTIFICATION_PREFS_TITLE,
     NOTIFICATION_PREFS_INTRO,
-    NOTIFICATION_PREF_LABELS
+    NOTIFICATION_PREF_LABELS,
+    EMAIL_PREFS_TITLE,
+    EMAIL_PREFS_INTRO,
+    EMAIL_PREFS_SOON_BADGE,
+    EMAIL_PREFS_SOON_HINT,
+    EMAIL_DIGEST_LABEL
 } from '../../data/constants'
 
 const TYPES: (keyof Prefs)[] = ['like', 'comment', 'follow', 'newPoem']
@@ -112,6 +117,50 @@ export default function NotificationPreferences() {
                     </li>
                 ))}
             </ul>
+
+            {/*
+                EMAIL, ANNOUNCED BUT NOT BUILT.
+
+                Shown rather than omitted because the absence of email should be
+                a stated fact, not something a poet has to infer from four
+                toggles that never mention it. Resend is wired up
+                (`backend/src/utils/email.js`) and already sends password resets
+                and verification, so "we cannot send mail" is not the blocker —
+                a SCHEDULER is, plus an unsubscribe route. See TODO.md.
+
+                Three things make this honest rather than a tease:
+                  * it is `disabled` and permanently unchecked, so it cannot be
+                    mistaken for a subscription you already have;
+                  * it sends nothing and is bound to no state — there is no
+                    field behind it on `Author`, and inventing one now would
+                    persist a preference the sender does not read;
+                  * "coming soon" lives in the ACCESSIBLE NAME, not only in the
+                    badge. A disabled input is skipped by keyboard navigation
+                    and a purely visual badge beside it would never be read out,
+                    so a screen-reader user would meet an unexplained dead
+                    control.
+            */}
+            <div className='notification-prefs__email'>
+                <h3 className='notification-prefs__subtitle'>
+                    {EMAIL_PREFS_TITLE}
+                    <span className='notification-prefs__badge'>{EMAIL_PREFS_SOON_BADGE}</span>
+                </h3>
+                <p className='notification-prefs__intro'>{EMAIL_PREFS_INTRO}</p>
+                <ul className='notification-prefs__list'>
+                    <li className='notification-prefs__item'>
+                        <label className='notification-prefs__label notification-prefs__label--disabled'>
+                            <input
+                                type='checkbox'
+                                checked={false}
+                                disabled
+                                readOnly
+                                aria-label={`${EMAIL_DIGEST_LABEL} (${EMAIL_PREFS_SOON_HINT})`}
+                            />
+                            <span>{EMAIL_DIGEST_LABEL}</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
         </section>
     )
 }

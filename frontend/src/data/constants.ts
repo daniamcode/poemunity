@@ -322,7 +322,27 @@ export const STATS_RANK_UNRANKED = 'Outside the top 10'
 export const STATS_EMPTY = 'Publish your first poem and your stats will appear here.'
 
 export const NOTIFICATION_PREFS_TITLE = 'Notify me about'
-export const NOTIFICATION_PREFS_INTRO = 'Choose what you want to hear about. All are on by default.'
+// The intro NAMES the bell. Four toggles under "Notify me about" read as
+// "notify me however you notify people", and most sites mean email by that —
+// so without this sentence a poet could reasonably believe these subscribe them
+// to something. They do not: nothing here sends mail.
+export const NOTIFICATION_PREFS_INTRO =
+    'Choose what you want to hear about. These appear in the bell at the top of the page — ' +
+    'nothing is emailed. All are on by default.'
+
+// --- Email notifications (not built yet) ---------------------------------
+// Shown as a disabled control rather than omitted, so the absence of email is
+// a STATED fact rather than something a user has to infer. The label carries
+// its own "coming soon" text instead of relying on the badge alone, because a
+// disabled input is skipped by keyboard navigation and a purely visual badge
+// beside it would never be announced.
+export const EMAIL_PREFS_TITLE = 'Email'
+export const EMAIL_PREFS_INTRO =
+    'Not available yet. You are not subscribed to any email, and when this arrives it will be off until you turn it on.'
+export const EMAIL_PREFS_SOON_BADGE = 'Soon'
+export const EMAIL_DIGEST_LABEL = 'Weekly summary of your notifications'
+/** Appended to the accessible name of every not-yet-built email control. */
+export const EMAIL_PREFS_SOON_HINT = 'coming soon, not available yet'
 export const NOTIFICATION_PREF_LABELS = {
     like: 'Likes on my poems',
     comment: 'Comments on my poems',

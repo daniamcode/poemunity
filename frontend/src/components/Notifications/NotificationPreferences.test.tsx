@@ -6,7 +6,14 @@ import configureStore from 'redux-mock-store'
 import NotificationPreferences from './NotificationPreferences'
 import { AppContext } from '../../App'
 import * as actions from '../../redux/actions/notificationsActions'
-import { NOTIFICATION_PREF_LABELS } from '../../data/constants'
+import {
+    NOTIFICATION_PREF_LABELS,
+    NOTIFICATION_PREFS_INTRO,
+    EMAIL_PREFS_TITLE,
+    EMAIL_PREFS_INTRO,
+    EMAIL_DIGEST_LABEL,
+    EMAIL_PREFS_SOON_HINT
+} from '../../data/constants'
 
 jest.mock('../../redux/actions/notificationsActions', () => ({
     getNotificationPreferencesAction: jest.fn(() => ({ type: 'GET_PREFS' })),
@@ -179,6 +186,85 @@ describe('NotificationPreferences', () => {
             await user.click(box('follow'))
 
             expect(mockSave.mock.calls[0][0].data).toEqual({ follow: true })
+        })
+    })
+
+    // -----------------------------------------------------------------------
+    // Email is ANNOUNCED but NOT BUILT. These tests exist because a UI that
+    // shows an email control is one refactor away from implying a subscription
+    // nobody has — and because the absence of email has to be a stated fact,
+    // not something a poet infers from four toggles that never mention it.
+    // -----------------------------------------------------------------------
+    describe('the email section (not built yet)', () => {
+        const emailBox = () =>
+            screen.getByRole('checkbox', { name: new RegExp(EMAIL_DIGEST_LABEL, 'i') })
+
+        test('says the in-app toggles do not send email', () => {
+            // The whole point of the report this came from: four toggles headed
+            // "Notify me about" read as "notify me however you notify people",
+            // and on most sites that means email.
+            renderPrefs()
+
+            expect(screen.getByText(NOTIFICATION_PREFS_INTRO)).toBeInTheDocument()
+            expect(NOTIFICATION_PREFS_INTRO).toMatch(/nothing is emailed/i)
+        })
+
+        test('shows the email option rather than hiding it', () => {
+            renderPrefs()
+
+            expect(screen.getByText(EMAIL_PREFS_TITLE)).toBeInTheDocument()
+            expect(screen.getByText(EMAIL_PREFS_INTRO)).toBeInTheDocument()
+        })
+
+        test('states you are not subscribed to anything', () => {
+            renderPrefs()
+
+            expect(EMAIL_PREFS_INTRO).toMatch(/not subscribed/i)
+        })
+
+        test('is unchecked and disabled, so it cannot look like a subscription', () => {
+            renderPrefs()
+
+            expect(emailBox()).not.toBeChecked()
+            expect(emailBox()).toBeDisabled()
+        })
+
+        test('stays unchecked even once the real preferences load as all-on', () => {
+            // The distractor: it must not be wired to the in-app prefs object.
+            // Nothing on `Author` backs it, and binding it to `like` or to the
+            // query would show a subscription that does not exist.
+            renderPrefs({ item: allOn })
+
+            expect(emailBox()).not.toBeChecked()
+        })
+
+        test('sends nothing when clicked', async () => {
+            const user = userEvent.setup()
+            renderPrefs()
+
+            await user.click(emailBox())
+
+            expect(mockSave).not.toHaveBeenCalled()
+            expect(emailBox()).not.toBeChecked()
+        })
+
+        test('explains itself in the accessible name, not only in a badge', () => {
+            // A disabled input is skipped by keyboard navigation, and a purely
+            // visual "Soon" badge beside it is never announced — a screen
+            // reader user would otherwise meet an unexplained dead control.
+            renderPrefs()
+
+            expect(emailBox()).toHaveAccessibleName(
+                `${EMAIL_DIGEST_LABEL} (${EMAIL_PREFS_SOON_HINT})`
+            )
+        })
+
+        test('does not disturb the four working toggles', () => {
+            renderPrefs()
+
+            expect(screen.getAllByRole('checkbox')).toHaveLength(5)
+            expect(box('like')).toBeEnabled()
+            expect(box('like')).toBeChecked()
         })
     })
 

@@ -221,3 +221,46 @@
     cursor: progress;
     opacity: 0.6;
 }
+
+// The not-yet-built email section. Set apart from the working toggles above it
+// by a rule and by muted text: it must not read as another row of controls you
+// simply have not clicked yet.
+.notification-prefs__email {
+    margin-top: $space-4;
+    padding-top: $space-3;
+    border-top: 1px dashed $color-border-subtle;
+}
+
+.notification-prefs__subtitle {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin: 0 0 $space-2;
+    font-family: $font-heading;
+    font-size: $fs-base-minus;
+    font-weight: $fw-bold;
+    color: $color-text-secondary;
+}
+
+.notification-prefs__badge {
+    padding: 1px $space-2;
+    border-radius: 999px;
+    background-color: $color-primary-bg;
+    color: $color-primary-dark;
+    font-family: $font-body;
+    font-size: $fs-xs;
+    font-weight: $fw-regular;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+// Not `cursor: progress` — that is the saving state above, and this is not
+// saving. `not-allowed` is the honest cursor for a control that does nothing.
+.notification-prefs__label--disabled {
+    color: $color-text-muted;
+    cursor: not-allowed;
+
+    input[type='checkbox'] {
+        cursor: not-allowed;
+    }
+}
