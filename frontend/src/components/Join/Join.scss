@@ -12,8 +12,12 @@
     // Narrower than the column on purpose — a short measure is what makes this
     // scan as a note. The column is ~250px; this keeps the text off both edges.
     max-width: 210px;
-    margin-top: $space-5;
-    padding-top: $space-3;
+    // A clear gap from the Authors accordion above. The MUI accordions sit
+    // flush against each other by design — they are one control group — so this
+    // panel needs to visibly leave that group rather than read as a third
+    // accordion that forgot its chevron.
+    margin-top: $space-8;
+    padding-top: $space-4;
     border-top: 1px solid $color-border-subtle;
 }
 
