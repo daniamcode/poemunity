@@ -10,6 +10,7 @@ const { computeRanking } = require('../utils/ranking')
 const { normalizeGenre } = require('../utils/genre')
 const { POEM_STATUS, PUBLISHED_MATCH, publishedOnly, normalizeStatus } = require('../utils/poemVisibility')
 const { notifyMany, NOTIFICATION_TYPE } = require('../utils/notifications')
+const { escapeRegex, MAX_REGEX_INPUT } = require('../utils/escapeRegex')
 const Follow = require('../models/Follow')
 
 const AUTHOR_FIELDS = 'name slug picture username type'
@@ -50,13 +51,6 @@ function findSortForOrder (orderBy) {
   }
 }
 
-// User input goes into a $regex, so every regex metacharacter has to be inert.
-// Without this, a query like "a(" is an invalid pattern (500) and ".*" is a
-// user-supplied full scan.
-function escapeRegex (input) {
-  return String(input).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 // Free-text search over poem titles and author names.
 //
 // The regex is deliberately UNANCHORED, which means it cannot use an index and
@@ -68,7 +62,7 @@ function escapeRegex (input) {
 // nothing. If the collection outgrows a scan, the upgrade is Atlas Search, not
 // an index on this query.
 async function buildSearchCondition (q) {
-  const rx = { $regex: escapeRegex(q), $options: 'i' }
+  const rx = { $regex: escapeRegex(String(q).slice(0, MAX_REGEX_INPUT)), $options: 'i' }
 
   // Author names live in another collection, so matching them takes a second
   // query. Only _id is selected to keep it light. This $in grows with the

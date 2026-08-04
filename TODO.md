@@ -570,16 +570,18 @@ investigation did surface three real things:
   `node backend/scripts/check-index-drift.js` reports both directions and is
   strictly read-only. Worth a run after each P2.5 item ships.
 
-- 🤖 **Escape the `?letter=` regex on `GET /api/v1/authors`** (`controllers/authors.js`,
-  the `req.query.letter` branch). The value is interpolated straight into
-  `{ $regex: `^${letter}`, $options: 'i' }` — `.toUpperCase()` is not
-  sanitisation. A crafted value (`(a+)+$`) is a **ReDoS** vector on a public,
-  unauthenticated endpoint, and any regex metacharacter also silently returns the
-  wrong authors. It expects a single letter, so the fix is to validate it as
-  `/^[A-Za-z]$/` and 400 otherwise (cheapest and most honest), or escape the
-  string before interpolating. Security more than performance, but it lands on the
-  one author-listing branch that is currently fast — see the shape note in
-  `countedAuthorsPipeline` before touching that query.
+- ✅ **Escaped the `?letter=` regex** (2026-08-04). `escapeRegex` moved out of
+  `controllers/poems.js` into `src/utils/escapeRegex.js` and used by both call
+  sites — a "make this safe" helper only one of two callers can reach is how the
+  second one ends up unsafe. Input is also length-capped (`MAX_REGEX_INPUT`).
+  The charset was deliberately NOT narrowed to A-Z: escaping removes the
+  vulnerability without dropping authors whose names start with an accented
+  character, which that query can currently reach. `regexInjection.test.js`
+  asserts on RESULTS, not status codes — a wildcard match is a perfectly
+  successful 200. Two of its tests were hollow on the first pass and were given
+  teeth: proving a pattern is literal needs an author whose name literally
+  contains it, and proving truncation needs input whose tail would have changed
+  the answer.
 
 - 🤖 **`computeRanking()` is the heaviest thing on the like path.** It is a
   `$group` over *every* published poem (~16k) with no index able to serve it, and

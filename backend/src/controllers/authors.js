@@ -4,6 +4,7 @@ const Poem = require('../models/Poem')
 const userExtractor = require('../middleware/userExtractor')
 const { PUBLISHED_MATCH } = require('../utils/poemVisibility')
 const { followCounts, isFollowing } = require('../utils/follows')
+const { escapeRegex, MAX_REGEX_INPUT } = require('../utils/escapeRegex')
 
 function buildFilter (query) {
   const filter = {}
@@ -117,7 +118,19 @@ authorsRouter.get('/', async (req, res) => {
     const filter = buildFilter(req.query)
 
     if (req.query.letter) {
-      const letter = req.query.letter.toUpperCase()
+      // ESCAPED, and length-capped. This used to interpolate the raw parameter
+      // into `^${letter}` — `.toUpperCase()` is not sanitisation, and the
+      // uppercasing was pointless anyway next to `$options: 'i'`. Raw, a
+      // crafted value like `(a+)+$` is catastrophic backtracking on a public,
+      // unauthenticated endpoint, and any stray metacharacter silently returned
+      // the wrong authors or 500'd on an invalid pattern.
+      //
+      // The charset is deliberately NOT restricted to A-Z. The letter index
+      // only ever offers A-Z, so that would be safe today, but an author whose
+      // name starts with an accented character is reachable by this query and
+      // rejecting them would be a behaviour change smuggled in under a security
+      // fix. Escaping removes the vulnerability without narrowing what works.
+      const letter = escapeRegex(String(req.query.letter).slice(0, MAX_REGEX_INPUT))
       const authors = await Author.aggregate([
         { $match: { name: { $regex: `^${letter}`, $options: 'i' }, ...filter } },
         countLookup,
