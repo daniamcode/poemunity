@@ -486,6 +486,29 @@ investigation did surface three real things:
   `node backend/scripts/check-index-drift.js` reports both directions and is
   strictly read-only. Worth a run after each P2.5 item ships.
 
+- 🤖 **Escape the `?letter=` regex on `GET /api/v1/authors`** (`controllers/authors.js`,
+  the `req.query.letter` branch). The value is interpolated straight into
+  `{ $regex: `^${letter}`, $options: 'i' }` — `.toUpperCase()` is not
+  sanitisation. A crafted value (`(a+)+$`) is a **ReDoS** vector on a public,
+  unauthenticated endpoint, and any regex metacharacter also silently returns the
+  wrong authors. It expects a single letter, so the fix is to validate it as
+  `/^[A-Za-z]$/` and 400 otherwise (cheapest and most honest), or escape the
+  string before interpolating. Security more than performance, but it lands on the
+  one author-listing branch that is currently fast — see the shape note in
+  `countedAuthorsPipeline` before touching that query.
+
+- 🤖 **`computeRanking()` is the heaviest thing on the like path.** It is a
+  `$group` over *every* published poem (~16k) with no index able to serve it, and
+  it runs on **every like, create, delete and publish** because those embed a
+  freshly recomputed ranking in their response. It dwarfs everything the
+  notification writes do. Options, none chosen yet: cache the top-10 with a short
+  TTL and accept staleness; keep incremental per-author counters (poems, likes)
+  updated on the same mutations and rank from those; or accept it as-is while the
+  collection is this size. **Measure before the follower-points change lands** —
+  that adds a `$lookup` over `follows` to this same aggregation, i.e. it makes the
+  most frequently-run expensive query more expensive. See the ranking item in
+  P2.5.
+
 - 🤖 **Speed up the sitemap** — `pages/sitemap.xml.ts` pages the poems API 100 at
   a time (~160 sequential calls for 16k poems → ~25 s cold generation, risking the
   serverless timeout). It's already CDN-cached (`s-maxage=86400`), so this only
