@@ -86,8 +86,27 @@ export function usePoemsList({ genre, origin, orderBy, initialData, q = '', next
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [origin, genre, effectiveOrderBy, q, dispatch])
 
+    // SERVER-RENDER FROM `initialData` WHEN THE STORE IS STILL EMPTY.
+    //
+    // The seeding above happens in an EFFECT, and effects do not run during
+    // server rendering — so the server was producing an empty list. The page
+    // shipped the poems twice over (15 KB of them inside `__NEXT_DATA__`) and
+    // still rendered nothing until the browser had downloaded the JS, hydrated,
+    // and built the list from that JSON. Measured on the live site: TTFB 0ms,
+    // LCP render delay 2500ms, and zero `poem__title` elements in the HTML.
+    //
+    // Reading the prop directly costs nothing and is hydration-safe: on the
+    // client's FIRST render the effect has not run either, so the store is
+    // equally empty and this produces byte-identical markup. Once the effect
+    // seeds the store, `resolvedPoems` wins and this branch is never taken
+    // again — including on every client-side navigation, where the store is
+    // already populated.
     const poems = (() => {
-        if (!resolvedPoems.length) return []
+        if (!resolvedPoems.length) {
+            const seed = initialData?.poems
+            if (!seed?.length) return []
+            return sortPoems(effectiveOrderBy, [...seed])
+        }
         return sortPoems(effectiveOrderBy, [...resolvedPoems])
     })()
 
@@ -119,7 +138,11 @@ export function usePoemsList({ genre, origin, orderBy, initialData, q = '', next
         isLoading: poemsListQuery?.isFetching,
         isError: poemsListQuery?.isError || false,
         hasMore: poemsListQuery?.hasMore || false,
-        hasItems: resolvedPoems.length > 0,
+        // Derived from what will actually be RENDERED, not from the store
+        // alone — otherwise a server render holding poems from `initialData`
+        // reports "no items" and List shows its empty/loading branch over a
+        // list it is about to draw.
+        hasItems: poems.length > 0,
         handleLoadMore,
         retry
     }
