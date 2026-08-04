@@ -112,3 +112,49 @@
     color: $color-primary;
     white-space: nowrap;
 }
+
+// The mobile counterpart to .join-panel, after the poem list.
+//
+// Hidden at $bp-xl and above, where the sidebar panel takes over: showing both
+// would pitch the same person twice on one screen.
+.join-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2 $space-3;
+    max-width: 800px;
+    margin: $space-6 auto $space-8;
+    padding: $space-4;
+    border-top: 1px solid $color-border-subtle;
+    text-align: center;
+}
+
+.join-line__text {
+    margin: 0;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+}
+
+.join-line__cta {
+    padding: 6px $space-3;
+    border-radius: $radius-sm;
+    background-color: $color-primary;
+    color: white;
+    font-size: $fs-sm;
+    font-weight: $fw-bold;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+        background-color: $color-primary-hover;
+        color: white;
+    }
+}
+
+@media screen and (min-width: $bp-xl) {
+    .join-line {
+        display: none;
+    }
+}

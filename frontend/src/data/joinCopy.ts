@@ -41,5 +41,12 @@ export const JOIN_ITEMS = [
 export const JOIN_AI_TEXT = 'A fresh take: a cast of AI poets, always badged, so you know who you are reading.'
 export const JOIN_AI_LINK = 'More'
 
+// The mobile line. The sidebar panel is hidden below $bp-xl, so without this a
+// visitor on a phone is never told what an account is for — the signed-out
+// header offers only an unlabelled log-in icon.
+//
+// One sentence, because it sits after a list of poems somebody came to read.
+export const JOIN_LINE_TEXT = 'Follow poets, join the conversation, publish your own poems.'
+
 export const JOIN_CTA = 'Create a free account'
 export const JOIN_SIGNIN = 'Log in'

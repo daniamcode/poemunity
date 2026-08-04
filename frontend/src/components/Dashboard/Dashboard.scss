@@ -48,6 +48,10 @@
         margin-right: 3%;
         max-height: calc(100vh - 120px);
         overflow-y: auto;
+        // `overflow-y: auto` alone computes overflow-x to `auto` too, which is
+        // what put a horizontal scrollbar across this column and clipped the
+        // text behind it. Nothing here should ever scroll sideways.
+        overflow-x: hidden;
     }
 
     .dashboard__list {
@@ -70,5 +74,9 @@
         // reach. Scrolling the rail itself is what makes the overflow reachable.
         max-height: calc(100vh - 120px);
         overflow-y: auto;
+        // `overflow-y: auto` alone computes overflow-x to `auto` too, which is
+        // what put a horizontal scrollbar across this column and clipped the
+        // text behind it. Nothing here should ever scroll sideways.
+        overflow-x: hidden;
     }
 }

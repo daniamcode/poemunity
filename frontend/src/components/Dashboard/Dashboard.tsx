@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import Accordion from '../SimpleAccordion'
 import JoinPanel from '../Join/JoinPanel'
+import JoinLine from '../Join/JoinLine'
 import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
 import PoemOfTheWeek from '../PoemOfTheWeek/PoemOfTheWeek'
@@ -52,6 +53,10 @@ function Dashboard({ initialData, match }: DashboardProps) {
                     second visible title is noise. */}
                 <h1 className={genre ? 'dashboard__heading' : 'sr-only'}>{heading}</h1>
                 <List genre={genre} initialData={initialData} />
+                {/* Mobile only — the sidebar that carries JoinPanel is
+                    display:none below $bp-xl, so this is the only place a
+                    phone visitor is told what an account is for. */}
+                <JoinLine />
             </div>
             {/* Both live in the right rail, which only exists at $bp-xl — a
                 deliberate choice: this is a desktop-only extra, not something to
