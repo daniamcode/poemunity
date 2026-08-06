@@ -45,13 +45,26 @@ function Header() {
                         `priority` because this is in the header and always above
                         the fold — lazy-loading it would delay the one image a
                         visitor sees first. Width/height are the intrinsic ratio;
-                        the CSS still sets the drawn height. */}
+                        the CSS still sets the drawn height.
+
+                        `sizes` is what makes that saving real, and it is not
+                        optional here. Without it `next/image` derives the srcset
+                        from the `width` prop alone — 1x and 2x of it — so it
+                        UPSCALED a 547px-wide source to 640px and shipped 17 KiB
+                        to draw 91px on a phone. With `sizes` Next emits a
+                        width-descriptor srcset and the browser picks the
+                        candidate that matches the box it will actually occupy.
+                        The four widths below are the four heights in
+                        Header.scss multiplied by the 547/120 aspect ratio
+                        (20/28/40/48px); if a breakpoint moves there, it moves
+                        here too, or the browser goes back to guessing 100vw. */}
                     <Image
                         src='/poemunity-logo.png'
                         alt='Poemunity'
                         className='header__logo-img'
-                        width={274}
-                        height={60}
+                        width={547}
+                        height={120}
+                        sizes='(min-width: 1200px) 219px, (min-width: 900px) 182px, (min-width: 481px) 128px, 91px'
                         priority
                     />
                 </Link>

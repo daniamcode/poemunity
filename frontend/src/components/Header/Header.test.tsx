@@ -172,6 +172,38 @@ describe('Header', () => {
         expect(logoLink).toContainElement(logoImg)
     })
 
+    test('should offer the logo at the small widths the header actually draws', () => {
+        renderWithContext(mockContextLoggedOut)
+        const logoImg = screen.getByRole('img', { name: 'Poemunity' })
+
+        // `sizes` is what turns the srcset into width descriptors. Without it
+        // next/image derives candidates from the `width` prop alone (1x and 2x),
+        // which upscaled the 547px source to 640px and shipped 17 KiB to fill a
+        // 91px box on a phone.
+        expect(logoImg).toHaveAttribute('sizes')
+
+        const candidates = (logoImg.getAttribute('srcset') || '')
+            .split(',')
+            .map((entry) => entry.trim())
+            .filter(Boolean)
+        expect(candidates.length).toBeGreaterThan(0)
+
+        const widths = candidates.map((entry) => {
+            const descriptor = entry.split(/\s+/)[1] || ''
+            // Density descriptors ("2x") are the failure mode, not a unit we
+            // accept: they mean the browser cannot pick by box size.
+            expect(descriptor).toMatch(/^\d+w$/)
+            return Number.parseInt(descriptor, 10)
+        })
+
+        // The narrowest box is 20px tall at 547/120, i.e. 91px wide — 182px on a
+        // 2x phone. A srcset whose smallest candidate is bigger than that cannot
+        // serve it without waste.
+        expect(Math.min(...widths)).toBeLessThanOrEqual(182)
+        // And nothing should be upscaled past the source's own 547px.
+        expect(widths.some((width) => width <= 547)).toBe(true)
+    })
+
     test('should have correct CSS classes', () => {
         const { container } = renderWithContext(mockContextLoggedOut)
 
