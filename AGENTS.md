@@ -615,6 +615,67 @@ a link on screen nor an `item` in the markup.
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
 
+## Sitemaps (an index over four sections)
+
+`/sitemap.xml` is a **sitemap index**, not a urlset. It lists four children —
+`pages`, `authors`, `poems-community`, `poems-famous` — served by
+`pages/sitemaps/[section].ts` over the helpers in `src/lib/sitemap.ts`. 19,587
+URLs in total, the same set the single file carried.
+
+**The split is a diagnostic, not a ranking trick.** Splitting a sitemap does not
+make Google index faster. Search Console reports coverage **per submitted
+sitemap**, so one 19,587-URL file gave one number that answered nothing about
+*which* class was stuck. The famous/community split is the one that earns its
+place: **15,652 of the 16,087 poems are famous ones that exist verbatim on
+hundreds of other sites**, against **435 that exist only here**. Those two groups
+have completely different prospects in search, and averaging them hides the only
+comparison worth making. Submit each child in GSC, not just the index, to get
+per-file numbers.
+
+**A sitemap never ships partial.** Every fetch helper **throws**; the route
+builds all entries before writing a byte, so a failure is a 500. It used to
+`break` out of the pagination loop and return what it had, which meant a timeout
+on page 90 of 157 published a 200 — cached 24 hours — silently missing 6,700
+URLs. URLs *disappearing* from a sitemap reads as "those pages are gone", so half
+a sitemap is worse than none; Google retries a 500 and keeps trusting its copy.
+`fetchAllPoems` also compares the collected count against the server's own
+`total` and throws on a mismatch — a short page fails no individual request, so
+nothing else can see it.
+
+**`COMMUNITY_ORIGINS` is the one list that can silently lose a whole class.**
+The list endpoint filters `origin` by equality with no "not this one", so
+community is enumerated by hand (`user`, `ai`) while famous is defined
+positively. `assertOriginsPartitionPoems` runs on the **community** section for
+exactly that reason: add a fourth origin and famous + community stops equalling
+the total, which fails the response instead of quietly omitting those poems.
+
+**`pages` costs 136 `limit=1` probes, not a walk of every poem.** The list is
+sorted `date` DESC, so row one of a genre is its newest poem and its `total`
+says whether the genre has any at all — the two facts the section needs.
+Deriving them by paginating the collection took 26s and 3.6MB to produce 136
+dates. Presence is the map **key** and freshness its **value**: a genre whose
+poems are all undated is still listed, just without a claim. Genre slugs go to
+the API verbatim — the database stores genres already in slug form
+(`arts-and-sciences`, not `Arts & Sciences`).
+
+Poem pages after the first are fetched **concurrently** off the page count that
+`total` gives up front (`FETCH_CONCURRENCY`, bounded by `mapWithConcurrency`).
+157 sequential round-trips was ~30s of pure latency, and a fetch-everything
+route that slow is one that eventually hits a platform timeout.
+
+**The Next routing trap, which fails silently.** `pages/sitemaps/[section].xml.ts`
+is the obvious spelling and it does not work: Next only treats a segment as
+dynamic when the brackets span the **whole** segment, so `[section].xml` is read
+as a literal directory name — `isDynamicRoute('/sitemaps/[section].xml')` is
+`false`. Every child 404s while the index linking them keeps answering 200.
+Hence the `.xml` → extensionless **rewrite** in `next.config.js`. It cannot be a
+redirect instead: the rewrite maps back and the two would loop. The extensionless
+form answers 200 as well; it is an unlinked internal alias, not a second
+advertised URL.
+
+The `<lastmod>` policy is unchanged and is pinned by
+`frontend/src/__tests__/sitemap.test.ts`.
+
 ## Poem of the week
 
 `GET /api/v1/poems/poem-of-the-week` returns one famous poem plus the Monday its
