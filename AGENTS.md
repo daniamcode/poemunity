@@ -670,10 +670,35 @@ which is the entire reason these URLs exist. Titles carry the page number for
 the same reason: 125 pages under one title read as one page.
 
 The nav lists **first and last**, not just prev/next: page 125 would otherwise
-sit 124 hops from page 1 and no crawler walks that far. It describes the **URL**,
-not how far infinite scroll has loaded — a nav tracking the scroll position
-would renumber itself as you read, and would not render identically on server
-and client.
+sit 124 hops from page 1 and no crawler walks that far.
+
+### The address bar follows the scroll
+
+`hooks/usePageUrlSync.ts` rewrites the URL via `history.replaceState` as the
+reader crosses from one page of poems into the next. Infinite scroll is
+untouched; nothing refetches and the list does not re-render.
+
+**This is not an SEO device** — crawlers do not scroll and already have the
+`<a href>` nav. It fixes two reader-facing problems: scrolling to poem 400 and
+sharing the URL used to send someone to poem 1, and opening a poem then hitting
+Back used to return you to the top with everything you had loaded gone.
+
+`replaceState`, never `pushState`: one history entry per boundary would mean
+forty taps of Back to escape a list you scrolled through once. Back lands on
+`?page=41`, which server-renders poems 401-410 rather than all 400 you had
+scrolled — accepted, since restoring the whole list means caching it.
+
+The page is recomputed from **every** marker, not from the observer entry that
+fired: scroll upward out of page 3 and its marker stops intersecting before page
+2's arrives, leaving a gap where the last event is simply wrong. There is a
+120px activation offset so a boundary grazing the top edge does not renumber the
+page on a one-pixel jitter.
+
+The nav's current page is this synced page, so the nav and the address bar can
+never disagree about where the reader is. Syncing is **disabled while the typed
+search query differs from the URL's** — the list is then showing results the
+address bar does not describe, and writing `?page=3` onto it would name a page
+of a different result set.
 
 ### The author index is letters, not buttons
 

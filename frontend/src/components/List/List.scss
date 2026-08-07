@@ -333,3 +333,13 @@
         }
     }
 }
+
+// Page boundary marker for the scroll-to-URL sync (see usePageUrlSync). It sits
+// between poems purely as a coordinate, so it must take up no space at all —
+// with a height it would add a gap every ten poems.
+.list__page-marker {
+    display: block;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}

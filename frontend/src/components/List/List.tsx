@@ -12,6 +12,7 @@ import { ListHeader } from './components/ListHeader'
 import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
 import { Pagination } from '../Pagination'
 import { pageCount } from '../../utils/pagination'
+import { usePageUrlSync } from '../../hooks/usePageUrlSync'
 import { ORDER_BY_LIKES, PAGINATION_LIMIT, slugToCategory, ORIGIN_LABELS } from '../../data/constants'
 
 interface ListProps {
@@ -75,6 +76,19 @@ function List({ genre: genreProp, initialData, currentPage = 1, match }: ListPro
         onLoadMore: handleLoadMore,
         hasMore,
         isLoading
+    })
+
+    const basePath = genre ? `/${genre}` : '/'
+
+    // Rewrites the URL as the reader scrolls past a page boundary. Disabled
+    // while the typed query differs from the one in the URL: the list is then
+    // showing client-side search results the address bar does not describe, and
+    // writing `?page=3` onto it would name a page of a different result set.
+    const { visiblePage, markerRef } = usePageUrlSync({
+        basePath,
+        startPage: currentPage,
+        query: { q: queryFromUrl || undefined },
+        enabled: q === queryFromUrl
     })
 
     const handleOrderChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -145,8 +159,21 @@ function List({ genre: genreProp, initialData, currentPage = 1, match }: ListPro
                     </div>
                 )}
 
-                {!isError && poems.map(poem => (
-                    <ListItem key={poem?.id} poem={poem} context={listItemContext} />
+                {!isError && poems.map((poem, index) => (
+                    <React.Fragment key={poem?.id}>
+                        {/* Opens each page's block, so the scroll sync knows
+                            where one page of poems ends and the next begins.
+                            Zero-height and aria-hidden — it is a coordinate,
+                            not content. */}
+                        {index % PAGINATION_LIMIT === 0 && (
+                            <span
+                                ref={markerRef(currentPage + index / PAGINATION_LIMIT)}
+                                className='list__page-marker'
+                                aria-hidden='true'
+                            />
+                        )}
+                        <ListItem poem={poem} context={listItemContext} />
+                    </React.Fragment>
                 ))}
 
                 {isLoading && hasItems && (
@@ -161,14 +188,18 @@ function List({ genre: genreProp, initialData, currentPage = 1, match }: ListPro
                     more poems before it reaches the nav — the nav is the way to
                     JUMP, and the way a crawler walks the list at all.
 
-                    Built from the SSR total, not the live store one: this
-                    describes the URL, and the store's total changes under a
-                    search while the URL's page does not. Search results are
+                    `visiblePage`, not the SSR page: the URL now follows the
+                    scroll, so the nav marking a different page as current than
+                    the address bar would be the two disagreeing about where the
+                    reader is.
+
+                    The total is the SSR one, though — the store's changes under
+                    a search while the URL's page does not. Search results are
                     noindex anyway, and `q` rides along so paging a search stays
                     a search. */}
                 <Pagination
-                    basePath={genre ? `/${genre}` : '/'}
-                    currentPage={currentPage}
+                    basePath={basePath}
+                    currentPage={visiblePage}
                     totalPages={initialData?.totalPages ?? pageCount(initialData?.total ?? 0, PAGINATION_LIMIT)}
                     query={{ q: queryFromUrl || undefined }}
                 />
