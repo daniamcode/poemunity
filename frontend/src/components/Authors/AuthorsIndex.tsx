@@ -32,7 +32,26 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
     const { isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
     // Resolve name/slug through the normalized authorEntities store so renames
     // propagate without a refetch; count and ordering stay from the list cache.
-    const authors = useSelector(selectAuthorsByLetter)
+    const storeAuthors = useSelector(selectAuthorsByLetter)
+
+    // SERVER-RENDER FROM THE PROPS WHEN THE STORE IS STILL EMPTY.
+    //
+    // Same bug the poem lists had (see usePoemsList): the seeding below happens
+    // in EFFECTS, and effects do not run during server rendering — so this page
+    // fetched 251 authors, shipped every one of them inside `__NEXT_DATA__`,
+    // and rendered NOT ONE LINK. Measured on the live site before this fix: 0
+    // `/authors/` links in the HTML of the index page for 3,364 author pages.
+    //
+    // That made the whole author section invisible to a crawler except through
+    // the sitemap, which is discovery with no internal linking behind it.
+    //
+    // Reading the props directly is hydration-safe: on the client's FIRST
+    // render the effects have not run either, so the store is equally empty and
+    // this produces byte-identical markup. Once seeded, the store wins.
+    const authors = storeAuthors?.length ? storeAuthors : (initialAuthors ?? [])
+    const seededLetters = (letters as string[] | undefined)?.length
+        ? (letters as string[])
+        : (initialLetters ?? [])
 
     useEffect(() => {
         if (initialLetters) {
@@ -66,7 +85,7 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
         dispatch(getAuthorsByLetterAction({ letter: activeLetter, origin: activeOrigin }))
     }, [activeLetter, activeOrigin])
 
-    const availableLetters = (letters as string[]) || []
+    const availableLetters = seededLetters
 
     function handleOriginChange(origin: string) {
         setActiveOrigin(origin)

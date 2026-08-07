@@ -87,6 +87,32 @@ Only the non-obvious parts are worth recording:
 - Async thunks in `src/redux/actions/` (`poemsActions`, `poemActions`, `loginActions`, `commonActions`). Cache consistency after mutations is automatic: mutations dispatch `poemUpdated`/`poemRemoved`/`authorUpdated` against the normalized entity stores and every id-based view re-reads them (see "Done: single source of truth"). The old `updateXCacheAfterY` thunk family is gone.
 - **`AppContext`** (`src/App.tsx`) holds client/auth state (current user, picture, isAdmin, …), hydrated from the DB (not the token — see Auth).
 
+**SSR props seeded into Redux must ALSO be read directly, or the server renders
+nothing.** Every list here seeds its `getServerSideProps` data into the store
+inside a `useEffect`, and **effects do not run during server rendering** — so the
+component reads an empty store and emits an empty page, shipping the data twice
+(once as JSON in `__NEXT_DATA__`, never as markup) and drawing nothing until the
+browser has hydrated. The fix is one line: fall back to the prop when the store
+is still empty (`storePoems.length ? storePoems : initialData.poems`). It is
+hydration-safe because the client's FIRST render has not run the effect either,
+so the markup is byte-identical; once seeded the store wins, including on every
+client-side navigation.
+
+Any count or flag DERIVED from that data needs the same fallback (`total`,
+`hasMore`), or the page reports 0 poems above a list it is about to draw.
+
+**This has bitten three times: the poem lists, the author page, and the authors
+index.** The last two cost the site its internal linking rather than just speed —
+`/authors` rendered 0 links to 3,364 author pages and each author page rendered
+0 links to its poems, so everything below `/authors` was reachable only through
+the sitemap. A crawl from the homepage reached 11% of poems within five clicks.
+The author page also emitted JSON-LD listing 10 poems it had not rendered.
+
+**RTL cannot catch this.** `render()` runs effects, so the store gets seeded and
+everything looks fine. The guards are `renderToString` tests —
+`List.ssr.test.tsx` and `Authors.ssr.test.tsx` — and a new SSR-seeded list needs
+one too.
+
 **API integration**
 - axios instance in `src/redux/actions/axiosInstance.js`. Client-side, `baseURL` is the Next proxy **`/api/backend`**; server-side it's `NEXT_PUBLIC_API_URL`.
 - The proxy `pages/api/backend/[...path].ts` forwards to the backend, attaches the httpOnly cookie as a Bearer token, and refreshes the cookie when a response body carries a `token`.
