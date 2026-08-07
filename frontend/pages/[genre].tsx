@@ -8,7 +8,8 @@ import { JsonLd } from '../src/components/JsonLd'
 import { Breadcrumbs } from '../src/components/Breadcrumbs'
 import { genreStructuredData } from '../src/utils/structuredData'
 import { genreTitle, genreDescription } from '../src/utils/seo'
-import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH, isKnownCategorySlug } from '../src/data/constants'
+import { ORDER_BY_LIKES, PAGINATION_LIMIT, SEARCH_MIN_LENGTH, isKnownCategorySlug } from '../src/data/constants'
+import { PAGE_PARAM, buildPageHref, pageCount, parsePageParam } from '../src/utils/pagination'
 
 interface PageProps {
     initialData: InitialPoemsData | null
@@ -17,16 +18,24 @@ interface PageProps {
     baseUrl: string
     /** Whether this render is a search result rather than the genre itself. */
     isSearch: boolean
+    /** 1-based page from `?page=`. Absent means page 1. */
+    currentPage?: number
 }
 
-export default function GenrePage({ initialData, genre, baseUrl, isSearch }: PageProps) {
+export default function GenrePage({ initialData, genre, baseUrl, isSearch, currentPage = 1 }: PageProps) {
     const label = capitalizeFirstLetter(genre.replace(/-/g, ' '))
     const total = initialData?.total ?? 0
     // A known category that simply has nothing in it yet — not an unknown one,
     // which getServerSideProps already answers 404 for.
     const isEmpty = total === 0
-    const url = `${baseUrl}/${genre}`
-    const description = genreDescription(label, total, initialData?.poems)
+    const totalPages = initialData?.totalPages ?? pageCount(total, PAGINATION_LIMIT)
+    // EACH PAGE CANONICALISES TO ITSELF, not back to page 1.
+    //
+    // Page 2 holds different poems, so pointing it at page 1 would declare it a
+    // duplicate of a page it shares nothing with — and Google drops the links
+    // on a URL it has folded away, which is the entire reason these URLs exist.
+    const url = `${baseUrl}${buildPageHref(`/${genre}`, currentPage)}`
+    const description = genreDescription(label, total, initialData?.poems, currentPage, totalPages)
 
     return (
         <>
@@ -49,7 +58,7 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch }: Pag
                 publishes a Wedding poem the tag disappears on its own. Nothing
                 to remember, nothing to undo. */}
             <SeoHead
-                title={genreTitle(label, total)}
+                title={genreTitle(label, total, currentPage)}
                 description={description}
                 url={url}
                 noIndex={isSearch || isEmpty}
@@ -124,20 +133,47 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, quer
     // See the note in pages/index.tsx: ?q= has to be honoured server-side or the
     // seeded search box renders next to an unfiltered list.
     const q = typeof query.q === 'string' ? query.q.trim() : ''
+    const search = q.length >= SEARCH_MIN_LENGTH ? q : ''
+
+    // `?page=` used to be IGNORED here — this fetched page 1 whatever the URL
+    // said, so /love?page=2 served byte-identical poems to /love and poems
+    // 11..1,247 had no URL at all. Junk and ?page=1 redirect to the clean URL
+    // rather than rendering, so one page of results never has two addresses.
+    const parsed = parsePageParam(query[PAGE_PARAM])
+    if (parsed.kind === 'redirect' && query[PAGE_PARAM] !== undefined) {
+        return {
+            redirect: {
+                destination: buildPageHref(`/${genre}`, 1, { q: search || undefined }),
+                permanent: false
+            }
+        }
+    }
+    const currentPage = parsed.kind === 'ok' ? parsed.page : 1
+
     const data = await serverFetch<InitialPoemsData>('/api/v1/poems', {
-        page: 1,
-        limit: 10,
+        page: currentPage,
+        limit: PAGINATION_LIMIT,
         genre,
         orderBy: ORDER_BY_LIKES,
-        ...(q.length >= SEARCH_MIN_LENGTH && { q })
+        ...(search && { q: search })
     }, token)
+
+    // A page past the end is a 404, not an empty list. `?page=9999` renders a
+    // heading over nothing — the soft-404 shape — and there are infinitely many
+    // of them, so left at 200 they are unbounded crawlable emptiness. Page 1 is
+    // exempt: a genre with no poems at all is a real page that says so.
+    if (currentPage > 1 && !data?.poems?.length) {
+        return { notFound: true }
+    }
+
     return {
         props: {
             initialData: data,
             initialUser: await fetchServerUser(token),
             genre,
             baseUrl,
-            isSearch: q.length >= SEARCH_MIN_LENGTH
+            isSearch: Boolean(search),
+            currentPage
         }
     }
 }

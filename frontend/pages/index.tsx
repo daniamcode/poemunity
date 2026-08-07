@@ -3,26 +3,32 @@ import Dashboard from '../src/components/Dashboard/Dashboard'
 import { SeoHead } from '../src/components/SeoHead'
 import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
-import { ORDER_BY_LIKES, SEARCH_MIN_LENGTH } from '../src/data/constants'
+import { ORDER_BY_LIKES, PAGINATION_LIMIT, SEARCH_MIN_LENGTH } from '../src/data/constants'
+import { PAGE_PARAM, buildPageHref, parsePageParam } from '../src/utils/pagination'
 
 interface PageProps {
     initialData: InitialPoemsData | null
     initialUser: ServerUser | null
     baseUrl: string
+    /** 1-based page from `?page=`. Absent means page 1. */
+    currentPage?: number
 }
 
-export default function IndexPage({ initialData, baseUrl }: PageProps) {
+export default function IndexPage({ initialData, baseUrl, currentPage = 1 }: PageProps) {
     return (
         <>
             <SeoHead
-                title='Your poem community'
+                title={currentPage > 1 ? `Poems — page ${currentPage}` : 'Your poem community'}
                 description={
                     'Poemunity is a poem community — discover, read and share poems. ' +
                     'Browse by genre, explore famous and community poets, and publish your own work.'
                 }
-                url={baseUrl}
+                // Self-canonical per page: page 2 holds different poems, and
+                // pointing it at the homepage would declare it a duplicate of a
+                // page it shares nothing with — taking its links with it.
+                url={`${baseUrl}${buildPageHref('/', currentPage)}`}
             />
-            <Dashboard initialData={initialData ?? undefined} />
+            <Dashboard initialData={initialData ?? undefined} currentPage={currentPage} />
         </>
     )
 }
@@ -36,11 +42,30 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     // server ignored ?q= the page would show the search box filled in beside
     // the complete, unfiltered list.
     const q = typeof query.q === 'string' ? query.q.trim() : ''
+    const search = q.length >= SEARCH_MIN_LENGTH ? q : ''
+
+    // See src/utils/pagination.ts. Junk and ?page=1 redirect to `/` rather than
+    // rendering, so one page of results never has two addresses.
+    const parsed = parsePageParam(query[PAGE_PARAM])
+    if (parsed.kind === 'redirect' && query[PAGE_PARAM] !== undefined) {
+        return {
+            redirect: { destination: buildPageHref('/', 1, { q: search || undefined }), permanent: false }
+        }
+    }
+    const currentPage = parsed.kind === 'ok' ? parsed.page : 1
+
     const data = await serverFetch<InitialPoemsData>('/api/v1/poems', {
-        page: 1,
-        limit: 10,
+        page: currentPage,
+        limit: PAGINATION_LIMIT,
         orderBy: ORDER_BY_LIKES,
-        ...(q.length >= SEARCH_MIN_LENGTH && { q })
+        ...(search && { q: search })
     }, token)
-    return { props: { initialData: data, initialUser: await fetchServerUser(token), baseUrl } }
+
+    // A page past the end is a 404, not a heading over nothing — see the same
+    // note on the genre route.
+    if (currentPage > 1 && !data?.poems?.length) {
+        return { notFound: true }
+    }
+
+    return { props: { initialData: data, initialUser: await fetchServerUser(token), baseUrl, currentPage } }
 }

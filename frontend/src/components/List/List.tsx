@@ -10,11 +10,15 @@ import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useSearchQuery } from '../../hooks/useSearchQuery'
 import { ListHeader } from './components/ListHeader'
 import { usePoemsList, InitialPoemsData } from './hooks/usePoemsList'
-import { ORDER_BY_LIKES, slugToCategory, ORIGIN_LABELS } from '../../data/constants'
+import { Pagination } from '../Pagination'
+import { pageCount } from '../../utils/pagination'
+import { ORDER_BY_LIKES, PAGINATION_LIMIT, slugToCategory, ORIGIN_LABELS } from '../../data/constants'
 
 interface ListProps {
     genre?: string
     initialData?: InitialPoemsData
+    /** 1-based page from `?page=`, resolved server-side. */
+    currentPage?: number
     match?: {
         params?: {
             genre?: string
@@ -23,7 +27,7 @@ interface ListProps {
     }
 }
 
-function List({ genre: genreProp, initialData, match }: ListProps) {
+function List({ genre: genreProp, initialData, currentPage = 1, match }: ListProps) {
     const genre = genreProp ?? match?.params?.genre
     const router = useRouter()
     // A "search all poems" link carries the query in ?q= so it survives the
@@ -152,6 +156,22 @@ function List({ genre: genreProp, initialData, match }: ListProps) {
                 )}
 
                 <div ref={sentinelRef} style={{ height: '20px' }} />
+
+                {/* Below the infinite-scroll sentinel, so scrolling reaches
+                    more poems before it reaches the nav — the nav is the way to
+                    JUMP, and the way a crawler walks the list at all.
+
+                    Built from the SSR total, not the live store one: this
+                    describes the URL, and the store's total changes under a
+                    search while the URL's page does not. Search results are
+                    noindex anyway, and `q` rides along so paging a search stays
+                    a search. */}
+                <Pagination
+                    basePath={genre ? `/${genre}` : '/'}
+                    currentPage={currentPage}
+                    totalPages={initialData?.totalPages ?? pageCount(initialData?.total ?? 0, PAGINATION_LIMIT)}
+                    query={{ q: queryFromUrl || undefined }}
+                />
             </div>
         </>
     )

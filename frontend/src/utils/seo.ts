@@ -24,9 +24,17 @@ function poemWord(total: number): string {
     return total === 1 ? 'poem' : 'poems'
 }
 
-/** "46 Love poems" · "1 Love poem" · "Love poems" when the genre is empty. */
-export function genreTitle(label: string, total: number): string {
-    return `${countPrefix(total)}${label} ${poemWord(total)}`
+/**
+ * "46 Love poems" · "1 Love poem" · "Love poems" when the genre is empty.
+ *
+ * Page 2 and beyond carry the page number, because they are separate indexable
+ * URLs and 125 pages sharing one title is 125 pages Google reads as the same
+ * page. Page 1 stays clean — the number would be noise on the URL people
+ * actually search for and link to.
+ */
+export function genreTitle(label: string, total: number, page = 1): string {
+    const base = `${countPrefix(total)}${label} ${poemWord(total)}`
+    return page > 1 ? `${base} — page ${page}` : base
 }
 
 /** "35 poems by John Doe" · "1 poem by John Doe" · "Poems by John Doe". */
@@ -44,7 +52,13 @@ export function authorTitle(name: string, total: number): string {
  *
  * The samples come from data the page already fetched — no extra query.
  */
-export function genreDescription(label: string, total: number, poems: Poem[] = []): string {
+export function genreDescription(
+    label: string,
+    total: number,
+    poems: Poem[] = [],
+    page = 1,
+    totalPages = 1
+): string {
     const lower = label.toLowerCase()
     const opening = total > 0
         ? `Read ${total} ${lower} ${poemWord(total)} on ${SITE}`
@@ -57,7 +71,12 @@ export function genreDescription(label: string, total: number, poems: Poem[] = [
 
     const middle = samples.length > 0 ? `, including ${samples.join(' and ')}` : ''
 
-    return `${opening}${middle}. Discover, like and share community poetry.`
+    // The sample poems already differ per page, so the description is not a
+    // duplicate — but naming the page says so outright, and it is what a
+    // searcher landing on page 7 needs to understand where they are.
+    const tail = page > 1 ? ` Page ${page} of ${totalPages}.` : ''
+
+    return `${opening}${middle}. Discover, like and share community poetry.${tail}`
 }
 
 /**

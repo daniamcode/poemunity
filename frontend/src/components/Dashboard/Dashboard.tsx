@@ -14,6 +14,8 @@ import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter'
 
 interface DashboardProps {
     initialData?: InitialPoemsData
+    /** 1-based page from `?page=`, resolved server-side. */
+    currentPage?: number
     match?: {
         params?: {
             genre?: string
@@ -24,7 +26,7 @@ interface DashboardProps {
     history?: unknown
 }
 
-function Dashboard({ initialData, match }: DashboardProps) {
+function Dashboard({ initialData, currentPage, match }: DashboardProps) {
     const router = useRouter()
     const genre = match?.params?.genre ?? (router.query.genre as string | undefined)
 
@@ -52,7 +54,7 @@ function Dashboard({ initialData, match }: DashboardProps) {
                     is the site's front door and already carries the brand, so a
                     second visible title is noise. */}
                 <h1 className={genre ? 'dashboard__heading' : 'sr-only'}>{heading}</h1>
-                <List genre={genre} initialData={initialData} />
+                <List genre={genre} initialData={initialData} currentPage={currentPage} />
                 {/* Mobile only — the sidebar that carries JoinPanel is
                     display:none below $bp-xl, so this is the only place a
                     phone visitor is told what an account is for. */}

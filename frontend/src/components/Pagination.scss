@@ -1,0 +1,63 @@
+@use '../styles/variables' as *;
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: $space-3;
+    padding: $space-6 0 $space-4;
+}
+
+.pagination__pages {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-2;
+    // It is a real <ol> — the pages are an ordered sequence — so the marker and
+    // the default indent have to go.
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination__page,
+.pagination__step,
+.pagination__current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    // 44px is the pointer target size the WCAG target-size rule asks for; page
+    // numbers are one or two characters and would otherwise be a ~10px target.
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 $space-3;
+    border-radius: $radius-md;
+    font-size: $fs-md;
+    text-decoration: none;
+}
+
+.pagination__page,
+.pagination__step {
+    color: $color-text-dark;
+    border: 1px solid $color-border;
+
+    &:hover,
+    &:focus-visible {
+        border-color: $color-error;
+        color: $color-error;
+    }
+}
+
+.pagination__current {
+    // The page you are on is a <span>, not a link, so colour alone would be the
+    // only thing marking it — hence the filled block as well.
+    background: $color-error;
+    color: #fff;
+    font-weight: $fw-bold;
+}
+
+.pagination__gap {
+    padding: 0 $space-1;
+    color: $color-text-secondary;
+}

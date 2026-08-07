@@ -56,7 +56,7 @@ const initialData: InitialPoemsData = {
     total: 2
 }
 
-const ssr = (props: { initialData?: InitialPoemsData } = {}) => {
+const ssr = (props: { initialData?: InitialPoemsData, currentPage?: number } = {}) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { renderToString } = require('react-dom/server')
     return renderToString(
@@ -106,5 +106,53 @@ describe('List — server rendering', () => {
     test('survives having no initialData at all', () => {
         // Not every caller passes it; the client fetch is the fallback.
         expect(() => ssr()).not.toThrow()
+    })
+
+    describe('pagination links', () => {
+        // The lists load by infinite scroll, which no crawler performs. Without
+        // these links a genre page exposes 10 of its 1,247 poems and the rest
+        // have no URL that reaches them.
+        const paged: InitialPoemsData = {
+            poems: [poem('p1', 'Aubade')],
+            page: 1,
+            hasMore: true,
+            total: 47,
+            totalPages: 5
+        }
+
+        test('the server HTML carries a link to page 2', () => {
+            const html = ssr({ initialData: paged })
+
+            expect(html).toContain('href="/?page=2"')
+        })
+
+        test('and to the LAST page, so deep pages are not 100 hops away', () => {
+            const html = ssr({ initialData: paged })
+
+            expect(html).toContain('href="/?page=5"')
+        })
+
+        test('page 5 links back to the clean URL, never to ?page=1', () => {
+            const html = ssr({ initialData: paged, currentPage: 5 })
+
+            expect(html).toContain('href="/"')
+            expect(html).not.toContain('page=1')
+        })
+
+        test('falls back to the total when the API omitted totalPages', () => {
+            const html = ssr({
+                initialData: { poems: [poem('p1', 'Aubade')], page: 1, hasMore: true, total: 47 }
+            })
+
+            expect(html).toContain('href="/?page=5"')
+        })
+
+        test('a list that fits on one page gets no pagination nav', () => {
+            // The distractor for a component that always draws one.
+            const html = ssr({ initialData })
+
+            expect(html).not.toContain('aria-label="Pagination"')
+            expect(html).not.toContain('page=')
+        })
     })
 })
