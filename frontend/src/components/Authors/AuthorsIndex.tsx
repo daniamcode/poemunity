@@ -1,135 +1,108 @@
-import { useState, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
 import Link from 'next/link'
-import { getAuthorsByLetterAction, getAuthorsLettersAction } from '../../redux/actions/authorsActions'
-import { getTypes } from '../../redux/actions/commonActions'
-import { ACTIONS } from '../../redux/reducers/authorsReducers'
-import { selectAuthorsByLetter } from '../../redux/selectors/authorCacheSelectors'
-import { RootState, useAppDispatch } from '../../redux/store'
 import { Author } from '../../typescript/interfaces'
+import {
+    AUTHOR_ORIGINS,
+    DEFAULT_LETTER,
+    DEFAULT_ORIGIN,
+    buildAuthorsHref
+} from '../../utils/authorsIndex'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-const ORIGIN_FILTERS = [
-    { value: 'all', label: 'All' },
-    { value: 'famous', label: 'Famous' },
-    { value: 'user', label: 'Users' },
-    { value: 'ai', label: 'AI' }
-]
-
-interface AuthorsIndexProps {
-    initialLetters?: string[]
-    initialAuthors?: Author[]
+const ORIGIN_LABELS: Record<string, string> = {
+    all: 'All',
+    famous: 'Famous',
+    user: 'Users',
+    ai: 'AI'
 }
 
-export default function AuthorsIndex({ initialLetters, initialAuthors }: AuthorsIndexProps) {
-    const dispatch = useAppDispatch()
-    const [activeLetter, setActiveLetter] = useState('A')
-    const [activeOrigin, setActiveOrigin] = useState('all')
-    const lettersSeeded = useRef(false)
-    const authorsSeeded = useRef(false)
+interface AuthorsIndexProps {
+    /** Letters that have at least one author with poems. */
+    initialLetters?: string[]
+    initialAuthors?: Author[]
+    letter?: string
+    origin?: string
+}
 
-    const { item: letters } = useSelector((state: RootState) => state.authorsLettersQuery)
-    const { isFetching } = useSelector((state: RootState) => state.authorsByLetterQuery)
-    // Resolve name/slug through the normalized authorEntities store so renames
-    // propagate without a refetch; count and ordering stay from the list cache.
-    const storeAuthors = useSelector(selectAuthorsByLetter)
-
-    // SERVER-RENDER FROM THE PROPS WHEN THE STORE IS STILL EMPTY.
-    //
-    // Same bug the poem lists had (see usePoemsList): the seeding below happens
-    // in EFFECTS, and effects do not run during server rendering — so this page
-    // fetched 251 authors, shipped every one of them inside `__NEXT_DATA__`,
-    // and rendered NOT ONE LINK. Measured on the live site before this fix: 0
-    // `/authors/` links in the HTML of the index page for 3,364 author pages.
-    //
-    // That made the whole author section invisible to a crawler except through
-    // the sitemap, which is discovery with no internal linking behind it.
-    //
-    // Reading the props directly is hydration-safe: on the client's FIRST
-    // render the effects have not run either, so the store is equally empty and
-    // this produces byte-identical markup. Once seeded, the store wins.
-    const authors = storeAuthors?.length ? storeAuthors : (initialAuthors ?? [])
-    const seededLetters = (letters as string[] | undefined)?.length
-        ? (letters as string[])
-        : (initialLetters ?? [])
-
-    useEffect(() => {
-        if (initialLetters) {
-            const { fulfilledAction } = getTypes(ACTIONS.AUTHORS_LETTERS)
-            dispatch({ type: fulfilledAction, payload: initialLetters })
-            lettersSeeded.current = true
-        }
-    }, [dispatch])
-
-    useEffect(() => {
-        if (initialAuthors) {
-            const { fulfilledAction } = getTypes(ACTIONS.AUTHORS_BY_LETTER)
-            dispatch({ type: fulfilledAction, payload: initialAuthors })
-            authorsSeeded.current = true
-        }
-    }, [dispatch])
-
-    useEffect(() => {
-        if (lettersSeeded.current) {
-            lettersSeeded.current = false
-            return
-        }
-        dispatch(getAuthorsLettersAction({ origin: activeOrigin }))
-    }, [activeOrigin])
-
-    useEffect(() => {
-        if (authorsSeeded.current) {
-            authorsSeeded.current = false
-            return
-        }
-        dispatch(getAuthorsByLetterAction({ letter: activeLetter, origin: activeOrigin }))
-    }, [activeLetter, activeOrigin])
-
-    const availableLetters = seededLetters
-
-    function handleOriginChange(origin: string) {
-        setActiveOrigin(origin)
-        setActiveLetter('A')
-    }
+/**
+ * The author index.
+ *
+ * THE LETTERS AND THE ORIGIN FILTER ARE LINKS, NOT BUTTONS. They used to be 26
+ * `<button onClick>` handlers over client state, which meant there was no URL
+ * anywhere on the site for "authors starting with B": the page server-rendered
+ * letter A and the other 25 letters — 3,100-odd of the 3,364 author pages —
+ * existed only after a click a crawler cannot perform.
+ *
+ * Being links also makes the whole component PROP-DRIVEN. Every letter and
+ * filter is a real navigation that re-runs `getServerSideProps`, so there is no
+ * client fetch, no seeding effect, and no window in which the store holds the
+ * previous letter's authors while the URL names a different one. That window is
+ * what the effect-seeded version had, and it is the same class of bug as
+ * rendering nothing on the server — see `Authors.ssr.test.tsx`.
+ */
+export default function AuthorsIndex({
+    initialLetters,
+    initialAuthors,
+    letter = DEFAULT_LETTER,
+    origin = DEFAULT_ORIGIN
+}: AuthorsIndexProps) {
+    const authors = initialAuthors ?? []
+    const availableLetters = initialLetters ?? []
 
     return (
         <main className='authors-index'>
             <h1 className='authors-index__title'>Authors</h1>
 
-            <div className='authors-index__origin-filter'>
-                {ORIGIN_FILTERS.map(f => (
-                    <button
-                        key={f.value}
-                        className={`authors-index__origin-btn${activeOrigin === f.value ? ' active' : ''}`}
-                        onClick={() => handleOriginChange(f.value)}
-                    >
-                        {f.label}
-                    </button>
-                ))}
-            </div>
+            <nav className='authors-index__origin-filter' aria-label='Filter authors by kind'>
+                {AUTHOR_ORIGINS.map(value => {
+                    const isActive = value === origin
+                    return (
+                        <Link
+                            key={value}
+                            className={`authors-index__origin-btn${isActive ? ' active' : ''}`}
+                            // Changing the filter returns to A: the letters that
+                            // hold authors differ per filter, so keeping the
+                            // letter can land on one this filter has emptied.
+                            href={buildAuthorsHref(DEFAULT_LETTER, value)}
+                            aria-current={isActive ? 'true' : undefined}
+                        >
+                            {ORIGIN_LABELS[value]}
+                        </Link>
+                    )
+                })}
+            </nav>
 
             <nav className='authors-index__alphabet' aria-label='Browse authors by letter'>
-                {ALPHABET.map(letter => {
-                    const hasAuthors = availableLetters.includes(letter)
-                    const activeClass = activeLetter === letter ? ' active' : ''
-                    const disabledClass = !hasAuthors ? ' disabled' : ''
+                {ALPHABET.map(entry => {
+                    const hasAuthors = availableLetters.includes(entry)
+                    const isActive = entry === letter
+                    const activeClass = isActive ? ' active' : ''
+
+                    // A letter with no authors is not a link and not a page —
+                    // it would render a heading over nothing, which is the
+                    // soft-404 shape the empty genres were fixed for.
+                    if (!hasAuthors) {
+                        return (
+                            <span key={entry} className='authors-index__letter disabled' aria-disabled='true'>
+                                {entry}
+                            </span>
+                        )
+                    }
+
                     return (
-                        <button
-                            key={letter}
-                            className={`authors-index__letter${activeClass}${disabledClass}`}
-                            onClick={() => hasAuthors && setActiveLetter(letter)}
-                            aria-current={activeLetter === letter ? 'true' : undefined}
-                            disabled={!hasAuthors}
+                        <Link
+                            key={entry}
+                            className={`authors-index__letter${activeClass}`}
+                            href={buildAuthorsHref(entry, origin)}
+                            aria-current={isActive ? 'true' : undefined}
                         >
-                            {letter}
-                        </button>
+                            {entry}
+                        </Link>
                     )
                 })}
             </nav>
 
             <section className='authors-index__list'>
-                {isFetching && <p className='authors-index__loading'>Loading...</p>}
-                {!isFetching && authors?.map(author => (
+                {authors.map(author => (
                     <Link
                         key={author.slug}
                         className='authors-index__author'
@@ -141,7 +114,7 @@ export default function AuthorsIndex({ initialLetters, initialAuthors }: Authors
                         </span>
                     </Link>
                 ))}
-                {!isFetching && !authors?.length && (
+                {authors.length === 0 && (
                     <p className='authors-index__empty'>No authors found for this letter.</p>
                 )}
             </section>

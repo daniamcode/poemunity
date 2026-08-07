@@ -641,6 +641,68 @@ a link on screen nor an `item` in the markup.
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
 
+## Paginated list URLs
+
+The lists load by **infinite scroll**, which no crawler performs, and the routes
+hardcoded `page: 1` — so `/love?page=2` returned byte-identical poems to `/love`
+and poems 11..1,247 had **no URL that reached them**. A genre page exposed 10 of
+its 1,247 poems. Measured before the fix: a crawl from the homepage following
+only server-rendered links reached 11% of poems within five clicks.
+
+Infinite scroll stays; `?page=N` is honoured server-side underneath it, and
+`components/Pagination.tsx` renders real `<a href>` links into the HTML.
+`src/utils/pagination.ts` owns the rules and `pagination.test.tsx` pins them.
+
+**One page of results has one address.** Page 1 is the CLEAN URL and `?page=1`
+redirects rather than rendering. So does junk — and the validation is a
+`/^[1-9]\d*$/` test, not `Number()`, which accepts `'1.5'`, `' 2 '`, `'0x3'`,
+`'1e3'` and `'02'`. Silently falling back to page 1 is what the genre route used
+to do, and it mints a limitless supply of URLs serving poems they do not name.
+
+**A page past the end is a 404.** `?page=9999` rendered a heading over nothing —
+the soft-404 shape — and there are infinitely many of them. Page 1 is exempt: an
+empty genre is a real page that says so.
+
+**Each page canonicalises to ITSELF, never back to page 1.** Page 2 holds
+different poems, so folding it into page 1 declares it a duplicate of a page it
+shares nothing with, and Google drops the links on a URL it has folded away —
+which is the entire reason these URLs exist. Titles carry the page number for
+the same reason: 125 pages under one title read as one page.
+
+The nav lists **first and last**, not just prev/next: page 125 would otherwise
+sit 124 hops from page 1 and no crawler walks that far. It describes the **URL**,
+not how far infinite scroll has loaded — a nav tracking the scroll position
+would renumber itself as you read, and would not render identically on server
+and client.
+
+### The author index is letters, not buttons
+
+The alphabet was 26 `<button onClick>` handlers over client state, so there was
+**no URL for "authors starting with B"**: the page server-rendered letter A and
+the other 25 letters — 3,100-odd of the 3,364 author pages — existed only after
+a click. `?letter=` was ignored server-side too.
+
+They are `<Link>`s now, which also makes `AuthorsIndex` **purely prop-driven**:
+every letter and filter is a real navigation that re-runs `getServerSideProps`,
+so there is no seeding effect and no window where the store holds the previous
+letter's authors under a URL naming a different one.
+
+Rules mirror pagination: **letter A is the clean `/authors` URL**, `?letter=A`
+redirects, and **lowercase REDIRECTS rather than being uppercased in place** —
+uppercasing would leave `?letter=b` and `?letter=B` both answering 200 with the
+same authors. A letter nobody's name begins with is a **404** and is not linked.
+
+**Letters are indexable and self-canonical; the origin filter is
+`noindex,follow`.** Letters *partition* the authors, so no two letter pages list
+the same person. An origin-filtered view is a strict SUBSET of one, so indexing
+it would put the same people on two URLs — the same treatment `?q=` gets, and
+`follow` because its links are still worth crawling. Changing the filter returns
+to letter A, because the letters holding authors differ per filter and carrying
+one across can land on a letter that filter has emptied.
+
+All 3,364 author pages are now linked, verified by walking A-Z against the real
+backend.
+
 ## Sitemaps (an index over four sections)
 
 `/sitemap.xml` is a **sitemap index**, not a urlset. It lists four children —

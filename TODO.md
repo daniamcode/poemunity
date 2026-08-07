@@ -216,6 +216,7 @@ Ordered by impact. Seeded by a competitor review (Yavendras' "Zona Privada": tab
 
 **One line each, by design.** The reasoning that outlives the change lives in `AGENTS.md`; this list exists only so nobody proposes the work again.
 
+- **Paginated list URLs + author-index letters** (2026-08-07) — `?page=N` and `?letter=X` are honoured server-side with real `<a>` navs; one address per view (`?page=1`/`?letter=A` redirect), out-of-range is 404, each page self-canonical. All 3,364 author pages are now linked.
 - **Author pages render their links on the server** (2026-08-07) — `/authors` emitted 0 links to 3,364 author pages and each author page 0 links to its poems, both from seeding SSR props inside a `useEffect`. Guarded by `Authors.ssr.test.tsx`; RTL cannot see this class of bug.
 - **Sitemap split into an index over four sections** (2026-08-07) — `pages`, `authors`, `poems-community`, `poems-famous`, so Search Console reports coverage per class instead of one number over 19,587 URLs. Same URL set as before. **The fetchers now throw instead of `break`ing**: a failure is a 500, not a silently-truncated sitemap cached for a day. Poem pages fetch concurrently off the page count (~30s → ~5s), and `pages` costs 136 `limit=1` probes rather than a walk of every poem.
 - **Sitemap `<lastmod>`** (2026-08-06) — emitted only where it is true; poems carry their own date, a genre is as fresh as its newest poem, author/privacy/terms carry none.
