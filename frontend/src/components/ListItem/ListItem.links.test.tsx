@@ -65,7 +65,9 @@ describe('ListItem — poem links', () => {
     test('the comments icon deep-links to the comments, still by slug', () => {
         renderItem(basePoem)
 
-        expect(screen.getByRole('link', { name: 'View comments' }))
+        // The name carries the poem title now — ten cards on a page used to
+        // give ten identical "View comments" links. See linkText.test.tsx.
+        expect(screen.getByRole('link', { name: /^View comments/ }))
             .toHaveAttribute('href', '/detail/the-moon-and-the-sun-moon14#comments')
     })
 

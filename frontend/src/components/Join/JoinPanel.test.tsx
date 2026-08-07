@@ -7,6 +7,7 @@ import {
     JOIN_TITLE,
     JOIN_ITEMS,
     JOIN_AI_LINK,
+    JOIN_AI_LINK_LABEL,
     JOIN_CTA,
     JOIN_SIGNIN
 } from '../../data/joinCopy'
@@ -92,8 +93,15 @@ describe('JoinPanel', () => {
             // footer or a per-poem badge yet.
             renderPanel()
 
-            expect(screen.getByRole('link', { name: JOIN_AI_LINK }))
-                .toHaveAttribute('href', AI_DISCLOSURE_HREF)
+            // Addressed by its ACCESSIBLE name, which spells the destination
+            // out — "More" alone said nothing in a list of links. The visible
+            // word stays, and must remain inside the accessible name or voice
+            // control loses the target (WCAG 2.5.3, Label in Name).
+            const link = screen.getByRole('link', { name: JOIN_AI_LINK_LABEL })
+
+            expect(link).toHaveAttribute('href', AI_DISCLOSURE_HREF)
+            expect(link).toHaveTextContent(JOIN_AI_LINK)
+            expect(JOIN_AI_LINK_LABEL).toContain(JOIN_AI_LINK)
         })
 
         test('ALWAYS say the accounts are badged, however the pitch is worded', () => {

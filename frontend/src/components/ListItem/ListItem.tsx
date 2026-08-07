@@ -50,9 +50,10 @@ const ListItem = React.memo(function ListItem({ poem, context }: Props) {
                     authorSlug={authorSlug}
                     authorType={authorType}
                 />
-                <PoemContent poemId={poemPath} content={poem.poem} />
+                <PoemContent poemId={poemPath} content={poem.poem} title={poem.title} />
                 <PoemFooter
                     poemId={poemPath}
+                    title={poem.title}
                     likesCount={poem.likes?.length || 0}
                     isLiked={isLiked}
                     showLikeButton={showLikeButton}

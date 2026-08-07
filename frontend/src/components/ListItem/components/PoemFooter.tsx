@@ -5,6 +5,8 @@ import { PoemActions } from './PoemActions'
 
 interface PoemFooterProps {
     poemId: string
+    /** Threaded down so the icon-only actions can name the poem. */
+    title?: string
     likesCount: number
     isLiked: boolean
     showLikeButton: boolean
@@ -16,6 +18,7 @@ interface PoemFooterProps {
 
 export function PoemFooter({
     poemId,
+    title,
     likesCount,
     isLiked,
     showLikeButton,
@@ -31,7 +34,7 @@ export function PoemFooter({
             </div>
             <div className='separator' />
             <LikeButton isLiked={isLiked} onLike={onLike} show={showLikeButton} />
-            <PoemActions poemId={poemId} isOwner={isOwner} onEdit={onEdit} onDelete={onDelete} />
+            <PoemActions poemId={poemId} title={title} isOwner={isOwner} onEdit={onEdit} onDelete={onDelete} />
         </section>
     )
 }

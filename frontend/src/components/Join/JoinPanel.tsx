@@ -8,6 +8,7 @@ import {
     JOIN_ITEMS,
     JOIN_AI_TEXT,
     JOIN_AI_LINK,
+    JOIN_AI_LINK_LABEL,
     JOIN_CTA,
     JOIN_SIGNIN
 } from '../../data/joinCopy'
@@ -55,7 +56,17 @@ export default function JoinPanel() {
 
             <p className='join-panel__ai'>
                 {JOIN_AI_TEXT}{' '}
-                <Link href={AI_DISCLOSURE_HREF} className='join-panel__ai-link'>{JOIN_AI_LINK}</Link>
+                {/* "More" alone says nothing in a list of links. The visible
+                    word stays — it follows a sentence that supplies the
+                    context — and the accessible name spells the destination
+                    out, keeping the visible text inside it (WCAG 2.5.3). */}
+                <Link
+                    href={AI_DISCLOSURE_HREF}
+                    className='join-panel__ai-link'
+                    aria-label={JOIN_AI_LINK_LABEL}
+                >
+                    {JOIN_AI_LINK}
+                </Link>
             </p>
         </section>
     )

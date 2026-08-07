@@ -130,6 +130,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         class="poems__read-more"
       >
         <a
+          aria-label="Read more of “Test Poem”"
           class="poems__read-more"
           href="/detail/test-poem-id"
         >
@@ -151,7 +152,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         class="separator"
       />
       <button
-        aria-label="Edit poem"
+        aria-label="Edit poem — “Test Poem”"
         class="poem__edit-icon"
         data-testid="edit-poem"
         type="button"
@@ -169,7 +170,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         </svg>
       </button>
       <button
-        aria-label="Delete poem"
+        aria-label="Delete poem — “Test Poem”"
         class="poem__delete-icon"
         data-testid="delete-poem"
         style="fill: red;"
@@ -188,7 +189,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         </svg>
       </button>
       <a
-        aria-label="View comments"
+        aria-label="View comments — “Test Poem”"
         class="poem__comments-icon"
         href="/detail/test-poem-id#comments"
       >
@@ -262,6 +263,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         class="poems__read-more"
       >
         <a
+          aria-label="Read more of “Test Poem”"
           class="poems__read-more"
           href="/detail/test-poem-id"
         >
@@ -283,7 +285,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         class="separator"
       />
       <button
-        aria-label="Edit poem"
+        aria-label="Edit poem — “Test Poem”"
         class="poem__edit-icon"
         data-testid="edit-poem"
         type="button"
@@ -301,7 +303,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         </svg>
       </button>
       <button
-        aria-label="Delete poem"
+        aria-label="Delete poem — “Test Poem”"
         class="poem__delete-icon"
         data-testid="delete-poem"
         style="fill: red;"
@@ -320,7 +322,7 @@ exports[`MUI Components Visual Regression Tests ListItem should render list item
         </svg>
       </button>
       <a
-        aria-label="View comments"
+        aria-label="View comments — “Test Poem”"
         class="poem__comments-icon"
         href="/detail/test-poem-id#comments"
       >

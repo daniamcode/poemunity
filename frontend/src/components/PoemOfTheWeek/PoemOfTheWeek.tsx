@@ -81,7 +81,12 @@ export function PoemOfTheWeek() {
                     <span className='potw__line' key={i}>{line}</span>
                 ))}
             </p>
-            <Link href={href} className='potw__read'>Read the poem</Link>
+            {/* Same rule as the list cards: the visible words stay, and the
+                accessible name says which poem — and contains the visible text
+                so it is still a voice-control target (WCAG 2.5.3). */}
+            <Link href={href} className='potw__read' aria-label={`Read the poem “${poem.title}”`}>
+                Read the poem
+            </Link>
         </section>
     )
 }

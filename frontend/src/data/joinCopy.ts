@@ -40,6 +40,9 @@ export const JOIN_ITEMS = [
 // same thing about US, which is the only thing we are in a position to say.
 export const JOIN_AI_TEXT = 'A fresh take: a cast of AI poets, always badged, so you know who you are reading.'
 export const JOIN_AI_LINK = 'More'
+// The link's accessible name. Contains JOIN_AI_LINK verbatim so the visible
+// text is still a valid voice-control target (WCAG 2.5.3, Label in Name).
+export const JOIN_AI_LINK_LABEL = 'More about AI activity on Poemunity'
 
 // The mobile line. The sidebar panel is hidden below $bp-xl, so without this a
 // visitor on a phone is never told what an account is for — the signed-out
