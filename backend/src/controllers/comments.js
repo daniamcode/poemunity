@@ -209,10 +209,26 @@ commentsRouter.get('/received', userExtractor, async (req, res) => {
 commentsRouter.get('/', async (req, res) => {
   const { targetType, targetId, since } = req.query
   try {
+    // Same rule as `?userId=` on the poem list: a malformed parameter is a 400,
+    // not a 500. Both of these reached the driver unchecked and threw a
+    // CastError into the catch-all below — `targetId` because it is cast to an
+    // ObjectId, `since` because an unparseable date becomes `Invalid Date`,
+    // which cannot be compared and fails at query time rather than here.
     const filter = {}
     if (targetType) filter.targetType = targetType
-    if (targetId) filter.targetId = targetId
-    if (since) filter.createdAt = { $gt: new Date(since) }
+    if (targetId) {
+      if (!mongoose.Types.ObjectId.isValid(String(targetId))) {
+        return res.status(400).json({ error: 'Invalid targetId' })
+      }
+      filter.targetId = targetId
+    }
+    if (since) {
+      const from = new Date(since)
+      if (Number.isNaN(from.getTime())) {
+        return res.status(400).json({ error: 'Invalid since date' })
+      }
+      filter.createdAt = { $gt: from }
+    }
 
     if (!targetType && !targetId && !since) {
       return res.status(400).json({ error: 'Provide targetType+targetId or since' })

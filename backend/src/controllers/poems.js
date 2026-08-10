@@ -238,8 +238,17 @@ poemsRouter.get('/', userExtractor.optional, async (req, res) => {
     }
 
     // userId filter — check authorId (new) and legacy userId field (string or ObjectId)
+    //
+    // The validity check is not decoration: `new ObjectId('junk')` THROWS, and
+    // the throw landed in this handler's catch-all, so `?userId=junk` answered
+    // 500 Internal Server Error. Nothing internal went wrong — the request was
+    // malformed, which is a 400. A 500 also reads as "the site is broken" in
+    // logs and uptime monitoring, so it buries real failures among typos.
     if (req.query.userId && !wantsDrafts) {
-      const id = new mongoose.Types.ObjectId(req.query.userId)
+      if (!mongoose.Types.ObjectId.isValid(String(req.query.userId))) {
+        return res.status(400).json({ error: 'Invalid userId' })
+      }
+      const id = new mongoose.Types.ObjectId(String(req.query.userId))
       filter.$or = [{ authorId: id }, { userId: id }, { userId: req.query.userId }]
     }
 
@@ -336,6 +345,26 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
   const poemData = req.body
   const { userId } = req
 
+  // A POEM NEEDS WORDS AND A NAME.
+  //
+  // `Poem` declares neither `title` nor `poem` as required, so the API happily
+  // stored an empty one — which is not merely untidy: it is listed like any
+  // other poem, it gets a detail page, it is emitted into the sitemap, and its
+  // slug is derived from an absent title. The form has always required both, so
+  // this only ever produced junk from direct API calls.
+  //
+  // Enforced HERE rather than with `required: true` on the schema, deliberately.
+  // The like route mutates and `save()`s an existing document, and save runs
+  // validators over the WHOLE document — so a schema rule would make any legacy
+  // poem that happens to lack one of these fields impossible to like, turning a
+  // write-path rule into a read-path outage on data nobody has audited. The
+  // boundary is where the bad value enters.
+  const title = typeof poemData.title === 'string' ? poemData.title.trim() : ''
+  const body = typeof poemData.poem === 'string' ? poemData.poem.trim() : ''
+  if (!title || !body) {
+    return res.status(400).json({ error: 'A poem needs a title and a body' })
+  }
+
   const adminId = process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_ADMIN_PRE
     : process.env.REACT_APP_ADMIN
@@ -357,7 +386,7 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
     return res.status(404).json({ error: 'Author not found' })
   }
 
-  const slug = await buildUniqueSlug(poemData.title, author.name || author.username)
+  const slug = await buildUniqueSlug(title, author.name || author.username)
 
   // The dropdown constrains the UI only — this endpoint spreads the body into a
   // `strict: false` model, so an unvalidated genre would be stored verbatim and
@@ -381,8 +410,10 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
   // someone deliberately makes it writable, whereas a delete-list silently
   // admits whatever it was not updated to exclude.
   const newPoem = new Poem({
-    poem: poemData.poem,
-    title: poemData.title,
+    // The TRIMMED values, so a title of spaces cannot slip past the check
+    // above and then be stored verbatim.
+    poem: body,
+    title,
     genre: genre.genre,
     authorId: author._id,
     // Derived from the author, never the request — an ordinary poet must not be

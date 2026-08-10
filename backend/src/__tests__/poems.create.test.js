@@ -39,6 +39,49 @@ describe('Poems API - Create and Update', () => {
   })
 
   describe('POST /api/v1/poems', () => {
+    /**
+     * A POEM NEEDS WORDS AND A NAME.
+     *
+     * `Poem` declares neither field as required, so the API stored empty poems
+     * — which are then listed like any other, get a detail page, and are
+     * emitted into the sitemap, with a slug derived from an absent title.
+     *
+     * Every assertion here checks the COLLECTION as well as the status. The
+     * handler builds and saves the document, so a version that answered 400
+     * after saving would satisfy a status-only test.
+     */
+    describe('rejects a poem with nothing in it', () => {
+      const post = (body) => request(app)
+        .post('/api/v1/poems')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(body)
+
+      test.each([
+        ['no title at all', { poem: 'Some verse', genre: 'Love' }],
+        ['an empty title', { title: '', poem: 'Some verse', genre: 'Love' }],
+        ['a title of spaces', { title: '   ', poem: 'Some verse', genre: 'Love' }],
+        ['no body at all', { title: 'Aubade', genre: 'Love' }],
+        ['an empty body', { title: 'Aubade', poem: '', genre: 'Love' }],
+        ['a body of whitespace', { title: 'Aubade', poem: ' \n\t ', genre: 'Love' }]
+      ])('%s is a 400 and persists nothing', async (_label, body) => {
+        const before = await Poem.countDocuments()
+
+        await post(body).expect(400)
+
+        expect(await Poem.countDocuments()).toBe(before)
+      })
+
+      test('a real poem still saves, with both fields trimmed', async () => {
+        // The distractor for a check that rejects too much — and it pins the
+        // trimming, so a padded title cannot pass the guard and then be stored
+        // with the padding intact.
+        const res = await post({ title: '  Aubade  ', poem: '  Some verse  ', genre: 'Love' }).expect(201)
+
+        expect(res.body.title).toBe('Aubade')
+        expect(res.body.poem).toBe('Some verse')
+      })
+    })
+
     test('should create a new poem successfully', async () => {
       const newPoem = {
         title: 'New Poem',
@@ -290,7 +333,11 @@ describe('Poems API - Create and Update', () => {
         .send(newPoem)
         .expect(201)
 
-      expect(response.body.poem).toBe(longContent)
+      // `.trim()` because the fixture is built with `.repeat()`, which leaves a
+      // trailing space — and the create route now trims both fields (see the
+      // empty-poem guard above). This test is about long content surviving, not
+      // about trailing whitespace surviving.
+      expect(response.body.poem).toBe(longContent.trim())
     })
 
     test('should handle special characters in poem content', async () => {
