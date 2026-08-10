@@ -37,11 +37,18 @@ export function genreTitle(label: string, total: number, page = 1): string {
     return page > 1 ? `${base} — page ${page}` : base
 }
 
-/** "35 poems by John Doe" · "1 poem by John Doe" · "Poems by John Doe". */
-export function authorTitle(name: string, total: number): string {
+/**
+ * "35 poems by John Doe" · "1 poem by John Doe" · "Poems by John Doe".
+ *
+ * Page 2 and beyond carry the page number for the same reason genre titles do:
+ * they are separate self-canonical URLs, and nine pages sharing one title read
+ * as nine copies of one page.
+ */
+export function authorTitle(name: string, total: number, page = 1): string {
     const prefix = countPrefix(total)
     const word = prefix ? poemWord(total) : 'Poems'
-    return `${prefix}${word} by ${name}`
+    const base = `${prefix}${word} by ${name}`
+    return page > 1 ? `${base} — page ${page}` : base
 }
 
 /**
@@ -87,13 +94,26 @@ export function genreDescription(
  * Over-length text is cut by SeoHead, so the count survives truncation and the
  * bio is what gets clipped.
  */
-export function authorDescription(name: string, total: number, bio?: string): string {
+export function authorDescription(
+    name: string,
+    total: number,
+    bio?: string,
+    page = 1,
+    totalPages = 1
+): string {
     const lead = total > 0
         ? `${total} ${poemWord(total)} by ${name} on ${SITE}.`
         : `Poems by ${name} on ${SITE}.`
 
+    // Named outright rather than left to the bio, which is identical on every
+    // page of an author — without this, pages 2..9 of a prolific poet carry a
+    // description indistinguishable from page 1's.
+    const tail = page > 1 ? ` Page ${page} of ${totalPages}.` : ''
+
     const trimmedBio = bio?.trim()
-    return trimmedBio ? `${lead} ${trimmedBio}` : `${lead} Read, like and share their poetry.`
+    return trimmedBio
+        ? `${lead} ${trimmedBio}${tail}`
+        : `${lead} Read, like and share their poetry.${tail}`
 }
 
 /**

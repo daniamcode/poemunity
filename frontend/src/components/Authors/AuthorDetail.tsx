@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
@@ -8,7 +8,10 @@ import CircularProgress from '../CircularIndeterminate'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { useAuthorPoems, InitialAuthorPoemsData } from './useAuthorPoems'
 import API from '../../redux/actions/axiosInstance'
-import { categoryToSlug, FOLLOWERS_LABEL, FOLLOWING_LABEL } from '../../data/constants'
+import { usePageUrlSync } from '../../hooks/usePageUrlSync'
+import { Pagination } from '../Pagination'
+import { pageCount } from '../../utils/pagination'
+import { categoryToSlug, FOLLOWERS_LABEL, FOLLOWING_LABEL, PAGINATION_LIMIT } from '../../data/constants'
 import CommentsSection from '../Comments/CommentsSection'
 import FollowButton from '../Follow/FollowButton'
 import { useAppDispatch } from '../../redux/store'
@@ -41,9 +44,11 @@ export interface AuthorProfile {
 interface AuthorDetailProps {
     initialPoems?: InitialAuthorPoemsData
     initialAuthor?: AuthorProfile | null
+    /** 1-based page from `?page=`, resolved server-side. */
+    currentPage?: number
 }
 
-export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDetailProps) {
+export default function AuthorDetail({ initialPoems, initialAuthor, currentPage = 1 }: AuthorDetailProps) {
     const router = useRouter()
     const slug = router.query.slug as string
     const context = useContext(AppContext)
@@ -58,13 +63,24 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
     const authorEntity = useSelector((state: RootState) =>
         (authorId ? selectAuthorEntityById(state, authorId) : undefined))
 
-    const { poems, isLoading, hasMore, total, handleLoadMore } = useAuthorPoems(slug, initialPoems)
+    const { poems, isLoading, hasMore, total, handleLoadMore } = useAuthorPoems(slug, initialPoems, currentPage)
 
     const authorName = authorProfile?.name
         || poems[0]?.authorName || poems[0]?.author
         || (slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '')
 
     const sentinelRef = useInfiniteScroll({ onLoadMore: handleLoadMore, hasMore, isLoading })
+
+    // Same arrangement as the poem lists: infinite scroll is untouched, and the
+    // URL follows the reader across a page boundary via replaceState so a
+    // deep-scrolled author page is shareable and Back returns to it.
+    const basePath = `/authors/${slug}`
+    const { visiblePage, markerRef } = usePageUrlSync({
+        basePath,
+        startPage: currentPage,
+        enabled: Boolean(slug)
+    })
+    const totalPages = initialPoems?.totalPages ?? pageCount(total, PAGINATION_LIMIT)
 
     useEffect(() => {
         if (!slug) return
@@ -167,14 +183,37 @@ export default function AuthorDetail({ initialPoems, initialAuthor }: AuthorDeta
                         {total} {total === 1 ? 'poem' : 'poems'}
                     </h2>
                 )}
-                {poems.map(poem => (
-                    <ListItem key={poem.id} poem={poem} context={context} />
+                {poems.map((poem, index) => (
+                    <React.Fragment key={poem.id}>
+                        {/* Opens each page's block so the scroll sync knows
+                            where one page ends and the next begins. Zero-height
+                            and aria-hidden — a coordinate, not content. */}
+                        {index % PAGINATION_LIMIT === 0 && (
+                            <span
+                                ref={markerRef(currentPage + index / PAGINATION_LIMIT)}
+                                className='list__page-marker'
+                                aria-hidden='true'
+                            />
+                        )}
+                        <ListItem poem={poem} context={context} />
+                    </React.Fragment>
                 ))}
                 {isLoading && <CircularProgress />}
                 {!isLoading && poems.length === 0 && (
                     <p className='author-detail__empty'>No poems found for this author.</p>
                 )}
                 <div ref={sentinelRef} />
+
+                {/* Below the sentinel, so scrolling reaches more poems before
+                    it reaches the nav — the nav is how you JUMP, and how a
+                    crawler walks past poem 10 at all. `visiblePage` rather than
+                    the SSR page, so the nav and the address bar cannot disagree
+                    about where the reader is. */}
+                <Pagination
+                    basePath={basePath}
+                    currentPage={visiblePage}
+                    totalPages={totalPages}
+                />
             </div>
 
             {authorProfile?.id && (

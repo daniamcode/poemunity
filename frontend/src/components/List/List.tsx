@@ -64,7 +64,8 @@ function List({ genre: genreProp, initialData, currentPage = 1, match }: ListPro
         orderBy: paramsData.orderBy,
         initialData,
         q,
-        nextSignal
+        nextSignal,
+        currentPage
     })
 
     // Infinite scroll works normally during a search now. It used to be frozen

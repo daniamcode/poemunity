@@ -27,28 +27,60 @@ export interface UsePoemsListParams {
     q?: string
     /** Fresh AbortSignal per fetch, so a superseded request cannot land late. */
     nextSignal?: () => AbortSignal
+    /** 1-based page from `?page=`, resolved server-side. */
+    currentPage?: number
 }
 
-export function usePoemsList({ genre, origin, orderBy, initialData, q = '', nextSignal }: UsePoemsListParams) {
+export function usePoemsList({
+    genre,
+    origin,
+    orderBy,
+    initialData,
+    q = '',
+    nextSignal,
+    currentPage = 1
+}: UsePoemsListParams) {
     const dispatch = useAppDispatch()
     const poemsListQuery = useSelector((state: RootState) => state.poemsListQuery)
     // Cache stores poem ids; resolve them back to Poem[] via the entity store.
     const resolvedPoems = useSelector(selectPoemsListPoems)
     const isSeeded = useRef(false)
+    /** Which page the store was last seeded from; null until the first seed. */
+    const seededPage = useRef<number | null>(null)
     const effectiveOrderBy = orderBy || ORDER_BY_LIKES
 
-    // On mount: seed store with SSR data (skip reset+fetch) or do normal reset
+    // On mount: seed store with SSR data (skip reset+fetch) or do normal reset.
+    //
+    // ALSO ON EVERY PAGE CHANGE. Clicking a link in the pagination nav is a
+    // client-side navigation: `getServerSideProps` re-runs and hands down page
+    // 3's poems, but this component never unmounts, so a mount-only seed left
+    // the store holding page 1 and the reader saw the poems they had just paged
+    // away from, under a URL naming a page they never got.
+    //
+    // The reset first is load-bearing: the cache APPENDS a payload whose `page`
+    // is not 1 — that is how infinite scroll grows the list — so seeding page 3
+    // onto a store holding page 1 renders both.
     useEffect(() => {
+        const { fulfilledAction, resetAction } = getTypes(ACTIONS.POEMS_LIST)
         if (initialData) {
+            if (seededPage.current === currentPage) return
+            if (seededPage.current !== null) dispatch({ type: resetAction })
             // Seed the entity store first so the id-array resolves to full poems.
             dispatch(poemsUpserted(initialData.poems))
-            const { fulfilledAction } = getTypes(ACTIONS.POEMS_LIST)
             dispatch({ type: fulfilledAction, payload: initialData })
-            isSeeded.current = true
+            // Only the FIRST seed suppresses the fetch below. That effect does
+            // not watch the page, so on a page navigation it never runs to
+            // clear the flag — and a flag left standing would swallow the fetch
+            // for the next real filter or search change instead.
+            if (seededPage.current === null) isSeeded.current = true
+            seededPage.current = currentPage
         } else {
             dispatch(getPoemsListAction({ options: { reset: true, fetch: false } }))
         }
-    }, [dispatch])
+        // `initialData` is deliberately absent: Next hands down a new object on
+        // every render, and depending on it would re-seed in a loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, currentPage])
 
     // Every fetch (initial, search, load-more, retry) sends the same filters;
     // only the page differs. Keeping one builder means search can never be

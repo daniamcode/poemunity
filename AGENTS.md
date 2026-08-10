@@ -672,6 +672,42 @@ the same reason: 125 pages under one title read as one page.
 The nav lists **first and last**, not just prev/next: page 125 would otherwise
 sit 124 hops from page 1 and no crawler walks that far.
 
+**Three routes carry these rules**: `/`, `/[genre]` and `/authors/<slug>`. The
+author page was added last (408 authors have more than ten poems, and 3,381
+poems — 21% of the collection — sat past page 1 of theirs); it reuses
+`utils/pagination.ts` and `components/Pagination.tsx` unchanged, so a fourth
+paginated list is wiring, not new rules.
+
+### A page link is a client-side navigation, and the store must follow it
+
+Every one of these lists seeds Redux from its SSR props inside an effect, and
+the effect ran **once, on mount**. Clicking a page link does not unmount
+anything — `getServerSideProps` re-runs and hands down page 3's poems while the
+component keeps the store it already had. Two different wrong outcomes hide
+there, and the paginated URLs work perfectly on a cold load in both:
+
+- **Stale** — the seed is skipped and the reader keeps looking at page 1 under a
+  URL naming page 3.
+- **Appended** — the seed runs without a reset first. The list caches *append*
+  any payload whose `page` is not 1, because that is how infinite scroll grows
+  the list, so page 3 lands under page 1 and twenty poems render.
+
+So the seed watches `currentPage`, and **resets the cache before re-seeding**
+whenever the page it last seeded differs. In `usePoemsList` only the FIRST seed
+sets the flag that suppresses the filter-change fetch: that effect does not
+watch the page, so on a page navigation it never runs to clear the flag, and a
+flag left standing would swallow the fetch for the next real search instead.
+
+A `renderHook` test with **one store across both renders** is what pins this;
+building the store inside the wrapper component rebuilds it on every render, the
+hook falls back to its prop, and every assertion passes against both bugs. That
+is not hypothetical — a red-check caught exactly that hollow version here.
+
+The other half of the same class: `/[genre]` computed `currentPage` and **never
+passed it to `<Dashboard>`**, so on `/love?page=7` the nav marked page 1 current
+and `usePageUrlSync` rewrote the address bar back to `/love`. Server-side
+paging was right; nothing rendered from it.
+
 ### The address bar follows the scroll
 
 `hooks/usePageUrlSync.ts` rewrites the URL via `history.replaceState` as the

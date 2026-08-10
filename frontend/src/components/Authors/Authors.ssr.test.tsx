@@ -186,4 +186,66 @@ describe('AuthorDetail — server rendering', () => {
     test('survives having no initialPoems at all', () => {
         expect(() => ssr()).not.toThrow()
     })
+
+    /**
+     * The pagination nav is server-rendered for the same reason the poem links
+     * are: it is the only way a crawler reaches poem 11 of an author. 408
+     * authors have more than 10 poems and 3,381 poems sat past page 1 of their
+     * author page with no URL on this route naming them.
+     */
+    describe('the pagination nav', () => {
+        const prolific = (page: number): InitialAuthorPoemsData => ({
+            poems: [poem('p1', 'Aubade', 'aubade-ada')],
+            page,
+            hasMore: true,
+            total: 85,
+            totalPages: 9
+        })
+
+        const ssrPaged = (page: number) =>
+            render(
+                <AuthorDetail
+                    initialPoems={prolific(page)}
+                    initialAuthor={{ id: 'a1', slug: 'ada-brine', name: 'Ada Brine' } as never}
+                    currentPage={page}
+                />
+            )
+
+        test('renders real hrefs into the HTML, first and last included', () => {
+            const html = ssrPaged(1)
+
+            expect(html).toContain('href="/authors/ada-brine?page=2"')
+            // Not just next: page 9 would otherwise sit eight hops from page 1.
+            expect(html).toContain('href="/authors/ada-brine?page=9"')
+        })
+
+        // Scoped to the nav's own markup, not the whole page. A red-check
+        // caught this passing with the nav deleted entirely: the poem rows
+        // already link to /authors/ada-brine, so the clean URL is present
+        // whether or not the nav renders.
+        const nav = (html: string) =>
+            (html.match(/<nav class="pagination"[\s\S]*?<\/nav>/) || [''])[0]
+
+        test('page 1 is linked as the clean URL, never as ?page=1', () => {
+            const markup = nav(ssrPaged(3))
+
+            expect(markup).toContain('href="/authors/ada-brine"')
+            expect(markup).not.toContain('href="/authors/ada-brine?page=1"')
+        })
+
+        test('the page the reader is on is marked current, not linked', () => {
+            const html = ssrPaged(3)
+
+            expect(html).toContain('aria-current="page"')
+            expect(html).not.toContain('href="/authors/ada-brine?page=3"')
+        })
+
+        test('an author who fits on one page gets no nav at all', () => {
+            // The distractor for a component that always draws one: most of the
+            // 3,364 authors here have fewer than ten poems.
+            const html = ssr(initialPoems)
+
+            expect(html).not.toContain('class="pagination"')
+        })
+    })
 })

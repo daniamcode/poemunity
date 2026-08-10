@@ -83,7 +83,7 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch, curre
                 baseUrl={baseUrl}
                 crumbs={[{ name: 'Poemunity', path: '/' }, { name: label }]}
             />
-            <Dashboard initialData={initialData ?? undefined} />
+            <Dashboard initialData={initialData ?? undefined} currentPage={currentPage} />
         </>
     )
 }

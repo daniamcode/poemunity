@@ -14,13 +14,16 @@ export interface InitialAuthorPoemsData {
     page: number
     hasMore: boolean
     total: number
+    totalPages?: number
 }
 
-export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsData) {
+export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsData, currentPage = 1) {
     const dispatch = useAppDispatch()
     const authorPoemsQuery = useSelector((state: RootState) => state.authorPoemsQuery)
     const storePoems = useSelector(selectAuthorPoemsPoems)
     const isSeeded = useRef(false)
+    /** Which page the store was last seeded from; null until the first seed. */
+    const seededPage = useRef<number | null>(null)
 
     // SERVER-RENDER FROM `initialData` WHEN THE STORE IS STILL EMPTY.
     //
@@ -44,16 +47,33 @@ export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsDat
     // the store is already populated.
     const poems = storePoems.length ? storePoems : (initialData?.poems ?? [])
 
+    // RE-SEEDS WHEN THE PAGE CHANGES, not only on mount.
+    //
+    // Clicking a page link is a client-side navigation: `getServerSideProps`
+    // re-runs and hands down page 3's poems, but the component never unmounts,
+    // so a mount-only effect would leave the store holding page 1 and the reader
+    // would see the old poems under a URL naming a page they never got.
+    //
+    // The reset before the seed is load-bearing. The cache APPENDS a payload
+    // whose `page` is not 1 (that is how infinite scroll works), so seeding page
+    // 3 onto a store already holding page 1 would render twenty poems: ten of
+    // them the ones the reader just paged away from.
     useEffect(() => {
+        const { fulfilledAction, resetAction } = getTypes(ACTIONS.AUTHOR_POEMS)
         if (initialData) {
+            if (seededPage.current === currentPage) return
+            if (seededPage.current !== null) dispatch({ type: resetAction })
             dispatch(poemsUpserted(initialData.poems))
-            const { fulfilledAction } = getTypes(ACTIONS.AUTHOR_POEMS)
             dispatch({ type: fulfilledAction, payload: initialData })
+            seededPage.current = currentPage
             isSeeded.current = true
         } else {
             dispatch(getAuthorPoemsAction({ options: { reset: true, fetch: false } }))
         }
-    }, [dispatch])
+        // `initialData` is deliberately absent: Next hands down a new object on
+        // every render, and depending on it would re-seed in a loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, slug, currentPage])
 
     useEffect(() => {
         if (isSeeded.current) {
@@ -61,13 +81,16 @@ export function useAuthorPoems(slug: string, initialData?: InitialAuthorPoemsDat
             return
         }
         if (!slug) return
+        // `currentPage`, not 1: on the unseeded path (no SSR data) the URL still
+        // says which page the reader asked for, and fetching page 1 there would
+        // render poems 1-10 under a URL naming page 4.
         dispatch(
             getAuthorPoemsAction({
-                params: { page: 1, limit: PAGINATION_LIMIT, author: slug },
+                params: { page: currentPage, limit: PAGINATION_LIMIT, author: slug },
                 options: { reset: true, fetch: true }
             })
         )
-    }, [slug, dispatch])
+    }, [slug, currentPage, dispatch])
 
     const handleLoadMore = () => {
         if (!authorPoemsQuery.isFetching && authorPoemsQuery.hasMore) {
