@@ -272,8 +272,10 @@ composes it: the list endpoint (search, genre, origin, userId, likedBy, and the
 paginated `total` — a filtered list with an unfiltered count advertises what it
 refused to show), `computeRanking()`, poem-of-the-week, `GET /poem/:id`, the
 next-poem walk (inside `findNext` and `firstAuthorAfter`, not at the call sites),
-author poem counts, comment creation, and the legacy `GET /users` populate. The
-frontend sitemap needs no change of its own — it crawls `GET /poems`.
+author poem counts, comment creation, and the `/comments` tabs. The frontend
+sitemap needs no change of its own — it crawls `GET /poems`. (The legacy
+`GET /users` populate was on that list until the route was deleted on
+2026-08-10 — it served every legacy user, email included, to anyone.)
 
 Two things about that fragment are deliberate. It is a single **top-level key**,
 so it composes with the `$or` (userId) and `$and` (search) the list endpoint

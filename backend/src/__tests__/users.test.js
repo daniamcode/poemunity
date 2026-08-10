@@ -1,407 +1,68 @@
 const request = require('supertest')
-const bcrypt = require('bcryptjs')
 const { app } = require('../../app')
 const User = require('../models/User')
-const Poem = require('../models/Poem')
 
-describe('Users API', () => {
-  describe('GET /api/v1/users', () => {
-    test('should return all users successfully', async () => {
-      // Create test users
-      const passwordHash = await bcrypt.hash('password123', 10)
-      await User.create([
-        {
-          username: 'user1',
-          name: 'User One',
-          email: 'user1@example.com',
-          passwordHash,
-          picture: 'pic1.jpg'
-        },
-        {
-          username: 'user2',
-          name: 'User Two',
-          email: 'user2@example.com',
-          passwordHash,
-          picture: 'pic2.jpg'
-        }
-      ])
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-
-      expect(response.body).toHaveLength(2)
-      const usernames = response.body.map(u => u.username).sort()
-      expect(usernames).toEqual(['user1', 'user2'])
+/**
+ * THE TWO LEGACY /users ROUTES ARE GONE, AND MUST STAY GONE.
+ *
+ * Both were public and both were dead — nothing in the frontend, the scripts or
+ * the Cypress specs called either. Found by the 2026-08-10 audit:
+ *
+ *   GET  /api/v1/users   listed every legacy user document with no auth,
+ *                        EMAIL INCLUDED (`User.toJSON` strips only the password
+ *                        hash). Verified against a running server: an address
+ *                        came back in the response body.
+ *   POST /api/v1/users   created an account anonymously — no auth, no rate
+ *                        limit, no validation, no email. Verified: 201 from an
+ *                        anonymous request, i.e. unlimited document insertion
+ *                        into production by anyone who found the path.
+ *
+ * This file used to be ~300 lines asserting that both worked, which is why they
+ * survived so long: a route with a thorough test suite reads as load-bearing.
+ * What is worth pinning is the opposite, so the tests below assert 404 AND
+ * assert on the DATABASE — a route that answered 500 while still writing would
+ * satisfy a status-code check.
+ *
+ * The rest of the router (stats, me, profile, picture) is covered by
+ * userStats.test.js and migration-verification.test.js.
+ */
+describe('the removed legacy user routes', () => {
+  test('GET /api/v1/users is not a route', async () => {
+    await User.create({
+      username: 'legacy-user',
+      name: 'Legacy User',
+      email: 'legacy@example.com',
+      passwordHash: 'x'
     })
 
-    test('should return empty array when no users exist', async () => {
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+    const response = await request(app).get('/api/v1/users')
 
-      expect(response.body).toEqual([])
-      expect(Array.isArray(response.body)).toBe(true)
-    })
-
-    test('should populate poems with content and date', async () => {
-      const passwordHash = await bcrypt.hash('password123', 10)
-      const user = await User.create({
-        username: 'testuser',
-        name: 'Test User',
-        email: 'test@example.com',
-        passwordHash,
-        picture: 'pic.jpg'
-      })
-
-      // Create a poem for this user
-      const poem = await Poem.create({
-        title: 'Test Poem',
-        author: 'testuser',
-        poem: 'This is poem content',
-        genre: 'love',
-        likes: [],
-        userId: user._id,
-        picture: 'pic.jpg',
-        date: new Date('2024-01-01')
-      })
-
-      // Add poem to user
-      user.poems = [poem._id]
-      await user.save()
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-
-      expect(response.body).toHaveLength(1)
-      expect(response.body[0].poems).toBeDefined()
-      expect(Array.isArray(response.body[0].poems)).toBe(true)
-      expect(response.body[0].poems).toHaveLength(1)
-      // Should only populate content and date
-      expect(response.body[0].poems[0]).toHaveProperty('date')
-    })
-
-    test('should include user properties in response', async () => {
-      const passwordHash = await bcrypt.hash('password123', 10)
-      await User.create({
-        username: 'testuser',
-        name: 'Test User',
-        email: 'test@example.com',
-        passwordHash,
-        picture: 'https://example.com/pic.jpg'
-      })
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-
-      expect(response.body[0]).toHaveProperty('username')
-      expect(response.body[0]).toHaveProperty('email')
-      expect(response.body[0]).toHaveProperty('picture')
-      expect(response.body[0]).toHaveProperty('id')
-    })
-
-    test('should not expose password hash in response', async () => {
-      const passwordHash = await bcrypt.hash('password123', 10)
-      await User.create({
-        username: 'testuser',
-        name: 'Test User',
-        email: 'test@example.com',
-        passwordHash,
-        picture: 'pic.jpg'
-      })
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-
-      expect(response.body[0].password).toBeUndefined()
-      expect(response.body[0]).not.toHaveProperty('password')
-    })
-
-    test('should return users with empty poems array if no poems', async () => {
-      const passwordHash = await bcrypt.hash('password123', 10)
-      await User.create({
-        username: 'testuser',
-        name: 'Test User',
-        email: 'test@example.com',
-        passwordHash,
-        picture: 'pic.jpg'
-      })
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-
-      expect(response.body[0].poems).toBeDefined()
-      expect(Array.isArray(response.body[0].poems)).toBe(true)
-      expect(response.body[0].poems).toHaveLength(0)
-    })
-
-    test('should handle multiple users with different poem counts', async () => {
-      const passwordHash = await bcrypt.hash('password123', 10)
-      const user1 = await User.create({
-        username: 'user1',
-        name: 'User One',
-        email: 'user1@example.com',
-        passwordHash,
-        picture: 'pic1.jpg'
-      })
-
-      // Second user exists only so the assertions prove filtering by user1
-      await User.create({
-        username: 'user2',
-        name: 'User Two',
-        email: 'user2@example.com',
-        passwordHash,
-        picture: 'pic2.jpg'
-      })
-
-      // Create poems for user1 only
-      const poem1 = await Poem.create({
-        title: 'Poem 1',
-        author: 'user1',
-        poem: 'Content 1',
-        genre: 'love',
-        likes: [],
-        userId: user1._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
-
-      const poem2 = await Poem.create({
-        title: 'Poem 2',
-        author: 'user1',
-        poem: 'Content 2',
-        genre: 'sad',
-        likes: [],
-        userId: user1._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
-
-      user1.poems = [poem1._id, poem2._id]
-      await user1.save()
-
-      const response = await request(app)
-        .get('/api/v1/users')
-        .expect(200)
-
-      expect(response.body).toHaveLength(2)
-      const user1Response = response.body.find(u => u.username === 'user1')
-      const user2Response = response.body.find(u => u.username === 'user2')
-
-      expect(user1Response.poems).toHaveLength(2)
-      expect(user2Response.poems).toHaveLength(0)
-    })
+    expect(response.status).toBe(404)
+    // The point is the email, not the status. A handler that 404'd after
+    // serializing, or one restored behind a different path, would still leak it.
+    expect(JSON.stringify(response.body)).not.toContain('legacy@example.com')
   })
 
-  describe('POST /api/v1/users', () => {
-    test('should create a new user successfully', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'newuser',
-          name: 'New User',
-          password: 'password123'
-        })
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+  test('POST /api/v1/users creates nothing', async () => {
+    const before = await User.countDocuments()
 
-      expect(response.body.username).toBe('newuser')
-      expect(response.body.name).toBe('New User')
-      expect(response.body.picture).toBe('https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg')
-      expect(response.body).toHaveProperty('id')
-      expect(response.body).not.toHaveProperty('passwordHash')
-    })
+    const response = await request(app)
+      .post('/api/v1/users')
+      .send({ username: 'anon-created', name: 'Anon', password: 'password123' })
 
-    test('should hash the password', async () => {
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'testuser',
-          name: 'Test User',
-          password: 'password123'
-        })
-        .expect(201)
+    expect(response.status).toBe(404)
+    // Asserted against the collection, not the response: the original handler
+    // saved the document BEFORE it answered, so a route that failed on its way
+    // to replying would still have created the account.
+    expect(await User.countDocuments()).toBe(before)
+    expect(await User.findOne({ username: 'anon-created' })).toBeNull()
+  })
 
-      const user = await User.findOne({ username: 'testuser' })
-      expect(user.passwordHash).toBeDefined()
-      expect(user.passwordHash).not.toBe('password123')
-
-      // Verify the hash is valid
-      const isValid = await bcrypt.compare('password123', user.passwordHash)
-      expect(isValid).toBe(true)
-    })
-
-    test('should assign default profile picture', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'testuser',
-          name: 'Test User',
-          password: 'password123'
-        })
-        .expect(201)
-
-      expect(response.body.picture).toBe('https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg')
-    })
-
-    test('should create user in database', async () => {
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'dbuser',
-          name: 'DB User',
-          password: 'password123'
-        })
-        .expect(201)
-
-      const user = await User.findOne({ username: 'dbuser' })
-      expect(user).toBeDefined()
-      expect(user.username).toBe('dbuser')
-      expect(user.name).toBe('DB User')
-    })
-
-    test('should not expose password in response', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'secureuser',
-          name: 'Secure User',
-          password: 'secretpassword'
-        })
-        .expect(201)
-
-      expect(response.body.password).toBeUndefined()
-      expect(response.body).not.toHaveProperty('password')
-    })
-
-    test('should handle special characters in username', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'user_123-test',
-          name: 'Special User',
-          password: 'password123'
-        })
-        .expect(201)
-
-      expect(response.body.username).toBe('user_123-test')
-    })
-
-    test('should handle special characters in name', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'testuser',
-          name: 'John O\'Brien-Smith',
-          password: 'password123'
-        })
-        .expect(201)
-
-      expect(response.body.name).toBe('John O\'Brien-Smith')
-    })
-
-    test('should create multiple different users', async () => {
-      // First user
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'user1',
-          name: 'User One',
-          password: 'pass1'
-        })
-        .expect(201)
-
-      // Second user
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'user2',
-          name: 'User Two',
-          password: 'pass2'
-        })
-        .expect(201)
-
-      // Both should exist in database
-      const count = await User.countDocuments()
-      expect(count).toBe(2)
-    })
-
-    test('should use bcrypt with salt rounds of 10', async () => {
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'bcryptuser',
-          name: 'Bcrypt User',
-          password: 'testpassword'
-        })
-        .expect(201)
-
-      const user = await User.findOne({ username: 'bcryptuser' })
-
-      // Bcrypt hashes start with $2b$ (or $2a$) followed by cost factor
-      expect(user.passwordHash).toMatch(/^\$2[ab]\$10\$/)
-    })
-
-    test('should initialize user with empty poems array', async () => {
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'newuser',
-          name: 'New User',
-          password: 'password123'
-        })
-        .expect(201)
-
-      const user = await User.findOne({ username: 'newuser' })
-      expect(user.poems).toBeDefined()
-      expect(Array.isArray(user.poems)).toBe(true)
-      expect(user.poems).toHaveLength(0)
-    })
-
-    test('should allow users with same name but different usernames', async () => {
-      // First user
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'user1',
-          name: 'John Smith',
-          password: 'pass1'
-        })
-        .expect(201)
-
-      // Second user with same name but different username
-      await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'user2',
-          name: 'John Smith',
-          password: 'pass2'
-        })
-        .expect(201)
-
-      const count = await User.countDocuments({ name: 'John Smith' })
-      expect(count).toBe(2)
-    })
-
-    test('should handle user creation with minimal required fields', async () => {
-      const response = await request(app)
-        .post('/api/v1/users')
-        .send({
-          username: 'minimaluser',
-          name: 'Minimal',
-          password: 'pass'
-        })
-        .expect(201)
-
-      expect(response.body.username).toBe('minimaluser')
-      expect(response.body.name).toBe('Minimal')
-      expect(response.body.picture).toBe('https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg')
-    })
+  test('the surviving routes on this router still answer', async () => {
+    // The distractor for a fix that removed the router or its mount rather than
+    // the two handlers: /stats is on the same router and must still be reached,
+    // answering 401 unauthenticated rather than 404.
+    await request(app).get('/api/v1/users/stats').expect(401)
+    await request(app).get('/api/v1/users/profile').expect(401)
   })
 })

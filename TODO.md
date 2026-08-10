@@ -66,6 +66,38 @@ Two things about that workflow worth not undoing:
 
   Deliverable: a findings list with severities, then fixes as their own tasks. Each finding that gets fixed needs a regression test — a security fix without one silently un-fixes itself in six months.
 
+  **Partly done — code audit of both apps, 2026-08-10.** Findings below, verified
+  against a running server (throwaway probe suite, not kept) rather than read off
+  the source. It answers the injection, XSS, session/cookie and rate-limiting
+  bullets; **still unchecked**: `pnpm audit`, live response headers, CORS in prod,
+  and the `SIMULATION_INTERNAL_SECRET` comparison.
+
+  Confirmed sound, so nobody re-audits them: draft visibility held against every
+  probe; `privateFields` is honoured on the public author endpoint; notification
+  and drafts routes are session-scoped throughout; JSON-LD escaping, the
+  identity-only JWT with `passwordChangedAt` revocation, and CSRF (SameSite=Lax
+  plus the origin check) all hold.
+
+- 🤖 **(HIGH) `?genre=` interpolates raw input into a regex** — `backend/src/controllers/poems.js:260` — the filter is built as a template string interpolated straight into `$regex`. Confirmed: `?genre=.*` returns every genre and `?genre=Love|Faith` alternates, so the genre partition is not a partition. Worse on an unauthenticated endpoint over 16k documents, `(a+)+$` is catastrophic backtracking. `escapeRegex` is already imported into this file and used by search and by `?letter=` — this is the third caller, and it is exactly the failure mode recorded under the `?letter=` fix: a helper only some callers reach. Drafts do NOT leak through it (`PUBLISHED_MATCH` is applied last, as designed). Fix + a row in `regexInjection.test.js`, which currently covers the other two callers only.
+
+- 👤 **(HIGH, data half) Does the legacy `users` collection still hold rows?** The two public routes over it are **deleted** (2026-08-10, see Recently shipped), so nothing serves that data any more — but deleting a route does not delete a collection, and until this is answered nobody knows whether the site was leaking real addresses or dead code. `db.users.countDocuments()` settles it. Empty ⇒ drop the collection and the `User` model with it (the only remaining reference is the pre-migration fallback in `poems.js`). Not empty ⇒ those users never made it into `authors`, which is a migration gap, not just a cleanup: they cannot log in, and their poems resolve through the legacy fallback. **A read-only script must set BOTH `mongoose.set('autoIndex', false)` and `autoCreate: false` before requiring any model** — see the Gotchas; `check-index-drift.js` created an empty collection in production while calling itself read-only.
+
+- 🤝 **(MEDIUM) `/register/availability?email=` is an account-existence oracle** — `backend/src/controllers/register.js:54`. Answers `emailAvailable: false` for a registered address, at 30/min. Login is deliberately non-enumerating (dummy bcrypt, identical 401) and register returns a neutral message for the email conflict *citing anti-enumeration* — then this states the answer plainly. The username half is necessary and harmless; the email half is the one that undoes the care taken elsewhere. **A product call**: drop the email check, or keep it and accept that the anti-enumeration elsewhere is decorative.
+
+- 🤝 **(MEDIUM) `GET /api/v1/comments?since=1970-01-01` dumps every comment on the site** — `backend/src/controllers/comments.js:208`. Unauthenticated, unpaginated, populated with author name/slug/picture. It exists for the simulation scripts. Separately, the by-target branch has no draft check, so comments on a withdrawn poem stay publicly readable — the exact case `/mine` and `/received` go out of their way to filter. **Product call**: do the scripts still need `since=`, or can it move behind `SIMULATION_INTERNAL_SECRET`?
+
+- 🤖 **(MEDIUM) `?userId=<junk>` is a 500** — `backend/src/controllers/poems.js:242`. `new mongoose.Types.ObjectId()` throws into the catch-all. Should be a 400; it is an unhandled throw, not a decision.
+
+- 🤖 **(LOW) Audit smalls, one commit.** Individually minor:
+  - `poems.js:442` — admin `PATCH /api/v1/poems` runs `updateMany({}, { $set: req.body })` over all 16k poems with no allowlist and no dry-run. `{"status":"draft"}` unpublishes the site in one request, and every other bulk operation in this repo is dry-run by default.
+  - `Poem` has no `required` on `title`/`poem`, so the API can create empty poems, which then appear in lists and in the sitemap.
+  - `poems.js:254` — the author-not-found early return hardcodes `page: 1, limit: 10` whatever was asked for.
+  - Deleting a poem orphans its comments and notifications. The UI copes (`notificationHref` returns null, `/mine` filters them), but the rows accumulate and `?targetId=` still serves the comments.
+  - `/privacy` still says session data may live in local storage. It does not (grep is clean) — a wrong statement on a legal page.
+  - A `testAccount` author is hidden from listings, but `/authors/<slug>` still resolves for them.
+
+- 👤 **Not covered by that audit: layout, visual and live-site behaviour.** A static pass cannot see them — the sticky rail that hid Poem of the week, the rail vanishing below `$bp-xl`, and a commit that never deployed all passed lint, typecheck and every test. Needs a browser and the deployed URL.
+
 - 👤 **No separate dev/staging database** — `MONGODB_PRE` is byte-for-byte identical to `MONGODB` (same cluster, same `poemsAPI` db). So every "pre"/dev-mode script writes straight to **production**, and there's nowhere safe to rehearse a seed or migration. Stand up a real pre/staging cluster (or at least repoint `MONGODB_PRE` at a throwaway DB). Until then, treat all seed/migration scripts as prod writes: dry-run + `mongodump` snapshot first. (Seed logic is now validated via ephemeral in-memory Mongo in tests instead — see `aiSeed.test.js`.) **Plan (deferred, not now):** create a copy of prod and point `MONGODB_PRE` at it so `pre` becomes a real separate environment.
 
 - 🤝 **Applitools CI** — accept the known baselines in the Applitools dashboard (👤), then switch `eyes.closeAsync()` → `eyes.close()` in `frontend/selenium/visual.spec.ts` so visual diffs fail the run (🤖).
@@ -227,6 +259,7 @@ Ordered by impact. Seeded by a competitor review (Yavendras' "Zona Privada": tab
 
 **One line each, by design.** The reasoning that outlives the change lives in `AGENTS.md`; this list exists only so nobody proposes the work again.
 
+- **Deleted the two legacy public `/users` routes** (2026-08-10, from the audit) — `GET /api/v1/users` served every legacy user document *including email* with no authentication, and `POST /api/v1/users` created an account anonymously with no rate limit or validation. Both were dead: nothing in the frontend, the scripts or the Cypress specs called either. Deleted rather than gated, and `users.test.js` now pins their absence against the DATABASE, not just the status code. The `users` COLLECTION is a separate open question — see P2.
 - **SEO smalls** (2026-08-10) — `WebSite` + `SearchAction` + `Organization` on the homepage (page 1 only), a `CollectionPage` on `/authors` built from the poets actually listed, a homepage `h1` that names the site rather than saying "Poems", canonicals on `/privacy` and `/terms`, and `og:image:width/height` — stated only for the site card, never for the author avatar a page may pass instead.
 - **Author-page pagination** (2026-08-10) — `/authors/<slug>?page=N` honoured server-side with the same rules as the lists (clean page 1, junk redirects, past-the-end 404, self-canonical, page number in the title), plus the scroll-following URL. Reached the 3,381 poems (21%) that sat past page 1 of an author page. **Two bugs found on the way, both in the shipped list pagination:** `/[genre]` computed `currentPage` and never passed it to `<Dashboard>`, and neither list hook re-seeded on a client-side page navigation — clicking a page link left the reader on the old poems, or appended the new ones under them.
 - **The address bar follows infinite scroll** (2026-08-07) — `usePageUrlSync` rewrites the URL with `replaceState` as the reader crosses a page boundary, so a deep-scrolled URL is shareable and Back returns to the right chunk. Not an SEO change; crawlers already had the `<a href>` nav.

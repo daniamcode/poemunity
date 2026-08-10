@@ -169,8 +169,10 @@ describe('Drafts — public read paths', () => {
     ['GET /poem/:slug/next (walk from the oldest poem)', () => '/api/v1/poem/finished-elegy/next'],
     ['GET /authors (top authors)', () => '/api/v1/authors'],
     ['GET /authors?letter=A', () => '/api/v1/authors?letter=A'],
-    ['GET /authors?letter=Z', () => '/api/v1/authors?letter=Z'],
-    ['GET /users (legacy)', () => '/api/v1/users']
+    ['GET /authors?letter=Z', () => '/api/v1/authors?letter=Z']
+    // GET /users (legacy) was a row here until 2026-08-10, when the route was
+    // deleted — it listed every legacy user, email included, with no auth. Its
+    // absence is pinned by users.test.js instead.
   ])('%s never mentions a draft', async (label, buildUrl) => {
     const fixture = await seed()
     const res = await request(app).get(buildUrl(fixture)).expect(200)

@@ -1,14 +1,31 @@
-const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
 const usersRouter = require('express').Router()
 const Author = require('../models/Author')
 const Poem = require('../models/Poem')
-const User = require('../models/User')
 const userExtractor = require('../middleware/userExtractor')
 const { signAuthorToken, buildAuthorProfile } = require('../utils/authToken')
 const { PUBLISHED_MATCH } = require('../utils/poemVisibility')
 
-const DEFAULT_PICTURE = 'https://poemunity.s3.us-east-2.amazonaws.com/user/default-profile-icon.jpg'
+// TWO LEGACY ROUTES WERE REMOVED FROM HERE (2026-08-10). Both were dead —
+// nothing in the frontend, the scripts or the Cypress specs called either —
+// and both were public, over the deprecated `User` model:
+//
+//   GET /api/v1/users   listed every legacy user document, EMAIL INCLUDED, with
+//                       no authentication. `User.toJSON` strips only
+//                       `passwordHash`.
+//   POST /api/v1/users  created an account anonymously: no auth, no rate limit,
+//                       no validation, no email, no unique index beyond
+//                       `username`. Unlimited document insertion into
+//                       production by anyone who found it.
+//
+// Neither is worth hardening, because neither is used: the real equivalents are
+// `POST /api/v1/register` (rate-limited, validated, case-insensitively unique)
+// and the profile routes below. Deleted rather than gated, so there is nothing
+// left to re-expose by loosening a middleware later.
+//
+// `User` itself still exists: poems.js falls back to it when an old poem's
+// author id resolves to the `users` collection. That fallback is the only
+// remaining reference.
 
 // Maps common image mime types to file extensions for the blob pathname.
 const MIME_EXTENSIONS = {
@@ -45,39 +62,6 @@ async function storePicture (dataUrl, userId) {
   const blob = await put(pathname, buffer, { access: 'public', contentType })
   return blob.url
 }
-
-usersRouter.get('/', async (req, res) => {
-  try {
-    // Legacy route over the legacy User model, but it still dereferences poem
-    // ids — so it gets the same visibility match as every other public read.
-    const users = await User.find({}).populate({ path: 'poems', select: 'poem date', match: PUBLISHED_MATCH })
-    res.json(users)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Internal server error' })
-  }
-})
-
-usersRouter.post('/', async (req, res) => {
-  try {
-    const { username, name, password } = req.body
-    const passwordHash = await bcrypt.hash(password, 10)
-
-    const newUser = new User({
-      username,
-      name,
-      passwordHash,
-      picture: DEFAULT_PICTURE,
-      poems: []
-    })
-
-    const savedUser = await newUser.save()
-    res.status(201).json(savedUser)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'User creation failed' })
-  }
-})
 
 // GET /api/v1/users/stats — the profile stats panel.
 //
