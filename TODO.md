@@ -12,9 +12,9 @@ Single source of truth for the backlog (frontend + backend). Deeper detail lives
 
 1. **👤 Rotate the MongoDB password and `RESEND_API_KEY`** (P0). Open since 2026-07-30 and the only item with a clock on it. Everything else on this list can wait a week without getting worse; leaked credentials get worse by sitting.
 2. **👤 Count the legacy `users` collection** (P2 security). One query — `db.users.countDocuments()` — decides whether the two routes deleted on 2026-08-10 were serving real people's email addresses to anyone who asked, or nothing at all. It also decides whether there is a migration gap stranding real accounts.
-3. **👤 Submit the four child sitemaps in Search Console** (P3 SEO). Five minutes of work, then two weeks of waiting — so starting it late costs two weeks. It is the only thing that can answer whether the 15,652 famous poems can rank at all, and that answer decides the `noindex` question, the edge-caching question, and where any backlink effort should point.
+3. **👤 Look at the live site.** Six commits are in production unlooked-at, four of them from today, and two of those are backend deploys — the backend has no test gate at all. CI cannot prove a deploy; only the URL can. The list is in *Live-site verification* below, and it takes about ten minutes.
 
-The standing fourth: **the live-site verification queue below is never empty**, because CI cannot prove a deploy. Six commits are currently unverified in production.
+**On the calendar, not on the list: read the per-sitemap indexed ratios from ~21 August.** All five sitemaps were submitted on 7 Aug 2026 and parse `Correcto`, so the clock is already running — nothing to do until then, and reading it early tells you nothing. It is the highest-value *answer* pending on this project: it decides the `noindex` question for 97% of the collection, the edge-caching question, and where any backlink effort should point.
 
 ---
 
@@ -125,10 +125,12 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 ### SEO
 
-- 👤 **Submit the four child sitemaps in Search Console and compare their indexed ratios.** This is the payoff for the split and the whole reason it was done — GSC reports coverage per submitted sitemap, so submit `poems-famous.xml`, `poems-community.xml`, `authors.xml` and `pages.xml` individually, not just `sitemap.xml`. Then read the ratios against each other, because the split cannot make Google index faster, only tell you why it isn't:
+- 👤 **Read the per-sitemap indexed ratios — from ~21 August 2026.** ✅ Submitted 7 Aug 2026: all five (index + four children) parse `Correcto`, and the discovered counts match the code exactly — 15,652 famous + 435 community + 3,364 authors + 136 pages = 19,587, the index total to the digit. That arithmetic is also independent proof that Google read every child in FULL, which is what the "a sitemap never ships partial" work exists to guarantee.
+
+  **What is submitted is not what is answered.** The Sitemaps screen shows *Páginas descubiertas* — URLs found in the file, not URLs indexed. The ratio this was all for lives in **Indexación → Páginas**, filtered per sitemap (⋮ → "Ver indexación de páginas" on each row). Read it against these two scenarios, because the split cannot make Google index faster, only tell you why it isn't:
   - **Community high, famous near zero** — duplication confirmed. The 15,652 famous poems exist verbatim on hundreds of other sites and cannot rank; the decision is then whether to `noindex` them (recovering crawl budget for the 435 that are unique) or keep them as reader traffic and stop expecting search traffic. **Do not act before the numbers arrive** — `noindex`ing 97% of the collection on a hunch is not cheaply reversible.
   - **Everything near zero, including community** — not a duplication problem. A site-level signal, and a completely different investigation.
-  - Give it a couple of weeks; per-sitemap numbers do not populate immediately.
+  - Two weeks from submission is the earliest honest read; three days is not a signal, it is noise.
 - 🤝 **Every SSR page is uncacheable — decide whether to make public pages edge-cacheable.** Every route returns `cache-control: private, no-cache, no-store`, Next's default when `getServerSideProps` sets none. Nothing caches at Vercel's edge, so all 16,087 poem pages cost a full render plus a backend round-trip on **every** Googlebot fetch, and crawl rate is throttled by how expensive a site is to crawl. TTFB is fine (0.3–0.55s); the point is that it is paid every time.
 
   **A product decision, not a header tweak.** These pages embed `initialUser`, so the HTML genuinely differs per visitor. Making them anonymous-cacheable means dropping `initialUser` from SSR and hydrating auth client-side (`/api/auth/session` already exists) and accepting a brief signed-out header on first paint. Do NOT just add `s-maxage` without moving `initialUser` — that serves one visitor's signed-in header to everyone.
