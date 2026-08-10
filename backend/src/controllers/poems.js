@@ -256,8 +256,20 @@ poemsRouter.get('/', userExtractor.optional, async (req, res) => {
       filter.authorId = author._id
     }
 
+    // ESCAPED, and length-capped — the third caller of this helper, and the one
+    // that was still raw. The regex itself stays: it is anchored `^...$` with
+    // `i`, which is how a request for `/Love` finds poems filed under `love`
+    // (the collection holds mixed-case genres, and the frontend redirects the
+    // URL casing but the API is called directly too).
+    //
+    // Raw, the anchors bought nothing: `?genre=.*` matched every genre, so the
+    // one filter that is supposed to PARTITION the collection returned all of
+    // it, and `(a+)+$` was catastrophic backtracking on a public,
+    // unauthenticated endpoint over 16k documents. Same failure as `?letter=`,
+    // found the same way — a shared helper that one call site never reached.
     if (req.query.genre) {
-      filter.genre = { $regex: `^${req.query.genre}$`, $options: 'i' }
+      const genre = escapeRegex(String(req.query.genre).slice(0, MAX_REGEX_INPUT))
+      filter.genre = { $regex: `^${genre}$`, $options: 'i' }
     }
 
     // Search goes under $and rather than $or, because the userId filter above

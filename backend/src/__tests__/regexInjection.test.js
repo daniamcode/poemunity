@@ -172,3 +172,83 @@ describe('GET /poems?q= — the same input, already escaped', () => {
     expect(res.body.map(p => p.title)).toContain('Aubade')
   })
 })
+
+describe('GET /poems?genre= — the third caller, raw until 2026-08-10', () => {
+  // The genre filter is the one that is supposed to PARTITION the collection,
+  // so a wildcard here does not merely return too much — it returns everything
+  // while claiming to be a category page. The fixture holds three distinct
+  // genres so a wrong implementation gives a DIFFERENT answer from a right one:
+  // with a single genre, `.*` and `^love$` are indistinguishable.
+  const seedGenres = async () => {
+    const { ada } = await seed()
+    await Poem.create({ title: 'L', slug: 'l-x', poem: 'c', genre: 'love', authorId: ada._id, origin: 'user', date: new Date() })
+    await Poem.create({ title: 'F', slug: 'f-x', poem: 'c', genre: 'faith', authorId: ada._id, origin: 'user', date: new Date() })
+    await Poem.create({ title: 'S', slug: 's-x', poem: 'c', genre: 'sorrow', authorId: ada._id, origin: 'user', date: new Date() })
+  }
+
+  const genres = (res) => res.body.map(p => p.genre).sort()
+
+  test('a wildcard matches no genre rather than every genre', async () => {
+    await seedGenres()
+
+    const res = await request(app).get('/api/v1/poems?genre=' + encodeURIComponent('.*')).expect(200)
+
+    // Raw, this returned love, faith, sorrow AND the two seeded by `seed()`.
+    expect(res.body).toEqual([])
+  })
+
+  test('alternation is a literal, not an operator', async () => {
+    await seedGenres()
+
+    const res = await request(app).get('/api/v1/poems?genre=' + encodeURIComponent('love|faith')).expect(200)
+
+    expect(res.body).toEqual([])
+  })
+
+  test('an invalid pattern is an empty result, not a 500', async () => {
+    await seedGenres()
+
+    // `a(` is an unterminated group: unescaped, the driver throws and the
+    // endpoint answers 500 to anyone who types a bracket.
+    const res = await request(app).get('/api/v1/poems?genre=' + encodeURIComponent('a(')).expect(200)
+
+    expect(res.body).toEqual([])
+  })
+
+  test('a genre containing a metacharacter matches ITSELF', async () => {
+    // Proving the escaping is literal needs a genre that literally contains
+    // one — otherwise "matches nothing" is satisfied by a filter that is simply
+    // broken for every input.
+    const { ada } = await seed()
+    await Poem.create({ title: 'M', slug: 'm-x', poem: 'c', genre: 'c++', authorId: ada._id, origin: 'user', date: new Date() })
+
+    const res = await request(app).get('/api/v1/poems?genre=' + encodeURIComponent('c++')).expect(200)
+
+    expect(res.body.map(p => p.title)).toEqual(['M'])
+  })
+
+  test('an ordinary genre still matches, whatever the casing', async () => {
+    // The distractor for a "fix" that drops the regex for exact equality: the
+    // case-insensitive anchored match is why /Love finds poems filed as love,
+    // and the collection genuinely holds mixed-case genres.
+    await seedGenres()
+
+    const lower = await request(app).get('/api/v1/poems?genre=love').expect(200)
+    const upper = await request(app).get('/api/v1/poems?genre=LOVE').expect(200)
+
+    // Distinct genres, not the row count: `seed()` contributes love poems of
+    // its own, so counting rows here would pin the fixture rather than the
+    // filter. What matters is that faith and sorrow are absent from both.
+    expect([...new Set(genres(lower))]).toEqual(['love'])
+    expect([...new Set(genres(upper))]).toEqual(['love'])
+    expect(upper.body.length).toBe(lower.body.length)
+  })
+
+  test('input past the cap is truncated rather than compiled', async () => {
+    const res = await request(app)
+      .get('/api/v1/poems?genre=' + encodeURIComponent('a'.repeat(MAX_REGEX_INPUT + 50)))
+      .expect(200)
+
+    expect(res.body).toEqual([])
+  })
+})

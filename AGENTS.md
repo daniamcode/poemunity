@@ -495,6 +495,14 @@ rather than replacing them, and paginates like any other list. Poem **body text
 is deliberately excluded** — without snippet highlighting, full-text hits are
 unscannable.
 
+**Three query parameters reach a `$regex`, and all three go through
+`escapeRegex`**: `?q=` (search, unanchored), `?letter=` (the author index) and
+`?genre=` (anchored `^...$` with `i`, which is how `/Love` finds poems filed as
+`love`). The last two were each raw at some point and each was found the same
+way — a shared helper that one call site never reached. `regexInjection.test.js`
+covers all three, and asserts on RESULTS rather than status codes, because a
+wildcard match is a perfectly successful 200.
+
 The regex is **unanchored and escaped**, and therefore does a collection scan.
 That is the intended trade at this size. Do not "optimise" it into an anchored
 `^term` regex to make it indexable: that only matches titles *starting* with the
