@@ -35,9 +35,14 @@ function Dashboard({ initialData, currentPage, match }: DashboardProps) {
     // looks at three results.
     const cachedTotal = useSelector((state: RootState) => state.poemsListQuery?.total)
     const total = cachedTotal ?? initialData?.total ?? 0
+    // The homepage h1 used to be the single word "Poems", which says nothing
+    // about what this site is — the <title> ("Your poem community") was doing
+    // all the work on its own. It stays visually hidden (see below); a hidden
+    // heading is still the page's top-level heading for search engines and for
+    // anyone navigating by headings, so it may as well be the true one.
     const heading = genre
         ? genreTitle(capitalizeFirstLetter(genre.replace(/-/g, ' ')), total)
-        : 'Poems'
+        : 'Poemunity — your poem community'
 
     return (
         <main className='dashboard' data-testid='dashboard-component'>

@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/react'
 import GenrePage, { getServerSideProps as genreProps } from '../../pages/[genre]'
 import AuthorPage from '../../pages/authors/[slug]'
 import DetailPage from '../../pages/detail/[poemId]'
+import IndexPage from '../../pages/index'
+import AuthorsIndexPage from '../../pages/authors/index'
+import PrivacyPage from '../../pages/privacy'
+import TermsPage from '../../pages/terms'
 
 jest.mock('../../src/lib/serverApi', () => ({
     serverFetch: jest.fn(async () => ({ poems: [], page: 1, hasMore: false, total: 0 })),
@@ -32,6 +36,14 @@ jest.mock('../components/SimpleAccordion', () => ({
 jest.mock('../components/AuthorsAccordion', () => ({
     __esModule: true,
     default: () => <div>authors</div>
+}))
+jest.mock('../components/Authors/AuthorsIndex', () => ({
+    __esModule: true,
+    default: () => <div>authors index</div>
+}))
+jest.mock('../components/Legal/LegalPage', () => ({
+    __esModule: true,
+    default: () => <div>legal</div>
 }))
 
 // next/head renders nothing into the container in a test env, so capture the
@@ -398,5 +410,142 @@ describe('poem page metadata', () => {
 
             expect(jsonLdTypes()).not.toContain('Poem')
         })
+    })
+})
+
+/**
+ * SITE-LEVEL MARKUP AND THE LAST MISSING CANONICALS.
+ *
+ * The homepage — the strongest page here — emitted no structured data at all,
+ * and `/authors` none either. `/privacy` and `/terms` were the only indexable
+ * pages on the site with no canonical.
+ */
+describe('homepage structured data', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const renderHome = (currentPage?: number) =>
+        render(
+            <IndexPage
+                initialData={{ poems: [], page: currentPage ?? 1, hasMore: false, total: 46 }}
+                initialUser={null}
+                baseUrl='https://poemunity.com'
+                currentPage={currentPage}
+            />
+        )
+
+    test('describes the site and its publisher', () => {
+        renderHome()
+
+        expect(jsonLdTypes()).toContain('WebSite')
+        expect(jsonLdTypes()).toContain('Organization')
+    })
+
+    test('carries the SearchAction that can earn a sitelinks searchbox', () => {
+        renderHome()
+
+        const website = allTags()
+            .filter(tag => tag.type === 'script')
+            .map(tag => JSON.parse((tag.props.dangerouslySetInnerHTML as { __html: string }).__html))
+            .find(data => data['@type'] === 'WebSite')
+
+        expect(website.potentialAction['@type']).toBe('SearchAction')
+    })
+
+    test('page 2 of the list does NOT repeat it', () => {
+        // The distractor for markup emitted unconditionally: WebSite describes
+        // the site, and asserting it at 125 paginated URLs describes nothing.
+        renderHome(2)
+
+        expect(jsonLdTypes()).not.toContain('WebSite')
+        expect(jsonLdTypes()).not.toContain('Organization')
+    })
+})
+
+describe('the author index page', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const renderIndex = (props: Partial<Parameters<typeof AuthorsIndexPage>[0]> = {}) =>
+        render(
+            <AuthorsIndexPage
+                initialLetters={['A']}
+                initialAuthors={[{ slug: 'ada-brine', name: 'Ada Brine' } as never]}
+                initialUser={null}
+                baseUrl='https://poemunity.com'
+                letter='A'
+                origin='all'
+                {...props}
+            />
+        )
+
+    test('describes itself as the collection of poets it lists', () => {
+        renderIndex()
+
+        expect(jsonLdTypes()).toContain('CollectionPage')
+    })
+
+    test('an origin-filtered view emits none', () => {
+        // It is a strict subset of the letter page and is noindex already;
+        // markup calling it the letter's collection would describe a page that
+        // does not exist.
+        renderIndex({ origin: 'ai' })
+
+        expect(jsonLdTypes()).not.toContain('CollectionPage')
+    })
+})
+
+describe('the legal pages', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    test('/privacy carries a canonical', () => {
+        render(<PrivacyPage />)
+
+        expect(linkOf('canonical')).toBe('https://poemunity.com/privacy')
+    })
+
+    test('/terms carries a canonical', () => {
+        render(<TermsPage />)
+
+        expect(linkOf('canonical')).toBe('https://poemunity.com/terms')
+    })
+})
+
+describe('og:image dimensions', () => {
+    beforeEach(() => { heads.length = 0 })
+
+    const ogOf = (property: string) =>
+        allTags().find(tag => tag.props.property === property)?.props.content as string | undefined
+
+    test('are stated for the site card, whose size is known', () => {
+        render(
+            <GenrePage
+                initialData={{ poems: [], page: 1, hasMore: false, total: 46 }}
+                initialUser={null}
+                genre='love'
+                baseUrl='https://poemunity.com'
+                isSearch={false}
+            />
+        )
+
+        expect(ogOf('og:image:width')).toBe('1200')
+        expect(ogOf('og:image:height')).toBe('630')
+    })
+
+    test('are NOT stated for a page passing its own image', () => {
+        // The author pages pass the poet's avatar, a ~44px square. Claiming
+        // 1200x630 for it tells a scraper to reserve a layout slot the image
+        // cannot fill — the same mismatch that got avatars pulled from the poem
+        // pages' social cards.
+        render(
+            <AuthorPage
+                initialPoems={{ poems: [], page: 1, hasMore: false, total: 35 } as never}
+                initialAuthor={{ name: 'John Doe', picture: 'https://poemunity.com/avatars/jd.jpg' } as never}
+                initialUser={null}
+                slug='john-doe'
+                baseUrl='https://poemunity.com'
+            />
+        )
+
+        expect(ogOf('og:image')).toBe('https://poemunity.com/avatars/jd.jpg')
+        expect(ogOf('og:image:width')).toBeUndefined()
     })
 })

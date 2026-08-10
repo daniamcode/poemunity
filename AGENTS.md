@@ -616,7 +616,30 @@ Two rules for the structured data:
 - **AI personas get no `Person` entity.** Emitting one would assert in
   machine-readable form that a real human exists — undoing the AI disclosure the
   footer and the per-poem badges exist to make. Their pages describe the
-  collection and stay silent about authorship.
+  collection and stay silent about authorship. This is also why the `/authors`
+  index emits flat `ListItem`s rather than `Person`s: that page mixes real
+  users, famous poets and AI personas, and a name plus a URL is the most it can
+  say truthfully about all three.
+
+**Site-level markup lives on the homepage, and only on page 1.** `WebSite`
+(carrying the `SearchAction` that can earn a sitelinks searchbox, targeting
+`/?q=` because that is the URL the search bar really produces) and
+`Organization`. Both describe the *site*, not the page, so repeating them across
+125 paginated URLs asserts one entity at 125 addresses; the listing pages
+reference the same site through `isPartOf` instead.
+
+**`og:image:width`/`height` are only emitted for the default card.** They are a
+claim about a specific file. The author pages pass the poet's avatar as `image`,
+and stating 1200x630 for a ~44px square tells a scraper to reserve a slot the
+image cannot fill — the same mismatch that got avatars pulled from the poem
+pages' social cards. Note `next/head` **flattens one level only**: two tags
+wrapped in a fragment never reach `<head>` at all, so a conditional pair is two
+separate expressions. That shipped-looking bug was caught by a test, not review.
+
+`/privacy` and `/terms` canonicalise via `canonicalUrl()` against
+`NEXT_PUBLIC_SITE_URL`, not the request host, because they are statically
+optimised — adding `getServerSideProps` just to learn the host would cost a
+render per request for a document that never changes.
 
 **Poem pages** canonicalise to the **slug**, never to the requested URL: a poem
 resolves by both id and slug, so the two are duplicates, and echoing whichever

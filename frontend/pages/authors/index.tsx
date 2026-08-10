@@ -12,6 +12,8 @@ import {
     parseLetterParam,
     parseOriginParam
 } from '../../src/utils/authorsIndex'
+import { JsonLd } from '../../src/components/JsonLd'
+import { authorsIndexStructuredData } from '../../src/utils/structuredData'
 
 interface PageProps {
     initialLetters: string[] | null
@@ -30,6 +32,7 @@ export default function AuthorsIndexPage({
     origin
 }: PageProps) {
     const isFiltered = origin !== DEFAULT_ORIGIN
+    const url = `${baseUrl}${buildAuthorsHref(letter)}`
     const title = letter === DEFAULT_LETTER ? 'Poetry Authors' : `Poets starting with ${letter}`
     const description = letter === DEFAULT_LETTER
         ? 'Browse famous poets, AI-generated authors and community writers. Explore their poems on Poemunity.'
@@ -48,10 +51,25 @@ export default function AuthorsIndexPage({
             <SeoHead
                 title={title}
                 description={description}
-                url={`${baseUrl}${buildAuthorsHref(letter)}`}
+                url={url}
                 noIndex={isFiltered}
                 followLinks={isFiltered}
             />
+            {/* Not on a filtered view: the markup would describe a subset while
+                claiming to be the letter's collection page, and the page is
+                noindex anyway — the same call the genre search results make. */}
+            {!isFiltered && (
+                <JsonLd
+                    id='authors-collection'
+                    data={authorsIndexStructuredData({
+                        letter,
+                        description,
+                        url,
+                        baseUrl,
+                        authors: initialAuthors ?? []
+                    })}
+                />
+            )}
             <AuthorsIndex
                 initialLetters={initialLetters ?? undefined}
                 initialAuthors={initialAuthors ?? undefined}

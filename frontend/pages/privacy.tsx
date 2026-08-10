@@ -1,4 +1,4 @@
-import { SeoHead } from '../src/components/SeoHead'
+import { SeoHead, canonicalUrl } from '../src/components/SeoHead'
 import LegalPage, { LegalSection } from '../src/components/Legal/LegalPage'
 
 const effectiveDate = '12 June 2026'
@@ -128,6 +128,7 @@ export default function PrivacyPage() {
             <SeoHead
                 title='Privacy Policy'
                 description='How Poemunity collects, uses and protects account, poem and community activity data.'
+                url={canonicalUrl('/privacy')}
             />
             <LegalPage
                 title='Privacy Policy'

@@ -40,6 +40,102 @@ function itemList(baseUrl: string, poems: Poem[]): JsonLdObject {
     }
 }
 
+/**
+ * The site itself, for the HOMEPAGE only.
+ *
+ * `SearchAction` is the one part of this with a visible payoff: it is what can
+ * earn a sitelinks searchbox, letting people search Poemunity from the results
+ * page. Its target is `/?q=` because that is the URL the homepage search bar
+ * actually produces — markup describing a search endpoint the site does not
+ * have would be a claim, not a description.
+ *
+ * Homepage only, deliberately. `WebSite` is a statement about the site, not the
+ * page, and repeating it on every listing page would assert the same entity at
+ * a dozen URLs; the listing pages already reference it through `isPartOf`.
+ */
+export function websiteStructuredData(baseUrl: string): JsonLdObject {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE,
+        url: baseUrl,
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${baseUrl}/?q={search_term_string}`
+            },
+            'query-input': 'required name=search_term_string'
+        }
+    }
+}
+
+/**
+ * Who publishes the site. Kept minimal on purpose: `Organization` is where a
+ * logo, a founding date and social profiles would go, and every one of those is
+ * a factual claim about a real entity. Only the name, the URL and the logo the
+ * site actually serves are stated.
+ */
+export function organizationStructuredData(baseUrl: string): JsonLdObject {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE,
+        url: baseUrl,
+        logo: `${baseUrl}/og-image.png`
+    }
+}
+
+export interface AuthorsIndexStructuredDataArgs {
+    /** The letter this page lists, e.g. 'A'. */
+    letter: string
+    description: string
+    url: string
+    baseUrl: string
+    authors?: { slug: string, name: string }[]
+}
+
+/**
+ * The author index, as the collection of poets it renders.
+ *
+ * Built from the authors on THIS letter, never from the 3,364 total — the same
+ * rule the poem item lists follow. A page listing 251 poets that claimed 3,364
+ * would be describing a page that does not exist.
+ *
+ * The entries are plain `ListItem`s — a name and a URL — and deliberately NOT
+ * `Person`. The list mixes real users, famous poets and AI personas, and a
+ * `Person` entity for a generated account asserts in machine-readable form that
+ * a human exists, which is the claim the AI disclosure exists to prevent. That
+ * rule lives on the author pages too; here it is the reason this list is flat.
+ */
+export function authorsIndexStructuredData({
+    letter,
+    description,
+    url,
+    baseUrl,
+    authors = []
+}: AuthorsIndexStructuredDataArgs): JsonLdObject {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: `Poets starting with ${letter}`,
+        description,
+        url,
+        isPartOf: { '@type': 'WebSite', name: SITE, url: baseUrl },
+        mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: authors
+                .filter(author => author?.slug && author?.name)
+                .map((author, index) => ({
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    url: `${baseUrl}/authors/${author.slug}`,
+                    name: author.name
+                }))
+        }
+    }
+}
+
 export interface GenreStructuredDataArgs {
     label: string
     description: string

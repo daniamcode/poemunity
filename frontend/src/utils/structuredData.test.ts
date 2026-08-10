@@ -1,4 +1,11 @@
-import { genreStructuredData, authorStructuredData, poemStructuredData } from './structuredData'
+import {
+    genreStructuredData,
+    authorStructuredData,
+    poemStructuredData,
+    websiteStructuredData,
+    organizationStructuredData,
+    authorsIndexStructuredData
+} from './structuredData'
 import { Poem } from '../typescript/interfaces'
 
 const poem = (over: Partial<Poem> & { id: string }): Poem => ({
@@ -189,5 +196,78 @@ describe('poemStructuredData', () => {
             expect(data.author).toBeUndefined()
             expect(data['@type']).toBe('Poem')
         })
+    })
+})
+
+describe('websiteStructuredData', () => {
+    const data = websiteStructuredData(BASE)
+
+    test('describes the site, not a page', () => {
+        expect(data['@type']).toBe('WebSite')
+        expect(data.url).toBe(BASE)
+    })
+
+    // The one part of the site-level markup with a visible payoff: this is what
+    // can earn a sitelinks searchbox on the results page.
+    test('declares a SearchAction pointing at the search URL the site really has', () => {
+        // Not a guess at a conventional path: `/?q=` is what the homepage
+        // search bar produces, and markup naming an endpoint the site does not
+        // serve is a claim rather than a description.
+        expect(data.potentialAction).toMatchObject({
+            '@type': 'SearchAction',
+            target: { urlTemplate: `${BASE}/?q={search_term_string}` },
+            'query-input': 'required name=search_term_string'
+        })
+    })
+})
+
+describe('organizationStructuredData', () => {
+    test('names the publisher and the logo the site actually serves', () => {
+        const data = organizationStructuredData(BASE)
+
+        expect(data['@type']).toBe('Organization')
+        expect(data.logo).toBe(`${BASE}/og-image.png`)
+    })
+})
+
+describe('authorsIndexStructuredData', () => {
+    const authors = [
+        { slug: 'ada-brine', name: 'Ada Brine' },
+        { slug: 'milo-vance', name: 'Milo Vance' }
+    ]
+
+    const build = (over: Partial<Parameters<typeof authorsIndexStructuredData>[0]> = {}) =>
+        authorsIndexStructuredData({
+            letter: 'A',
+            description: 'Poets whose name begins with A.',
+            url: `${BASE}/authors`,
+            baseUrl: BASE,
+            authors,
+            ...over
+        })
+
+    test('lists the authors the page rendered, addressed by slug', () => {
+        const list = (build().mainEntity as { itemListElement: Record<string, unknown>[] })
+
+        // Slug and name deliberately differ in the fixture: the URL is built
+        // from the slug and the label from the name.
+        expect(list.itemListElement).toEqual([
+            { '@type': 'ListItem', position: 1, url: `${BASE}/authors/ada-brine`, name: 'Ada Brine' },
+            { '@type': 'ListItem', position: 2, url: `${BASE}/authors/milo-vance`, name: 'Milo Vance' }
+        ])
+    })
+
+    test('claims nothing when the page rendered nobody', () => {
+        const list = (build({ authors: [] }).mainEntity as { itemListElement: unknown[] })
+
+        expect(list.itemListElement).toEqual([])
+    })
+
+    // The index mixes real users, famous poets and AI personas, and `Person`
+    // asserts in machine-readable form that a human exists — the claim the AI
+    // disclosure exists to prevent. Flat ListItems say only "this page links
+    // here", which is true of all three kinds.
+    test('emits no Person entity for anyone on the list', () => {
+        expect(JSON.stringify(build())).not.toContain('Person')
     })
 })

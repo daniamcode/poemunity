@@ -5,6 +5,8 @@ import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import { ORDER_BY_LIKES, PAGINATION_LIMIT, SEARCH_MIN_LENGTH } from '../src/data/constants'
 import { PAGE_PARAM, buildPageHref, parsePageParam } from '../src/utils/pagination'
+import { JsonLd } from '../src/components/JsonLd'
+import { websiteStructuredData, organizationStructuredData } from '../src/utils/structuredData'
 
 interface PageProps {
     initialData: InitialPoemsData | null
@@ -28,6 +30,15 @@ export default function IndexPage({ initialData, baseUrl, currentPage = 1 }: Pag
                 // page it shares nothing with — taking its links with it.
                 url={`${baseUrl}${buildPageHref('/', currentPage)}`}
             />
+            {/* Page 1 only. `WebSite` and `Organization` describe the site, not
+                this page, and a SearchAction repeated on page 47 of the list
+                would assert the same entity at 125 URLs. */}
+            {currentPage === 1 && (
+                <>
+                    <JsonLd id='website' data={websiteStructuredData(baseUrl)} />
+                    <JsonLd id='organization' data={organizationStructuredData(baseUrl)} />
+                </>
+            )}
             <Dashboard initialData={initialData ?? undefined} currentPage={currentPage} />
         </>
     )

@@ -1,4 +1,4 @@
-import { SeoHead } from '../src/components/SeoHead'
+import { SeoHead, canonicalUrl } from '../src/components/SeoHead'
 import LegalPage, { LegalSection } from '../src/components/Legal/LegalPage'
 
 const effectiveDate = '12 June 2026'
@@ -126,6 +126,7 @@ export default function TermsPage() {
                     'The rules for using Poemunity, including user content, moderation and',
                     'AI-assisted community activity.'
                 ])}
+                url={canonicalUrl('/terms')}
             />
             <LegalPage
                 title='Terms of Service'
