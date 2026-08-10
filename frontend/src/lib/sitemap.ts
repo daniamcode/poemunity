@@ -24,6 +24,28 @@ export const FETCH_CONCURRENCY = 16
  */
 export const SITEMAP_SECTIONS = ['pages', 'authors', 'poems-community', 'poems-famous'] as const
 
+/**
+ * The cache header every sitemap route sends, in one place so the index and the
+ * sections cannot drift apart.
+ *
+ * **`stale-while-revalidate` needs a value.** It was sent bare, and a directive
+ * with no value is dropped in normalisation — so only `public` survived to the
+ * CDN and `poems-famous.xml`, a 15,652-URL document, regenerated in full on
+ * every single crawl (`x-vercel-cache: MISS`, `age: 0`, on a route that fetches
+ * 157 pages from the backend to build itself).
+ *
+ * The two numbers say different things. `s-maxage` is how long the copy is
+ * fresh: a day, because that is roughly how often this site's URL set changes.
+ * `stale-while-revalidate` is how long a STALE copy may still be served while a
+ * new one is built behind it — a week, because the alternative when the backend
+ * is slow or briefly down is a crawler receiving nothing, and a week-old
+ * sitemap is worth incomparably more than a 500. It is also the one header that
+ * is safe to cache publicly here: a sitemap is identical for every visitor,
+ * unlike the SSR pages, which embed `initialUser` and cannot be shared.
+ */
+export const SITEMAP_CACHE_CONTROL =
+    'public, s-maxage=86400, stale-while-revalidate=604800'
+
 export type SitemapSection = (typeof SITEMAP_SECTIONS)[number]
 
 /**

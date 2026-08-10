@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next'
 import {
     COMMUNITY_ORIGINS,
+    SITEMAP_CACHE_CONTROL,
     SitemapEntry,
     SitemapSection,
     assertOriginsPartitionPoems,
@@ -78,7 +79,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
     const entries = await buildSection(section)
 
     res.setHeader('Content-Type', 'application/xml')
-    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate')
+    res.setHeader('Cache-Control', SITEMAP_CACHE_CONTROL)
     res.write(renderUrlset(sitemapBaseUrl(req), entries))
     res.end()
 

@@ -1,5 +1,6 @@
 import {
     COMMUNITY_ORIGINS,
+    SITEMAP_CACHE_CONTROL,
     SITEMAP_SECTIONS,
     assertOriginsPartitionPoems,
     buildAuthorEntries,
@@ -404,5 +405,51 @@ describe('mapWithConcurrency', () => {
                 return n
             })
         ).rejects.toThrow('boom')
+    })
+})
+
+/**
+ * THE CACHE HEADER.
+ *
+ * `stale-while-revalidate` was sent with no value, and a valueless directive is
+ * dropped in normalisation — only `public` reached the CDN, so `poems-famous.xml`
+ * regenerated in full on every crawl (`x-vercel-cache: MISS`, `age: 0`) despite
+ * costing 157 backend round-trips to build.
+ *
+ * Asserting on the STRING is the point. The header parses fine either way, the
+ * XML is byte-identical either way, and nothing in a test suite or a build can
+ * see the difference — only a response header on the deployed site can.
+ */
+describe('the sitemap cache header', () => {
+    test('gives stale-while-revalidate a value, or the CDN drops it', () => {
+        expect(SITEMAP_CACHE_CONTROL).toMatch(/stale-while-revalidate=\d+/)
+    })
+
+    test('is publicly cacheable and stays fresh for a day', () => {
+        expect(SITEMAP_CACHE_CONTROL).toMatch(/(^|,\s*)public(,|$)/)
+        expect(SITEMAP_CACHE_CONTROL).toMatch(/s-maxage=86400/)
+    })
+
+    test('may serve a stale copy for longer than it stays fresh', () => {
+        // The window only means anything if it outlasts freshness — equal
+        // values would expire together and a crawler would get the 500 the
+        // stale copy exists to prevent.
+        const fresh = Number(/s-maxage=(\d+)/.exec(SITEMAP_CACHE_CONTROL)?.[1])
+        const stale = Number(/stale-while-revalidate=(\d+)/.exec(SITEMAP_CACHE_CONTROL)?.[1])
+
+        expect(stale).toBeGreaterThan(fresh)
+    })
+
+    test('the index route actually sends it', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { getServerSideProps } = require('../../pages/sitemap.xml')
+        const res = { setHeader: jest.fn(), write: jest.fn(), end: jest.fn() }
+
+        await getServerSideProps({
+            req: { headers: { host: 'poemunity.com' } },
+            res
+        })
+
+        expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', SITEMAP_CACHE_CONTROL)
     })
 })

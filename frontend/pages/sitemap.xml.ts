@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next'
-import { SITEMAP_SECTIONS, renderSitemapIndex } from '../src/lib/sitemap'
+import { SITEMAP_CACHE_CONTROL, SITEMAP_SECTIONS, renderSitemapIndex } from '../src/lib/sitemap'
 import { sitemapBaseUrl } from '../src/lib/sitemapRequest'
 
 /**
@@ -18,7 +18,7 @@ import { sitemapBaseUrl } from '../src/lib/sitemapRequest'
  */
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     res.setHeader('Content-Type', 'application/xml')
-    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate')
+    res.setHeader('Cache-Control', SITEMAP_CACHE_CONTROL)
     res.write(renderSitemapIndex(sitemapBaseUrl(req), SITEMAP_SECTIONS))
     res.end()
 

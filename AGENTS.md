@@ -848,6 +848,21 @@ advertised URL.
 The `<lastmod>` policy is unchanged and is pinned by
 `frontend/src/__tests__/sitemap.test.ts`.
 
+**`stale-while-revalidate` needs a value, or the whole directive is dropped.**
+Both routes send `SITEMAP_CACHE_CONTROL` (one constant, so the index and the
+sections cannot drift). It was sent bare, so only `public` survived to the CDN
+and `poems-famous.xml` — 15,652 URLs, 157 backend round-trips to build —
+regenerated on every crawl. Nothing local can see this: the header parses either
+way and the XML is byte-identical, so the test asserts on the STRING and the
+proof is `x-vercel-cache: HIT` with a rising `age:` on the deployed response.
+The stale window deliberately outlasts `s-maxage`; when they expire together a
+crawler hitting a slow backend gets the 500 the stale copy exists to prevent.
+
+Sitemaps are also the **only** routes here safe to cache publicly — they are
+identical for every visitor, while the SSR pages embed `initialUser` and would
+serve one reader's signed-in header to everyone. See `TODO.md` for that
+decision, which is parked behind the Search Console numbers.
+
 ## Poem of the week
 
 `GET /api/v1/poems/poem-of-the-week` returns one famous poem plus the Monday its
