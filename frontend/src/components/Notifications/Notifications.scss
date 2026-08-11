@@ -57,11 +57,43 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     padding: $space-3;
 
-    // On a narrow screen a fixed 320px panel anchored right can still overflow,
-    // so it becomes near-full-width instead.
-    @media screen and (max-width: 480px) {
-        width: calc(100vw - #{$space-6});
-        right: -$space-2;
+    // On a narrow screen the panel spans the viewport instead — see the
+    // media query at the end of this block for why that also means changing
+    // what it is anchored TO.
+    @media screen and (max-width: $bp-sm) {
+        left: $space-2;
+        right: $space-2;
+        // `auto`, not a calc: with both edges pinned the width IS the viewport
+        // minus those insets, and it stays right if the header padding changes.
+        width: auto;
+    }
+}
+
+// WHAT THE PANEL IS ANCHORED TO HAS TO CHANGE WITH ITS WIDTH.
+//
+// `.notification-bell` is `position: relative`, so `right: 0` above pins the
+// panel to the BELL's right edge — which is correct on a wide screen, where
+// there is plenty of room to its left.
+//
+// On a phone the bell sits about 100px in from the right edge (avatar and
+// logout are to its right), so a near-viewport-wide panel hanging off that
+// point overflows the LEFT edge by ~70px. That is the reported bug: the title
+// rendered as "ons" and each row began mid-word. The previous mobile rule made
+// it worse rather than better — it widened the panel to `100vw - 24px` while
+// leaving it anchored to the bell, so the wider it got, the further off-screen
+// its left edge went.
+//
+// Dropping `position: relative` here hands the panel's containing block to
+// `.header`, which is `position: fixed` and therefore spans the viewport. Two
+// things then fall out for free: `left`/`right` are viewport insets, and
+// `top: 100%` means "below the header" rather than "below the bell" — which is
+// where it was already being drawn.
+//
+// The badge is unaffected: it anchors to `.notification-bell__button`, which
+// keeps its own `position: relative`.
+@media screen and (max-width: $bp-sm) {
+    .notification-bell {
+        position: static;
     }
 }
 
