@@ -375,10 +375,53 @@
     flex-shrink: 0;
 }
 
+// THE BAR DID NOT FIT ON A PHONE IN PORTRAIT.
+//
+// Measured signed-in at a 356px viewport: the row needed 413px, so the logout
+// button was pushed clean off the right edge and the wordmark collided with the
+// Categories menu. Nothing here can shrink — `.header__dropdown` and
+// `.header__actions` are both `flex-shrink: 0`, deliberately, because a
+// squashed touch target is worse than a tight one — so the excess had to come
+// out of what is actually being spent:
+//
+//   138px  Categories menu — of which the WORD is 84px (icon 22 + chevron 24)
+//    91px  wordmark
+//   136px  bell 36 + avatar 32 + logout 44, plus two 12px gaps
+//    32px  header padding
+//    32px  two 16px gaps between the three zones
+//
+// The word is the one item that is redundant rather than functional: it sits
+// directly beside a hamburger and a chevron, which is the universal mobile
+// idiom for this control, and it comes back at 481px. Removing it recovers
+// 84px of the 57px overflow on its own; the tighter gaps and padding buy the
+// margin that makes 320px work too.
 @media screen and (max-width: $bp-sm) {
     .header {
-        padding-left: $space-4;
-        padding-right: $space-4;
+        padding-left: $space-3;
+        padding-right: $space-3;
+        gap: $space-2;
+    }
+
+    .header__actions {
+        gap: $space-2;
+    }
+
+    // VISUALLY hidden, not `display: none`. The accordion's summary is the
+    // control's only text, so hiding it outright would leave a button whose
+    // accessible name is empty — a menu a screen reader announces as "button".
+    // Same technique as `.sr-only` in App.scss, inlined because this is a
+    // responsive state of an existing element rather than a utility class the
+    // markup opts into.
+    .header__dropdown-categories {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
     }
 
     .header__logo-img {
