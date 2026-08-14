@@ -14,7 +14,7 @@ Single source of truth for the backlog (frontend + backend). Deeper detail lives
 2. **👤 Count the legacy `users` collection** (P2 security). One query — `db.users.countDocuments()` — decides whether the two routes deleted on 2026-08-10 were serving real people's email addresses to anyone who asked, or nothing at all. It also decides whether there is a migration gap stranding real accounts.
 3. **👤 Look at the live site.** Nine commits are in production unlooked-at, six of them from 2026-08-10, and three of those are backend deploys — the backend has no test gate at all. CI cannot prove a deploy; only the URL can. The list is in *Live-site verification* below, and it takes about ten minutes.
 
-**On the calendar, not on the list: read the per-sitemap indexed ratios from ~21 August.** All five sitemaps were submitted on 7 Aug 2026 and parse `Correcto`, so the clock is already running — nothing to do until then, and reading it early tells you nothing. It is the highest-value *answer* pending on this project: it decides the `noindex` question for 97% of the collection, the edge-caching question, and where any backlink effort should point.
+**The coverage data landed early, on 2026-08-14: 708 indexed, 19,100 not.** The dominant reason is *Discovered — currently not indexed* (17,349): Google knows those URLs and is choosing not to crawl them. That reframes the top of this list — see the two SEO items in P3, one of which (1,025 soft 404s) is a real bug and the other of which is the famous-poem decision, now informed rather than speculative.
 
 ---
 
@@ -125,12 +125,28 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 ### SEO
 
-- 👤 **Read the per-sitemap indexed ratios — from ~21 August 2026.** ✅ Submitted 7 Aug 2026: all five (index + four children) parse `Correcto`, and the discovered counts match the code exactly — 15,652 famous + 435 community + 3,364 authors + 136 pages = 19,587, the index total to the digit. That arithmetic is also independent proof that Google read every child in FULL, which is what the "a sitemap never ships partial" work exists to guarantee.
+- 👤 **Confirm the composition of the 708 indexed pages** (2026-08-14). The coverage data arrived early and it is bleak but legible: **708 indexed, 19,100 not**. Reasons, in Google's own words:
 
-  **What is submitted is not what is answered.** The Sitemaps screen shows *Páginas descubiertas* — URLs found in the file, not URLs indexed. The ratio this was all for lives in **Indexación → Páginas**, filtered per sitemap (⋮ → "Ver indexación de páginas" on each row). Read it against these two scenarios, because the split cannot make Google index faster, only tell you why it isn't:
-  - **Community high, famous near zero** — duplication confirmed. The 15,652 famous poems exist verbatim on hundreds of other sites and cannot rank; the decision is then whether to `noindex` them (recovering crawl budget for the 435 that are unique) or keep them as reader traffic and stop expecting search traffic. **Do not act before the numbers arrive** — `noindex`ing 97% of the collection on a hunch is not cheaply reversible.
-  - **Everything near zero, including community** — not a duplication problem. A site-level signal, and a completely different investigation.
-  - Two weeks from submission is the earliest honest read; three days is not a signal, it is noise.
+  | reason | pages | what it means |
+  |---|---|---|
+  | Discovered – currently not indexed | 17,349 | Google knows the URL and **has not crawled it**. Not a duplicate-content verdict: a crawl-budget/authority one. |
+  | Soft 404 | 1,025 | Fetched, got a 200, judged effectively empty. **The only one of these that is a bug on our side.** |
+  | Crawled – currently not indexed | 705 | Crawled, judged not worth indexing. |
+  | Redirect / noindex | 4 | Expected. |
+
+  **The one click still worth doing**: filter Indexación → Páginas by each submitted sitemap. The prediction, which is exactly what the split was built to test: `pages` (136) and `poems-community` (435) make up most of the 708, and `poems-famous` is near zero. 136 + 435 = 571, and 708 - 571 = 137, which would be the indexed author pages. **If that holds, the famous-poem duplication question is answered** — see the decision below.
+
+- 👤 **The decision the numbers now inform: what to do with 15,652 famous poems.** They are verbatim copies of poems on hundreds of other sites, and Google is declining to crawl them. Two honest options, and "wait and see" is no longer one of them:
+  - **`noindex,follow` them and drop them from the sitemap.** Recovers the entire crawl budget for the ~570 pages that are unique. Precedent exists in this codebase: empty genres and `?q=` pages already do exactly this. Reversible, but not cheaply — re-indexing 15k pages takes months.
+  - **Keep them as reader content and stop expecting search traffic from them.** Costs nothing, changes nothing, and accepts that the site's indexable surface is ~570 pages.
+  - **The thing not to do is nothing**, because today they are consuming crawl budget the unique poems need.
+
+- 🤖 **(Likely bug) 1,025 soft 404s — the single-poem author pages are the prime suspect.** **1,231 authors have exactly one poem** (measured 2026-08-14 across all 26 letters), against 1,025 soft 404s. On such a page the only unique content IS that poem, so `/authors/<slug>` is a near-duplicate of the one `/detail/<slug>` it links to — 1,570 characters of rendered text, of which ~350 is the category nav. **Confirm before acting**: GSC → Soft 404 → sample the example URLs. Close counts are a hypothesis, not a diagnosis.
+
+  If confirmed, the fix follows existing precedent: `noindex,follow` an author page with fewer than 2 poems AND drop it from the sitemap (the two must move together — the empty-genre fix did both). It reverses itself the moment they publish a second poem.
+
+- 🤖 **(Smaller, separate) ~190 poems have almost no body.** 1.2% of an 800-poem sample is under 80 characters. Some are legitimately short — Issa haiku — but several are scraping truncations: "And the Ghosts" (19 chars), "from The Botanic Garden" (8 chars). Worth a pass to find and either fix or unpublish the truncated ones; they are thin pages in their own right.
+
 - 🤝 **Every SSR page is uncacheable — decide whether to make public pages edge-cacheable.** Every route returns `cache-control: private, no-cache, no-store`, Next's default when `getServerSideProps` sets none. Nothing caches at Vercel's edge, so all 16,087 poem pages cost a full render plus a backend round-trip on **every** Googlebot fetch, and crawl rate is throttled by how expensive a site is to crawl. TTFB is fine (0.3–0.55s); the point is that it is paid every time.
 
   **A product decision, not a header tweak.** These pages embed `initialUser`, so the HTML genuinely differs per visitor. Making them anonymous-cacheable means dropping `initialUser` from SSR and hydrating auth client-side (`/api/auth/session` already exists) and accepting a brief signed-out header on first paint. Do NOT just add `s-maxage` without moving `initialUser` — that serves one visitor's signed-in header to everyone.
