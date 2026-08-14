@@ -3,7 +3,14 @@ import Detail from '../../src/components/Detail/Detail'
 import Accordion from '../../src/components/SimpleAccordion'
 import AuthorsAccordion from '../../src/components/AuthorsAccordion'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, serverFetchResult, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
+import {
+    serverFetch,
+    serverFetchResult,
+    fetchServerUser,
+    ServerUser,
+    isBackendUnavailable,
+    markBackendUnavailable
+} from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
 import { JsonLd } from '../../src/components/JsonLd'
 import { Breadcrumbs } from '../../src/components/Breadcrumbs'
@@ -80,7 +87,7 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
     const poemId = params?.poemId as string
     const token = req.cookies?.token
     const protocol = (req.headers['x-forwarded-proto'] as string)?.split(',')[0] || 'http'
@@ -109,6 +116,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req }) =>
     // Google to deindex the lot.
     if (poemResult.status === 404) {
         return { notFound: true }
+    }
+
+    // ...and a backend that did not answer at all is a 503, not a 200 holding
+    // an empty page. Gated on the status for the same reason `notFound` is: a
+    // 404 is an answer, an outage is not.
+    //
+    // This is the confirmed cause of 1,025 soft 404s (see markBackendUnavailable).
+    // The reasoning above stopped at two branches — 404 or render-what-we-have —
+    // and rendering nothing at 200 is exactly what Google files as a soft 404.
+    if (isBackendUnavailable(poemResult.status)) {
+        markBackendUnavailable(res)
     }
 
     return {

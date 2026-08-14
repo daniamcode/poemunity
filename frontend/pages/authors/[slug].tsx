@@ -1,7 +1,14 @@
 import { GetServerSideProps } from 'next'
 import AuthorDetail, { AuthorProfile } from '../../src/components/Authors/AuthorDetail'
 import { SeoHead } from '../../src/components/SeoHead'
-import { serverFetch, serverFetchResult, fetchServerUser, ServerUser } from '../../src/lib/serverApi'
+import {
+    serverFetch,
+    serverFetchResult,
+    fetchServerUser,
+    ServerUser,
+    isBackendUnavailable,
+    markBackendUnavailable
+} from '../../src/lib/serverApi'
 import { InitialAuthorPoemsData } from '../../src/components/Authors/useAuthorPoems'
 import { JsonLd } from '../../src/components/JsonLd'
 import { Breadcrumbs } from '../../src/components/Breadcrumbs'
@@ -77,7 +84,7 @@ export default function AuthorDetailPage({
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res, query }) => {
     const slug = params?.slug as string
     const token = req.cookies?.token
     const protocol = (req.headers['x-forwarded-proto'] as string)?.split(',')[0] || 'http'
@@ -115,6 +122,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, quer
     // Poet Xyz" — an unbounded space of URLs each claiming to be a real poet.
     if (authorResult.status === 404) {
         return { notFound: true }
+    }
+
+    // An unreachable backend is a 503, not a 200 showing a name derived from the
+    // slug over an empty list — see markBackendUnavailable.
+    if (isBackendUnavailable(authorResult.status)) {
+        markBackendUnavailable(res)
     }
 
     // A page past the end is a 404, not a heading over an empty list — the

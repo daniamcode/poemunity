@@ -1,7 +1,13 @@
 import { GetServerSideProps } from 'next'
 import Dashboard from '../src/components/Dashboard/Dashboard'
 import { SeoHead } from '../src/components/SeoHead'
-import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
+import {
+    serverFetchResult,
+    fetchServerUser,
+    ServerUser,
+    isBackendUnavailable,
+    markBackendUnavailable
+} from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import capitalizeFirstLetter from '../src/utils/capitalizeFirstLetter'
 import { JsonLd } from '../src/components/JsonLd'
@@ -88,7 +94,7 @@ export default function GenrePage({ initialData, genre, baseUrl, isSearch, curre
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res, query }) => {
     const requested = params?.genre as string
     const genre = requested.toLowerCase()
     const token = req.cookies?.token
@@ -122,12 +128,18 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, quer
     // The probe deliberately ignores ?q=: searching a real genre for something
     // it does not contain is an empty result, not a missing page.
     if (!isKnownCategorySlug(genre)) {
-        const probe = await serverFetch<InitialPoemsData>('/api/v1/poems', {
+        const probe = await serverFetchResult<InitialPoemsData>('/api/v1/poems', {
             page: 1,
             limit: 1,
             genre
         }, token)
-        if (!probe || probe.total === 0) return { notFound: true }
+        // An outage must not 404 a slug it simply could not check — that is the
+        // probe answering "this genre does not exist" on no evidence.
+        if (isBackendUnavailable(probe.status)) {
+            markBackendUnavailable(res)
+            return { props: { initialData: null, initialUser: await fetchServerUser(token), genre, baseUrl, isSearch: false, currentPage: 1 } }
+        }
+        if (!probe.data || probe.data.total === 0) return { notFound: true }
     }
 
     // See the note in pages/index.tsx: ?q= has to be honoured server-side or the
@@ -150,13 +162,30 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, quer
     }
     const currentPage = parsed.kind === 'ok' ? parsed.page : 1
 
-    const data = await serverFetch<InitialPoemsData>('/api/v1/poems', {
+    const result = await serverFetchResult<InitialPoemsData>('/api/v1/poems', {
         page: currentPage,
         limit: PAGINATION_LIMIT,
         genre,
         orderBy: ORDER_BY_LIKES,
         ...(search && { q: search })
     }, token)
+    const data = result.data
+
+    // Before the past-the-end 404 below: an outage is not an empty page — see
+    // the same guard on the homepage.
+    if (isBackendUnavailable(result.status)) {
+        markBackendUnavailable(res)
+        return {
+            props: {
+                initialData: null,
+                initialUser: await fetchServerUser(token),
+                genre,
+                baseUrl,
+                isSearch: Boolean(search),
+                currentPage
+            }
+        }
+    }
 
     // A page past the end is a 404, not an empty list. `?page=9999` renders a
     // heading over nothing — the soft-404 shape — and there are infinitely many

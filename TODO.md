@@ -141,9 +141,11 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
   - **Keep them as reader content and stop expecting search traffic from them.** Costs nothing, changes nothing, and accepts that the site's indexable surface is ~570 pages.
   - **The thing not to do is nothing**, because today they are consuming crawl budget the unique poems need.
 
-- 🤖 **(Likely bug) 1,025 soft 404s — the single-poem author pages are the prime suspect.** **1,231 authors have exactly one poem** (measured 2026-08-14 across all 26 letters), against 1,025 soft 404s. On such a page the only unique content IS that poem, so `/authors/<slug>` is a near-duplicate of the one `/detail/<slug>` it links to — 1,570 characters of rendered text, of which ~350 is the category nav. **Confirm before acting**: GSC → Soft 404 → sample the example URLs. Close counts are a hypothesis, not a diagnosis.
+- ✅ **The 1,025 soft 404s were the backend failing during the crawl surge, and are fixed** (2026-08-14). **My first hypothesis — thin single-poem author pages — was wrong**, and the GSC examples said so immediately: every soft 404 is a `/detail/` poem page, while the INDEXED list is mostly author pages. The real mechanism, reproduced exactly by pointing the app at a dead backend:
 
-  If confirmed, the fix follows existing precedent: `noindex,follow` an author page with fewer than 2 poems AND drop it from the sitemap (the two must move together — the empty-genre fix did both). It reverses itself the moment they publish a second poem.
+  `HTTP 200` · `<title>Poem | Poemunity</title>` · empty description · self-referencing canonical · no poem anywhere in the HTML.
+
+  `getServerSideProps` gated `notFound` on a 404 STATUS — deliberately, so a blip could not deindex the site — but that left only two branches where there are three, and "the backend did not answer" was being told as 200-with-nothing. The dates line up: every example is 7-8 Aug, the crawl surge right after the sitemap submission, when a serverless backend and Atlas were asked for 19,587 URLs at once. Now 503 + `Retry-After`, which Google retries and files nothing against. Also removed a real deindex hazard: during an outage `?page=2` returned a genuine 404 on every paginated URL.
 
 - 🤖 **(Smaller, separate) ~190 poems have almost no body.** 1.2% of an 800-poem sample is under 80 characters. Some are legitimately short — Issa haiku — but several are scraping truncations: "And the Ghosts" (19 chars), "from The Botanic Garden" (8 chars). Worth a pass to find and either fix or unpublish the truncated ones; they are thin pages in their own right.
 

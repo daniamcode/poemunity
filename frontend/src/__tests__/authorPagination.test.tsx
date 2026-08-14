@@ -26,7 +26,12 @@ import { makePoem } from '../test-utils/fixtures'
  *   reason these URLs exist.
  */
 
+// The two backend-availability helpers come from `requireActual`, not stubs:
+// they are pure functions, and mocking them out would silently disable the 503
+// guard the routes depend on — the mock would be testing a different route than
+// the one that ships.
 jest.mock('../../src/lib/serverApi', () => ({
+    ...jest.requireActual('../../src/lib/serverApi'),
     serverFetch: jest.fn(async () => ({ poems: [], page: 1, hasMore: false, total: 0 })),
     serverFetchResult: jest.fn(async () => ({ status: 200, data: { id: 'a1', name: 'Ada Brine' } })),
     fetchServerUser: jest.fn(async () => null)

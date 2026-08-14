@@ -162,6 +162,48 @@ export async function serverFetchResult<T>(
     }
 }
 
+/**
+ * The backend did not answer, as opposed to answering "no".
+ *
+ * `0` is a request that never completed (DNS, timeout, connection refused);
+ * `5xx` is the backend failing. Both mean "ask again later". A 404 does NOT
+ * belong here and never should: that is a real answer about a real URL.
+ */
+export function isBackendUnavailable(status: number): boolean {
+    return status === 0 || status >= 500
+}
+
+/**
+ * TELL A CRAWLER THE TRUTH WHEN THE BACKEND IS DOWN: 503, NOT 200.
+ *
+ * This is the fix for 1,025 soft 404s, and the mechanism was reproduced
+ * exactly — point the app at a dead backend and request any poem:
+ *
+ *     HTTP 200 · <title>Poem | Poemunity</title> · empty description
+ *     · self-referencing canonical · no poem anywhere on the page
+ *
+ * Google fetched pages in that state during the crawl surge that followed the
+ * 7 Aug sitemap submission, and filed 1,025 of them as soft 404 — a page that
+ * claims success while showing nothing.
+ *
+ * The routes already reasoned about one half of this: `notFound` is gated on a
+ * 404 status rather than on `!data`, precisely so a blip cannot deindex the
+ * site. But that left only two branches, 404 or 200, and the honest answer to
+ * "my database is unreachable" is neither. A 503 says *temporary*: Google
+ * retries, keeps the URL indexed, and files nothing against it.
+ *
+ * `Retry-After` is advisory but free, and it is what turns a 503 from "broken"
+ * into "come back in two minutes".
+ *
+ * The page still renders whatever it has, deliberately — a human who hits this
+ * gets the site's chrome and a nav rather than a stack trace, while the crawler
+ * reads the status code and comes back.
+ */
+export function markBackendUnavailable(res: { statusCode: number, setHeader: (k: string, v: string) => void }): void {
+    res.statusCode = 503
+    res.setHeader('Retry-After', '120')
+}
+
 export async function serverFetch<T>(
     path: string,
     params?: Record<string, string | number>,

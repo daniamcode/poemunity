@@ -1,7 +1,13 @@
 import { GetServerSideProps } from 'next'
 import Dashboard from '../src/components/Dashboard/Dashboard'
 import { SeoHead } from '../src/components/SeoHead'
-import { serverFetch, fetchServerUser, ServerUser } from '../src/lib/serverApi'
+import {
+    serverFetchResult,
+    fetchServerUser,
+    ServerUser,
+    isBackendUnavailable,
+    markBackendUnavailable
+} from '../src/lib/serverApi'
 import { InitialPoemsData } from '../src/components/List/hooks/usePoemsList'
 import { ORDER_BY_LIKES, PAGINATION_LIMIT, SEARCH_MIN_LENGTH } from '../src/data/constants'
 import { PAGE_PARAM, buildPageHref, parsePageParam } from '../src/utils/pagination'
@@ -44,7 +50,7 @@ export default function IndexPage({ initialData, baseUrl, currentPage = 1 }: Pag
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
     const token = req.cookies?.token
     const protocol = (req.headers['x-forwarded-proto'] as string)?.split(',')[0] || 'http'
     const baseUrl = `${protocol}://${req.headers.host}`
@@ -65,12 +71,22 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     }
     const currentPage = parsed.kind === 'ok' ? parsed.page : 1
 
-    const data = await serverFetch<InitialPoemsData>('/api/v1/poems', {
+    const result = await serverFetchResult<InitialPoemsData>('/api/v1/poems', {
         page: currentPage,
         limit: PAGINATION_LIMIT,
         orderBy: ORDER_BY_LIKES,
         ...(search && { q: search })
     }, token)
+    const data = result.data
+
+    // BEFORE the past-the-end check below, which is the point. "No poems came
+    // back" and "the backend is down" are not the same fact, and the 404 below
+    // reads the first from the second: during an outage every `?page=2` would
+    // answer 404 and invite Google to deindex it. A 503 says try again.
+    if (isBackendUnavailable(result.status)) {
+        markBackendUnavailable(res)
+        return { props: { initialData: null, initialUser: await fetchServerUser(token), baseUrl, currentPage } }
+    }
 
     // A page past the end is a 404, not a heading over nothing — see the same
     // note on the genre route.

@@ -4,12 +4,22 @@ import { getServerSideProps as genreProps } from '../../pages/[genre]'
 import * as serverApi from '../lib/serverApi'
 import { SEARCH_MIN_LENGTH } from '../data/constants'
 
+// The two backend-availability helpers come from `requireActual`, not stubs:
+// they are pure functions, and mocking them out would silently disable the 503
+// guard the routes depend on — the mock would be testing a different route than
+// the one that ships.
 jest.mock('../../src/lib/serverApi', () => ({
+    ...jest.requireActual('../../src/lib/serverApi'),
     serverFetch: jest.fn(async () => ({ poems: [], page: 1, hasMore: false, total: 0 })),
+    serverFetchResult: jest.fn(async () => ({ status: 200, data: { poems: [], page: 1, hasMore: false, total: 0 } })),
     fetchServerUser: jest.fn(async () => null)
 }))
 
-const mockServerFetch = serverApi.serverFetch as jest.Mock
+// The routes fetch their PRIMARY data through `serverFetchResult` — they need
+// the status to tell "no such genre" from "the backend is down" (see
+// backendUnavailable.test.ts). `serverFetch` is still used for secondary data
+// that may legitimately be absent.
+const mockServerFetch = serverApi.serverFetchResult as jest.Mock
 
 // A ?q= URL has to be searched SERVER-side. The client deliberately skips its
 // first fetch when it was seeded from SSR (usePoemsList's isSeeded guard), so

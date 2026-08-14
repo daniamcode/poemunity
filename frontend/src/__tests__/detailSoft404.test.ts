@@ -3,7 +3,12 @@ import { getServerSideProps as poemProps } from '../../pages/detail/[poemId]'
 import { getServerSideProps as authorProps } from '../../pages/authors/[slug]'
 import * as serverApi from '../lib/serverApi'
 
+// The two backend-availability helpers come from `requireActual`, not stubs:
+// they are pure functions, and mocking them out would silently disable the 503
+// guard the routes depend on — the mock would be testing a different route than
+// the one that ships.
 jest.mock('../../src/lib/serverApi', () => ({
+    ...jest.requireActual('../../src/lib/serverApi'),
     serverFetch: jest.fn(async () => null),
     serverFetchResult: jest.fn(async () => ({ data: null, status: 200 })),
     fetchServerUser: jest.fn(async () => null)
@@ -36,9 +41,15 @@ const mockResult = serverApi.serverFetchResult as jest.Mock
 describe('record pages answer 404 rather than an empty 200', () => {
     beforeEach(() => jest.clearAllMocks())
 
+    // `res` is real here because the routes now WRITE to it: an unreachable
+    // backend sets 503 rather than rendering a 200 shell (the soft-404 fix).
+    // These tests cover the neighbouring rule — that such a failure must not
+    // become a 404 — so they exercise that path and need somewhere for the
+    // status to land.
     const ctx = (params: Record<string, string>) =>
         ({
             req: { cookies: {}, headers: { host: 'poemunity.com' } },
+            res: { statusCode: 200, setHeader: jest.fn() },
             query: {},
             params
         } as unknown as GetServerSidePropsContext)
