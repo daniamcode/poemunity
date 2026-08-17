@@ -125,6 +125,12 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 ### SEO
 
+- 🤝 **Write the next tier of genre introductions** (raised 2026-08-17). Twenty are written and live — see *Recently shipped* and `docs/SEO_AUDIT.md`. The next candidates, by the same rule (inventory weighted by **search intent**, not inventory alone): `marriage`, `hope`, `loss`, `nostalgia`-adjacent `home`, `mental-health`, `heartbreak`-adjacent `lost-love`, `birds`, `ocean`, `winter`, `christmas`. Deliberately still absent: `arts-and-sciences` (1,269 poems) and `social-commentaries` (517), which are Poetry Foundation taxonomy buckets nobody types into a search box.
+
+  **The rules are in the header of `frontend/src/data/genreIntros.ts` and they are the whole point** — every claim checkable, nothing that could be swapped between two genres, honest about thin shelves. A genre with no entry renders nothing, which is a supported state; there is no pressure to fill all 131.
+
+- 🤖 **Curated `startHere` links need re-checking after any author migration.** `node frontend/scripts/check-author-slugs.mjs` verifies all 80 against production (read-only); `--refresh` rewrites the committed snapshot the unit test asserts against. The test catches a slug that was wrong when written; only the script catches one retired later.
+
 - 👤 **Confirm the composition of the 708 indexed pages** (2026-08-14). The coverage data arrived early and it is bleak but legible: **708 indexed, 19,100 not**. Reasons, in Google's own words:
 
   | reason | pages | what it means |
@@ -210,6 +216,9 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 ## ✅ Recently shipped (context — do not re-add)
 
 **One line each, by design.** The reasoning that outlives the change lives in `AGENTS.md`; this list exists only so nobody proposes the work again.
+
+- **Editorial introductions on the twenty largest genre pages** (2026-08-17) — ~250 words of original prose plus four curated poet links each, from `docs/SEO_AUDIT.md`, which crawled the site as Googlebot and found the technical SEO essentially done and the corpus the problem: **15,652 scraped famous poems (97.3%), 416 AI (2.6%), 19 human (0.1%)**. Scraped poem pages cannot outrank their own source, so the genre pages are the only surface that can rank on merit — and only if they carry text existing nowhere else. Page 1 only and never on `?q=` (repeating it across 125 paginated URLs is boilerplate). Also the first fix for the internal-link graph the audit measured: a genre page linked to 10 poems and nothing else, so this adds 80 author links across the 20.
+- **A full-site Googlebot crawl audit** (2026-08-17) — `docs/SEO_AUDIT.md`. Verdict, evidence and a prioritised plan. Confirms as correct: every status code (308 www/case/trailing-slash, 404 past-the-end and unknown slugs, 307 `/profile`, 503 on outage), self-canonical pagination, `noindex,follow` placement, sitemap CDN caching (`x-vercel-cache: HIT`, Vercel consumes `s-maxage`/`swr` at the edge and strips them from the client header — the bare `public` is expected, not a regression), TTFB 0.30–0.49s, crawl depth ≤5 to any poem.
 
 - **The header did not fit a phone in portrait** (2026-08-11) — signed in, the row needed 413px in a 356px viewport, so the logout button was pushed off the right edge and the wordmark collided with the Categories menu. Below `$bp-sm` the menu's LABEL is now visually hidden (84px of the 138px control, redundant beside a hamburger and a chevron) and the gaps and padding tighten. Measured, not eyeballed: fits from 320px up.
 - **The notifications panel hung 72px off the left edge on mobile** (2026-08-11) — `.notification-bell` is `position: relative`, so the panel was anchored to the BELL, which sits ~100px in from the right edge; the old mobile rule widened it to `100vw - 24px` while leaving it anchored there, so widening it pushed it further off-screen. It now anchors to the fixed, full-width `.header` below `$bp-sm`.

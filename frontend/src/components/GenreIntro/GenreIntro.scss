@@ -1,0 +1,91 @@
+@use '../../styles/variables' as *;
+
+// The editorial introduction above a genre's poem list. Page 1 only — see the
+// component for why.
+//
+// It is styled to read as an *introduction* rather than as a card competing
+// with the poems: no border, no background panel, no shadow. The only visual
+// separation from the list below is a rule, because the reader's next move is
+// almost always to start scrolling and a boxed block invites them to skip it.
+.genre-intro {
+    max-width: 68ch; // Prose measure. The poem list below is wider on purpose.
+    margin: 0 0 $space-7;
+    padding-bottom: $space-6;
+    border-bottom: 1px solid $color-border-subtle;
+    font-family: $font-body;
+}
+
+.genre-intro__heading {
+    margin: 0 0 $space-4;
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    color: $color-text-dark;
+}
+
+.genre-intro__paragraph {
+    margin: 0 0 $space-4;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: $color-text-medium;
+
+    &:last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.genre-intro__start {
+    margin-top: $space-6;
+}
+
+.genre-intro__start-heading {
+    margin: 0 0 $space-3;
+    font-family: $font-heading;
+    font-size: 1rem;
+    color: $color-text-dark;
+}
+
+.genre-intro__start-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.genre-intro__start-item {
+    margin-bottom: $space-2;
+    font-size: 1rem;
+    line-height: 1.6;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.genre-intro__start-link {
+    color: $color-primary;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary-hover;
+        text-decoration: underline;
+    }
+}
+
+// Muted, but $color-text-accessible-muted rather than $color-text-secondary:
+// this is real content a reader is meant to read, not a timestamp, so it has to
+// clear WCAG AA on white.
+.genre-intro__start-note {
+    color: $color-text-accessible-muted;
+}
+
+@media screen and (max-width: $bp-md) {
+    .genre-intro {
+        margin-bottom: $space-6;
+        padding-bottom: $space-5;
+    }
+
+    .genre-intro__paragraph {
+        font-size: 1rem;
+    }
+}

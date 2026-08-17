@@ -315,6 +315,20 @@ export default [
             ]
         }
     },
+    // Prose data files: paragraphs of editorial copy, one string per paragraph.
+    //
+    // max-len would force each one to be split into concatenated fragments, and
+    // the whole value of this content is that a person can read and edit it as
+    // prose — the moment it becomes `'…the trap is the ' + 'abstract noun.'`
+    // nobody proofreads it again. max-lines for the same reason: it is 20
+    // genres of copy, and its length is the point rather than a smell.
+    {
+        files: ['src/data/genreIntros.ts'],
+        rules: {
+            'max-len': 'off',
+            'max-lines': 'off'
+        }
+    },
     // Test files and Jest setup: Allow Node.js globals and relax strict rules
     {
         files: [

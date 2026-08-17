@@ -7,6 +7,7 @@ import AuthorsAccordion from '../AuthorsAccordion'
 import Ranking from '../Ranking/Ranking'
 import PoemOfTheWeek from '../PoemOfTheWeek/PoemOfTheWeek'
 import List from '../List/List'
+import GenreIntro from '../GenreIntro/GenreIntro'
 import { InitialPoemsData } from '../List/hooks/usePoemsList'
 import { RootState } from '../../redux/store'
 import { genreTitle } from '../../utils/seo'
@@ -29,6 +30,7 @@ interface DashboardProps {
 function Dashboard({ initialData, currentPage, match }: DashboardProps) {
     const router = useRouter()
     const genre = match?.params?.genre ?? (router.query.genre as string | undefined)
+    const queryFromUrl = typeof router.query.q === 'string' ? router.query.q : ''
 
     // Live total, not the SSR one: searching is client-side, so a heading built
     // from initialData would keep claiming the unfiltered count while the reader
@@ -59,6 +61,34 @@ function Dashboard({ initialData, currentPage, match }: DashboardProps) {
                     is the site's front door and already carries the brand, so a
                     second visible title is noise. */}
                 <h1 className={genre ? 'dashboard__heading' : 'sr-only'}>{heading}</h1>
+                {/* The genre's editorial introduction — the one piece of text on
+                    this site that exists nowhere else on the web, and the reason
+                    a genre page can rank where a scraped poem page cannot (see
+                    docs/SEO_AUDIT.md).
+
+                    Three gates, and each one is load-bearing:
+
+                    `genre` — the homepage has no genre and no introduction.
+
+                    `currentPage === 1` — repeating the same 250 words across
+                    125 paginated URLs is boilerplate, and it would make every
+                    page of /love mostly identical to every other, which is the
+                    near-duplicate shape self-canonical pagination exists to
+                    avoid. Page 1 is the one competing for "love poems".
+
+                    `!queryFromUrl` — a ?q= URL is noindex and shows a filtered
+                    subset, so an essay about the whole genre would sit above
+                    results it does not describe.
+
+                    The URL query is the right signal for that last one rather
+                    than the live typed input: this decides what the SERVER
+                    renders, which is all a crawler ever sees. Typing in the
+                    search box without navigating leaves the introduction in
+                    place, which is correct for a reader who is still on the
+                    genre page. */}
+                {genre && currentPage === 1 && !queryFromUrl && (
+                    <GenreIntro genre={genre} label={capitalizeFirstLetter(genre.replace(/-/g, ' '))} />
+                )}
                 <List genre={genre} initialData={initialData} currentPage={currentPage} />
                 {/* Mobile only — the sidebar that carries JoinPanel is
                     display:none below $bp-xl, so this is the only place a

@@ -910,6 +910,10 @@ worth.
 ## Reference Docs
 
 - `TODO.md` — the backlog (priorities, deferred decisions, recently shipped).
+- `docs/SEO_AUDIT.md` — live Googlebot crawl, verdict and prioritised plan
+  (2026-08-17). The short version: the technical SEO is done; 97.3% of the poems
+  are scraped famous ones and 0.1% are human-written, and that ratio is the
+  traffic problem.
 - `docs/NEXTJS_MIGRATION.md` — Next.js migration status.
 - `docs/AI_COMMUNITY_SIMULATION.md` — AI activity seed plan + scripts.
 - `docs/DATABASE_BACKUP_RESTORE.md` — backup/restore drill.
