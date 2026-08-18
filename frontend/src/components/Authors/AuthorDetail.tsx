@@ -13,6 +13,7 @@ import { Pagination } from '../Pagination'
 import { pageCount } from '../../utils/pagination'
 import { categoryToSlug, FOLLOWERS_LABEL, FOLLOWING_LABEL, PAGINATION_LIMIT } from '../../data/constants'
 import CommentsSection from '../Comments/CommentsSection'
+import AuthorIntro from '../AuthorIntro/AuthorIntro'
 import FollowButton from '../Follow/FollowButton'
 import { useAppDispatch } from '../../redux/store'
 import type { RootState } from '../../redux/store'
@@ -171,6 +172,27 @@ export default function AuthorDetail({ initialPoems, initialAuthor, currentPage 
                     </div>
                 )}
             </header>
+
+            {/* The editorial introduction — original prose about this poet, and
+                the only text on an author page that exists nowhere else on the
+                web (docs/SEO_AUDIT.md).
+
+                Page 1 only: repeating it on every paginated page of a prolific
+                poet is boilerplate, and it would make page 3 of Shakespeare
+                mostly identical to page 1 — the near-duplicate shape the
+                self-canonical pagination work exists to avoid.
+
+                It sits BETWEEN the header and the poem list, not inside
+                `author-detail__poems`, for the same reason the `h2` there is
+                worded the way it is: that section is "85 poems", and prose
+                about the poet is not one of them.
+
+                AI personas and registered users render nothing — the component
+                decides that, and it is a correctness rule rather than a layout
+                one. See AuthorIntro. */}
+            {currentPage === 1 && (
+                <AuthorIntro slug={slug} name={authorName ?? ''} authorType={authorType} />
+            )}
 
             <div className='author-detail__poems'>
                 {/* Heads the poem list rather than sitting up in the header: an

@@ -323,7 +323,7 @@ export default [
     // nobody proofreads it again. max-lines for the same reason: it is 20
     // genres of copy, and its length is the point rather than a smell.
     {
-        files: ['src/data/genreIntros.ts'],
+        files: ['src/data/genreIntros.ts', 'src/data/authorIntros.ts'],
         rules: {
             'max-len': 'off',
             'max-lines': 'off'
