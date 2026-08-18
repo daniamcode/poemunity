@@ -46,6 +46,48 @@
     }
 }
 
+// The disclosure. `list-style: none` plus the WebKit pseudo-element are both
+// needed to remove the default triangle — Safari ignores the first on its own.
+.genre-intro__toggle {
+    display: inline-block;
+    // The lead above is `:last-of-type` within the section, so it takes
+    // `margin-bottom: 0` — this margin is the whole gap between them.
+    margin-top: $space-4;
+    color: $color-primary;
+    font-family: $font-body;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+        color: $color-primary-hover;
+        text-decoration: underline;
+    }
+}
+
+// Swap the label on open, so the control never claims it will do the thing it
+// has already done. CSS rather than JS, to match the component's reasoning.
+.genre-intro__toggle-less,
+.genre-intro__more[open] .genre-intro__toggle-more {
+    display: none;
+}
+
+.genre-intro__more[open] .genre-intro__toggle-less {
+    display: inline;
+}
+
+// First paragraph after the summary needs its own top margin back: the summary
+// is inline-block and its margin does not collapse into the paragraph below.
+.genre-intro__more[open] .genre-intro__paragraph:first-of-type {
+    margin-top: $space-4;
+}
+
 .genre-intro__start {
     margin-top: $space-6;
 }

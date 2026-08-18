@@ -43,30 +43,64 @@ export function GenreIntro({ genre, label }: GenreIntroProps) {
     if (!intro) return null
 
     const headingId = 'genre-intro-heading'
+    const [lead, ...rest] = intro.body
 
     return (
         <section className='genre-intro' aria-labelledby={headingId}>
             <h2 className='genre-intro__heading' id={headingId}>
                 {intro.heading ?? `About ${label.toLowerCase()} poetry`}
             </h2>
-            {intro.body.map(paragraph => (
-                <p className='genre-intro__paragraph' key={paragraph.slice(0, 40)}>
-                    {paragraph}
-                </p>
-            ))}
-            <div className='genre-intro__start'>
-                <h3 className='genre-intro__start-heading'>Start here</h3>
-                <ul className='genre-intro__start-list'>
-                    {intro.startHere.map(poet => (
-                        <li className='genre-intro__start-item' key={poet.slug}>
-                            <Link className='genre-intro__start-link' href={`/authors/${poet.slug}`}>
-                                {poet.name}
-                            </Link>
-                            <span className='genre-intro__start-note'> — {poet.note}</span>
-                        </li>
+            {/* THE LEAD IS ALWAYS VISIBLE; THE REST IS BEHIND A DISCLOSURE.
+                Fully expanded, this block was 564px tall and pushed the first
+                poem to y=766 — on a poetry site, an essay where the poems
+                should be. The lead alone is ~150px, so a reader lands on
+                context plus poems rather than on an essay. */}
+            <p className='genre-intro__paragraph genre-intro__lead'>{lead}</p>
+
+            {/* `<details>`, NOT React state.
+
+                Everything inside is in the SERVER-RENDERED HTML — collapsed is
+                a presentation state, not a fetch — which is the whole reason
+                this is an acceptable place to put the one text on this site
+                that exists nowhere else. Google indexes content inside
+                expandable sections normally; content it has to run JS to
+                obtain is a different and worse bet.
+
+                And native rather than a state hook because a `useState` toggle
+                does nothing until hydration: the button would be inert for the
+                first moments on a slow connection, and inert-looking controls
+                get clicked twice. `<details>` works with no JS at all, brings
+                its own keyboard handling and `aria-expanded` semantics, and
+                cannot desynchronise from a re-render. */}
+            {rest.length > 0 && (
+                <details className='genre-intro__more'>
+                    <summary className='genre-intro__toggle'>
+                        {/* Two labels swapped by CSS on [open], so the control
+                            does not lie about what it will do once expanded —
+                            with no JS to keep them in sync. */}
+                        <span className='genre-intro__toggle-more'>Read more</span>
+                        <span className='genre-intro__toggle-less'>Show less</span>
+                    </summary>
+                    {rest.map(paragraph => (
+                        <p className='genre-intro__paragraph' key={paragraph.slice(0, 40)}>
+                            {paragraph}
+                        </p>
                     ))}
-                </ul>
-            </div>
+                    <div className='genre-intro__start'>
+                        <h3 className='genre-intro__start-heading'>Start here</h3>
+                        <ul className='genre-intro__start-list'>
+                            {intro.startHere.map(poet => (
+                                <li className='genre-intro__start-item' key={poet.slug}>
+                                    <Link className='genre-intro__start-link' href={`/authors/${poet.slug}`}>
+                                        {poet.name}
+                                    </Link>
+                                    <span className='genre-intro__start-note'> — {poet.note}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </details>
+            )}
         </section>
     )
 }

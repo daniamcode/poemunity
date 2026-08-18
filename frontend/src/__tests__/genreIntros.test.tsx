@@ -151,6 +151,34 @@ describe('where the introduction renders', () => {
         expect(screen.getByText(/the trap is the abstract noun/)).toBeInTheDocument()
     })
 
+    test('only the LEAD paragraph is outside the disclosure', () => {
+        // The layout complaint this design answers: fully expanded the block
+        // was 564px and pushed the first poem to y=766. The reader must land on
+        // context PLUS poems, so exactly one paragraph stays open.
+        renderDashboard({ genre: 'love', currentPage: 1 })
+
+        const details = document.querySelector('details')
+        const lead = screen.getByText(/Love poetry is the oldest thing/)
+        const second = screen.getByText(/the trap is the abstract noun/)
+
+        expect(details).not.toBeNull()
+        expect(details!.contains(lead)).toBe(false)
+        expect(details!.contains(second)).toBe(true)
+        // The curated links are behind it too — they are a "where to go next"
+        // aid, not something to put above the poems.
+        expect(details!.contains(screen.getByRole('link', { name: 'John Donne' }))).toBe(true)
+    })
+
+    test('the disclosure is closed on arrival and offers to open', () => {
+        renderDashboard({ genre: 'love', currentPage: 1 })
+
+        expect(document.querySelector('details')!.hasAttribute('open')).toBe(false)
+        expect(screen.getByText('Read more')).toBeInTheDocument()
+        // Both labels ship; CSS swaps them on [open], so the control cannot
+        // claim it will do what it has already done.
+        expect(screen.getByText('Show less')).toBeInTheDocument()
+    })
+
     test('page 2 does NOT — 250 identical words across 125 URLs is boilerplate', () => {
         renderDashboard({ genre: 'love', currentPage: 2 })
 
@@ -212,6 +240,23 @@ describe('the crawler sees it in the server-rendered HTML', () => {
         // A distinctive clause from the body — proves the PROSE shipped, not
         // just the heading and the link list.
         expect(html).toContain('declines to be consoled')
+    })
+
+    test('the COLLAPSED half is server-rendered too, not fetched on click', () => {
+        // The load-bearing assertion for the whole disclosure design. Collapsed
+        // is a presentation state; if the hidden paragraphs and the curated
+        // links were only added on expand, the one text on this site that
+        // exists nowhere else would be invisible to a crawler and the entire
+        // exercise would be pointless. `declines to be consoled` and the
+        // Start-here links all live inside <details>.
+        const html = ssr(<GenreIntro genre='grief' label='Grief' />)
+
+        expect(html).toContain('<details')
+        expect(html).toContain('declines to be consoled')
+        expect(html).toContain('Start here')
+        expect(html).toContain('/authors/jane-kenyon')
+        // And NOT open by default — that would defeat the point of collapsing.
+        expect(html).not.toMatch(/<details[^>]*\sopen/)
     })
 
     test('an uncovered genre server-renders nothing at all', () => {
