@@ -47,6 +47,19 @@ export function GenreIntro({ genre, label }: GenreIntroProps) {
 
     return (
         <section className='genre-intro' aria-labelledby={headingId}>
+            {/* The default template fits only 20 of the 132 genres, and the
+                other 112 carry an explicit `heading`. Two separate reasons, both
+                worth knowing before adding a genre:
+
+                "About <x> poetry" needs <x> to read as a modifier. It works for
+                love, nature, war; it does not for "About suicide poetry" or
+                "About sister poetry", which are the ones this shipped with.
+
+                And `toLowerCase()` flattens PROPER NOUNS — America, Christmas,
+                Halloween and Thanksgiving all rendered lowercase. The lowercase
+                is still needed (capitalizeFirstLetter hands us "Love", and
+                "About Love poetry" is wrong), so the fix is per-genre data
+                rather than cleverer string handling. */}
             <h2 className='genre-intro__heading' id={headingId}>
                 {intro.heading ?? `About ${label.toLowerCase()} poetry`}
             </h2>

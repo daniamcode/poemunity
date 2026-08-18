@@ -81,8 +81,14 @@ describe('the curated poet links all resolve', () => {
 describe('the written content is sound', () => {
     const entries = Object.entries(GENRE_INTROS)
 
-    test('twenty genres are covered', () => {
-        expect(entries).toHaveLength(20)
+    test('every category with poems in it is covered', () => {
+        // 132 of the 143 entries in CATEGORIES. The eleven absentees all hold
+        // ZERO poems (Easter, Wedding, Mother's Day, Valentine's Day and so
+        // on): `/[genre]` already marks an empty genre `noindex`, so prose
+        // there would be an essay over nothing — the exact thin-content shape
+        // the introductions exist to avoid. They become one-line additions the
+        // moment somebody publishes into them.
+        expect(entries).toHaveLength(132)
     })
 
     test.each(entries.map(([slug]) => slug))('%s is a real category slug', slug => {
@@ -92,9 +98,13 @@ describe('the written content is sound', () => {
         expect(known.has(slug)).toBe(true)
     })
 
-    test.each(entries)('%s is 150–350 words — long enough to say something', (_slug, intro) => {
+    test.each(entries)('%s is 60–350 words — long enough to say something', (_slug, intro) => {
+        // LENGTH IS TIERED BY INVENTORY, deliberately. A genre holding 1,600
+        // poems can carry three paragraphs; Kindness holds one poem, and 250
+        // words above it would be an essay wearing a poem as a hat. The floor
+        // is what stops an entry being added as a stub.
         const words = intro.body.join(' ').split(/\s+/).length
-        expect(words).toBeGreaterThanOrEqual(150)
+        expect(words).toBeGreaterThanOrEqual(60)
         expect(words).toBeLessThanOrEqual(350)
     })
 
@@ -198,9 +208,12 @@ describe('where the introduction renders', () => {
     })
 
     test('a genre with no introduction written renders no empty shell', () => {
-        // 111 of 131 genres have none, and that is the steady state. A stray
-        // heading over nothing would be a soft-404 signal on every one of them.
-        renderDashboard({ genre: 'halloween', currentPage: 1 })
+        // The eleven uncovered categories are the ones holding ZERO poems, so
+        // this is also the case where a stray heading would sit above nothing
+        // at all — the soft-404 shape. `wedding` is one of them; if somebody
+        // publishes a wedding poem AND writes the intro, this test will say so
+        // rather than silently testing nothing.
+        renderDashboard({ genre: 'wedding', currentPage: 1 })
 
         expect(screen.queryByRole('heading', { name: /^About / })).not.toBeInTheDocument()
         expect(screen.queryByText('Start here')).not.toBeInTheDocument()
@@ -260,7 +273,7 @@ describe('the crawler sees it in the server-rendered HTML', () => {
     })
 
     test('an uncovered genre server-renders nothing at all', () => {
-        expect(ssr(<GenreIntro genre='halloween' label='Halloween' />)).toBe('')
+        expect(ssr(<GenreIntro genre='wedding' label='Wedding' />)).toBe('')
     })
 })
 
