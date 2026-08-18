@@ -59,7 +59,15 @@ export function AuthorIntro({ slug, name, authorType }: AuthorIntroProps) {
     if (!intro) return null
 
     return (
+        // `key` on the SLUG so the disclosure collapses again when the reader
+        // clicks through to a different poet. Without it React reuses the same
+        // <details> element across the client-side navigation and its `open`
+        // state is DOM state, not React state — so arriving via "Read next"
+        // from an expanded introduction dropped you mid-essay on somebody you
+        // had just chosen to read about. Reported alongside the stale-heading
+        // bug in AuthorDetail, and it survives that fix independently.
         <EditorialIntro
+            key={slug}
             variant='author'
             heading={`About ${name}`}
             body={intro.body}

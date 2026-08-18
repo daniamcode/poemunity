@@ -35,7 +35,12 @@ export function GenreIntro({ genre, label }: GenreIntroProps) {
     if (!intro) return null
 
     return (
+        // Keyed for the same reason as the author version: `<details open>` is
+        // DOM state that React carries across a client-side navigation, so
+        // expanding /love and then clicking through to /grief landed the reader
+        // mid-essay on a genre they had not expanded.
         <EditorialIntro
+            key={genre}
             variant='genre'
             heading={intro.heading ?? `About ${label.toLowerCase()} poetry`}
             body={intro.body}

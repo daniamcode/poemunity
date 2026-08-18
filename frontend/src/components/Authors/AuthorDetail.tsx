@@ -55,6 +55,34 @@ export default function AuthorDetail({ initialPoems, initialAuthor, currentPage 
     const context = useContext(AppContext)
     const dispatch = useAppDispatch()
     const [authorProfile, setAuthorProfile] = useState<AuthorProfile | null>(initialAuthor ?? null)
+
+    // RE-SEED WHEN THE AUTHOR CHANGES, not only on mount.
+    //
+    // `/authors/a` → `/authors/b` is a client-side navigation: getServerSideProps
+    // re-runs and hands down the new author, but this component never unmounts,
+    // so a mount-only `useState` seed kept the previous one. Reported from
+    // production — clicking "Read next" from Shakespeare to Donne gave Donne's
+    // URL, breadcrumb, poems, count and introduction BODY under a heading and
+    // an `h1` that both still said William Shakespeare, until the client-side
+    // profile refetch corrected it a round-trip later.
+    //
+    // Everything else was right because everything else reads the live slug or
+    // the re-seeded poem list, which is what made it look like a rendering
+    // glitch: only the two fields sourced from this state were wrong.
+    //
+    // Adjusted DURING RENDER rather than in an effect, which is the documented
+    // React pattern for resetting state when an identity prop changes: React
+    // re-runs this component immediately without painting the stale value, so
+    // there is no frame showing the wrong poet's name. An effect would run
+    // after paint and the flash would remain — smaller than the bug, still the
+    // bug. This is the fourth time this codebase has hit seed-on-mount across a
+    // client-side navigation; see AGENTS.md under paginated list URLs.
+    const [seededSlug, setSeededSlug] = useState(slug)
+    if (slug !== seededSlug) {
+        setSeededSlug(slug)
+        setAuthorProfile(initialAuthor ?? null)
+    }
+
     const authorId = authorProfile?.id
     // The counts and the follow state are read from the NORMALIZED store, not
     // from this component's copy of the profile, so a follow performed here and

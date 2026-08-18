@@ -219,6 +219,28 @@ describe('where the introduction renders', () => {
         expect(screen.queryByText('Start here')).not.toBeInTheDocument()
     })
 
+    test('the expanded disclosure collapses when you navigate to another genre', () => {
+        // `<details open>` is DOM state, not React state, so React carries it
+        // across a client-side navigation: expanding /love and clicking through
+        // to /grief landed the reader mid-essay on a genre they never opened.
+        // Fixed with a key on the genre; this is the guard.
+        const { rerender } = renderDashboard({ genre: 'love', currentPage: 1 })
+        document.querySelector('details')!.open = true
+
+        mockRouter.query = { genre: 'grief' }
+        rerender(
+            <Provider store={store()}>
+                <Dashboard
+                    initialData={{ poems: [], page: 1, hasMore: false, total: 341 } as never}
+                    currentPage={1}
+                />
+            </Provider>
+        )
+
+        expect(screen.getByRole('heading', { name: 'About grief poetry' })).toBeInTheDocument()
+        expect(document.querySelector('details')!.open).toBe(false)
+    })
+
     test('mother and father override the awkward default heading', () => {
         renderDashboard({ genre: 'mother', currentPage: 1 })
 
