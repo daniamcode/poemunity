@@ -22,7 +22,26 @@ export const FETCH_CONCURRENCY = 16
  * This is a diagnostic, not a ranking trick. Splitting a sitemap does not make
  * Google index faster — it makes Google tell you WHY it isn't.
  */
-export const SITEMAP_SECTIONS = ['pages', 'authors', 'poems-community', 'poems-famous'] as const
+/**
+ * `poems-famous` WAS a fourth section here and was removed on 2026-08-18.
+ *
+ * A sitemap is a request to index. The 15,652 famous poems are now
+ * `noindex,follow` (see pages/detail/[poemId].tsx), so listing them here would
+ * ask Google to index pages the same response tells it not to — a contradiction
+ * that costs a crawl of every one of them to discover.
+ *
+ * The route for it is gone too, so `/sitemaps/poems-famous.xml` 404s. That is
+ * deliberate rather than left serving-but-unlisted: an unlisted file Google
+ * already has submitted keeps being fetched and keeps making the same request.
+ * It has to be REMOVED IN SEARCH CONSOLE by hand — deleting the route does not
+ * withdraw a submission, and until it is withdrawn GSC will report an error
+ * against it.
+ *
+ * The famous poems are NOT deleted and nothing about the site changes for a
+ * reader: they stay published, linked from every genre list and author page,
+ * and crawlable through those. Only the request to rank them is withdrawn.
+ */
+export const SITEMAP_SECTIONS = ['pages', 'authors', 'poems-community'] as const
 
 /**
  * The cache header every sitemap route sends, in one place so the index and the

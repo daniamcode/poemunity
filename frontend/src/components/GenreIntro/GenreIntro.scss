@@ -7,10 +7,23 @@
 // with the poems: no border, no background panel, no shadow. The only visual
 // separation from the list below is a rule, because the reader's next move is
 // almost always to start scrolling and a boxed block invites them to skip it.
+// 800px CENTRED, not a prose measure left-aligned in the column.
+//
+// It shipped as `max-width: 68ch; margin: 0 0 …`, which is the textbook advice
+// for body copy and was visibly wrong here: 68ch of EB Garamond is ~525px, so
+// the block sat hard against the column's left border while the `h1` directly
+// above it was centred in 800px. The two disagreed by ~170px, which reads as
+// the page being broken rather than as a deliberate measure.
+//
+// 800px is the site-wide content width — `.dashboard__heading`, Detail,
+// Comments, Authors and Join all use it — and matching it is what makes the
+// heading, this block and the poem list share one left edge. The same lesson
+// Dashboard.scss records about the breadcrumb sitting 9px off the h1: a
+// near-miss alignment looks worse than an obvious difference.
 .genre-intro {
-    max-width: 68ch; // Prose measure. The poem list below is wider on purpose.
-    margin: 0 0 $space-7;
-    padding-bottom: $space-6;
+    max-width: 800px;
+    margin: 0 auto $space-7;
+    padding: 0 $space-4 $space-6;
     border-bottom: 1px solid $color-border-subtle;
     font-family: $font-body;
 }

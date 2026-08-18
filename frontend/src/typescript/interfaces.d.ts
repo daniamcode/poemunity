@@ -30,6 +30,18 @@ export interface Poem {
     authorName?: string
     authorType?: 'famous' | 'user' | 'ai'
     /**
+     * The POEM's provenance, which is not the same field as `authorType` above
+     * — that is the AUTHOR's kind. They usually agree and are not required to:
+     * the admin can post a famous poem on behalf of an account, and it is the
+     * poem that is or is not a verbatim copy of something published elsewhere.
+     *
+     * `origin === 'famous'` is what drives `noindex` on the detail page and
+     * what partitions the sitemap, so read this rather than `authorType` for
+     * any question about duplication. Optional because a poem created through
+     * the ordinary form carries no origin at all.
+     */
+    origin?: 'famous' | 'user' | 'ai'
+    /**
      * Draft = private to its author. Optional because the ~16k poems that
      * predate the field carry no status at all and the server treats a missing
      * one as published — so `undefined` here means published too.

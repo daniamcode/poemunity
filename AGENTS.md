@@ -674,6 +674,57 @@ a link on screen nor an `item` in the markup.
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
 
+## Famous poems are noindex (one condition, two places)
+
+15,652 of 16,087 poems are `origin: 'famous'` — verbatim copies of poems on
+poetryfoundation.org and poets.org, the originals, on far older domains. They
+cannot outrank their own source however they are marked up, and Search Console
+already agreed: 17,349 URLs at *Discovered — currently not indexed*. So since
+2026-08-18 they are `noindex,follow` and out of the sitemap.
+
+**This is NOT a deletion and must not become one.** Every famous poem stays
+published, readable, linked from every genre list and author page, and
+crawlable through them. Including the canon is normal for a poetry site — the
+anomaly here is the ratio (**15,652 famous / 416 AI / 19 human**), not the
+inclusion. What is withdrawn is only the request to *rank* them.
+
+**The condition is per-POEM, never per-route.** `/detail/[poemId]` serves all
+three origins, so a `noIndex` on the route deindexes the 19 human poems and 416
+AI ones — precisely the pages the change exists to rescue — while rendering
+identically and passing every other test. `famousPoemNoindex.test.tsx` pins this
+with fixtures that differ *only* by `origin`.
+
+Three details that each look like a free choice and are not:
+
+- **`origin`, not `authorType`.** They usually agree and need not: `authorType`
+  is the author's kind, `origin` is the poem's provenance, and it is the poem
+  that is or is not a copy.
+- **An allowlist (`=== 'famous'`), not `!== 'user'`.** Same rule as
+  `PUBLISHED_MATCH` and the poem-field allowlist: an origin added later must be
+  inert, not silently deindexed. A missing `origin` means indexable — poems
+  created through the ordinary form carry none.
+- **`follow`, never `nofollow`.** These pages carry the author link and the
+  next-poem card, and the link graph is already the weakest thing here (16,087
+  poems form a single linked list). Deindexing them must not sever the paths
+  through them.
+
+**The sitemap side is the same decision.** A sitemap is a request to index, so
+listing URLs whose own response says `noindex` is a contradiction that costs a
+crawl each to discover. `poems-famous` is gone from `SITEMAP_SECTIONS` and its
+route 404s. `assertOriginsPartitionPoems` becomes *more* load-bearing, not less:
+`poems-community` is now the only poem sitemap, so a fourth origin would be in
+no sitemap at all — the assertion turns that into a 500 instead of silence.
+
+👤 **Deleting the route does not withdraw a submission** — `poems-famous.xml`
+must be removed in Search Console by hand, or GSC reports an error against it.
+
+**What this does and does not buy.** It recovers crawl focus and makes coverage
+numbers legible. It is *not* a growth lever and the site-level quality benefit
+is plausible rather than documented — Google has said noindexed pages generally
+do not feed site-wide signals, which is about as firm as the public evidence
+gets. The binding constraint on traffic is that 19 people have written a poem
+here. Do not expect a traffic change from this alone.
+
 ## Paginated list URLs
 
 The lists load by **infinite scroll**, which no crawler performs, and the routes

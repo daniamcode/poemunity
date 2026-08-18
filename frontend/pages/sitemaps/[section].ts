@@ -44,9 +44,13 @@ async function buildSection(section: SitemapSection): Promise<SitemapEntry[]> {
 
         case 'poems-community': {
             // The poems that exist ONLY here — 435 of them against 15,652
-            // famous ones. This is the section whose indexed ratio actually
-            // answers a question, and it is cheap enough to verify while we are
-            // in it.
+            // famous ones, and since the famous section was dropped this is the
+            // ONLY poem sitemap. That makes the partition check below more
+            // load-bearing than it was, not less: `origin` is enumerated by
+            // hand in COMMUNITY_ORIGINS because the list endpoint has no "not
+            // this one", so a fourth origin added tomorrow would now be in no
+            // sitemap at all AND noindexed by nothing. The assertion is what
+            // turns that into a loud 500 instead of poems quietly vanishing.
             const perOrigin = await Promise.all(
                 COMMUNITY_ORIGINS.map(origin => fetchAllPoems(`&origin=${origin}`))
             )
@@ -60,9 +64,6 @@ async function buildSection(section: SitemapSection): Promise<SitemapEntry[]> {
 
             return buildPoemEntries(community)
         }
-
-        case 'poems-famous':
-            return buildPoemEntries(await fetchAllPoems('&origin=famous'))
     }
 }
 

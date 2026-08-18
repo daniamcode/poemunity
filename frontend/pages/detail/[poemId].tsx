@@ -44,11 +44,40 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
                 picture, as the 1200x630 social card — which crops to mush or is
                 rejected outright. SeoHead's site card is the better default
                 until there is a real per-poem image. */}
+            {/* FAMOUS POEMS ARE noindex,follow — 15,652 of 16,087 of them.
+                They are verbatim copies of poems that exist on
+                poetryfoundation.org and poets.org, the originals, on far older
+                domains, so these pages cannot win a search result against their
+                own source however they are marked up. Google agrees already:
+                17,349 URLs sit in Search Console as "Discovered — currently not
+                indexed". See docs/SEO_AUDIT.md.
+
+                THIS IS A PER-POEM TEST, NOT A PER-ROUTE ONE, and that is the
+                whole subtlety. The same route serves the 19 human-written poems
+                and the 416 AI ones — the only pages this exercise exists to
+                rescue — so a `noIndex` on the route would delete exactly what it
+                is trying to save. Hence `origin === 'famous'` rather than
+                anything simpler.
+
+                An ALLOWLIST-shaped test on purpose: an origin added later is
+                indexable until somebody decides otherwise, which is the failure
+                that can be noticed. `!== 'user'` would silently deindex it.
+
+                `follow`, never `nofollow`. These pages still carry the author
+                link and the next-poem card, and the audit measured the link
+                graph as the weakest thing here: 16,087 poems form a single
+                linked list. Deindexing them must not also cut the paths through
+                them.
+
+                NOT a deletion — every poem stays readable, linked and in every
+                genre list. The only thing withdrawn is the request to rank it. */}
             <SeoHead
                 title={title}
                 description={description}
                 url={url}
                 type='article'
+                noIndex={initialPoem?.origin === 'famous'}
+                followLinks={initialPoem?.origin === 'famous'}
             />
             {initialPoem && (
                 <JsonLd id='poem' data={poemStructuredData({ poem: initialPoem, url, baseUrl })} />

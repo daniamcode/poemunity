@@ -142,10 +142,20 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
   **The one click still worth doing**: filter Indexación → Páginas by each submitted sitemap. The prediction, which is exactly what the split was built to test: `pages` (136) and `poems-community` (435) make up most of the 708, and `poems-famous` is near zero. 136 + 435 = 571, and 708 - 571 = 137, which would be the indexed author pages. **If that holds, the famous-poem duplication question is answered** — see the decision below.
 
+- 👤 **Remove `poems-famous.xml` in Search Console.** Shipped 2026-08-18: the famous poems are `noindex,follow` and the section is gone from the sitemap index, so `/sitemaps/poems-famous.xml` now 404s. **Deleting the route does not withdraw the submission** — until it is removed by hand in GSC → Sitemaps, Google keeps fetching it and reports an error. Two clicks.
+
+- ~~👤 **The decision the numbers now inform: what to do with 15,652 famous poems.**~~ **Decided 2026-08-18: `noindex,follow` + out of the sitemap, poems kept on the site.** Rationale and the three traps are in `AGENTS.md` → *Famous poems are noindex*. Expect no traffic change from this on its own; it buys crawl focus and legible coverage numbers.
+
+  <details><summary>Original framing, kept because the reasoning was revised</summary>
+
 - 👤 **The decision the numbers now inform: what to do with 15,652 famous poems.** They are verbatim copies of poems on hundreds of other sites, and Google is declining to crawl them. Two honest options, and "wait and see" is no longer one of them:
   - **`noindex,follow` them and drop them from the sitemap.** Recovers the entire crawl budget for the ~570 pages that are unique. Precedent exists in this codebase: empty genres and `?q=` pages already do exactly this. Reversible, but not cheaply — re-indexing 15k pages takes months.
   - **Keep them as reader content and stop expecting search traffic from them.** Costs nothing, changes nothing, and accepts that the site's indexable surface is ~570 pages.
   - **The thing not to do is nothing**, because today they are consuming crawl budget the unique poems need.
+
+  **Two corrections made when this was decided.** "Recovers the entire crawl budget" was overstated — Google must crawl a page to see its `noindex`, so recovery is gradual, and removing the URLs from the sitemap is the faster-acting half. And "including famous poems is abnormal" was wrong: Family Friend Poems, AllPoetry and PoemHunter all do it. The anomaly is the **ratio** (19 human poems), not the inclusion.
+
+  </details>
 
 - ✅ **The 1,025 soft 404s were the backend failing during the crawl surge, and are fixed** (2026-08-14). **My first hypothesis — thin single-poem author pages — was wrong**, and the GSC examples said so immediately: every soft 404 is a `/detail/` poem page, while the INDEXED list is mostly author pages. The real mechanism, reproduced exactly by pointing the app at a dead backend:
 
@@ -217,6 +227,7 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 **One line each, by design.** The reasoning that outlives the change lives in `AGENTS.md`; this list exists only so nobody proposes the work again.
 
+- **Famous poems are `noindex,follow` and out of the sitemap** (2026-08-18) — 15,652 of 16,087, decided from `docs/SEO_AUDIT.md`. Per-POEM on `origin === 'famous'`, never per-route: the same route serves the 19 human and 416 AI poems the change exists to rescue. `poems-famous` dropped from `SITEMAP_SECTIONS` and its route now 404s. Nothing is deleted — the poems stay published and linked. Reasoning and the three traps in `AGENTS.md`; **the GSC submission still needs removing by hand** (see the P3 item).
 - **Editorial introductions on the twenty largest genre pages** (2026-08-17) — ~250 words of original prose plus four curated poet links each, from `docs/SEO_AUDIT.md`, which crawled the site as Googlebot and found the technical SEO essentially done and the corpus the problem: **15,652 scraped famous poems (97.3%), 416 AI (2.6%), 19 human (0.1%)**. Scraped poem pages cannot outrank their own source, so the genre pages are the only surface that can rank on merit — and only if they carry text existing nowhere else. Page 1 only and never on `?q=` (repeating it across 125 paginated URLs is boilerplate). Also the first fix for the internal-link graph the audit measured: a genre page linked to 10 poems and nothing else, so this adds 80 author links across the 20.
 - **A full-site Googlebot crawl audit** (2026-08-17) — `docs/SEO_AUDIT.md`. Verdict, evidence and a prioritised plan. Confirms as correct: every status code (308 www/case/trailing-slash, 404 past-the-end and unknown slugs, 307 `/profile`, 503 on outage), self-canonical pagination, `noindex,follow` placement, sitemap CDN caching (`x-vercel-cache: HIT`, Vercel consumes `s-maxage`/`swr` at the edge and strips them from the client header — the bare `public` is expected, not a regression), TTFB 0.30–0.49s, crawl depth ≤5 to any poem.
 
