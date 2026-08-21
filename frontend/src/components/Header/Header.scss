@@ -248,9 +248,28 @@
 }
 
 .accordion__list {
+    padding: 0 5px;
+}
+
+// The 350px cap belongs to the HEADER DROPDOWN ONLY, and scoping it is the
+// whole fix for the dashboard's stack of scrollbars.
+//
+// The dropdown floats over the page from a fixed header, so it has no container
+// to be bounded by and would otherwise run off the bottom of the screen — it
+// needs its own scroller.
+//
+// The dashboard sidebar has the opposite problem. `.dashboard__accordion` is
+// already a scroller (see Dashboard.scss: a sticky rail taller than the viewport
+// pins its top, so anything below the fold inside it is unreachable without
+// one), and this rule nested a second scroller inside it per accordion. The
+// dashboard therefore showed FIVE scrollbars at once — the page, the left rail,
+// Categories, Authors, and the right rail — for two columns of about twenty
+// links, and the reader had to guess which one moved the thing they were
+// looking at. Nested scrollers are also where a wheel event gets swallowed by
+// the inner box while the reader is trying to move the page.
+.header__dropdown .accordion__list {
     max-height: 350px;
     overflow-y: auto;
-    padding: 0 5px;
 }
 
 .header__dropdown-categories {
