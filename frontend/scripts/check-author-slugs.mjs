@@ -1,5 +1,10 @@
 /**
- * Re-check the curated `startHere` links against PRODUCTION.
+ * Re-check the curated author links against PRODUCTION.
+ *
+ * Both curated lists are in scope: `startHere` on the genre introductions and
+ * `readNext` on the author introductions. They are the same kind of link and
+ * they rot the same way, so a script that checked only one would report "every
+ * curated link resolves" while half of them went unread.
  *
  * `genreIntros.test.ts` asserts every curated poet slug against a committed
  * snapshot (`src/test-utils/authorSlugs.json`), which is hermetic and catches
@@ -51,8 +56,11 @@ if (process.argv.includes('--refresh')) {
 
 // Import the intros without a TS build step: the curated slugs are the only
 // thing needed, and they are a stable, greppable shape.
-const source = fs.readFileSync(path.join(HERE, '..', 'src', 'data', 'genreIntros.ts'), 'utf8')
-const curated = [...source.matchAll(/slug: '([a-z0-9-]+)'/g)].map(m => m[1])
+const DATA = ['genreIntros.ts', 'authorIntros.ts']
+const curated = DATA.flatMap(file => {
+    const source = fs.readFileSync(path.join(HERE, '..', 'src', 'data', file), 'utf8')
+    return [...source.matchAll(/slug: '([a-z0-9-]+)'/g)].map(m => m[1])
+})
 const liveSet = new Set(live)
 const missing = [...new Set(curated)].filter(s => !liveSet.has(s))
 

@@ -6,16 +6,17 @@ import { AUTHOR_INTROS, authorIntro } from '../data/authorIntros'
 /**
  * EDITORIAL INTRODUCTIONS ON AUTHOR PAGES.
  *
- * The author-page counterpart to genreIntros.test.tsx, scoped to the 40 poets
- * with 30 or more poems here. Most of these assertions mirror that file. Two
+ * The author-page counterpart to genreIntros.test.tsx, scoped to the 103 poets
+ * with 20 or more poems here. Most of these assertions mirror that file. Two
  * do not, and they are the reason this suite exists separately:
  *
- *   NO AI PERSONA MAY EVER GET ONE. Three of them clear the threshold —
- *   emily-hart (38 poems), sadie-monroe (35) and thomas-walker (30) — and prose
- *   introducing one of them as a poet would assert in plain English the thing
- *   the AI badge, the footer disclosure and the deliberate absence of a
- *   `Person` entity in their structured data all exist to deny. This is a
- *   truthfulness rule, not a styling one.
+ *   NO AI PERSONA MAY EVER GET ONE. Five of them clear the threshold —
+ *   emily-hart (38 poems), sadie-monroe (35), thomas-walker (30),
+ *   michael-brennan (28) and maya-torres (25) — and prose introducing one of
+ *   them as a poet would assert in plain English the thing the AI badge, the
+ *   footer disclosure and the deliberate absence of a `Person` entity in their
+ *   structured data all exist to deny. This is a truthfulness rule, not a
+ *   styling one.
  *
  *   AND THE GUARD IS AN ALLOWLIST. `authorType !== 'famous'` rather than
  *   `=== 'ai'`, so a fourth author kind, or a profile response that omits the
@@ -24,8 +25,8 @@ import { AUTHOR_INTROS, authorIntro } from '../data/authorIntros'
 
 const KNOWN_AUTHOR_SLUGS = new Set(require('../test-utils/authorSlugs.json') as string[])
 
-/** The three AI personas that clear the 30-poem threshold this file is scoped to. */
-const AI_PERSONAS = ['emily-hart', 'sadie-monroe', 'thomas-walker']
+/** The five AI personas that clear the 20-poem threshold this file is scoped to. */
+const AI_PERSONAS = ['emily-hart', 'sadie-monroe', 'thomas-walker', 'michael-brennan', 'maya-torres']
 
 describe('no AI persona is ever introduced as a poet', () => {
     test.each(AI_PERSONAS)('%s has no entry in the data', slug => {
@@ -78,8 +79,8 @@ describe('the guard is an allowlist', () => {
 describe('the written content is sound', () => {
     const entries = Object.entries(AUTHOR_INTROS)
 
-    test('forty poets are covered — every author with 30+ poems, minus the AI ones', () => {
-        expect(entries).toHaveLength(40)
+    test('103 poets are covered — every author with 20+ poems, minus the AI ones', () => {
+        expect(entries).toHaveLength(103)
     })
 
     test.each(entries.map(([slug]) => slug))('%s is a real author page', slug => {
