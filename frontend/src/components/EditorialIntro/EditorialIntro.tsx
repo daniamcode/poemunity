@@ -67,7 +67,20 @@ export function EditorialIntro({ heading, body, linksHeading, links, variant }: 
             <h2 className='editorial-intro__heading' id={headingId}>{heading}</h2>
             <p className='editorial-intro__paragraph editorial-intro__lead'>{lead}</p>
 
-            {rest.length > 0 && (
+            {/*
+              * THE DISCLOSURE OPENS FOR THE LINKS ALONE, NOT ONLY FOR PROSE.
+              *
+              * The links live inside `<details>`, so a `rest.length > 0` guard
+              * silently drops them for any entry written as a SINGLE paragraph
+              * — and the shortest entries are exactly the ones on the thinnest
+              * author pages, which need the outbound links most. The bug is
+              * invisible in review: the page renders, reads correctly, and is
+              * simply a dead end.
+              *
+              * Brevity is a judgement about how much an author's collection
+              * warrants, and it must not cost that author's page its links.
+              */}
+            {(rest.length > 0 || links.length > 0) && (
                 <details className='editorial-intro__more'>
                     <summary className='editorial-intro__toggle'>
                         <span className='editorial-intro__toggle-more'>Read more</span>

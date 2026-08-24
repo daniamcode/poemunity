@@ -8,56 +8,50 @@
  * group of pages Google currently indexes on this site, which makes them worth
  * improving rather than merely worth having.
  *
- * SCOPE: authors with 11 or more poems here, in three passes — the 40 poets at
- * 30+ (2026-08-18), 63 more at 20–29 (2026-08-21), and 266 more at 11–19
- * (2026-08-24). 408 of the 3,364 authors clear 11 poems; 369 have an entry.
+ * SCOPE: authors with 6 or more poems here, in four passes — 40 at 30+
+ * (2026-08-18), 63 at 20-29 (2026-08-21), 266 at 11-19 (2026-08-24) and 327 at
+ * 6-10 (2026-08-24). 874 of the 3,364 authors clear 6 poems; 696 have an entry,
+ * covering 9,418 of the 16,082 poems.
  *
  * ═══ THE THRESHOLD IS NOT THE ONLY FILTER, AND THE OTHER ONE MATTERS MORE ═══
  *
- * 39 authors clear 11 poems and have NO entry, for three separate reasons, and
- * every one of them is deliberate.
+ * 178 authors clear 6 poems and have NO entry, for four reasons.
  *
- * FIFTEEN ARE AI PERSONAS: `emily-hart` (38 poems), `sadie-monroe` (35),
- * `thomas-walker` (30), `michael-brennan` (28), `maya-torres` (25),
- * `jake-sullivan` (14), `aria-patel` (14), `ruth-caldwell` (13),
- * `sam-rivera` (13), `devon-blake` (13), `marcus-webb` (12),
- * `chloe-frost` (12), `ryan-cole` (11), `grace-okafor` (11) and
- * `zion-parks` (11). They are not people. They get no entry.
+ * TWENTY ARE AI PERSONAS and ONE IS A REGISTERED USER. Every drop in the
+ * threshold pulls more personas over the line — 3, then 2, then 10, then 5 —
+ * so each pass re-derives the list from live data rather than trusting the
+ * last. Writing a biography for one of them would fabricate a human being.
  *
- * TWENTY-TWO ARE POETS WHOSE WORK IS NOT KNOWN WELL ENOUGH HERE TO DESCRIBE
- * TRUTHFULLY — mostly minor or very recent figures where the honest options are
- * an invented judgement or nothing, and nothing is correct. A page with no
- * introduction is a supported state; a page with a confident sentence that is
- * not true is the exact "written for search engines" signal this whole effort
- * exists to escape. They are, with their counts: `thomas-bastard` (19),
- * `louise-imogen-guiney` (18), `frank-lima` (15), `j-allyn-rosser` (14),
- * `joyce-sutphen` (14), `mark-rudman` (14), `nate-klug` (13),
- * `david-rivard` (13), `reginald-gibbons` (13), `marjorie-pickthall` (12),
- * `r-t-smith` (12), `rachel-sherwood` (12), `alice-b-fogel` (11),
- * `amy-beeder` (11), `devin-johnston` (11), `jessica-greenbaum` (11),
- * `joel-brouwer` (11), `katie-peterson` (11), `mark-levine` (11),
- * `sandra-simonds` (11), `sophie-jewett` (11) and `stephen-sandy` (11).
+ * 154 ARE POETS WHOSE WORK IS NOT KNOWN WELL ENOUGH HERE TO DESCRIBE
+ * TRUTHFULLY. This number is the honest signal in the whole effort: at 30+
+ * poems every non-persona author was writable, at 11-19 twenty-two were not,
+ * and in the 6-10 band a further 132 were not. The curve is the argument
+ * against going lower — below 6 poems it would dominate. A page with no
+ * introduction is a supported state; a confident sentence that is not true is
+ * the exact "written for search engines" signal this work exists to escape.
  *
- * TWO ARE BLOCKED ON A DATA BUG, not on knowledge. `lord-ron-george-gordon`
- * (19 poems) is Byron with his name mangled by the scrape, and
- * `knight-of-the-white-elephant-of-burmah-william-mcgonagall` (12) is
- * McGonagall carrying a joke title as part of his name. An introduction would
- * name a poet the page itself does not. Fix the names first — see `TODO.md`,
- * where this sits with the `wisawa-szymborska` typo as one transliteration
- * problem.
+ * THREE ARE BLOCKED ON A DATA BUG, not on knowledge. `lord-ron-george-gordon`
+ * (19 poems) is Byron with his name mangled by the scrape,
+ * `knight-of-the-white-elephant-of-burmah-william-mcgonagall` (12) carries a
+ * joke title inside the name field, and `elena-karina-rne` (7) has lost the
+ * start of a surname. An introduction would name a poet the page itself does
+ * not. Fix the names first — see `TODO.md`, where these sit with the
+ * `wisawa-szymborska` slug as one transliteration problem.
  *
- * Writing a biography for them would fabricate a human being — asserting in
- * prose the very thing the AI badge, the footer disclosure and the deliberate
- * absence of a `Person` entity in their structured data all exist to deny. It
- * is the same rule as `structuredData.ts`: their pages describe a collection
- * and stay silent about authorship. `authorIntros.test.ts` asserts by slug that
- * none of the fifteen is ever added.
+ * `authorIntros.test.tsx` asserts all four groups by slug, so "finish the set"
+ * can never become a reason to invent one.
+ *
+ * On the personas specifically: prose introducing one as a poet would assert
+ * the very thing the AI badge, the footer disclosure and the deliberate absence
+ * of a `Person` entity in their structured data all exist to deny. It is the
+ * same rule as `structuredData.ts` — their pages describe a collection and stay
+ * silent about authorship.
  *
  * Real registered users are excluded by the same logic and a simpler one: this
  * file is editorial commentary about published poets, and inventing a
  * description of a living account-holder is not something to do on their
- * behalf. None currently clears 11 poems in any case — the most any registered
- * user has published here is 8.
+ * behalf. One registered user now clears the threshold with 8 poems, and gets no
+ * entry for exactly this reason.
  *
  * `anonymous` (82 poems) IS included, and is not a biography — it is a note
  * about what that byline means, which is a genuinely useful thing to explain.
@@ -4519,6 +4513,3928 @@ export const AUTHOR_INTROS: Record<string, AuthorIntro> = {
             { slug: 'bob-kaufman', name: 'Bob Kaufman', note: 'Black surrealism in American English.' },
             { slug: 'nathaniel-mackey', name: 'Nathaniel Mackey', note: 'Black experimental poetics at length.' },
             { slug: 'harmony-holiday', name: 'Harmony Holiday', note: 'The next generation of that lineage.' }
+        ]
+    },
+    'adelaide-crapsey': {
+        body: [
+            'She invented the cinquain — five lines, a fixed syllable count rising and then collapsing to two — and wrote most of her best work while dying of tuberculosis in her thirties. The form is the achievement: it is built to end early, and the poems use that shape to say something and stop before consolation can arrive. Her single collection was published after her death. Read several together, since each one is over in about fifteen seconds.'
+        ],
+        readNext: [
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'The compression she is measured against.' },
+            { slug: 'h-d', name: 'H. D.', note: 'Imagism arriving at almost the same moment.' },
+            { slug: 'sara-teasdale', name: 'Sara Teasdale', note: 'The short American lyric of the period.' }
+        ]
+    },
+
+    ai: {
+        body: [
+            'She published under a single name and wrote almost entirely in dramatic monologue — murderers, child abusers, dictators, celebrities and the dead, each given a first person and no authorial rebuke.',
+            'The poems are short, violent and delivered in a flat, present-tense voice that refuses to stand outside the speaker and judge. That refusal is the whole method, and it makes the work genuinely uncomfortable rather than merely shocking. She wrote about being of mixed Black, Japanese, Choctaw and Irish descent and about being asked to pick one.'
+        ],
+        readNext: [
+            { slug: 'frank-bidart', name: 'Frank Bidart', note: 'The monologue spoken from inside extremity.' },
+            { slug: 'robert-browning', name: 'Robert Browning', note: 'The form at its origin.' },
+            { slug: 'norman-dubie', name: 'Norman Dubie', note: 'Invented voices as a lifelong method.' }
+        ]
+    },
+
+    'alan-dugan': {
+        body: [
+            'Plain, sardonic, unbeautiful poems written in a flat working voice that is suspicious of poetry itself — several of them are about the indignity of having a job, a body and a marriage, and none of them asks for sympathy.',
+            'He published books titled simply "Poems" and then numbered them, which is a fair statement of the attitude. The tone is comic and bitter in equal measure, and the technique is entirely in the timing: the last line usually withdraws whatever the poem seemed to be offering.'
+        ],
+        readNext: [
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'Work written plainly and without uplift.' },
+            { slug: 'charles-bukowski', name: 'Charles Bukowski', note: 'The anti-literary stance, less controlled.' },
+            { slug: 'weldon-kees', name: 'Weldon Kees', note: 'American bleakness in formal dress.' }
+        ]
+    },
+
+    'alice-oswald': {
+        body: [
+            'A British poet who trained as a classicist and worked as a gardener, and both are load-bearing: the poems are physically exact about water, soil and light, and they treat Homer as a living source rather than a monument.',
+            'One book is a long poem made from the voices of everyone who lives and works along a river, recorded and reworked. Another strips the Iliad down to its similes and the deaths of named soldiers, removing the plot entirely. She writes for the voice and performs from memory, which is audible in the rhythms.'
+        ],
+        readNext: [
+            { slug: 'd-h-lawrence', name: 'D. H. Lawrence', note: 'The English animal poem at its most physical.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Classical material rebuilt as contemporary poetry.' },
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'A long poem written for the ear.' }
+        ]
+    },
+
+    'amiri-baraka': {
+        body: [
+            'He changed names and politics more than once — Beat-adjacent Greenwich Village poet, then a founder of the Black Arts Movement, then a Marxist — and the work changes with him, which is the point rather than an inconsistency.',
+            'The early poems are lyrical and formally loose; the Black Arts work is confrontational, written for performance and explicitly meant to be useful to a movement. Jazz is everywhere, as subject and as structure, and his prose on blues and Black music is essential. Some of the polemics contain antisemitism and misogyny that his defenders have never satisfactorily explained away, and reading him honestly means reading those too.'
+        ],
+        readNext: [
+            { slug: 'sonia-sanchez', name: 'Sonia Sanchez', note: 'The same movement, and the better ear.' },
+            { slug: 'nikki-giovanni', name: 'Nikki Giovanni', note: 'Black Arts written for a wide audience.' },
+            { slug: 'ishmael-reed', name: 'Ishmael Reed', note: 'The satirist of the same era.' }
+        ]
+    },
+
+    'anne-winters': {
+        body: [
+            'A small body of work, published at long intervals, almost all of it about cities — New York specifically, and the labour, poverty and money that move underneath a street.',
+            'The poems are formally dense and syntactically demanding, closer to nineteenth-century models than to anything contemporary, and the difficulty is deliberate: she is describing an economic system, and a plain lyric would flatten it. The long title poem about capital and the people it displaces is the one to read first.'
+        ],
+        readNext: [
+            { slug: 'george-oppen', name: 'George Oppen', note: 'The city examined with the same seriousness.' },
+            { slug: 'charles-reznikoff', name: 'Charles Reznikoff', note: 'New York recorded without commentary.' },
+            { slug: 'charles-baudelaire', name: 'Charles Baudelaire', note: 'The modern city as poetic subject, at its source.' }
+        ]
+    },
+
+    'arthur-rimbaud': {
+        body: [
+            'He wrote everything he is known for between about sixteen and twenty-one, then stopped completely and spent the rest of his short life trading in Africa. The abandonment is part of the legend and should not be allowed to swallow the poems.',
+            'What he did: broke French verse open, argued that a poet must derange the senses systematically to become a seer, and produced in his last works a prose poetry with no obvious ancestor. Read in translation the loss is real — the sound was half of it — but the violence of the imagination survives intact. Almost every avant-garde since has claimed him.'
+        ],
+        readNext: [
+            { slug: 'paul-verlaine', name: 'Paul Verlaine', note: 'His lover, and the poet he nearly destroyed.' },
+            { slug: 'charles-baudelaire', name: 'Charles Baudelaire', note: 'The predecessor he took his licence from.' },
+            { slug: 'donald-revell', name: 'Donald Revell', note: 'One of his contemporary English translators.' }
+        ]
+    },
+
+    'bei-dao': {
+        body: [
+            'A Chinese poet whose early work circulated in the underground magazines of the late 1970s and was denounced as obscure — a charge that in that context meant politically unreadable rather than difficult.',
+            'The poems are short, image-driven and deliberately ambiguous, and the ambiguity was a way of writing under a state that read everything. One two-line poem became a slogan of the 1989 protests, after which he spent decades in exile, unable to return. The later work is quieter and preoccupied with language itself as the only country left.'
+        ],
+        readNext: [
+            { slug: 'paul-celan', name: 'Paul Celan', note: 'Compression under historical pressure.' },
+            { slug: 'zbigniew-herbert', name: 'Zbigniew Herbert', note: 'Writing obliquely under a regime.' },
+            { slug: 'ha-jin', name: 'Ha Jin', note: 'The Chinese century in plain English.' }
+        ]
+    },
+
+    'bill-berkson': {
+        body: [
+            'A New York School poet and, for most of his working life, an art critic — he wrote about painting constantly, collaborated with painters, and the poems have a gallery-goer\'s attention to surface and arrangement.',
+            'The verse is quick, urbane and full of friends, and it belongs to the conversational tradition O\'Hara established without imitating it. He is a good example of a poet whose real influence ran through a scene — editing, teaching, criticism, company — as much as through the books.'
+        ],
+        readNext: [
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'His friend and collaborator.' },
+            { slug: 'james-schuyler', name: 'James Schuyler', note: 'The quiet end of that circle.' },
+            { slug: 'ron-padgett', name: 'Ron Padgett', note: 'The second generation of it.' }
+        ]
+    },
+
+    'bruce-lansky': {
+        body: [
+            'A publisher and anthologist of comic verse for children whose collections have sold enormously and are, more than any single poet, how a great many American children first encountered a poem they liked.',
+            'The material is broad — jokes about school, teachers, homework and disgusting food — and the editorial principle is straightforward: he tested poems on classrooms and kept what worked. That is a real method, and it produced books with an unusually high hit rate. Read for the anthologist as much as the author.'
+        ],
+        readNext: [
+            { slug: 'jack-prelutsky', name: 'Jack Prelutsky', note: 'The best of the poets in these anthologies.' },
+            { slug: 'kenn-nesbitt', name: 'Kenn Nesbitt', note: 'The same comic territory.' },
+            { slug: 'j-patrick-lewis', name: 'J. Patrick Lewis', note: 'Children\'s verse with a wider range.' }
+        ]
+    },
+
+    'c-k-williams': {
+        body: [
+            'He is known for a line so long it barely fits the page — a decision made mid-career that let him carry the syntax of thinking, including all the qualifications and self-corrections, without breaking it up.',
+            'The poems are frequently about shame, complicity and moments of ordinary cruelty observed in the street, and the length is what allows a scene to be described and then re-examined inside the same sentence. He also translated Greek drama. The late books about ageing and mortality are shorter-breathed and, for some readers, the best.'
+        ],
+        readNext: [
+            { slug: 'robert-pinsky', name: 'Robert Pinsky', note: 'The long syntactic line handled differently.' },
+            { slug: 'sharon-olds', name: 'Sharon Olds', note: 'Exposure at comparable intensity.' },
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'His contemporary in the plain American voice.' }
+        ]
+    },
+
+    caconrad: {
+        body: [
+            'Their poems come out of what they call somatic rituals — elaborate physical procedures performed in order to write, involving objects, places, colours and sometimes considerable discomfort, with the resulting notes cut into the poem.',
+            'That sounds like a gimmick and functions as a genuine method: the constraint produces a diction nothing else would reach. The politics are explicit — queer life, ecological collapse, and a rage at both the state and the literary establishment. The rituals are published alongside the poems, so the work shows its own workings.'
+        ],
+        readNext: [
+            { slug: 'bernadette-mayer', name: 'Bernadette Mayer', note: 'Procedure applied to daily life.' },
+            { slug: 'eileen-myles', name: 'Eileen Myles', note: 'The unguarded queer American voice.' },
+            { slug: 'julian-talamantez-brolaski', name: 'Julian Talamantez Brolaski', note: 'Language mixed as a political act.' }
+        ]
+    },
+
+    'craig-arnold': {
+        body: [
+            'A formal poet of unusual technical control whose best-known poems are about appetite — a sequence on eating a fruit that is also plainly about desire, handled with a precision that makes the double reading feel earned rather than arch.',
+            'He was fascinated by volcanoes and disappeared while hiking one in Japan, which has inevitably shaped how the small body of work is read. Take the poems first: the ear is superb, the wit is dry, and the second book\'s long dramatic pieces show where he was going.'
+        ],
+        readNext: [
+            { slug: 'a-e-stallings', name: 'A. E. Stallings', note: 'Contemporary formal verse of the same generation.' },
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'Desire handled in metre.' },
+            { slug: 'randall-mann', name: 'Randall Mann', note: 'Form put to unromantic use.' }
+        ]
+    },
+
+    'dana-levin': {
+        body: [
+            'Restless, searching poems that mix the visionary with the deliberately banal — dreams, tarot, neuroscience, American politics and the poet\'s own doubts about writing any of it down.',
+            'The books are structured as inquiries rather than collections, and they leave their uncertainty visible: false starts, questions, notes to self. The mode risks seeming unfinished and is finished on purpose. Grief and a sense of civic collapse run underneath the later work.'
+        ],
+        readNext: [
+            { slug: 'brenda-hillman', name: 'Brenda Hillman', note: 'Experiment kept legible.' },
+            { slug: 'mary-ruefle', name: 'Mary Ruefle', note: 'The comic and the abyssal in one turn.' },
+            { slug: 'jorie-graham', name: 'Jorie Graham', note: 'Thinking staged as the poem.' }
+        ]
+    },
+
+    'daryl-hine': {
+        body: [
+            'A Canadian poet of extreme formal accomplishment, working in metres and stanza forms that had largely been abandoned, and a translator of Greek — including a verse Hesiod and the Homeric hymns.',
+            'He edited a major poetry magazine for a decade. The original poems are erudite, witty and syntactically elaborate, including a whole autobiography written in dactylic hexameter, which is either a stunt or a demonstration depending on how you feel by page ten. A poet for readers who like a form audibly held.'
+        ],
+        readNext: [
+            { slug: 'richard-wilbur', name: 'Richard Wilbur', note: 'Comparable urbanity and technique.' },
+            { slug: 'richard-wilbur', name: 'Richard Wilbur', note: 'The formal peak of that American generation.' },
+            { slug: 'a-e-stallings', name: 'A. E. Stallings', note: 'Classical translation and rhyme today.' }
+        ]
+    },
+
+    'david-ignatow': {
+        body: [
+            'Plain, short, unornamented poems written by a man who ran a family bindery business for years and wrote about work, money, the city and the strain of ordinary life without a trace of literary decoration.',
+            'The voice is conversational to the point of seeming artless, and the endings are where the craft is: a poem describes something flatly and then turns, in a line, into a statement about death or failure. He is a good corrective for anyone who thinks plainness is easy.'
+        ],
+        readNext: [
+            { slug: 'charles-reznikoff', name: 'Charles Reznikoff', note: 'The New York poem stripped bare.' },
+            { slug: 'william-carlos-williams', name: 'William Carlos Williams', note: 'The American plain style he works in.' },
+            { slug: 'alan-dugan', name: 'Alan Dugan', note: 'The same flat, sardonic register.' }
+        ]
+    },
+
+    'david-trinidad': {
+        body: [
+            'A poet of pop culture treated with complete seriousness — Barbie, film stars, 1960s television, cosmetics and the specific objects of a gay American childhood, catalogued with an archivist\'s exactness.',
+            'The camp surface is real and so is the elegy underneath it; a good many of these poems are about the AIDS epidemic and about friends who are gone, approached sideways through the objects they loved. He works in received forms and in list poems, and the lists are the most affecting thing he does.'
+        ],
+        readNext: [
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'The pop-culture poem at its source.' },
+            { slug: 'tim-dlugos', name: 'Tim Dlugos', note: 'The same milieu and the same losses.' },
+            { slug: 'elaine-equi', name: 'Elaine Equi', note: 'The everyday object turned strange.' }
+        ]
+    },
+
+    'douglas-kearney': {
+        body: [
+            'The page is a performance score. Words overlap, run at angles, collide and crowd each other, and the visual arrangement carries meaning that a linear reading cannot deliver.',
+            'The subjects are Black American history, minstrelsy, violence and fatherhood, and the typographic chaos is an argument about how that material has been represented. He is also a performer and a librettist, and hearing him read is the fastest way to understand what the pages are doing. Difficult on screen, and worth the trouble.'
+        ],
+        readNext: [
+            { slug: 'evie-shockley', name: 'Evie Shockley', note: 'Visual form and Black poetics.' },
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Language under commercial and racial pressure.' },
+            { slug: 'tyehimba-jess', name: 'Tyehimba Jess', note: 'Historical voices in engineered forms.' }
+        ]
+    },
+
+    'edgar-bowers': {
+        body: [
+            'The purest product of Yvor Winters\'s teaching: strict metre, plain abstract statement, and an almost complete refusal of decoration or self-display.',
+            'He served in Army counter-intelligence in Germany at the end of the Second World War, and the poems that come out of that — including several set in and around the ruins — are the strongest. The body of work is small, published slowly, and unfashionable in every decade it appeared in. Read for the pressure that formal restraint puts on plain speech.'
+        ],
+        readNext: [
+            { slug: 'yvor-winters', name: 'Yvor Winters', note: 'His teacher, and the doctrine.' },
+            { slug: 'j-v-cunningham', name: 'J. V. Cunningham', note: 'The same school, at epigram length.' },
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'The fellow student who went elsewhere.' }
+        ]
+    },
+
+    'edward-lear': {
+        body: [
+            'A professional painter of birds and landscapes who wrote nonsense verse as a sideline and is now remembered almost entirely for it — limericks, invented creatures, and words he made up that entered the language.',
+            'The nonsense is not simply silly. Its most famous pieces are about creatures who are mismatched, exiled or shaped wrong and who set off anyway, and the melancholy under the comedy is unmistakable once heard. He was a lonely, epileptic, itinerant man who wrote for other people\'s children, and the poems know it.'
+        ],
+        readNext: [
+            { slug: 'lewis-carroll', name: 'Lewis Carroll', note: 'The logician\'s nonsense.' },
+            { slug: 'hilaire-belloc', name: 'Hilaire Belloc', note: 'Comic verse with a crueller edge.' },
+            { slug: 'stevie-smith', name: 'Stevie Smith', note: 'Nursery rhythms carrying real despair.' }
+        ]
+    },
+
+    'francisco-x-alarcn': {
+        body: [
+            'A Chicano poet who wrote in Spanish, English and Nahuatl, frequently within the same book, and who treated the recovery of Indigenous Mexican language and ritual as central rather than decorative.',
+            'The poems are short, chant-like and set in narrow columns down the page, which gives them the pace of an incantation. He wrote extensively for children in bilingual editions, and was an openly gay Latino poet at a time when that cost something in both communities. Read a sequence aloud in both languages.'
+        ],
+        readNext: [
+            { slug: 'juan-felipe-herrera', name: 'Juan Felipe Herrera', note: 'The same tradition, at greater volume.' },
+            { slug: 'gary-soto', name: 'Gary Soto', note: 'Chicano childhood in plain narrative.' },
+            { slug: 'lorna-dee-cervantes', name: 'Lorna Dee Cervantes', note: 'Chicana poetry of the same generation.' }
+        ]
+    },
+
+    'jack-spicer': {
+        body: [
+            'He argued that poems are dictated — that the poet is a radio receiving something from outside, and that the job is to keep the furniture of one\'s own personality out of the transmission.',
+            'That belief produced serial books meant to be read whole rather than anthologised, full of Martians, baseball, lemons, Rimbaud and the Holy Grail, and a tone that is funny and desolate at once. He refused to let his books be distributed outside the Bay Area. The Vancouver lectures are the clearest statement of the theory, and the posthumous collected made him a major figure decades after his death.'
+        ],
+        readNext: [
+            { slug: 'robin-blaser', name: 'Robin Blaser', note: 'His friend, editor and defender.' },
+            { slug: 'robert-duncan', name: 'Robert Duncan', note: 'The third of that San Francisco circle.' },
+            { slug: 'peter-gizzi', name: 'Peter Gizzi', note: 'His modern editor, and closest inheritor.' }
+        ]
+    },
+
+    'james-whitcomb-riley': {
+        body: [
+            'The Hoosier poet: enormously popular in his lifetime, writing in an Indiana dialect about country childhood, ghosts, pumpkins and the frost on the fields, and read aloud to American schoolchildren for generations.',
+            'The dialect is the whole instrument, and it is handled with real skill — the metre never stumbles and the comic timing is exact. What dates is the sentimentality and the nostalgia for a rural past that was already being sold as a product. Read for what popular American verse actually sounded like before modernism.'
+        ],
+        readNext: [
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'Dialect verse and its costs.' },
+            { slug: 'edgar-albert-guest', name: 'Edgar Albert Guest', note: 'The next generation of popular verse.' },
+            { slug: 'robert-w-service', name: 'Robert W. Service', note: 'Recitable narrative at its best.' }
+        ]
+    },
+
+    'jim-harrison': {
+        body: [
+            'Better known for fiction, and he considered himself a poet first. The poems are physical, appetite-driven and set outdoors — rivers, dogs, birds, food, drink, the northern Michigan and Montana country he lived in.',
+            'The form he made his own is a compressed suite of short unrhymed stanzas, influenced by his reading of Chinese and Zen poetry, which lets a poem move from a bird to mortality in three lines without a transition. He is unembarrassed about pleasure and unsentimental about death, which is a rare combination.'
+        ],
+        readNext: [
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The same Asian influence, more disciplined.' },
+            { slug: 'james-galvin', name: 'James Galvin', note: 'Western landscape written from inside it.' },
+            { slug: 'ted-kooser', name: 'Ted Kooser', note: 'Plain American attention.' }
+        ]
+    },
+
+    'john-wieners': {
+        body: [
+            'A poet of extraordinary tenderness and damage — the early Boston and San Francisco poems record addiction, hustling, queer desire and psychiatric confinement in a voice that stays lyrical throughout.',
+            'He came out of Black Mountain and the Beat scene without belonging to either, and the later work grows fragmentary as his life did, mixing celebrity gossip, drag, and mystical fragments. The tone is what carries it: courteous, wounded, entirely without self-pity. A poet other poets have always championed and general readers are still discovering.'
+        ],
+        readNext: [
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'The New York lyric of the same years.' },
+            { slug: 'charles-olson', name: 'Charles Olson', note: 'His teacher at Black Mountain.' },
+            { slug: 'tim-dlugos', name: 'Tim Dlugos', note: 'The later gay lyric of the city.' }
+        ]
+    },
+
+    'john-yau': {
+        body: [
+            'A poet and art critic whose work is playful, serial and suspicious of the idea that a poem should express a self — many are built on repetition with variation, or spoken by invented characters across a whole sequence.',
+            'Chinese American identity is a recurring subject, handled with irony rather than testimony, and the poems frequently mock the terms in which that identity is demanded. He has written extensively on painting, and the criticism and the poems share a preference for the sideways approach.'
+        ],
+        readNext: [
+            { slug: 'john-ashbery', name: 'John Ashbery', note: 'The permission behind much of this.' },
+            { slug: 'marilyn-chin', name: 'Marilyn Chin', note: 'The same inheritance, more combative.' },
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Serial procedure and wordplay.' }
+        ]
+    },
+
+    'joseph-brodsky': {
+        body: [
+            'Tried in Leningrad for social parasitism on the grounds that he had no recognised job, sentenced to internal exile, and expelled from the Soviet Union in his early thirties. He never went back.',
+            'The Russian poems are formally intricate, rhymed and metrically strict, and he insisted on carrying that into English, translating himself with results that divide readers sharply. The recurring subjects are empire, time, exile and the indifference of the physical world. He received the Nobel Prize in Literature and later served as United States Poet Laureate — an unusual thing for a poet writing mostly in another language.'
+        ],
+        readNext: [
+            { slug: 'osip-mandelstam', name: 'Osip Mandelstam', note: 'The Russian predecessor he measured himself against.' },
+            { slug: 'marina-tsvetaeva', name: 'Marina Tsvetaeva', note: 'The poet he called the greatest of the century.' },
+            { slug: 'czeslaw-milosz', name: 'Czeslaw Milosz', note: 'His friend, and the same exile.' }
+        ]
+    },
+
+    'kazim-ali': {
+        body: [
+            'A poet of spare, questioning lyrics shaped by Muslim practice, queerness and a persistent interest in the body — swimming, breath, fasting, prayer — as a way of thinking rather than as imagery.',
+            'The poems are short and full of gaps, and they tend to ask rather than assert. He writes across forms, including essays and novels, and translates from French. What holds the work together is a refusal to resolve the tension between a religious inheritance and a life it does not straightforwardly accommodate.'
+        ],
+        readNext: [
+            { slug: 'fanny-howe', name: 'Fanny Howe', note: 'Faith approached without resolution.' },
+            { slug: 'jean-valentine', name: 'Jean Valentine', note: 'The short poem full of silence.' },
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'Muslim inheritance in American English.' }
+        ]
+    },
+
+    'kenneth-patchen': {
+        body: [
+            'A pacifist, an outsider and a genuine formal inventor — he made picture poems, painted books and poems-with-jazz recordings decades before any of that was a category, largely while in severe chronic pain.',
+            'The verse ranges from tender love poems to furious antiwar denunciation, and the tone is sincere in a way that embarrasses the sophisticated. He was enormously important to the Beats and has never fitted any syllabus. Read the picture poems as objects; the printed text alone loses half of what they are.'
+        ],
+        readNext: [
+            { slug: 'lawrence-ferlinghetti', name: 'Lawrence Ferlinghetti', note: 'The poem as public and political object.' },
+            { slug: 'e-e-cummings', name: 'E. E. Cummings', note: 'Typography as part of the poem.' },
+            { slug: 'kenneth-rexroth', name: 'Kenneth Rexroth', note: 'The pacifist American avant-garde.' }
+        ]
+    },
+
+    'lady-mary-wortley-montagu': {
+        body: [
+            'An aristocrat, letter-writer and satirist whose verse is sharp, worldly and often furious about the position of women in marriage and the marriage market.',
+            'She observed smallpox inoculation in Constantinople and campaigned to introduce it in England, which is what she is usually remembered for. The poems deserve their own attention: town eclogues, verse epistles, and a devastating reply to Pope after their friendship collapsed into public feuding. The wit is Augustan and the anger is her own.'
+        ],
+        readNext: [
+            { slug: 'alexander-pope', name: 'Alexander Pope', note: 'Her friend, then her enemy.' },
+            { slug: 'jonathan-swift', name: 'Jonathan Swift', note: 'The satiric register of the period.' },
+            { slug: 'anne-finch-countess-of-winchilsea', name: 'Anne Finch, Countess of Winchilsea', note: 'The generation just before, and quieter.' }
+        ]
+    },
+
+    'linh-dinh': {
+        body: [
+            'Born in Saigon and brought to the United States as a child, he writes short, harsh, deliberately ugly poems about poverty, war, bodies and language, in a voice that refuses every consolation available to an immigrant narrative.',
+            'He is also a translator and anthologist of Vietnamese poetry, and a photographer of American streets. The work is confrontational by design and has grown more so; readers should expect deliberate offence rather than accidental. The early poems are the ones that show what the method can do.'
+        ],
+        readNext: [
+            { slug: 'ai', name: 'Ai', note: 'Violence delivered without authorial comfort.' },
+            { slug: 'charles-bukowski', name: 'Charles Bukowski', note: 'The anti-literary stance.' },
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The cruel little fable.' }
+        ]
+    },
+
+    'louise-erdrich': {
+        body: [
+            'Known primarily as a novelist, and the poems are where a good deal of the same material was first worked out — Ojibwe inheritance, North Dakota, Catholicism, desire and family across generations.',
+            'The verse is narrative and image-led, with a strong strain of the mythic; several poems are spoken by figures from Ojibwe story or by historical characters, and the borders between the human and the animal are treated as porous rather than metaphorical. Read alongside the novels and the shared world becomes obvious.'
+        ],
+        readNext: [
+            { slug: 'joy-harjo', name: 'Joy Harjo', note: 'The best-known Native voice of that generation.' },
+            { slug: 'linda-hogan', name: 'Linda Hogan', note: 'The same ground, quieter.' },
+            { slug: 'heid-e-erdrich', name: 'Heid E. Erdrich', note: 'Her sister, and the dryer register.' }
+        ]
+    },
+
+    'luke-kennard': {
+        body: [
+            'A British poet whose early work is built around comic prose poems featuring a wolf who offers unwanted literary criticism, which is a fair indication of the register: absurd, deadpan and considerably sadder than it first appears.',
+            'The later books turn to sonnets, self-help language and the mechanics of a failing marriage, keeping the comedy while sharpening it. He is one of the few contemporary poets in English whose jokes actually land on the page, and the seriousness arrives underneath them rather than instead of them.'
+        ],
+        readNext: [
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The prose poem as absurd fable.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'Deadpan American surrealism.' },
+            { slug: 'matthew-sweeney', name: 'Matthew Sweeney', note: 'The impossible narrated flatly.' }
+        ]
+    },
+
+    'lynn-emanuel': {
+        body: [
+            'Cinematic, fast-cutting poems with a strong sense of the American West and of film — one book circles her father, another the town she grew up in, and the poems keep breaking frame to address the reader directly about the poem being written.',
+            'That metafictional habit is not decoration: the recurring question is who is doing the looking and what a poem does to whatever it describes. The voice is dry, funny and slightly hard-boiled. Read for the pacing, which is closer to editing than to lineation.'
+        ],
+        readNext: [
+            { slug: 'laura-kasischke', name: 'Laura Kasischke', note: 'Domestic dread at a similar angle.' },
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Grief handled through style.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'The frame broken for comic effect.' }
+        ]
+    },
+
+    'margarita-engle': {
+        body: [
+            'A Cuban American writer whose books are verse novels, mostly for young readers, telling Cuban history through short first-person poems — an abolitionist poet, a plantation, a hurricane, a family divided by revolution.',
+            'The form does real work: short lyric sections let a difficult history be carried by individual voices rather than by exposition, and the white space lets a young reader stop. She served as national Young People\'s Poet Laureate. The research is thorough and the poems never lecture.'
+        ],
+        readNext: [
+            { slug: 'jacqueline-woodson', name: 'Jacqueline Woodson', note: 'Memoir in verse for young readers.' },
+            { slug: 'marilyn-nelson', name: 'Marilyn Nelson', note: 'History told in formal verse.' },
+            { slug: 'juan-felipe-herrera', name: 'Juan Felipe Herrera', note: 'Latino poetry for every audience at once.' }
+        ]
+    },
+
+    'marina-tsvetaeva': {
+        body: [
+            'The most rhythmically violent of the great Russian poets of her generation — the lines are broken by dashes, the syntax is compressed to the point of rupture, and the poems move at a speed that translators struggle to keep up with.',
+            'The life was catastrophic: revolution, emigration, poverty, a daughter dead of starvation in an orphanage, return to the Soviet Union, her husband executed, and her own suicide in evacuation. The poems are not merely a record of that; they are ferocious, erotic and formally inventive throughout. Read more than one translation, because no single English version carries the sound.'
+        ],
+        readNext: [
+            { slug: 'osip-mandelstam', name: 'Osip Mandelstam', note: 'Her contemporary and the same catastrophe.' },
+            { slug: 'anna-akhmatova', name: 'Anna Akhmatova', note: 'The other great Russian woman poet of the century.' },
+            { slug: 'joseph-brodsky', name: 'Joseph Brodsky', note: 'Who called her the greatest poet of the century.' }
+        ]
+    },
+
+    'maya-angelou': {
+        body: [
+            'The memoirs made her famous and the poems made her a public voice — read at a presidential inauguration, quoted in classrooms and on posters, and held at arm\'s length by a good deal of academic criticism.',
+            'The verse is built for the voice: strong repeating refrains, insistent rhythm, direct address, and a rhetoric drawn from the pulpit and from blues. Poems about survival and dignity are the core of it, and their enormous readership is a fact about them worth taking seriously rather than explaining away. Hear a recording before deciding; on the page they are only half present.'
+        ],
+        readNext: [
+            { slug: 'nikki-giovanni', name: 'Nikki Giovanni', note: 'The same public voice, more combative.' },
+            { slug: 'langston-hughes', name: 'Langston Hughes', note: 'The blues and pulpit rhythms at their source.' },
+            { slug: 'lucille-clifton', name: 'Lucille Clifton', note: 'The same material at a fraction of the volume.' }
+        ]
+    },
+
+    'michael-anania': {
+        body: [
+            'A Chicago poet, editor and publisher whose work is quiet, precise and rooted in place — the Missouri River, Nebraska, the industrial Midwest — with an attention to landscape that owes something to the Objectivists.',
+            'He edited a significant small press for years and taught for decades, and his influence on Midwestern writing runs largely through that work. The poems are unhurried, image-led and resistant to summary, and they reward being read as sequences rather than sampled.'
+        ],
+        readNext: [
+            { slug: 'george-oppen', name: 'George Oppen', note: 'The Objectivist attention behind this.' },
+            { slug: 'carl-sandburg', name: 'Carl Sandburg', note: 'The Chicago poem before him.' },
+            { slug: 'stuart-dybek', name: 'Stuart Dybek', note: 'The same city in a warmer register.' }
+        ]
+    },
+
+    'michael-hofmann': {
+        body: [
+            'A German-born poet writing in English and one of the most important literary translators working from German, which shapes everything: the English is slightly angular, the diction is exact and unusual, and the tone is permanently displaced.',
+            'The central subject is his father, a German novelist, approached across several books with a coldness that is itself the emotion. He is also a critic whose reviews are famously severe. The poems are few and slow to arrive; the translations are a body of work in their own right.'
+        ],
+        readNext: [
+            { slug: 'gottfried-benn', name: 'Gottfried Benn', note: 'One of the German poets he has translated.' },
+            { slug: 'robert-lowell', name: 'Robert Lowell', note: 'The father poems and the confessional inheritance.' },
+            { slug: 'philip-larkin', name: 'Philip Larkin', note: 'The English tone he writes against and through.' }
+        ]
+    },
+
+    'michael-robbins': {
+        body: [
+            'Dense, fast, rhyming poems packed with song lyrics, brand names, internet slang and heavy metal, moving between registers at a speed that is the whole effect.',
+            'The rhymes are hard and comic and the argument underneath is not: ecological collapse, faith, drugs and the exhaustion of irony recur across the books. He is also a critic with strong opinions about popular music. The method risks turning into a tic and the best poems are the ones where the joke turns out to have been an elegy.'
+        ],
+        readNext: [
+            { slug: 'frederick-seidel', name: 'Frederick Seidel', note: 'Immaculate rhyme carrying unpleasant content.' },
+            { slug: 'paul-muldoon', name: 'Paul Muldoon', note: 'Rhyme stretched past the point of comfort.' },
+            { slug: 'matthew-zapruder', name: 'Matthew Zapruder', note: 'The contemporary poem thinking aloud.' }
+        ]
+    },
+
+    'minnie-bruce-pratt': {
+        body: [
+            'A lesbian feminist poet whose central sequence comes out of losing custody of her children in the American South because of her sexuality, and it is one of the clearest cases in modern poetry of a private catastrophe that is entirely political.',
+            'The poems are plain, narrative and unsparing, and they refuse both self-pity and triumph. Later work deals with gender, labour organising and her marriage to a transgender activist. Her prose on identity and accountability has been widely read outside poetry.'
+        ],
+        readNext: [
+            { slug: 'audre-lorde', name: 'Audre Lorde', note: 'The same politics and generation.' },
+            { slug: 'adrienne-rich', name: 'Adrienne Rich', note: 'The lesbian feminist lyric at its most argued.' },
+            { slug: 'june-jordan', name: 'June Jordan', note: 'The political poem written plainly.' }
+        ]
+    },
+
+    'nate-marshall': {
+        body: [
+            'A Chicago poet out of the city\'s youth performance scene, writing about the South Side neighbourhood he grew up in with a precision that refuses both the pastoral and the crime report.',
+            'The poems use hip-hop structure openly — internal rhyme, sampling, the logic of a verse — and one book is organised around the idea of assembling a crew. He is also an editor and anthologist of that scene. The work is generous about a place that outsiders mostly describe from a distance.'
+        ],
+        readNext: [
+            { slug: 'kevin-young', name: 'Kevin Young', note: 'Music as the structure of the book.' },
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'The Chicago poem at its source.' },
+            { slug: 'danez-smith', name: 'Danez Smith', note: 'The same performance generation.' }
+        ]
+    },
+
+    'paul-violi': {
+        body: [
+            'A comic formal inventor: poems shaped as indexes, errata slips, television listings, footnotes and captions, in which the borrowed format does the storytelling and the story is usually a small disaster.',
+            'The jokes are exact and the melancholy is real — an index that gradually reveals a ruined life is a genuinely moving thing. He belonged to the wider New York School orbit and taught for years. Read three or four of the found-format poems in a row; the invention is the pleasure.'
+        ],
+        readNext: [
+            { slug: 'kenneth-koch', name: 'Kenneth Koch', note: 'The comic New York School at its best.' },
+            { slug: 'ron-padgett', name: 'Ron Padgett', note: 'Deadpan of the same lineage.' },
+            { slug: 'elaine-equi', name: 'Elaine Equi', note: 'The short poem timed to the second.' }
+        ]
+    },
+
+    'quan-barry': {
+        body: [
+            'Born in Saigon and raised in Massachusetts, she writes formally various poems about war, the body, medicine and history, with an unusual willingness to look directly at atrocity.',
+            'One book is built around Vietnam — the war, its afterlife, the country as it is rather than as an American memory — and another around the physical body in illness. She is also a novelist and playwright. The voice is cool and exact, which is what allows the material to be as violent as it is.'
+        ],
+        readNext: [
+            { slug: 'yusef-komunyakaa', name: 'Yusef Komunyakaa', note: 'Vietnam from the other side of it.' },
+            { slug: 'ocean-vuong', name: 'Ocean Vuong', note: 'The Vietnamese American inheritance, later.' },
+            { slug: 'carolyn-forch', name: 'Carolyn Forché', note: 'Witness and its problems.' }
+        ]
+    },
+
+    'richard-brautigan': {
+        body: [
+            'Short, whimsical, deceptively slight poems that arrive like jokes and frequently turn out to be about loneliness — a few lines, an unlikely comparison, and a stop before anything is explained.',
+            'He was enormously popular in the counterculture and then critically dismissed as a period artefact, which undersells the precision of the best pieces. The famous poem imagining a forest tended by machines of loving grace is either a utopia or a warning and is deliberately left as both. Read a handful; they are over almost before they start.'
+        ],
+        readNext: [
+            { slug: 'james-tate', name: 'James Tate', note: 'The deadpan American absurd.' },
+            { slug: 'ron-padgett', name: 'Ron Padgett', note: 'Comedy with a serious floor under it.' },
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The other side of that West Coast moment.' }
+        ]
+    },
+
+    'robert-lowell': {
+        body: [
+            'The dominant American poet of his generation, and the one whose career maps the mid-century shift most exactly: dense, formal, Catholic and rhetorical early; then a book of loose autobiographical poems about family, marriage and psychiatric hospitals that made confessional poetry a movement.',
+            'The later years went into unrhymed sonnets written and rewritten obsessively, including a book using his wife\'s private letters, which is still argued about as an ethical matter and should be. He came from a prominent New England family, was jailed as a conscientious objector, and lived with severe manic depression. The last book is quieter and among his best.'
+        ],
+        readNext: [
+            { slug: 'elizabeth-bishop', name: 'Elizabeth Bishop', note: 'His closest friend and his opposite.' },
+            { slug: 'w-d-snodgrass', name: 'W. D. Snodgrass', note: 'His student, who got there first.' },
+            { slug: 'john-berryman', name: 'John Berryman', note: 'The same generation and the same wreckage.' }
+        ]
+    },
+
+    'robert-wrigley': {
+        body: [
+            'An Idaho poet writing formally attentive narrative poems about the mountain West — hunting, horses, rivers, roadkill, weather — with a physical exactness that never turns the landscape into scenery.',
+            'The poems are frequently about killing something, or finding something dead, and about what that does to the person doing the looking. The metre is handled quietly enough that most readers will not notice it holding the line together. A poet of place who is not remotely sentimental about the place.'
+        ],
+        readNext: [
+            { slug: 'james-galvin', name: 'James Galvin', note: 'The same country, more elliptical.' },
+            { slug: 'jim-harrison', name: 'Jim Harrison', note: 'Appetite and landscape together.' },
+            { slug: 'james-l-dickey', name: 'James L. Dickey', note: 'The physical poem at its most driving.' }
+        ]
+    },
+
+    'rupert-brooke': {
+        body: [
+            'The face of English war poetry for about a year, and then its counterexample. The 1914 sonnets are patriotic, beautiful and entirely untouched by combat — he died of infection on the way to Gallipoli, having seen almost no fighting.',
+            'That is why he is read now against Owen and Rosenberg rather than beside them: the sonnets record what people believed before the trenches taught otherwise, and they are superbly made. The earlier poems are wittier and stranger than the reputation allows, including some genuinely funny ones about the English abroad.'
+        ],
+        readNext: [
+            { slug: 'wilfred-owen', name: 'Wilfred Owen', note: 'The correction, written from inside the war.' },
+            { slug: 'siegfried-sassoon', name: 'Siegfried Sassoon', note: 'The satire that followed the disillusion.' },
+            { slug: 'charles-hamilton-sorley', name: 'Charles Hamilton Sorley', note: 'The contemporary who saw through it first.' }
+        ]
+    },
+
+    'thomas-lux': {
+        body: [
+            'Short, punchy poems with a strong comic surface and a persistent darkness underneath — a barbed-wire fence, a childhood on a dairy farm, refrigerators, a man\'s bad heart, delivered in a fast plain line.',
+            'The early work was surreal and impersonal; he deliberately moved towards clarity and the later poems are the ones to read, where the strangeness is in the fact rather than in the treatment. He was a superb reader of his own work and taught for decades. Funny, and then not.'
+        ],
+        readNext: [
+            { slug: 'bill-knott', name: 'Bill Knott', note: 'The same generation at its wildest.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'The surreal American poem.' },
+            { slug: 'tony-hoagland', name: 'Tony Hoagland', note: 'The comic poem that turns on you.' }
+        ]
+    },
+
+    'thomas-merton': {
+        body: [
+            'A Trappist monk who published a bestselling autobiography and then spent decades writing poems, essays and letters from inside a monastery about the world he had supposedly left.',
+            'The early verse is devotional and conventional; the later work is far more interesting — antiwar poems, experiments in collage and found language, and a long engagement with Zen and with Latin American poets he corresponded with and translated. The tension between contemplation and public argument is the real subject, and he never resolved it.'
+        ],
+        readNext: [
+            { slug: 'czeslaw-milosz', name: 'Czeslaw Milosz', note: 'His correspondent, and the same moral pressure.' },
+            { slug: 'scott-cairns', name: 'Scott Cairns', note: 'Contemporary devotional poetry.' },
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The Zen reading, from the other direction.' }
+        ]
+    },
+
+    'tom-pickard': {
+        body: [
+            'A working-class Newcastle poet who left school at fourteen, reopened a medieval tower as a reading venue and brought Basil Bunting back into public life — an act with consequences for English poetry well beyond his own books.',
+            'The poems are short, sharp and often in Northumbrian speech, about work, unemployment, sex, the border country and the weather on the fells. They are political without being programmatic. The songs and the ballads are the strongest, and they are built to be spoken in the accent they were written in.'
+        ],
+        readNext: [
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'The poet he rescued from obscurity.' },
+            { slug: 'hugh-macdiarmid', name: 'Hugh MacDiarmid', note: 'Vernacular as a political choice.' },
+            { slug: 'robert-burns', name: 'Robert Burns', note: 'The song tradition behind it.' }
+        ]
+    },
+
+    'tomas-transtrmer': {
+        body: [
+            'A Swedish poet, read here in translation, who worked for most of his life as a psychologist in prisons and juvenile institutions and wrote a small number of very concentrated poems.',
+            'The signature is the metaphor arriving suddenly and physically — a landscape becoming an instrument, a sleeping man becoming a room — in poems that are otherwise plain and unhurried. Winter, water, borders and the moment of waking recur. A stroke in his fifties left him unable to speak, and he continued writing; the late poems are the shortest and most compressed. He received the Nobel Prize in Literature.'
+        ],
+        readNext: [
+            { slug: 'robert-bly', name: 'Robert Bly', note: 'His friend and principal English translator.' },
+            { slug: 'inger-christensen', name: 'Inger Christensen', note: 'Scandinavian poetry at another extreme.' },
+            { slug: 'charles-simic', name: 'Charles Simic', note: 'The plain sentence carrying the impossible.' }
+        ]
+    },
+
+    'wesley-mcnair': {
+        body: [
+            'A New England narrative poet who writes about small-town and rural Maine — trailers, diners, failing farms, people the economy has left behind — in a plain conversational line and with real affection.',
+            'The poems are character studies more than lyrics, and the technique is restraint: the situation is described, the judgement is withheld, and the last few lines let the reader feel what has not been said. He served as poet laureate of Maine. A poet in the direct line from Frost and Robinson, working the same country.'
+        ],
+        readNext: [
+            { slug: 'edwin-arlington-robinson', name: 'Edwin Arlington Robinson', note: 'The New England portrait poem.' },
+            { slug: 'ted-kooser', name: 'Ted Kooser', note: 'The same plainness, further west.' },
+            { slug: 'donald-hall', name: 'Donald Hall', note: 'Rural New England from inside it.' }
+        ]
+    },
+
+    'william-trowbridge': {
+        body: [
+            'A comic poet whose books are built around recurring hapless figures — an oaf, a misfit superhero, a man who gets everything slightly wrong — used as a way of writing about failure, ageing and mortality without solemnity.',
+            'The verse is technically capable and deliberately unshowy; the joke is always the delivery system, and the sadness is always underneath it. He served as poet laureate of Missouri. Read several of the character poems in sequence, since the figure accumulates.'
+        ],
+        readNext: [
+            { slug: 'thomas-lux', name: 'Thomas Lux', note: 'Comedy with a hard floor under it.' },
+            { slug: 'billy-collins', name: 'Billy Collins', note: 'The accessible comic American poem.' },
+            { slug: 'mark-halliday', name: 'Mark Halliday', note: 'The self-exposing comic speaker.' }
+        ]
+    },
+
+    'adrian-matejka': {
+        body: [
+            'His best-known book is a sequence about Jack Johnson, the first Black heavyweight champion, assembled from many voices — Johnson himself, his wives, his rivals, the newspapers — so that a life gets built out of what everyone else said about it.',
+            'The poems are formally various and the music is drawn from blues and hip-hop as much as from verse tradition. Elsewhere he writes about a mixed-race childhood in the Midwest, poverty and science fiction. He has edited a major poetry magazine.'
+        ],
+        readNext: [
+            { slug: 'tyehimba-jess', name: 'Tyehimba Jess', note: 'History assembled from competing voices.' },
+            { slug: 'kevin-young', name: 'Kevin Young', note: 'Music as the structure of a book.' },
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Formal invention on shared ground.' }
+        ]
+    },
+
+    'agha-shahid-ali': {
+        body: [
+            'A Kashmiri American poet who did more than anyone to establish the ghazal as a real form in English rather than a loose label — insisting on the strict repeating rhyme and refrain that English imitators had been quietly dropping.',
+            'The great subject is Kashmir: exile, the occupation, and a homeland that exists mainly as loss. The tone is formal, ornate and elegiac, and the poems are unembarrassed about beauty. He also translated Faiz Ahmed Faiz. The late book written during his terminal illness is the strongest.'
+        ],
+        readNext: [
+            { slug: 'kazim-ali', name: 'Kazim Ali', note: 'Muslim inheritance in American poetry.' },
+            { slug: 'mahmoud-darwish', name: 'Mahmoud Darwish', note: 'The poetry of a lost homeland.' },
+            { slug: 'marilyn-hacker', name: 'Marilyn Hacker', note: 'Strict inherited form in contemporary hands.' }
+        ]
+    },
+
+    'allen-ginsberg': {
+        body: [
+            'The poem that begins by declaring the best minds of his generation destroyed changed what American poetry could say out loud, and its obscenity trial changed what an American publisher could print.',
+            'The line is long and breath-driven, built from Whitman and from Hebrew liturgy, and it is designed to be performed. The elegy for his mother is the greater poem and much less quoted. He spent decades as a public figure — Buddhist, activist, teacher, relentless promoter of other writers — and the later work is uneven, but the political poems of the sixties still have their charge.'
+        ],
+        readNext: [
+            { slug: 'walt-whitman', name: 'Walt Whitman', note: 'The line he took and rebuilt.' },
+            { slug: 'lawrence-ferlinghetti', name: 'Lawrence Ferlinghetti', note: 'Who published him and stood trial for it.' },
+            { slug: 'gregory-corso', name: 'Gregory Corso', note: 'The Beat with the strangest ear.' }
+        ]
+    },
+
+    'anthony-madrid': {
+        body: [
+            'A formalist with an absurdist streak — his first book is a set of ghazals written in an aggressively confident voice that is plainly a put-on, and the joke holds for a whole collection.',
+            'The verse is metrically strict and the content deliberately ridiculous, which turns out to be a productive combination: the form keeps the nonsense from dissipating. He writes about prosody and folklore as a scholar too, and the poems are best read as performances by a persona rather than as statements.'
+        ],
+        readNext: [
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'The ghazal handled seriously.' },
+            { slug: 'kenneth-koch', name: 'Kenneth Koch', note: 'Comic exuberance inside real technique.' },
+            { slug: 'luke-kennard', name: 'Luke Kennard', note: 'The sustained comic persona.' }
+        ]
+    },
+
+    'ben-belitt': {
+        body: [
+            'Chiefly important as a translator — his English versions of Neruda, Lorca, Machado and Alberti introduced several generations of American readers to those poets, and were argued about for how much of himself he put into them.',
+            'His own poems are dense, latinate and heavily worked, out of step with the plain style that dominated his lifetime. He taught at the same college for decades. Read the translations first; the original poems make more sense once you have heard what he thought a poem should sound like.'
+        ],
+        readNext: [
+            { slug: 'robert-bly', name: 'Robert Bly', note: 'The rival approach to translating the same poets.' },
+            { slug: 'kenneth-rexroth', name: 'Kenneth Rexroth', note: 'Translation as a life\'s work.' },
+            { slug: 'hart-crane', name: 'Hart Crane', note: 'The dense American high style.' }
+        ]
+    },
+
+    'bruce-smith': {
+        body: [
+            'A Philadelphia poet whose work is musical, syntactically restless and preoccupied with class, race and the physical city — boxing, jazz, factories, the street he grew up on.',
+            'The line is jagged and full of interruption, closer to improvisation than to statement, and the poems tend to resist the tidy ending they seem to be approaching. He writes about being a white poet formed by Black music and is unusually honest about the awkwardness of that position.'
+        ],
+        readNext: [
+            { slug: 'michael-s-harper', name: 'Michael S. Harper', note: 'Jazz as poetic structure.' },
+            { slug: 'c-k-williams', name: 'C. K. Williams', note: 'Philadelphia and the long moral line.' },
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'Work and the city named plainly.' }
+        ]
+    },
+
+    'cate-marvin': {
+        body: [
+            'Sharp, formally aware poems with a hard edge — the speaker is frequently furious, frequently funny about it, and never asks to be liked, which is rarer than it sounds.',
+            'The subjects are desire, humiliation, girlhood, ambition and the specific indignities of being a woman in literary life. She co-founded an organisation campaigning on gender inequity in publishing, and the poems come from the same place. Read for the voice, which is the whole instrument.'
+        ],
+        readNext: [
+            { slug: 'kim-addonizio', name: 'Kim Addonizio', note: 'Comparable bluntness and wit.' },
+            { slug: 'brenda-shaughnessy', name: 'Brenda Shaughnessy', note: 'Syntax under emotional pressure.' },
+            { slug: 'sylvia-plath', name: 'Sylvia Plath', note: 'The fury handled formally.' }
+        ]
+    },
+
+    'charles-olson': {
+        body: [
+            'His essay on projective verse is one of the most consequential documents in postwar American poetry: it argued that the poem should be composed by field, that the line should follow the breath, and that the typewriter could score a voice on the page.',
+            'The practice is the long serial poem about Gloucester, Massachusetts — geography, fishing, history, myth and local record assembled over decades and left unfinished. He ran Black Mountain College and taught or influenced most of the poets around it. The theory is easier to read than the poems, which is a genuine problem and not a reason to skip them.'
+        ],
+        readNext: [
+            { slug: 'robert-creeley', name: 'Robert Creeley', note: 'The theory applied at short length.' },
+            { slug: 'robert-duncan', name: 'Robert Duncan', note: 'The open field taken somewhere visionary.' },
+            { slug: 'ezra-pound', name: 'Ezra Pound', note: 'The long poem he is arguing with.' }
+        ]
+    },
+
+    'chris-abani': {
+        body: [
+            'A Nigerian-born poet, novelist and essayist who was imprisoned in Nigeria over his writing while still very young, and whose work handles violence, faith and the body without ever making a spectacle of the biography.',
+            'The poems move between Lagos, Los Angeles and elsewhere, and are grounded in Igbo and Catholic material at the same time. He writes with great tenderness about brutality, which is the defining tension. The short lyrics are the way in; the longer sequences assume you have accepted the terms.'
+        ],
+        readNext: [
+            { slug: 'kofi-awoonor', name: 'Kofi Awoonor', note: 'West African poetry in English.' },
+            { slug: 'yusef-komunyakaa', name: 'Yusef Komunyakaa', note: 'Violence written with a musical ear.' },
+            { slug: 'jericho-brown', name: 'Jericho Brown', note: 'Faith, the body and damage.' }
+        ]
+    },
+
+    'cole-swensen': {
+        body: [
+            'A poet of the hybrid book: her collections take a subject — gardens, ghosts, illuminated manuscripts, a painter, the history of hands — and circle it in fragmentary lyric prose and sparse verse for a whole volume.',
+            'She is a translator from French and a theorist of the space between lyric and experiment, and both show. The poems are cool, researched and visually spacious, and they ask the reader to accept accumulation instead of argument. Read a whole book or none; a single page looks like a note.'
+        ],
+        readNext: [
+            { slug: 'susan-howe', name: 'Susan Howe', note: 'Archive and lyric fragment.' },
+            { slug: 'rosmarie-waldrop', name: 'Rosmarie Waldrop', note: 'The sentence as unit of composition.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Scholarship as poetic form.' }
+        ]
+    },
+
+    'david-wojahn': {
+        body: [
+            'His best-known sequence is a set of unrhymed sonnets on rock and roll — Elvis, Lennon, Hendrix, small cultural moments treated with the seriousness usually reserved for history, and getting it.',
+            'Elsewhere the subjects are family, addiction, illness and the American twentieth century, handled in dense formal poems full of documentary detail. His criticism on contemporary poetry is worth reading alongside. The method is to take the disposable and give it the weight it actually carried in people\'s lives.'
+        ],
+        readNext: [
+            { slug: 'larry-levis', name: 'Larry Levis', note: 'The long elegiac American poem.' },
+            { slug: 'lynda-hull', name: 'Lynda Hull', note: 'His wife, and the same music and damage.' },
+            { slug: 'robert-lowell', name: 'Robert Lowell', note: 'The unrhymed sonnet as a serial instrument.' }
+        ]
+    },
+
+    'debora-greger': {
+        body: [
+            'Painterly, allusive poems that move between museums, mythology, English and American landscapes and a dry domestic wit — the recurring gesture is to set a work of art beside an ordinary life and let both look strange.',
+            'She is a visual artist as well, and the poems have a curator\'s eye for arrangement. The tone is cool and slightly ironic, and the erudition is worn lightly. Read for the sidelong humour, which is easy to miss on a first pass.'
+        ],
+        readNext: [
+            { slug: 'elizabeth-bishop', name: 'Elizabeth Bishop', note: 'Observation as the whole emotion.' },
+            { slug: 'amy-gerstler', name: 'Amy Gerstler', note: 'Wit and the borrowed voice.' },
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Art history as poetic material.' }
+        ]
+    },
+
+    'e-e-cummings': {
+        body: [
+            'The typography is what everyone remembers — lowercase, split words, punctuation used as rhythm, lines scattered across the page — and it is a scoring system rather than a decoration: the arrangement tells you how fast to read and where the surprise falls.',
+            'Underneath it he is a surprisingly traditional lyric poet, writing sonnets about love and spring, and a savage satirist about war, patriotism and conformity. He was also a painter, and served in an ambulance corps in the First World War and was imprisoned by the French, which produced his best prose. The sentiment can cloy; the technique never stopped being new.'
+        ],
+        readNext: [
+            { slug: 'kenneth-patchen', name: 'Kenneth Patchen', note: 'The page as a visual object.' },
+            { slug: 'mina-loy', name: 'Mina Loy', note: 'Modernist typography with a harder edge.' },
+            { slug: 'gertrude-stein', name: 'Gertrude Stein', note: 'Grammar broken in the other direction.' }
+        ]
+    },
+
+    'eduardo-c-corral': {
+        body: [
+            'Spanish and English sit side by side in these poems without translation or apology, and the refusal to gloss is part of the argument about who the poem is for.',
+            'The subjects are queer desire, the border, undocumented migration and the body, handled with a lush precision that owes something to Lorca. One book is built around the voices of people crossing the desert. The images are frequently violent and frequently beautiful in the same line, which is the effect he is after.'
+        ],
+        readNext: [
+            { slug: 'javier-zamora', name: 'Javier Zamora', note: 'Migration written from inside it.' },
+            { slug: 'rigoberto-gonzlez', name: 'Rigoberto González', note: 'Queer Latino poetry of the same moment.' },
+            { slug: 'francisco-x-alarcn', name: 'Francisco X. Alarcón', note: 'The bilingual page as a position.' }
+        ]
+    },
+
+    'ellen-bryant-voigt': {
+        body: [
+            'A poet of rural Virginia and of family, working in a syntax that is genuinely her own — long sentences pulled tight across short lines, with a musician\'s sense of phrasing (she trained as a pianist).',
+            'The most striking book is a sequence of unrhymed sonnets about the 1918 influenza epidemic in a farming community, spoken by many voices and adding up to something no single narrator could carry. Her prose on the craft of syntax is among the best writing on technique by a working poet.'
+        ],
+        readNext: [
+            { slug: 'claudia-emerson', name: 'Claudia Emerson', note: 'Rural Virginia in the same register.' },
+            { slug: 'linda-gregerson', name: 'Linda Gregerson', note: 'Syntax stretched across the line.' },
+            { slug: 'robert-frost', name: 'Robert Frost', note: 'The rural dramatic poem she works from.' }
+        ]
+    },
+
+    'emily-berry': {
+        body: [
+            'A British poet whose first book is fast, funny and unsettling — dispatches from invented lives, absurd bureaucracies, and a persistent sense that the speaker is performing rather than confiding.',
+            'The second is very different: a sustained treatment of a mother\'s death and of grief as something that will not organise itself into a narrative, written in fragments and with the psychoanalytic vocabulary showing. The two books together demonstrate an unusual range. She has edited an important poetry magazine.'
+        ],
+        readNext: [
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Grief handled through style.' },
+            { slug: 'stevie-smith', name: 'Stevie Smith', note: 'The British poem at its strangest.' },
+            { slug: 'dorothea-lasky', name: 'Dorothea Lasky', note: 'Flat statement carrying extremity.' }
+        ]
+    },
+
+    'frances-ellen-watkins-harper': {
+        body: [
+            'An abolitionist, suffragist and lecturer who was among the most widely read African American poets of the nineteenth century, writing verse built to be delivered at meetings and to be understood at once.',
+            'The poems use ballad metre and hymn stanza — forms an audience already knew — to carry arguments about slavery, motherhood under slavery, temperance and the vote. The best-known declares she would not rest in a grave in a land where men are slaves. She also wrote one of the earliest novels published by a Black American woman.'
+        ],
+        readNext: [
+            { slug: 'phillis-wheatley', name: 'Phillis Wheatley', note: 'The first African American poet in print.' },
+            { slug: 'george-moses-horton', name: 'George Moses Horton', note: 'A poet who published while enslaved.' },
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'The generation that followed.' }
+        ]
+    },
+
+    'g-k-chesterton': {
+        body: [
+            'A prolific journalist, novelist and Catholic controversialist whose verse is loud, metrically driving and built for recitation — long galloping ballads about battles, roads, donkeys and beer.',
+            'The best of it is very good indeed: the battle poem about Lepanto has a momentum almost nothing else in English matches, and the comic pieces are genuinely funny. The politics are of their period and the antisemitism in some of his prose is real. Read the ballads aloud; silently they lose most of what they have.'
+        ],
+        readNext: [
+            { slug: 'hilaire-belloc', name: 'Hilaire Belloc', note: 'His close ally in every argument.' },
+            { slug: 'rudyard-kipling', name: 'Rudyard Kipling', note: 'The recitable ballad at its best.' },
+            { slug: 'alfred-noyes', name: 'Alfred Noyes', note: 'The same galloping narrative verse.' }
+        ]
+    },
+
+    'gerard-malanga': {
+        body: [
+            'A poet and photographer who worked as Andy Warhol\'s assistant through the Factory years, and whose real significance is as a documentarian of that scene — but the poems came first and continued.',
+            'They belong to the New York School\'s conversational mode: names, parties, love affairs, films, written quickly and without much revision. The interest is partly historical and partly in the tone, which is unguarded in a way the more careful poets of that circle were not.'
+        ],
+        readNext: [
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'The model for the poem-as-diary.' },
+            { slug: 'bill-berkson', name: 'Bill Berkson', note: 'The art world written from inside it.' },
+            { slug: 'ted-berrigan', name: 'Ted Berrigan', note: 'The second generation of that scene.' }
+        ]
+    },
+
+    'hugh-macdiarmid': {
+        body: [
+            'He set out to make a modern literature in Scots and largely succeeded — assembling a written language from dialect, dictionaries and older texts, and using it for a long philosophical poem in which a drunk man lies on a hillside arguing with a thistle.',
+            'That poem is one of the great modernist works in any language of these islands. The later work turns didactic and enormous, incorporating scientific and technical prose wholesale, and divides readers sharply. He was a communist, a nationalist, and quarrelsome to the point of being expelled from both movements.'
+        ],
+        readNext: [
+            { slug: 'robert-burns', name: 'Robert Burns', note: 'The Scots tradition he was reclaiming.' },
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'Northern modernism written for the ear.' },
+            { slug: 'tom-pickard', name: 'Tom Pickard', note: 'Vernacular as a political choice, later.' }
+        ]
+    },
+
+    'javier-zamora': {
+        body: [
+            'He crossed from El Salvador to the United States alone at nine, and the poems are about that journey, the war that caused it, and the family it separated him from for years.',
+            'The verse mixes Spanish and English, uses documentary fragments, and is precise about the physical facts — the desert, the boat, the coyote, the phone calls. What keeps it from being testimony is the formal care: the poems are made objects, not depositions. The memoir he later published covers the same ground at length.'
+        ],
+        readNext: [
+            { slug: 'eduardo-c-corral', name: 'Eduardo C. Corral', note: 'The border in a lusher idiom.' },
+            { slug: 'martn-espada', name: 'Martín Espada', note: 'The political poem written to be understood.' },
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'State language turned against itself.' }
+        ]
+    },
+
+    'jericho-brown': {
+        body: [
+            'He invented a form he calls the duplex — a fourteen-line poem built from repeating, slightly altered couplets, borrowing from the sonnet, the ghazal and the blues — and it has been widely taken up since.',
+            'The subjects are Black life in America, queer desire, a violent father, HIV and faith, handled with a lyricism that never softens the material. The poems are short and the endings land hard. His argument for the form is that a poem about inherited violence should be built out of repetition that will not resolve.'
+        ],
+        readNext: [
+            { slug: 'danez-smith', name: 'Danez Smith', note: 'The same generation, more performative.' },
+            { slug: 'carl-phillips', name: 'Carl Phillips', note: 'Desire handled with syntactic restraint.' },
+            { slug: 'lucille-clifton', name: 'Lucille Clifton', note: 'Compression with total authority.' }
+        ]
+    },
+
+    'jill-alexander-essbaum': {
+        body: [
+            'A formal poet whose subject is the collision of the erotic and the devotional — the poems rhyme hard, pun constantly, and treat lust and prayer as versions of the same appetite.',
+            'The technique is showy on purpose: heavy internal rhyme, wordplay pushed to the edge of taste, and a willingness to be tasteless when that is the honest register. The religious material is not ironic. She has also written a novel. Read several; the effect depends on the accumulation of nerve.'
+        ],
+        readNext: [
+            { slug: 'john-donne', name: 'John Donne', note: 'The erotic and the devout in one instrument.' },
+            { slug: 'richard-crashaw', name: 'Richard Crashaw', note: 'Devotion at its most extravagant.' },
+            { slug: 'kim-addonizio', name: 'Kim Addonizio', note: 'Contemporary form and appetite.' }
+        ]
+    },
+
+    'jill-mcdonough': {
+        body: [
+            'One book is a sequence of sonnets on executions in America, one for each century and each case, written in a plain conversational voice that reports what happened and declines to editorialise.',
+            'The restraint is the argument: fifty flat accounts of a state killing someone do more than any denunciation. She has taught in prisons for years and writes about that too, alongside poems about drinking, teaching and marriage that are funny and unguarded. The formal control is constant across both registers.'
+        ],
+        readNext: [
+            { slug: 'reginald-dwayne-betts', name: 'Reginald Dwayne Betts', note: 'Incarceration written from inside it.' },
+            { slug: 'marilyn-nelson', name: 'Marilyn Nelson', note: 'Atrocity contained by strict form.' },
+            { slug: 'charles-reznikoff', name: 'Charles Reznikoff', note: 'The record left to speak for itself.' }
+        ]
+    },
+
+    'karen-volkman': {
+        body: [
+            'An abstract lyric poet: the poems are musically dense and almost entirely without narrative or occasion, working through sound, syntax and a vocabulary that keeps sliding out of reference.',
+            'One book is a sequence of sonnets that observe the form\'s shape while refusing its argumentative logic. The influence of French symbolism is audible. This is poetry to be read for the pleasure of the sentence rather than for what it is about, and readers who need a subject will find it frustrating by design.'
+        ],
+        readNext: [
+            { slug: 'stphane-mallarm', name: 'Stéphane Mallarmé', note: 'The symbolist ancestor.' },
+            { slug: 'michael-palmer', name: 'Michael Palmer', note: 'Lyric beauty without connection.' },
+            { slug: 'lucie-brock-broido', name: 'Lucie Brock-Broido', note: 'Extravagant diction as method.' }
+        ]
+    },
+
+    'kaveh-akbar': {
+        body: [
+            'Addiction and faith are the two subjects, and the poems refuse to separate them — recovery is described in devotional language and God is addressed with the vocabulary of craving.',
+            'He is Iranian American and Muslim, and Persian poetry sits underneath the work as an inheritance rather than as reference. The line is short, the images are physical and strange, and the tone is startled rather than confessional. He has also done a great deal as an interviewer and editor to widen what American poetry pays attention to.'
+        ],
+        readNext: [
+            { slug: 'franz-wright', name: 'Franz Wright', note: 'Addiction and prayer in the same poem.' },
+            { slug: 'kazim-ali', name: 'Kazim Ali', note: 'Muslim practice as a way of thinking.' },
+            { slug: 'christian-wiman', name: 'Christian Wiman', note: 'Belief argued under duress.' }
+        ]
+    },
+
+    'kenneth-slessor': {
+        body: [
+            'An Australian poet whose reputation rests largely on a handful of poems, one of which — a long elegy for a friend drowned in Sydney Harbour — is among the finest in Australian English.',
+            'The verse is modernist in manner, urban, and obsessed with time and memory; he was also a war correspondent and wrote almost no poetry after that. The Sydney poems capture a specific harbour city at a specific moment better than anything else in the literature. A small body of work, and very little of it wasted.'
+        ],
+        readNext: [
+            { slug: 'les-murray', name: 'Les Murray', note: 'The later Australian voice.' },
+            { slug: 'stephen-edgar', name: 'Stephen Edgar', note: 'Australian formal verse today.' },
+            { slug: 'hart-crane', name: 'Hart Crane', note: 'The same modernist high style.' }
+        ]
+    },
+
+    'lorna-dee-cervantes': {
+        body: [
+            'A Chicana poet whose first book is a landmark: poems about a Californian childhood, a grandmother\'s house, racism experienced and denied, and the specific difficulty of writing in a language that is and is not yours.',
+            'The best-known poem answers a white friend who insists there is no war between the races, and dismantles that claim without raising its voice. The politics are direct and the craft is quiet. Later work is more experimental and less read; the early poems remain foundational for Chicana literature.'
+        ],
+        readNext: [
+            { slug: 'francisco-x-alarcn', name: 'Francisco X. Alarcón', note: 'The bilingual page as a position.' },
+            { slug: 'gary-soto', name: 'Gary Soto', note: 'Californian childhood in plain narrative.' },
+            { slug: 'audre-lorde', name: 'Audre Lorde', note: 'The political poem as survival.' }
+        ]
+    },
+
+    'lynda-hull': {
+        body: [
+            'Long, dense, image-saturated poems about heroin, jazz clubs, cheap hotels and the American city at night, written in a syntax that keeps accelerating and rarely lets a sentence close early.',
+            'She had lived the material and does not present it as spectacle. The music is central: Coltrane and bebop as structure, and a sense of the poem improvising over changes. She died in a car crash in her thirties with three books\' worth of work, the last two published after her death.'
+        ],
+        readNext: [
+            { slug: 'david-wojahn', name: 'David Wojahn', note: 'Her husband, and the same cultural material.' },
+            { slug: 'larry-levis', name: 'Larry Levis', note: 'The long associative elegiac poem.' },
+            { slug: 'michael-s-harper', name: 'Michael S. Harper', note: 'Jazz as structural principle.' }
+        ]
+    },
+
+    'mahmoud-darwish': {
+        body: [
+            'The Palestinian national poet, read here in translation, and a writer who spent a career resisting exactly that title — his later work is deliberately more personal and more oblique than the audiences wanting anthems would have liked.',
+            'The early poems are direct and were memorised and chanted; the mature work is meditative, allusive and preoccupied with exile, land, memory and the Arabic language itself. He drew on classical Arabic tradition and on the European modernists equally. Even in translation the cadence carries, which is unusual and says something about the underlying construction.'
+        ],
+        readNext: [
+            { slug: 'fady-joudah', name: 'Fady Joudah', note: 'His principal English translator.' },
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'The poetry of a lost homeland.' },
+            { slug: 'yehuda-amichai', name: 'Yehuda Amichai', note: 'The other side of the same ground.' }
+        ]
+    },
+
+    'margaret-fishback': {
+        body: [
+            'A working advertising copywriter — reportedly the highest-paid woman in the business in her day — who wrote light verse for magazines about department stores, hats, dates, taxis and the daily comedy of a working woman in Manhattan.',
+            'The technique is exact: tight rhyme, brisk metre, and a punchline that arrives on schedule. It is period writing and it is very well made, and it documents a life that serious poetry of the 1930s largely ignored. Read alongside Dorothy Parker, whose register is close and considerably darker.'
+        ],
+        readNext: [
+            { slug: 'dorothy-parker', name: 'Dorothy Parker', note: 'The same wit, with more acid.' },
+            { slug: 'franklin-pierce-adams', name: 'Franklin Pierce Adams', note: 'The newspaper light-verse column.' },
+            { slug: 'x-j-kennedy', name: 'X. J. Kennedy', note: 'Light verse handled with full technique.' }
+        ]
+    },
+
+    'marin-sorescu': {
+        body: [
+            'A Romanian poet, read in translation, whose poems are short, ironic parables written in the flattest possible language — a man interrogates a stone, someone tries to leave a room that has no door.',
+            'Under a censoring state that deadpan was a strategy as well as a style: the poems are politically unanswerable because they never state a position. The humour survives translation because it lives in the situation rather than in the wordplay. The late poems, written while dying, drop the irony almost entirely.'
+        ],
+        readNext: [
+            { slug: 'miroslav-holub', name: 'Miroslav Holub', note: 'The same dry Eastern European deadpan.' },
+            { slug: 'zbigniew-herbert', name: 'Zbigniew Herbert', note: 'The parable under a regime.' },
+            { slug: 'charles-simic', name: 'Charles Simic', note: 'The impossible object stated plainly.' }
+        ]
+    },
+
+    'mary-barnard': {
+        body: [
+            'Her Sappho is the reason most English readers hear Sappho the way they do: spare, fragmentary, arranged as short free-verse pieces with the gaps left visible rather than filled in.',
+            'That decision — to let the damage of the manuscripts be part of the poem — shaped the modern reception of a poet who survives almost entirely in scraps. Her own verse is imagist in descent, precise and unhurried, and she wrote about the Pacific Northwest. The translations are the achievement.'
+        ],
+        readNext: [
+            { slug: 'h-d', name: 'H. D.', note: 'Greek material at its most spare.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'The later Sappho in English.' },
+            { slug: 'ezra-pound', name: 'Ezra Pound', note: 'Who advised her early on.' }
+        ]
+    },
+
+    'mary-sidney-herbert-countess-of-pembroke': {
+        body: [
+            'She completed her brother Philip Sidney\'s verse translation of the Psalms after his death, and the result is one of the most metrically inventive works of the English Renaissance — over a hundred psalms, almost every one in a different stanza form.',
+            'That variety was a technical demonstration as much as a devotional act, and it was read in manuscript by poets including Herbert and Donne. She also edited her brother\'s work, translated from French and Italian, and ran a literary circle. A major writer whose reputation was subsumed into her brother\'s for four centuries.'
+        ],
+        readNext: [
+            { slug: 'sir-philip-sidney', name: 'Sir Philip Sidney', note: 'Her brother, and the work she finished.' },
+            { slug: 'george-herbert', name: 'George Herbert', note: 'The devotional poet who read these psalms.' },
+            { slug: 'lady-mary-wroth', name: 'Lady Mary Wroth', note: 'Her niece, and the next woman of that circle.' }
+        ]
+    },
+
+    'mary-szybist': {
+        body: [
+            'One book circles the Annunciation — the moment of being addressed by something enormous — through dozens of formal approaches: erasures, diagrams, a poem laid out as a sunburst, a poem made from a newspaper report.',
+            'The result is a genuinely unusual religious book: attentive, secular in its doubts, and formally inventive without being cold. The recurring question is what it means to be spoken to and whether anyone is speaking. Read the whole sequence; individual pieces look like experiments and cohere as a book.'
+        ],
+        readNext: [
+            { slug: 'scott-cairns', name: 'Scott Cairns', note: 'Contemporary devotional poetry, playful.' },
+            { slug: 'jean-valentine', name: 'Jean Valentine', note: 'The interior addressed to somebody absent.' },
+            { slug: 'fanny-howe', name: 'Fanny Howe', note: 'Belief without resolution.' }
+        ]
+    },
+
+    'nathalie-handal': {
+        body: [
+            'A French American poet of Palestinian descent who writes across languages and continents, and whose books are frequently organised as journeys — cities, borders, hotel rooms, the Mediterranean.',
+            'The poems are short, lyrical and preoccupied with belonging to several places and none. She is also an editor and anthologist whose collections of Arab and Arab American women\'s writing did a great deal to widen what is available in English. The travel poems are the strongest.'
+        ],
+        readNext: [
+            { slug: 'mahmoud-darwish', name: 'Mahmoud Darwish', note: 'The Palestinian inheritance at its source.' },
+            { slug: 'naomi-shihab-nye', name: 'Naomi Shihab Nye', note: 'The same descent, plainer.' },
+            { slug: 'meena-alexander', name: 'Meena Alexander', note: 'Displacement across several languages.' }
+        ]
+    },
+
+    'oliver-wendell-holmes-sr': {
+        body: [
+            'A physician and professor who wrote occasional verse for most of his life — light, witty, formally neat poems produced for dinners, reunions and public occasions, plus a few that outlived the occasion.',
+            'The best-known saved a warship from being scrapped by shaming the public into keeping it, which is a rare instance of a poem doing something concrete. Another turns a shell into an extended argument about the soul, competently enough to have been memorised for a century. His medical writing on hand-washing and childbed fever mattered more than any of it.'
+        ],
+        readNext: [
+            { slug: 'ralph-waldo-emerson', name: 'Ralph Waldo Emerson', note: 'The New England circle he belonged to.' },
+            { slug: 'henry-wadsworth-longfellow', name: 'Henry Wadsworth Longfellow', note: 'The most popular of that group.' },
+            { slug: 'john-greenleaf-whittier', name: 'John Greenleaf Whittier', note: 'The New England generation.' }
+        ]
+    },
+
+    'paul-celan': {
+        body: [
+            'A German-speaking Jewish poet from what is now Ukraine whose parents were murdered in the camps, and who spent his life writing in the language of their killers. Everything about the work follows from that.',
+            'The early poem about black milk is the most famous German poem of the Holocaust and he came to distrust its beauty. The later poems compress and break German into coinages and fragments, until a poem can be four words wide — the language taken apart because it cannot be used whole. He is difficult in a way no paraphrase survives, and the difficulty is not a style.'
+        ],
+        readNext: [
+            { slug: 'osip-mandelstam', name: 'Osip Mandelstam', note: 'The poet he translated and identified with.' },
+            { slug: 'gottfried-benn', name: 'Gottfried Benn', note: 'The German language before the catastrophe.' },
+            { slug: 'heather-mchugh', name: 'Heather McHugh', note: 'One of his English translators.' }
+        ]
+    },
+
+    'rafael-campo': {
+        body: [
+            'A practising physician who writes formal verse — sonnets, villanelles, rhymed couplets — about patients, HIV, being Cuban American and being gay, and the form is doing specific work rather than being a preference.',
+            'His argument, made in essays too, is that metre is a kind of care: the ordered line holds a suffering body the way a clinic is supposed to. The poems are direct about medicine\'s failures and about his own. The AIDS poems from the epidemic\'s worst years are the core of the work.'
+        ],
+        readNext: [
+            { slug: 'c-dale-young', name: 'C. Dale Young', note: 'The other contemporary physician-poet here.' },
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'The epidemic elegy in metre.' },
+            { slug: 'marilyn-hacker', name: 'Marilyn Hacker', note: 'Formal verse and illness.' }
+        ]
+    },
+
+    'rebecca-lindenberg': {
+        body: [
+            'Her first book is an elegy for the poet Craig Arnold, who disappeared on a volcano in Japan, and it is structured as an index — fragments, definitions and cross-references circling a death with no body and no confirmed account.',
+            'The form solves a real problem: a disappearance cannot be narrated, and an index does not pretend to. The poems are lyrical and exact, and they avoid every available cliché of the grief book. Later work moves outward without losing that formal intelligence.'
+        ],
+        readNext: [
+            { slug: 'craig-arnold', name: 'Craig Arnold', note: 'The poet the book is written for.' },
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Grief handled through style.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'The elegy as an assembled object.' }
+        ]
+    },
+
+    'rick-barot': {
+        body: [
+            'Quiet, essayistic poems that move by association between a painting, a memory, a news item and a physical detail, in long sentences that keep qualifying themselves.',
+            'He is Filipino American, and the material of migration, colonial history and family surfaces without being announced as a theme. One book is built around the galleon trade and its long consequences. The register is calm and the poems are unusually good at holding several unrelated things in mind at once.'
+        ],
+        readNext: [
+            { slug: 'arthur-sze', name: 'Arthur Sze', note: 'Constellated form and clear images.' },
+            { slug: 'carl-phillips', name: 'Carl Phillips', note: 'The long self-qualifying sentence.' },
+            { slug: 'rigoberto-gonzlez', name: 'Rigoberto González', note: 'The same generation and inheritance.' }
+        ]
+    },
+
+    'robert-bridges': {
+        body: [
+            'Poet Laureate for the last decade of his life, and now remembered mostly for two things other than his own poems: he was Gerard Manley Hopkins\'s friend and eventually his editor, publishing the poems decades after Hopkins died, and he wrote a long philosophical poem in old age that was an unexpected bestseller.',
+            'His own lyrics are metrically fastidious — he experimented seriously with quantitative and syllabic measures — and emotionally cool. The reputation has fallen a long way. Read him for the technical experiments and for the fact that without him there would be no Hopkins to read.'
+        ],
+        readNext: [
+            { slug: 'gerard-manley-hopkins', name: 'Gerard Manley Hopkins', note: 'The friend whose work he preserved.' },
+            { slug: 'a-e-housman', name: 'A. E. Housman', note: 'The same generation, plainer and harder.' },
+            { slug: 'alfred-lord-tennyson', name: 'Alfred, Lord Tennyson', note: 'The Victorian ear he inherited.' }
+        ]
+    },
+
+    'ronald-johnson': {
+        body: [
+            'He took a copy of Paradise Lost and erased almost all of it, leaving a scattering of Milton\'s own words on the page as a new poem — one of the earliest and best erasure works, and still the most audacious.',
+            'His larger project is a long visionary poem built in three sections, concrete and typographic in places, celebratory throughout, and owing more to Blake and to American open-field poetics than to anything contemporary. He also wrote cookbooks. A poet almost unknown in his lifetime and steadily more read since.'
+        ],
+        readNext: [
+            { slug: 'john-milton', name: 'John Milton', note: 'The poem he erased.' },
+            { slug: 'charles-olson', name: 'Charles Olson', note: 'The open-field long poem.' },
+            { slug: 'susan-howe', name: 'Susan Howe', note: 'The page as a visual field.' }
+        ]
+    },
+
+    'sam-sax': {
+        body: [
+            'A poet out of the performance scene whose books are organised around a single pressure — one on madness and its medical history, one on queerness, disease and the bathhouse, one on the animal.',
+            'The poems are short, fast and formally aware, drawing on Jewish liturgy, queer history and the vocabulary of diagnosis. The politics are explicit and the tone is more grieving than combative. The research is real: these books argue with archives as well as with the present.'
+        ],
+        readNext: [
+            { slug: 'danez-smith', name: 'Danez Smith', note: 'The same generation and stage.' },
+            { slug: 'jericho-brown', name: 'Jericho Brown', note: 'Desire, illness and invented form.' },
+            { slug: 'tim-dlugos', name: 'Tim Dlugos', note: 'The epidemic written as it happened.' }
+        ]
+    },
+
+    'sina-queyras': {
+        body: [
+            'A Canadian poet whose books change method completely from one to the next — a long poem answering Virginia Woolf\'s waves, a book of grief written after a sister\'s death, a book on the poetics of anger.',
+            'The work is formally experimental and emotionally direct at the same time, which is an unusual combination, and it is explicitly queer and feminist in its arguments. Prose, essay and verse mix freely. Read a single book straight through: the shape of the argument is the point.'
+        ],
+        readNext: [
+            { slug: 'lisa-robertson', name: 'Lisa Robertson', note: 'Canadian experimental poetics.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Genre held deliberately open.' },
+            { slug: 'juliana-spahr', name: 'Juliana Spahr', note: 'Politics and form in the same move.' }
+        ]
+    },
+
+    'sir-john-suckling': {
+        body: [
+            'A Cavalier poet, gambler and courtier whose lyrics are brisk, cynical and very funny about love — the famous one asks a pale lolling lover what good his sighing is doing and tells him to give up.',
+            'The tone is anti-romantic on principle, which was itself a fashion, and he does it better than most. He invented the card game cribbage by some accounts, raised a troop for the king at his own extravagant expense, and died young in exile after a failed plot. The ballad on a wedding is his other durable piece.'
+        ],
+        readNext: [
+            { slug: 'richard-lovelace', name: 'Richard Lovelace', note: 'The Cavalier lyric at its most gallant.' },
+            { slug: 'thomas-carew', name: 'Thomas Carew', note: 'The polished end of the same circle.' },
+            { slug: 'ben-jonson', name: 'Ben Jonson', note: 'The classical model behind all of them.' }
+        ]
+    },
+
+    'stephanie-burt': {
+        body: [
+            'One of the most widely read poetry critics writing in English, and a poet whose own work is playful, allusive and formally various — sonnets, syllabics, poems spoken by objects, sea creatures and superheroes.',
+            'The criticism and the poems share a generosity: an unusual willingness to find what a poem is trying to do rather than to measure it against a standard. The later work deals directly with gender transition. Read the essays alongside; they are among the best available guides to contemporary poetry.'
+        ],
+        readNext: [
+            { slug: 'randall-jarrell', name: 'Randall Jarrell', note: 'The critic-poet she has written a book about.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Formal play at a small scale.' },
+            { slug: 'matthea-harvey', name: 'Matthea Harvey', note: 'Invention with a serious floor.' }
+        ]
+    },
+
+    'stephen-crane': {
+        body: [
+            'The novels came first and the poems are stranger than anything in them: very short, unrhymed, unmetred parables in which a man eats his own heart or argues with a universe that declines to be impressed.',
+            'They look like nothing else written in America in the 1890s — no ornament, no metre, no consolation — and they anticipate free verse by a decade or more. The tone is flat and ironic and the God in them is either absent or indifferent. He died at twenty-eight, having written a great deal in about seven years.'
+        ],
+        readNext: [
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'The other American writing nothing like her contemporaries.' },
+            { slug: 'ambrose-bierce', name: 'Ambrose Bierce', note: 'The same American bleakness in prose and verse.' },
+            { slug: 'herman-melville', name: 'Herman Melville', note: 'A novelist turned to hard, unbeautiful verse.' }
+        ]
+    },
+
+    'stephen-spender': {
+        body: [
+            'One of the group of English poets of the 1930s who tried to make a political poetry — pylons, factories, the Spanish civil war, unemployment — and the one whose reputation has suffered most from the association.',
+            'The best lyrics are genuinely fine, particularly the early ones about light, flight and the continually remembered dead. He spent much of his later life as an editor, memoirist and public literary figure, and his prose about that generation is as valuable as the verse. Uneven, and the good poems are better than the reputation.'
+        ],
+        readNext: [
+            { slug: 'louis-macneice', name: 'Louis MacNeice', note: 'The best poet of that group.' },
+            { slug: 'george-szirtes', name: 'George Szirtes', note: 'The formal British poem of a later generation.' },
+            { slug: 'wilfred-owen', name: 'Wilfred Owen', note: 'The war poetry they were writing after.' }
+        ]
+    },
+
+    'alice-moore-dunbar-nelson': {
+        body: [
+            'A writer, teacher and activist of the Harlem Renaissance generation whose poems, stories and journalism were long read mainly as a footnote to her marriage to Paul Laurence Dunbar.',
+            'The poems are formally conventional and quietly subversive: sonnets about the sea, about violets, about a woman\'s wish for a wider life than she has been allotted. Her diary, published long after her death, is a major document of Black women\'s intellectual life in the period, including her relationships with women. Read the sonnets, then the diary.'
+        ],
+        readNext: [
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'Her husband, and the poet she was overshadowed by.' },
+            { slug: 'georgia-douglas-johnson', name: 'Georgia Douglas Johnson', note: 'The same generation and the same constraints.' },
+            { slug: 'frances-ellen-watkins-harper', name: 'Frances Ellen Watkins Harper', note: 'The generation just before.' }
+        ]
+    },
+
+    'allen-grossman': {
+        body: [
+            'A poet and theorist whose prose about what poetry is for — the claim that it exists to keep persons from disappearing — is as substantial as the verse and considerably more read.',
+            'The poems are high, declarative and unfashionably grand, full of angels, fathers, the sea and the dead, in a diction that makes no concession to the plain style around it. He taught for decades and shaped a number of well-known poets. Difficult, deliberately elevated, and unlike anything else being written when it appeared.'
+        ],
+        readNext: [
+            { slug: 'hart-crane', name: 'Hart Crane', note: 'The American high style he works in.' },
+            { slug: 'robert-duncan', name: 'Robert Duncan', note: 'Visionary poetics taken seriously.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'Difficulty defended as respect.' }
+        ]
+    },
+
+    'allison-adelle-hedge-coke': {
+        body: [
+            'A poet of Cherokee, Huron and Creek descent who worked in fields, canneries and factories before publishing, and whose poems carry that labour as fact rather than as credential.',
+            'Her most ambitious book is a long sequence about the Indigenous earthworks of the American interior, spoken partly by the mounds themselves, set against the strip mining and agriculture that have destroyed them. The forms are experimental and the ecological argument is direct. She is also an editor and anthologist of Native writing.'
+        ],
+        readNext: [
+            { slug: 'linda-hogan', name: 'Linda Hogan', note: 'Ecology and Native history together.' },
+            { slug: 'heid-e-erdrich', name: 'Heid E. Erdrich', note: 'Formal invention and Native material.' },
+            { slug: 'diane-glancy', name: 'Diane Glancy', note: 'English deliberately broken.' }
+        ]
+    },
+
+    'anna-swir': {
+        body: [
+            'A Polish poet, read in translation, who served as a military nurse during the Warsaw Uprising and wrote about it decades later in very short, flat poems that report an atrocity in a few lines and stop.',
+            'The other body of work is about the female body — ageing, sex, childbirth, physical labour — written with a bluntness that had almost no precedent in Polish poetry. Milosz translated her and wrote about her at length. Both subjects are handled the same way: no metaphor, no consolation, one fact per poem.'
+        ],
+        readNext: [
+            { slug: 'czeslaw-milosz', name: 'Czeslaw Milosz', note: 'Her translator and advocate.' },
+            { slug: 'vera-pavlova', name: 'Vera Pavlova', note: 'The short poem on the body, later.' },
+            { slug: 'sharon-olds', name: 'Sharon Olds', note: 'The physical written without decorum.' }
+        ]
+    },
+
+    'b-h-fairchild': {
+        body: [
+            'His father ran a machine shop, and the poems are set there — lathes, drill presses, the specific vocabulary of metalwork — written in long narrative lines about men doing skilled physical work in small Kansas and Texas towns.',
+            'The trick, and it is a real one, is that the poems are also full of Hart Crane, opera and the history of art, because the men in them are not simple and the poems refuse to make them so. A machinist recites poetry over a lathe and the poem does not treat that as incongruous.'
+        ],
+        readNext: [
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'Industrial work named with respect.' },
+            { slug: 'rodney-jones', name: 'Rodney Jones', note: 'Long narrative lines out of small-town America.' },
+            { slug: 'hart-crane', name: 'Hart Crane', note: 'The poet his machinists read.' }
+        ]
+    },
+
+    'bruce-weigl': {
+        body: [
+            'He enlisted at eighteen and served in Vietnam, and has written about it for fifty years without ever settling the account — the poems keep returning because the material will not close.',
+            'The style is plain and declarative, and the best poems place an ordinary domestic present against something remembered, with no transition and no comment. He has also translated Vietnamese poetry and returned to the country repeatedly, including to adopt a daughter. Among the essential American writing on that war.'
+        ],
+        readNext: [
+            { slug: 'yusef-komunyakaa', name: 'Yusef Komunyakaa', note: 'The same war, with a jazz ear.' },
+            { slug: 'brian-turner', name: 'Brian Turner', note: 'Iraq, by somebody who had read these.' },
+            { slug: 'quan-barry', name: 'Quan Barry', note: 'Vietnam from the other direction.' }
+        ]
+    },
+
+    'chana-bloch': {
+        body: [
+            'A poet and translator whose versions of Yehuda Amichai and Dahlia Ravikovitch shaped how Israeli poetry reads in English, and whose translation of the Song of Songs restored its plain erotic directness.',
+            'Her own poems are short, wry and domestic — marriage, divorce, Jewish practice, illness — with a biblical vocabulary used conversationally rather than reverently. The late poems written during terminal illness are unsentimental and very good. Read the translations alongside; the same ear is doing both jobs.'
+        ],
+        readNext: [
+            { slug: 'yehuda-amichai', name: 'Yehuda Amichai', note: 'The poet she translated for decades.' },
+            { slug: 'alicia-ostriker', name: 'Alicia Ostriker', note: 'Biblical material rewritten by a woman.' },
+            { slug: 'linda-pastan', name: 'Linda Pastan', note: 'The domestic lyric at similar scale.' }
+        ]
+    },
+
+    'charles-hamilton-sorley': {
+        body: [
+            'He was twenty when he was killed at Loos, and had already written the poem that dismantles the consolations the rest of English war poetry was still offering: a sonnet telling the reader that the millions of mouthless dead cannot hear praise, and that no one should say anything soft about them.',
+            'He had studied in Germany just before the war and refused to hate the enemy, which is rarer than it sounds in 1915. The body of work is tiny and was published after his death. Robert Graves thought him one of the three great losses of that war.'
+        ],
+        readNext: [
+            { slug: 'wilfred-owen', name: 'Wilfred Owen', note: 'The same refusal, a year later.' },
+            { slug: 'isaac-rosenberg', name: 'Isaac Rosenberg', note: 'The war from the ranks.' },
+            { slug: 'rupert-brooke', name: 'Rupert Brooke', note: 'The consolation Sorley wrote against.' }
+        ]
+    },
+
+    'craig-santos-perez': {
+        body: [
+            'A Chamorro poet from Guam whose long serial project takes the language of military occupation, tourism, treaty and environmental report and rebuilds it as poetry — the pages use fragments, footnotes, blank space and untranslated CHamoru.',
+            'The argument is that an island administered as an unincorporated territory needs a poetics that shows the incompleteness rather than smoothing it. Ecological collapse in the Pacific is the other constant. Formally demanding, politically explicit, and unlike anything else in American poetry.'
+        ],
+        readNext: [
+            { slug: 'allison-adelle-hedge-coke', name: 'Allison Adelle Hedge Coke', note: 'Land, extraction and Indigenous form.' },
+            { slug: 'juliana-spahr', name: 'Juliana Spahr', note: 'Ecology and politics in experimental form.' },
+            { slug: 'kamau-brathwaite', name: 'Kamau Brathwaite', note: 'The page remade for a colonised language.' }
+        ]
+    },
+
+    'daniel-borzutzky': {
+        body: [
+            'Relentless, repetitive prose poems about state violence, debt, privatisation and bodies treated as accounting entries, moving between Chicago and Chile without marking the border.',
+            'The repetition is the method: a phrase returns dozens of times with small mutations until the bureaucratic language starts to sound like what it actually describes. He translates Chilean poetry, and the dictatorship\'s vocabulary is audible under the American material. Deliberately hard to read in bulk, and meant to be.'
+        ],
+        readNext: [
+            { slug: 'cesare-pavese', name: 'Cesare Pavese', note: 'European poetry of state violence and plain speech.' },
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'Official language turned against itself.' },
+            { slug: 'joyelle-mcsweeney', name: 'Joyelle McSweeney', note: 'The contemporary poetics of the grotesque.' }
+        ]
+    },
+
+    'dara-wier': {
+        body: [
+            'Slippery, associative poems that begin in a recognisable Southern or domestic scene and drift somewhere unaccountable, with the syntax staying calm the whole way.',
+            'One book is a sequence written after a friend\'s death that circles it obliquely for a hundred pages. She has taught for decades and co-founded a press, and her influence on younger experimental poets runs largely through that. Read for tone; the poems resist paraphrase and are not trying to be difficult.'
+        ],
+        readNext: [
+            { slug: 'james-tate', name: 'James Tate', note: 'Her longtime colleague, and the deadpan absurd.' },
+            { slug: 'mary-ruefle', name: 'Mary Ruefle', note: 'Abrupt turns handled lightly.' },
+            { slug: 'c-d-wright', name: 'C. D. Wright', note: 'Southern speech put to experimental use.' }
+        ]
+    },
+
+    'david-harsent': {
+        body: [
+            'A British poet whose work is consistently dark — violence, myth, dreams, a wood, a hunt, a war reported from no identified war — written in a spare, clipped line that withholds the explanation the poems keep implying.',
+            'He has collaborated extensively with a composer, writing libretti, and the poems have that sense of a text built to be set. One book is a sequence of dispatches from an unnamed conflict; another circles the Grimm brothers. Consistently unsettling and never gratuitous.'
+        ],
+        readNext: [
+            { slug: 'alice-oswald', name: 'Alice Oswald', note: 'English landscape and classical violence.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'Atrocity and the ethics of writing it.' },
+            { slug: 'matthew-sweeney', name: 'Matthew Sweeney', note: 'Dread narrated flatly.' }
+        ]
+    },
+
+    'david-shapiro': {
+        body: [
+            'He published his first book as a teenager and became the youngest member of the second-generation New York School, and the poems keep that precocity — quick, allusive, musical, full of art and philosophy handled lightly.',
+            'He was a violinist and an art historian, and wrote monographs on painters. The poems move by association and by pun, and they are more melancholy than the surface velocity suggests. The elegies for his father and the poems about music are the most direct.'
+        ],
+        readNext: [
+            { slug: 'john-ashbery', name: 'John Ashbery', note: 'The obvious elder.' },
+            { slug: 'kenneth-koch', name: 'Kenneth Koch', note: 'His teacher, and comic exuberance.' },
+            { slug: 'ted-berrigan', name: 'Ted Berrigan', note: 'The centre of that second generation.' }
+        ]
+    },
+
+    'diane-wakoski': {
+        body: [
+            'Long, incantatory, first-person poems that use a set of recurring personal mythologies — a motorcycle betrayer, the king of Spain, a missing father, the moon — repeated across books until they take on the weight of legend.',
+            'She rejected the label of confessional and called the work a personal mythology, which is a fair distinction: the material is autobiographical and the treatment is deliberately theatrical. The poems about being an unbeautiful woman in a culture that rewards beauty are the most uncomfortable and the most durable.'
+        ],
+        readNext: [
+            { slug: 'anne-sexton', name: 'Anne Sexton', note: 'The performed self in verse.' },
+            { slug: 'alice-notley', name: 'Alice Notley', note: 'Personal myth built at length.' },
+            { slug: 'jerome-rothenberg', name: 'Jerome Rothenberg', note: 'The deep-image American avant-garde.' }
+        ]
+    },
+
+    'edward-hirsch': {
+        body: [
+            'A poet and a rare successful populariser — his book on how to read a poem was a bestseller and is genuinely useful, written from love rather than from pedagogy.',
+            'The poems are lyrical, allusive and elegiac, with a strong strain of insomnia, art and Jewish inheritance. The book-length elegy for his son, written in short unrhymed triplets, is the work most readers now come to first: unflinching about addiction and about the failures of a parent, and formally disciplined enough to survive its own grief.'
+        ],
+        readNext: [
+            { slug: 'gerald-stern', name: 'Gerald Stern', note: 'The same ecstatic Jewish American line.' },
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'The elegy for a son, handled coldly.' },
+            { slug: 'donald-hall', name: 'Donald Hall', note: 'The long elegiac sequence.' }
+        ]
+    },
+
+    'elinor-wylie': {
+        body: [
+            'Polished, brittle, technically immaculate lyrics — she liked hard surfaces, and the poems are full of silver, glass, salt, ice and other things that shine and cut.',
+            'She was a celebrity for her private life in a way that has always distorted the reading, and the poems themselves are cool and controlled almost to the point of armour. The best of them use that hardness as the subject: how to survive by becoming less penetrable. Read her beside Millay for the contrast in temperature.'
+        ],
+        readNext: [
+            { slug: 'edna-st-vincent-millay', name: 'Edna St. Vincent Millay', note: 'The warmer contemporary.' },
+            { slug: 'louise-bogan', name: 'Louise Bogan', note: 'The same reticence, more severe.' },
+            { slug: 'sara-teasdale', name: 'Sara Teasdale', note: 'The plain lyric of the period.' }
+        ]
+    },
+
+    'elizabeth-spires': {
+        body: [
+            'Quiet, formally careful poems about childhood, motherhood, mortality and religious doubt, in a plain register that rarely raises its voice and never overstates.',
+            'She writes well about places — Ohio, the Maryland shore, Italy — and about paintings and historical figures approached as neighbours rather than as subjects. She has also written for children. A poet of the middle register, doing it very well, at a moment when that has been unfashionable.'
+        ],
+        readNext: [
+            { slug: 'linda-pastan', name: 'Linda Pastan', note: 'The domestic lyric at similar scale.' },
+            { slug: 'jane-kenyon', name: 'Jane Kenyon', note: 'Quiet with a darker undertow.' },
+            { slug: 'elizabeth-bishop', name: 'Elizabeth Bishop', note: 'Observation carrying the feeling.' }
+        ]
+    },
+
+    'franklin-pierce-adams': {
+        body: [
+            'A newspaper columnist whose daily column was the centre of literary New York for two decades, and whose own contributions were light verse — parodies, epigrams, versified complaints about the subway and the weather.',
+            'He is remembered for eight lines about a baseball double play that put three infielders permanently into the language. The column mattered more than the verse: he printed early work by writers who became famous, and being run there was a career event. Read as a document of what a literary public looked like when a newspaper could be one.'
+        ],
+        readNext: [
+            { slug: 'dorothy-parker', name: 'Dorothy Parker', note: 'The wit he helped make famous.' },
+            { slug: 'margaret-fishback', name: 'Margaret Fishback', note: 'The same light-verse economy.' },
+            { slug: 'louis-untermeyer', name: 'Louis Untermeyer', note: 'The taste-making anthologist of the era.' }
+        ]
+    },
+
+    'george-moses-horton': {
+        body: [
+            'He was enslaved in North Carolina and published poems while still enslaved — selling love lyrics to university students who wanted verses for their sweethearts, and using the money in an attempt to buy his freedom.',
+            'The poems are formally conventional, in the hymn and ballad measures available to him, and several state the case against slavery directly in a voice that had to be careful. That combination — polite eighteenth-century diction carrying an unanswerable argument — is the thing to notice. He gained his freedom at the end of the Civil War.'
+        ],
+        readNext: [
+            { slug: 'phillis-wheatley', name: 'Phillis Wheatley', note: 'The first African American poet in print.' },
+            { slug: 'frances-ellen-watkins-harper', name: 'Frances Ellen Watkins Harper', note: 'The abolitionist poem at its most public.' },
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'The generation after emancipation.' }
+        ]
+    },
+
+    'georgia-douglas-johnson': {
+        body: [
+            'A central figure of the Harlem Renaissance who ran a weekly salon in Washington for twenty years — Hughes, Toomer, Hurston and others passed through her house — while publishing her own poems and plays.',
+            'The verse is formally traditional and thematically bold for its moment: poems about the constrained lives of women, about being Black and a woman at once, and about longing described without euphemism. Her antilynching plays were too dangerous for most theatres to stage. The salon is part of the achievement, not a footnote to it.'
+        ],
+        readNext: [
+            { slug: 'jean-toomer', name: 'Jean Toomer', note: 'One of the writers who passed through her salon.' },
+            { slug: 'alice-moore-dunbar-nelson', name: 'Alice Moore Dunbar-Nelson', note: 'The same generation and constraints.' },
+            { slug: 'langston-hughes', name: 'Langston Hughes', note: 'The Harlem Renaissance at its most audible.' }
+        ]
+    },
+
+    'gregory-orr': {
+        body: [
+            'He killed his younger brother in a hunting accident as a boy, and has written about it directly for fifty years — the fact is central to the work and he has never treated it as private.',
+            'The early poems are short, imagistic and stunned; the later books turn to a sustained argument, in hundreds of small untitled lyrics, that poetry is what makes a survivable order out of disorder. His prose on that idea is widely read. The poems are plain, repetitive and quietly insistent, and the repetition is the point.'
+        ],
+        readNext: [
+            { slug: 'jean-valentine', name: 'Jean Valentine', note: 'The short poem full of silence.' },
+            { slug: 'stanley-kunitz', name: 'Stanley Kunitz', note: 'His teacher, and the same long reckoning.' },
+            { slug: 'franz-wright', name: 'Franz Wright', note: 'Damage written short.' }
+        ]
+    },
+
+    'inger-christensen': {
+        body: [
+            'A Danish poet, read in translation, whose major books are built on mathematical structures — one sequence expands according to the Fibonacci series, so each section is as long as the previous two combined.',
+            'That sounds arid and produces the opposite: a hypnotic catalogue of things that exist, written under the shadow of nuclear weapons and ecological loss, where the accumulating length becomes an argument about abundance and its destruction. Another book is a sonnet cycle of fifteen sonnets built to a strict interlocking pattern. Among the great European poems of the last century.'
+        ],
+        readNext: [
+            { slug: 'tomas-transtrmer', name: 'Tomas Tranströmer', note: 'The Scandinavian contemporary.' },
+            { slug: 'alice-fulton', name: 'Alice Fulton', note: 'Mathematics as a theory of poetic form.' },
+            { slug: 'ronald-johnson', name: 'Ronald Johnson', note: 'The long constructed visionary poem.' }
+        ]
+    },
+
+    'james-longenbach': {
+        body: [
+            'A poet and one of the best critics of modern poetry writing in his generation — his books on the line, on the resistance to poetry and on Pound and Stevens are unusually useful because they are written by somebody making the thing he describes.',
+            'The poems are quiet, syntactically elegant and preoccupied with music, painting and mortality. The late book written during terminal illness is direct and unadorned. Read a critical book and a collection together; each explains the other more than most poet-critics manage.'
+        ],
+        readNext: [
+            { slug: 'wallace-stevens', name: 'Wallace Stevens', note: 'The poet he wrote about best.' },
+            { slug: 'james-schuyler', name: 'James Schuyler', note: 'The quiet observational lyric.' },
+            { slug: 'stephanie-burt', name: 'Stephanie Burt', note: 'The other contemporary critic-poet here.' }
+        ]
+    },
+
+    'james-mcmichael': {
+        body: [
+            'A poet of long, discursive, essayistic poems that move slowly through history, family and place with almost no lyric heightening — one book-length poem takes in the Industrial Revolution, his mother\'s death and his own childhood in the same unhurried voice.',
+            'The influence is more from prose than from other poets, and the demand on the reader is patience rather than decoding. When it works the accumulation produces something no shorter poem could reach. Read a whole poem in one sitting or not at all.'
+        ],
+        readNext: [
+            { slug: 'a-r-ammons', name: 'A. R. Ammons', note: 'The long poem as a process.' },
+            { slug: 'robert-hass', name: 'Robert Hass', note: 'The prose-adjacent Californian line.' },
+            { slug: 'john-koethe', name: 'John Koethe', note: 'The long meditative American poem.' }
+        ]
+    },
+
+    'james-weldon-johnson': {
+        body: [
+            'He wrote the words to a song that became known as the Black national anthem, edited the first major anthology of African American poetry, ran the NAACP, and served as a United States consul. The poems sit inside a very full life.',
+            'His central book renders seven Black sermons as verse — the creation, the crucifixion, a funeral — capturing the cadence and imagery of the preachers he had heard without using dialect spelling, which he argued had become a trap. That decision, argued in his preface, is one of the most consequential in African American poetics.'
+        ],
+        readNext: [
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'The dialect problem he was answering.' },
+            { slug: 'langston-hughes', name: 'Langston Hughes', note: 'The next solution to the same question.' },
+            { slug: 'jean-toomer', name: 'Jean Toomer', note: 'The Harlem Renaissance at its most experimental.' }
+        ]
+    },
+
+    'jean-toomer': {
+        body: [
+            'His single essential book mixes poems, sketches and drama into a portrait of the rural Georgia he had briefly taught in and of Black urban life in Washington and Chicago — a form nobody had used before and he never repeated.',
+            'The poems inside it are spare, musical and heavily influenced by imagism and by the spirituals. He spent the rest of his life in spiritual movements, largely stopped publishing, and resisted being categorised racially at all, which complicated his place in the Harlem Renaissance then and now. The book is the achievement and it is complete in itself.'
+        ],
+        readNext: [
+            { slug: 'james-weldon-johnson', name: 'James Weldon Johnson', note: 'The generation just ahead.' },
+            { slug: 'georgia-douglas-johnson', name: 'Georgia Douglas Johnson', note: 'Whose salon he attended.' },
+            { slug: 'langston-hughes', name: 'Langston Hughes', note: 'Rural and urban Black life in verse.' }
+        ]
+    },
+
+    'john-berryman': {
+        body: [
+            'His major work is a sequence of nearly four hundred eighteen-line poems spoken by a character called Henry — a version of himself in the third person, interrupted by an unnamed friend who calls him Mr Bones and speaks in minstrel dialect.',
+            'That device is the difficulty and the achievement: it lets him write about grief, drink, lust and his father\'s suicide with a syntax broken and reassembled until it sounds like nobody else. The dialect borrowings are uncomfortable and are part of any honest reading. He died by suicide; the late religious poems are the quietest thing he wrote.'
+        ],
+        readNext: [
+            { slug: 'robert-lowell', name: 'Robert Lowell', note: 'His friend, and the same generation of wreckage.' },
+            { slug: 'delmore-schwartz', name: 'Delmore Schwartz', note: 'The friend he elegised repeatedly.' },
+            { slug: 'gerard-manley-hopkins', name: 'Gerard Manley Hopkins', note: 'The broken syntax he learned from.' }
+        ]
+    },
+
+    'john-haines': {
+        body: [
+            'He homesteaded in Alaska for more than twenty years — trapping, hunting, building — and the poems come out of that directly: snow, animals, silence, and a landscape indifferent to whether anyone survives it.',
+            'The verse is spare and image-driven, with a mythic undertow that the plainness keeps from becoming grandiose. He is unsentimental about wilderness in a way that later nature poetry often is not. The prose memoir of those years is the companion piece and is the more famous book.'
+        ],
+        readNext: [
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'Work in wild country as a practice.' },
+            { slug: 'william-e-stafford', name: 'William E. Stafford', note: 'Plain western attention.' },
+            { slug: 'robinson-jeffers', name: 'Robinson Jeffers', note: 'Nature without human consolation.' }
+        ]
+    },
+
+    'john-wilmot-earl-of-rochester': {
+        body: [
+            'A Restoration courtier and libertine whose verse is obscene, brilliantly made and philosophically serious in about that order — the satires on reason, on the court and on himself are as sharp as anything in the language.',
+            'The pornographic poems are genuinely pornographic and were suppressed for centuries; they are also formally immaculate, which is part of the joke. Underneath the libertinism is a real nihilism about human motive. He died at thirty-three, reportedly after a deathbed conversion that his contemporaries argued about for decades.'
+        ],
+        readNext: [
+            { slug: 'john-dryden', name: 'John Dryden', note: 'The dominant poet he quarrelled with.' },
+            { slug: 'sir-john-suckling', name: 'Sir John Suckling', note: 'The Cavalier cynicism just before.' },
+            { slug: 'jonathan-swift', name: 'Jonathan Swift', note: 'Disgust made into satire, later.' }
+        ]
+    },
+
+    'jonathan-galassi': {
+        body: [
+            'A publisher first — for decades at the head of a major literary house — and a translator of Eugenio Montale and Giacomo Leopardi whose versions are the standard English editions.',
+            'His own poems are formally careful, urbane and increasingly direct about a life reconsidered in middle age, including coming out later than most. The publishing world is a subject in the novel he wrote, and lightly present in the poems. Read the Montale first; the translations are the larger contribution.'
+        ],
+        readNext: [
+            { slug: 'michael-hofmann', name: 'Michael Hofmann', note: 'The other poet-translator of that stature.' },
+            { slug: 'geoffrey-brock', name: 'Geoffrey Brock', note: 'Italian poetry in contemporary English.' },
+            { slug: 'james-laughlin', name: 'James Laughlin', note: 'The publisher-poet before him.' }
+        ]
+    },
+
+    'joshua-clover': {
+        body: [
+            'A Marxist critic and poet whose verse is dense, referential and openly political — riots, capital, pop songs and film theory in the same stanza, with the argument never far below the surface.',
+            'The early books are more lyrical and the later ones more polemical; his prose on riots and strikes is read well outside poetry. He is a deliberately combative figure. Whether the poems survive the politics is exactly the question the poems want you to be asking.'
+        ],
+        readNext: [
+            { slug: 'charles-bernstein', name: 'Charles Bernstein', note: 'Language writing as political argument.' },
+            { slug: 'juliana-spahr', name: 'Juliana Spahr', note: 'Politics and experimental form together.' },
+            { slug: 'michael-robbins', name: 'Michael Robbins', note: 'Pop culture at speed.' }
+        ]
+    },
+
+    'joyce-carol-oates': {
+        body: [
+            'Enormously prolific in every genre, and the poems are the least known part of it — sharp, unsettling, often violent, and closer to her short fiction than to any lyric tradition.',
+            'The subjects are the body, damage, American violence and family, handled with the same refusal to look away that the novels are known for. The verse is uneven, as a body of work produced at that volume will be, and the best of it has an unnerving flatness. Read as a companion to the fiction rather than instead of it.'
+        ],
+        readNext: [
+            { slug: 'ai', name: 'Ai', note: 'Violence given a voice and no comment.' },
+            { slug: 'laura-kasischke', name: 'Laura Kasischke', note: 'Domestic dread from a novelist-poet.' },
+            { slug: 'sylvia-plath', name: 'Sylvia Plath', note: 'The controlled fury she has written about.' }
+        ]
+    },
+
+    'joyelle-mcsweeney': {
+        body: [
+            'Her term for what she does is the necropastoral: a poetics of decay, contamination, plague and the grotesque, set against the idea that nature is clean and separate from culture.',
+            'The writing is fast, baroque and deliberately excessive, moving between poem, play, essay and fiction. A book written after the death of her infant daughter turns that aesthetic on grief without softening it. She co-founded a press that has published a great deal of translated experimental writing. Not for readers who want the poem to behave.'
+        ],
+        readNext: [
+            { slug: 'daniel-borzutzky', name: 'Daniel Borzutzky', note: 'The grotesque as political method.' },
+            { slug: 'will-alexander', name: 'Will Alexander', note: 'Language at maximum pressure.' },
+            { slug: 'lucie-brock-broido', name: 'Lucie Brock-Broido', note: 'Extravagance in the service of grief.' }
+        ]
+    },
+
+    'juan-ramn-jimnez': {
+        body: [
+            'A Spanish poet whose early work is musical and heavily ornamented and whose mature work strips all of it away in pursuit of what he called naked poetry — the thing itself, with nothing added.',
+            'He is best known outside Spain for a prose book about a writer and his donkey, read by generations of schoolchildren, which undersells him badly. He went into exile after the civil war and never returned. He received the Nobel Prize in Literature. Lorca\'s generation treated him as the essential precursor.'
+        ],
+        readNext: [
+            { slug: 'antonio-machado', name: 'Antonio Machado', note: 'His great Spanish contemporary.' },
+            { slug: 'federico-garca-lorca', name: 'Federico García Lorca', note: 'The generation that followed him.' },
+            { slug: 'cesare-pavese', name: 'Cesare Pavese', note: 'The plain European line of the same decades.' }
+        ]
+    },
+
+    'kenn-nesbitt': {
+        body: [
+            'A children\'s poet whose work is built for the classroom read-aloud — short, rhymed, reliably funny poems about school, pets, homework and the small anarchies children actually find funny.',
+            'The craft is in the metre, which never trips a young reader, and in the punchline, which is always in the last line. He served as national Children\'s Poet Laureate and has done a great deal of practical work on getting poems in front of children who have decided they dislike poetry.'
+        ],
+        readNext: [
+            { slug: 'jack-prelutsky', name: 'Jack Prelutsky', note: 'The master of this exact form.' },
+            { slug: 'bruce-lansky', name: 'Bruce Lansky', note: 'The anthologist of that shelf.' },
+            { slug: 'j-patrick-lewis', name: 'J. Patrick Lewis', note: 'Children\'s verse with a wider range.' }
+        ]
+    },
+
+    'kenneth-fearing': {
+        body: [
+            'Depression-era poems written in the voice of advertising, radio and the newspaper — slogans, headlines and sales patter cut together until the whole American commercial surface sounds like a death notice.',
+            'The most famous is an obituary for a man whose life is summarised entirely in the noises of the city and the language of the ticker. He also wrote hard-boiled novels, one of them filmed twice. The technique — appropriating commercial speech to indict it — was decades ahead of its reputation.'
+        ],
+        readNext: [
+            { slug: 'carl-sandburg', name: 'Carl Sandburg', note: 'The American city in the same decades.' },
+            { slug: 'charles-reznikoff', name: 'Charles Reznikoff', note: 'Found language as poetic method.' },
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Commercial language turned inside out.' }
+        ]
+    },
+
+    'landis-everson': {
+        body: [
+            'He was part of the Berkeley Renaissance around Spicer and Duncan in the 1940s, stopped writing entirely for roughly forty years, and resumed in his seventies after an editor tracked him down.',
+            'The late poems are light, clear and unhurried, with a formal ease that the long silence did not damage; they won a first-book award for a man in his eighties. Read them alongside the early Berkeley work for one of the odder shapes a poetic career has taken.'
+        ],
+        readNext: [
+            { slug: 'jack-spicer', name: 'Jack Spicer', note: 'His Berkeley contemporary.' },
+            { slug: 'robert-duncan', name: 'Robert Duncan', note: 'The third of that circle.' },
+            { slug: 'ruth-stone', name: 'Ruth Stone', note: 'Another recognition arriving very late.' }
+        ]
+    },
+
+    'les-murray': {
+        body: [
+            'The dominant Australian poet of his generation: rural, Catholic, combative, and committed to the idea that a farm in New South Wales is as legitimate a subject as anything in Europe.',
+            'The verse is dense, alliterative and full of invented compounds, and it can be as difficult as anything modernist while being written in defence of ordinary country people against what he called the metropolitan sneer. He wrote a whole book in the voices of animals and a verse novel in sonnets. The politics were often ugly and the ear was extraordinary.'
+        ],
+        readNext: [
+            { slug: 'kenneth-slessor', name: 'Kenneth Slessor', note: 'The Australian generation before.' },
+            { slug: 'seamus-heaney', name: 'Seamus Heaney', note: 'Rural material at the same level of craft.' },
+            { slug: 'gerard-manley-hopkins', name: 'Gerard Manley Hopkins', note: 'The compound-word music behind it.' }
+        ]
+    },
+
+    'lucie-brock-broido': {
+        body: [
+            'An extravagant stylist — the diction is archaic, ornate and deliberately excessive, and the poems refuse the plain contemporary manner at every opportunity.',
+            'She described her mode as a personal elegy conducted in borrowed dress, and the books circle death, a murdered child, a father, historical figures spoken through. The difficulty is real and is not obscurity for its own sake: the ornament is armour around material she is not going to state plainly. She taught for decades and her students are visible throughout contemporary American poetry.'
+        ],
+        readNext: [
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Grief handled through style.' },
+            { slug: 'karen-volkman', name: 'Karen Volkman', note: 'The abstract ornate lyric.' },
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'The figure she wrote a whole book towards.' }
+        ]
+    },
+
+    'major-jackson': {
+        body: [
+            'Formally assured poems that move between Philadelphia childhood, art, travel, race and love, in a line that keeps a strong musical pulse without settling into fixed metre.',
+            'One long poem is a book-length letter in tercets, a running commentary on American life, celebrity and poetry itself. He works comfortably in received forms and in loose ones, and the range of reference — hip-hop, painting, philosophy — is worn without strain. An unusually sociable body of work: it addresses people.'
+        ],
+        readNext: [
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'His contemporary in formal invention.' },
+            { slug: 'yusef-komunyakaa', name: 'Yusef Komunyakaa', note: 'The musical ear and the elder.' },
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'The city rendered formally.' }
+        ]
+    },
+
+    'matthew-zapruder': {
+        body: [
+            'Plain, wandering poems that think aloud — they start with something ordinary, admit they do not know where they are going, and arrive somewhere unexpectedly moving without any change of tone.',
+            'The influence of Polish poetry and of the New York School is audible. His book arguing about why poetry is difficult, and why it mostly is not, is a good companion. The risk in the mode is preciousness and the best poems avoid it by being genuinely funny about their own uncertainty.'
+        ],
+        readNext: [
+            { slug: 'bob-hicok', name: 'Bob Hicok', note: 'Digression handled at greater speed.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'The deadpan turn.' },
+            { slug: 'adam-zagajewski', name: 'Adam Zagajewski', note: 'The Polish plainness he learned from.' }
+        ]
+    },
+
+    'maureen-n-mclane': {
+        body: [
+            'A poet and a scholar of Romanticism, and the two practices are visibly connected: the poems keep asking what a lyric is for, and answer by writing one anyway.',
+            'The verse is spare, quick and often in very short lines, mixing high literary reference with hiking, weather, sex and the internet. Her prose memoir told through the poems she has read is an unusual and successful hybrid. Read for the intelligence of the movement rather than for a subject.'
+        ],
+        readNext: [
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Scholarship and lyric in one practice.' },
+            { slug: 'stephanie-burt', name: 'Stephanie Burt', note: 'The critic-poet of the same generation.' },
+            { slug: 'lorine-niedecker', name: 'Lorine Niedecker', note: 'The very short line handled seriously.' }
+        ]
+    },
+
+    'meena-alexander': {
+        body: [
+            'Born in India, raised partly in Sudan, educated in England and settled in New York, she wrote about that dispersal without ever resolving it into a single story of arrival.',
+            'The poems are lyrical, fragmentary and full of place names, and they are preoccupied with violence — communal, colonial, domestic — and with the difficulty of writing a self in a language acquired under empire. Her prose memoir is the clearest guide. The late poems are the most direct.'
+        ],
+        readNext: [
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'The South Asian American lyric.' },
+            { slug: 'nathalie-handal', name: 'Nathalie Handal', note: 'Displacement across several languages.' },
+            { slug: 'marilyn-chin', name: 'Marilyn Chin', note: 'Inheritance and English.' }
+        ]
+    },
+
+    'monica-youn': {
+        body: [
+            'A former lawyer whose poems are structured like arguments — precise, controlled, working through a conceit or a legal term with a rigour that eventually turns it strange.',
+            'One book takes a legal placeholder term for an anonymous piece of land and uses it to think about property, inheritance and infertility. Another works through a set of variations on a single figure. The subjects include race, Korean American identity and the machinery of law. Cool on the surface and precisely engineered underneath.'
+        ],
+        readNext: [
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'Official vocabulary turned against itself.' },
+            { slug: 'srikanth-reddy', name: 'Srikanth Reddy', note: 'Procedure applied to political language.' },
+            { slug: 'cathy-park-hong', name: 'Cathy Park Hong', note: 'The same generation and questions.' }
+        ]
+    },
+
+    'natalie-shapero': {
+        body: [
+            'Wry, fast, morbid poems with a comic timing that keeps landing on mortality — the tone is somewhere between a stand-up set and a suicide note, and the poems know it.',
+            'She is also a lawyer, and there is a lawyer\'s precision in how a poem sets up its terms before knocking them over. Motherhood, illness, the body and American violence recur. The jokes are the point of entry and the second reading is the one that hurts.'
+        ],
+        readNext: [
+            { slug: 'monica-youn', name: 'Monica Youn', note: 'The other lawyer-poet here.' },
+            { slug: 'mary-ruefle', name: 'Mary Ruefle', note: 'The comic turn into the abyss.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Compression with a dry edge.' }
+        ]
+    },
+
+    'osip-mandelstam': {
+        body: [
+            'One of the great Russian poets of the century, and the one whose death is inseparable from his work: he wrote a sixteen-line epigram about Stalin, read it aloud to a few people, and died in a transit camp on the way to the Gulag.',
+            'The poems are dense, allusive and musically exact, moving between classical antiquity, Petersburg and the Voronezh exile where the late notebooks were written. His widow memorised the unpublished poems to keep them alive and later wrote two of the great memoirs of the period. Read her books alongside the poems.'
+        ],
+        readNext: [
+            { slug: 'marina-tsvetaeva', name: 'Marina Tsvetaeva', note: 'The same generation and catastrophe.' },
+            { slug: 'anna-akhmatova', name: 'Anna Akhmatova', note: 'His friend, and the other great survivor.' },
+            { slug: 'paul-celan', name: 'Paul Celan', note: 'Who translated him and claimed him as a brother.' }
+        ]
+    },
+
+    'philip-appleman': {
+        body: [
+            'A scholar of Darwin who edited the standard teaching edition, and a poet whose verse is humanist, sceptical and frequently very funny about religion.',
+            'The poems argue: against creationism, against consolation, for a moral life without a deity, in a plain conversational line that never lectures for long before making a joke. He also wrote love poems of considerable tenderness. A poet with an argument, which was unfashionable, and he made it well.'
+        ],
+        readNext: [
+            { slug: 'howard-nemerov', name: 'Howard Nemerov', note: 'Wit as a philosophical instrument.' },
+            { slug: 'philip-larkin', name: 'Philip Larkin', note: 'Unbelief handled with more dread.' },
+            { slug: 'jennifer-michael-hecht', name: 'Jennifer Michael Hecht', note: 'The poet-historian of doubt.' }
+        ]
+    },
+
+    'prageeta-sharma': {
+        body: [
+            'Elliptical, syntactically restless poems about race, institutional life, marriage and grief, written in a register that keeps refusing to settle into either lyric warmth or experimental coldness.',
+            'The book written after her husband\'s death is the most direct, and it handles both the loss and the racism she encountered in the academic town they lived in without separating the two. She has taught and directed programmes for years. Read a full book; the tone accumulates.'
+        ],
+        readNext: [
+            { slug: 'bhanu-kapil', name: 'Bhanu Kapil', note: 'The South Asian experimental line.' },
+            { slug: 'meena-alexander', name: 'Meena Alexander', note: 'Displacement and the lyric.' },
+            { slug: 'brenda-shaughnessy', name: 'Brenda Shaughnessy', note: 'Grief and syntax under pressure.' }
+        ]
+    },
+
+    'queen-elizabeth-i': {
+        body: [
+            'She wrote verse, and it is worth reading for reasons that are not only historical. The poems are short, formally competent and unusually revealing for somebody whose entire public method was concealment.',
+            'One responds to a rejected suitor; another, written on a window with a diamond, answers a courtier\'s complaint in two lines. The most striking is about being ruled by an inner passion she will not name. She also translated Boethius and Horace. A monarch who understood exactly how much a poem could be made to say and no more.'
+        ],
+        readNext: [
+            { slug: 'sir-walter-ralegh', name: 'Sir Walter Ralegh', note: 'The courtier who wrote to and about her.' },
+            { slug: 'mary-sidney-herbert-countess-of-pembroke', name: 'Mary Sidney Herbert', note: 'The other great woman writer of that court.' },
+            { slug: 'sir-philip-sidney', name: 'Sir Philip Sidney', note: 'The Elizabethan courtier poet as ideal.' }
+        ]
+    },
+
+    'randall-jarrell': {
+        body: [
+            'The most feared and most generous critic of his generation — he could destroy a book in a sentence and was also the reader who established Frost, Bishop and Whitman for a whole cohort.',
+            'The poems are quieter than the criticism\'s reputation suggests: monologues spoken by women in supermarkets and libraries, children, soldiers. The five-line poem about a ball turret gunner is the most anthologised American war poem and is over before you have braced for it. He also wrote a comic academic novel and translated Rilke.'
+        ],
+        readNext: [
+            { slug: 'elizabeth-bishop', name: 'Elizabeth Bishop', note: 'The poet he championed earliest.' },
+            { slug: 'robert-lowell', name: 'Robert Lowell', note: 'His friend and contemporary.' },
+            { slug: 'karl-shapiro', name: 'Karl Shapiro', note: 'The other poet of that war.' }
+        ]
+    },
+
+    'richard-blanco': {
+        body: [
+            'He read at a presidential inauguration — the first Latino, immigrant and openly gay poet to do so — and the occasional poems written for public moments are a real part of the work rather than an interruption to it.',
+            'The rest is about a Cuban American childhood in Miami, a family that never stopped talking about an island he had never seen, and the difficulty of being gay inside it. He trained as a civil engineer. The poems are narrative, warm and accessible, and the best of them are about not fitting the story you were handed.'
+        ],
+        readNext: [
+            { slug: 'elizabeth-alexander', name: 'Elizabeth Alexander', note: 'The inaugural poem and its problems.' },
+            { slug: 'margarita-engle', name: 'Margarita Engle', note: 'Cuban American history in verse.' },
+            { slug: 'rigoberto-gonzlez', name: 'Rigoberto González', note: 'Queer Latino poetry alongside him.' }
+        ]
+    },
+
+    'spencer-reece': {
+        body: [
+            'He worked in retail for years, published late, and later became an Episcopal priest — and the poems have that shape: patient, observant, unhurried, written by somebody used to watching people at a counter.',
+            'The long autobiographical poem about a department store clerk is the best-known. Later work comes out of his time at an orphanage in Honduras and from parish life. The register is quiet and the subject is usually loneliness. He is unembarrassed by faith and never uses it to close a poem early.'
+        ],
+        readNext: [
+            { slug: 'george-herbert', name: 'George Herbert', note: 'The priest-poet tradition.' },
+            { slug: 'james-schuyler', name: 'James Schuyler', note: 'Patient observation as method.' },
+            { slug: 'mark-doty', name: 'Mark Doty', note: 'The gay lyric of the same generation.' }
+        ]
+    },
+
+    'srikanth-reddy': {
+        body: [
+            'One of his books is an erasure: he took the memoirs of a former UN Secretary-General later revealed to have concealed his wartime service in a Nazi unit, and carved a confessional monologue out of the man\'s own evasive prose.',
+            'That is the method in general — procedure applied to political language until it says what it was constructed to avoid saying. Other books are quieter and more meditative, working in prose blocks and long philosophical sequences. He is a scholar as well, and the poems assume a reader willing to think slowly.'
+        ],
+        readNext: [
+            { slug: 'ronald-johnson', name: 'Ronald Johnson', note: 'Erasure at its most audacious.' },
+            { slug: 'monica-youn', name: 'Monica Youn', note: 'Legal and official language as material.' },
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'The state\'s vocabulary turned around.' }
+        ]
+    },
+
+    'stephen-dobyns': {
+        body: [
+            'A poet and crime novelist whose verse is narrative, fast and frequently comic, built on a device he uses constantly: a hypothetical situation proposed and then followed to an absurd or terrible conclusion.',
+            'The recurring figure across one long sequence is a bewildered everyman used to think about death, sex and stupidity. He writes plainly, at length, and with a novelist\'s appetite for incident. His book of essays on poetry is unusually practical about how a poem actually gets made.'
+        ],
+        readNext: [
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The absurd premise followed to the end.' },
+            { slug: 'thomas-lux', name: 'Thomas Lux', note: 'Comedy with a hard floor.' },
+            { slug: 'charles-simic', name: 'Charles Simic', note: 'The plain sentence carrying the impossible.' }
+        ]
+    },
+
+    'sydney-lea': {
+        body: [
+            'A New England poet of hunting, fishing, dogs and rural neighbours, writing long narrative poems in a conversational voice that takes its time and trusts the story.',
+            'The mode is traditional and the sympathies are with people the literary world does not usually notice — guides, farmers, drinkers, the recently dead. He founded and edited a well-regarded literary review, and served as poet laureate of Vermont. Read a long poem whole; the shape depends on the accumulation.'
+        ],
+        readNext: [
+            { slug: 'wesley-mcnair', name: 'Wesley McNair', note: 'Rural New England in the same register.' },
+            { slug: 'donald-hall', name: 'Donald Hall', note: 'The New Hampshire farm from inside.' },
+            { slug: 'robert-frost', name: 'Robert Frost', note: 'The New England narrative poem.' }
+        ]
+    },
+
+    'thomas-gray': {
+        body: [
+            'He published very little and one poem of his is among the most quoted in English — an evening in a country churchyard, thinking about the people buried there who never got the chance to become anybody.',
+            'That elegy is a technical marvel: quatrains of perfect balance, a vocabulary of extraordinary restraint, and an argument about obscurity that ends by imagining the poet\'s own epitaph. The rest of the work is odder and more learned — Pindaric odes, Norse and Welsh imitations — and much less read. A scholar who wrote one indispensable poem.'
+        ],
+        readNext: [
+            { slug: 'william-cowper', name: 'William Cowper', note: 'The quiet English interior after him.' },
+            { slug: 'samuel-johnson', name: 'Samuel Johnson', note: 'The moral verse of the same decades.' },
+            { slug: 'william-wordsworth', name: 'William Wordsworth', note: 'Who argued with Gray\'s diction and inherited his subject.' }
+        ]
+    },
+
+    'thomas-love-peacock': {
+        body: [
+            'A novelist and satirist whose verse is mostly embedded in his fiction — drinking songs, ballads and parodies sung by characters, several of which are better than the poems his contemporaries wrote in earnest.',
+            'He wrote a provocative essay arguing that poetry was a primitive survival with no place in an age of science, which prompted Shelley\'s famous defence. The joke is that Peacock was a good poet making a bad-faith case. Read the songs; they are funny, metrically deft and completely unpretentious.'
+        ],
+        readNext: [
+            { slug: 'percy-bysshe-shelley', name: 'Percy Bysshe Shelley', note: 'His friend, and the reply to his essay.' },
+            { slug: 'leigh-hunt', name: 'Leigh Hunt', note: 'The same literary circle.' },
+            { slug: 'george-meredith', name: 'George Meredith', note: 'His son-in-law, and another novelist-poet.' }
+        ]
+    },
+
+    'thomas-sayers-ellis': {
+        body: [
+            'The poems are typographically restless — words split, doubled, set as signs and shapes — and they draw structurally on go-go music, funk and the visual culture of Washington, D.C., where he grew up.',
+            'He co-founded the Dark Room Collective, which brought together a generation of Black poets, and he is also a photographer. The wordplay is dense and political, working on names, slogans and the vocabulary of race in America until the words come apart. Read aloud and look at the page; both are required.'
+        ],
+        readNext: [
+            { slug: 'douglas-kearney', name: 'Douglas Kearney', note: 'The page as performance score.' },
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Wordplay as structural politics.' },
+            { slug: 'amiri-baraka', name: 'Amiri Baraka', note: 'Music and Black poetics.' }
+        ]
+    },
+
+    'valzhyna-mort': {
+        body: [
+            'A Belarusian poet writing in Belarusian and in English, whose work is loud, physical and full of a country most of her readers cannot place — one that has spent a century being fought over and renamed.',
+            'The poems are dense with folk material, family history and violence, and they move between languages in a way that keeps the English slightly foreign. A recent book is built around Belarusian mass graves and the women who remembered them. The music is the point: read aloud, this is some of the most sonically driven poetry being written.'
+        ],
+        readNext: [
+            { slug: 'marina-tsvetaeva', name: 'Marina Tsvetaeva', note: 'The rhythmic violence she works from.' },
+            { slug: 'ilya-kaminsky', name: 'Ilya Kaminsky', note: 'The same region, written as parable.' },
+            { slug: 'anna-swir', name: 'Anna Swir', note: 'War and the body, flatly.' }
+        ]
+    },
+
+    'vera-pavlova': {
+        body: [
+            'A Russian poet, trained as a musicologist, who writes very short poems — often four to eight lines — about sex, marriage, motherhood and death with an epigrammatic bluntness.',
+            'The brevity is the technique: each poem states one thing exactly and refuses to develop it, so a book reads as hundreds of small hard observations rather than as a sequence. The erotic poems are frank without being performative. In English she is read through translations made by her husband, which is worth knowing.'
+        ],
+        readNext: [
+            { slug: 'anna-swir', name: 'Anna Swir', note: 'The body written just as bluntly.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Compression as a whole method.' },
+            { slug: 'samuel-menashe', name: 'Samuel Menashe', note: 'The very short poem taken seriously.' }
+        ]
+    },
+
+    'walter-de-la-mare': {
+        body: [
+            'An English poet of the uncanny — empty houses, listeners who do not answer, travellers knocking at doors nobody opens — working in traditional metres that make the strangeness worse rather than safer.',
+            'He wrote a great deal for children and is one of the few who did it without condescension; the children\'s poems are as unsettling as the adult ones. The famous poem about a traveller receiving no reply is a masterclass in withholding. Formally conservative, imaginatively very strange indeed.'
+        ],
+        readNext: [
+            { slug: 'edward-thomas', name: 'Edward Thomas', note: 'English quiet with the same undertow.' },
+            { slug: 'thomas-hardy', name: 'Thomas Hardy', note: 'Ghosts handled in plain metre.' },
+            { slug: 'robert-louis-stevenson', name: 'Robert Louis Stevenson', note: 'Poems for children without condescension.' }
+        ]
+    },
+
+    'zbigniew-herbert': {
+        body: [
+            'A Polish poet, read in translation, whose recurring figure is a man called Mr Cogito — an ordinary person thinking about history, cowardice, the classics and how to behave when behaving well costs everything.',
+            'The poems are ironic, plain and morally exact, drawing constantly on Greek and Roman material to say things about totalitarian Poland that could not be said directly. The most famous ends with an instruction to go where the others went, without hope of reward. Among the essential European poets of the century.'
+        ],
+        readNext: [
+            { slug: 'czeslaw-milosz', name: 'Czeslaw Milosz', note: 'His translator and countryman.' },
+            { slug: 'miroslav-holub', name: 'Miroslav Holub', note: 'The same dry deadpan under a regime.' },
+            { slug: 'marin-sorescu', name: 'Marin Sorescu', note: 'The parable as political method.' }
+        ]
+    },
+
+    'alan-seeger': {
+        body: [
+            'An American who joined the French Foreign Legion in 1914 and was killed on the Somme, leaving one poem that has never left the anthologies — a formal, rhymed declaration of an appointment with death that the poet fully intends to keep.',
+            'It is a poem of consent rather than protest, written before the war\'s reputation curdled, and it is beautifully made. The rest of the work is late-Romantic and much less distinctive. Read him next to Owen for the difference between a war entered voluntarily and one endured.'
+        ],
+        readNext: [
+            { slug: 'rupert-brooke', name: 'Rupert Brooke', note: 'The same early idealism.' },
+            { slug: 'wilfred-owen', name: 'Wilfred Owen', note: 'The correction.' },
+            { slug: 'charles-hamilton-sorley', name: 'Charles Hamilton Sorley', note: 'Who saw through it first.' }
+        ]
+    },
+
+    'alfred-noyes': {
+        body: [
+            'He wrote one of the most recitable narrative poems in English — a galloping ballad about a highwayman, a landlord\'s daughter and a redcoat ambush — and it has been memorised by schoolchildren for a century.',
+            'The metre is relentless and the story is pure melodrama executed at a very high level. He wrote a great deal else, mostly conservative in form and temperament, and was a vocal opponent of modernism. Read the ballads aloud; that is what they are for and they do not pretend otherwise.'
+        ],
+        readNext: [
+            { slug: 'g-k-chesterton', name: 'G. K. Chesterton', note: 'The same galloping narrative verse.' },
+            { slug: 'rudyard-kipling', name: 'Rudyard Kipling', note: 'The recitable ballad at its best.' },
+            { slug: 'robert-w-service', name: 'Robert W. Service', note: 'Narrative verse built for performance.' }
+        ]
+    },
+
+    'amit-majmudar': {
+        body: [
+            'A diagnostic radiologist who writes formally intricate poems — rhyme, invented stanzas, sustained conceits — about Hindu inheritance, American life, medicine and politics, at a rate that suggests the two careers do not conflict.',
+            'He has translated the Bhagavad Gita into verse and written novels and essays. The formal appetite is the distinguishing feature: he will attempt a shape most contemporaries would consider unusable and make it carry contemporary material. Read the poems on the body and on scripture together.'
+        ],
+        readNext: [
+            { slug: 'a-e-stallings', name: 'A. E. Stallings', note: 'Contemporary rhyme with classical ballast.' },
+            { slug: 'rafael-campo', name: 'Rafael Campo', note: 'The physician writing in metre.' },
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'South Asian inheritance in strict form.' }
+        ]
+    },
+
+    'angela-jackson': {
+        body: [
+            'A Chicago poet formed by the Black Arts workshop scene of the city, writing in a voice that carries Southern speech, blues and the storytelling of a family that came north.',
+            'The poems are musical and frequently spoken by characters — women in particular — and the mode is closer to oral performance than to the page. She has also written plays and novels, and served as poet laureate of Illinois. Read for the voice, which is doing most of the structural work.'
+        ],
+        readNext: [
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'The Chicago elder, and her subject in a later book.' },
+            { slug: 'sonia-sanchez', name: 'Sonia Sanchez', note: 'The Black Arts voice at its most musical.' },
+            { slug: 'margaret-walker', name: 'Margaret Walker', note: 'Southern inheritance in formal verse.' }
+        ]
+    },
+
+    'august-kleinzahler': {
+        body: [
+            'Sharp, urbane, jazz-inflected poems about cities — San Francisco, New Jersey, wherever he happens to be — with an ear for overheard speech and a dislike of anything that sounds like a poetry reading.',
+            'The tone is dry and slightly hostile in a way that turns out to be affectionate. He is a fine prose writer and a famously combative critic. The poems move fast between registers, from a bus stop to a Mahler symphony, and refuse to explain the transition. Read for the sound and the wit.'
+        ],
+        readNext: [
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'The San Francisco poem, more formal.' },
+            { slug: 'william-matthews', name: 'William Matthews', note: 'Jazz and urbanity in one voice.' },
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'The mentor figure he has written about.' }
+        ]
+    },
+
+    'babette-deutsch': {
+        body: [
+            'A poet, critic and translator whose handbook of poetic terms and whose survey of modern poetry taught several generations, and whose translations from Russian and German introduced English readers to Pushkin, Blok and Rilke.',
+            'Her own verse is formally traditional, intelligent and of its period. The lasting contribution is the criticism and the translation, and the poems are best read as the work of somebody who thought hard about how poems are made and could demonstrate it.'
+        ],
+        readNext: [
+            { slug: 'louis-untermeyer', name: 'Louis Untermeyer', note: 'The other great populariser of that era.' },
+            { slug: 'marina-tsvetaeva', name: 'Marina Tsvetaeva', note: 'The Russian tradition she translated from.' },
+            { slug: 'louise-bogan', name: 'Louise Bogan', note: 'The critic-poet of the same generation.' }
+        ]
+    },
+
+    'barbara-jane-reyes': {
+        body: [
+            'A Filipina American poet whose books mix English, Tagalog and Spanish, and use prayer, litany and colonial documents as structures — the poem as a form of talking back to an archive.',
+            'The subjects are diaspora, gendered violence, Catholicism and the specific position of Filipina women in American life. The forms are experimental and the anger is direct. She has written about the invisibility of Filipino American writing, and the poems are part of that argument.'
+        ],
+        readNext: [
+            { slug: 'rick-barot', name: 'Rick Barot', note: 'The same inheritance, quieter.' },
+            { slug: 'craig-santos-perez', name: 'Craig Santos Perez', note: 'The Pacific and the colonial document.' },
+            { slug: 'sarah-gambito', name: 'Sarah Gambito', note: 'Filipina American poetry alongside her.' }
+        ]
+    },
+
+    'ben-lerner': {
+        body: [
+            'Known now mainly as a novelist, and he began as a poet — three books whose central subject is the failure of poems to do what they claim, written in a voice that is fluent, ironic and unable to stop qualifying itself.',
+            'One is a sequence of prose sonnets built out of misremembered phrases; another works through Topeka and the language of the culture wars. His essay on why people hate poetry is the clearest statement of the project: the poem always falls short of the idea of the poem, and that gap is the subject.'
+        ],
+        readNext: [
+            { slug: 'john-ashbery', name: 'John Ashbery', note: 'The elder he has written about at length.' },
+            { slug: 'claudia-rankine', name: 'Claudia Rankine', note: 'The essayistic contemporary poem.' },
+            { slug: 'joshua-clover', name: 'Joshua Clover', note: 'Theory and poem in one practice.' }
+        ]
+    },
+
+    'bill-knott': {
+        body: [
+            'He published his first book under a pseudonym and announced that the author was dead by suicide, which is a fair introduction to a career spent antagonising the literary world that kept trying to admit him.',
+            'The poems are short, surreal, tender and grotesque, often in a single line — he was a master of the one-image poem that lands like a slap. Later he gave books away free online rather than deal with publishers. Wildly uneven by design; the best twenty poems are as good as anything in his generation.'
+        ],
+        readNext: [
+            { slug: 'james-tate', name: 'James Tate', note: 'The same generation of American surrealists.' },
+            { slug: 'thomas-lux', name: 'Thomas Lux', note: 'Comedy over a hard floor.' },
+            { slug: 'charles-simic', name: 'Charles Simic', note: 'The plain sentence made impossible.' }
+        ]
+    },
+
+    'c-p-cavafy': {
+        body: [
+            'A Greek poet of Alexandria who published almost nothing conventionally, printing poems as pamphlets and handing them to friends, and who is now among the most widely read modern European poets.',
+            'The poems are short, dry and unmetaphorical, and they do two things: they recreate obscure moments from Hellenistic and Byzantine history as if reporting them, and they record homosexual desire in a city where it had to be discreet, with a frankness that was decades early. The famous ones — the journey to Ithaka, the city that follows you, the barbarians who fail to arrive — are read as parables and were written as history.'
+        ],
+        readNext: [
+            { slug: 'george-seferis', name: 'George Seferis', note: 'The Greek poet who followed him.' },
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'Desire recorded at a level gaze.' },
+            { slug: 'yehuda-amichai', name: 'Yehuda Amichai', note: 'History carried in plain language.' }
+        ]
+    },
+
+    'carl-dennis': {
+        body: [
+            'Reflective, conversational poems that behave like the better half of an argument — a proposition is offered, the objection is granted, and the poem ends somewhere more honest than where it began.',
+            'The subjects are ordinary and moral: friendship, obligation, what one owes to a neighbour or a stranger or an earlier version of oneself. There is very little imagery and no display. It is a difficult mode to sustain and he has sustained it for decades, which is why the best poems feel like the work of a person rather than a style.'
+        ],
+        readNext: [
+            { slug: 'stephen-dunn', name: 'Stephen Dunn', note: 'The same reflective American register.' },
+            { slug: 'william-matthews', name: 'William Matthews', note: 'The talking poem, faster.' },
+            { slug: 'philip-appleman', name: 'Philip Appleman', note: 'The argued poem without a deity.' }
+        ]
+    },
+
+    'carmen-gimnez-smith': {
+        body: [
+            'Fast, restless poems that mix motherhood, Latina identity, class and rage in a syntax that keeps interrupting itself, and are openly suspicious of the well-made lyric.',
+            'One book is a hybrid memoir about her mother\'s illness and immigration; another is an extended argument with the American literary establishment about who gets to be a difficult poet. She has been an editor and publisher of experimental writing, and that curatorial work is part of the same project.'
+        ],
+        readNext: [
+            { slug: 'prageeta-sharma', name: 'Prageeta Sharma', note: 'Institutional life and race handled elliptically.' },
+            { slug: 'cathy-park-hong', name: 'Cathy Park Hong', note: 'The same argument, in essays and poems.' },
+            { slug: 'brenda-shaughnessy', name: 'Brenda Shaughnessy', note: 'Motherhood and syntax under pressure.' }
+        ]
+    },
+
+    'cathy-park-hong': {
+        body: [
+            'Her poems use invented and hybrid languages — a book written in a fictional creole spoken in a border town, another in the voices of tourists and guides in an imaginary desert city — to think about empire, tourism and English itself.',
+            'The verse is dense, comic and deliberately grating. She is now more widely known for a book of essays on Asian American consciousness, and the essays clarify what the poems were doing: refusing the well-behaved immigrant lyric in favour of something abrasive and strange.'
+        ],
+        readNext: [
+            { slug: 'marilyn-chin', name: 'Marilyn Chin', note: 'The combative Asian American lyric.' },
+            { slug: 'monica-youn', name: 'Monica Youn', note: 'Precision engineering on the same questions.' },
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Invented language as method.' }
+        ]
+    },
+
+    'charles-lamb': {
+        body: [
+            'An essayist first, and the verse is slighter — but the poem about old familiar faces, a plain list of the dead and departed with a repeated refrain, is one of the most affecting short poems of the period.',
+            'His life was marked by a family catastrophe he never discussed publicly in verse and never escaped, and the poems that touch it do so obliquely. He wrote with his sister a retelling of Shakespeare for children that has never gone out of print. Read the essays first; the poems make more sense after them.'
+        ],
+        readNext: [
+            { slug: 'samuel-taylor-coleridge', name: 'Samuel Taylor Coleridge', note: 'His schoolfriend and lifelong correspondent.' },
+            { slug: 'leigh-hunt', name: 'Leigh Hunt', note: 'The same literary circle.' },
+            { slug: 'william-cowper', name: 'William Cowper', note: 'The quiet English interior before them.' }
+        ]
+    },
+
+    'charlotte-smith': {
+        body: [
+            'She revived the English sonnet almost single-handedly at the end of the eighteenth century, publishing a book of elegiac sonnets that went through edition after edition and that Wordsworth and Coleridge both read closely.',
+            'The poems are melancholy, seaside, and unashamedly personal — she wrote to support her children after a disastrous marriage, and the debt and the misery are in the verse. Her long blank-verse poems on emigration and on the beach are radical about the French Revolution and about her own poverty. A major precursor whose reputation vanished for a century.'
+        ],
+        readNext: [
+            { slug: 'william-wordsworth', name: 'William Wordsworth', note: 'Who read her carefully and said so.' },
+            { slug: 'anna-ltitia-barbauld', name: 'Anna Lætitia Barbauld', note: 'Her contemporary in radical English verse.' },
+            { slug: 'john-clare', name: 'John Clare', note: 'The next generation of exact natural detail.' }
+        ]
+    },
+
+    'chen-chen': {
+        body: [
+            'Warm, funny, digressive poems about being a gay Chinese American son, a boyfriend, a person on the internet, written in a voice that sounds like talking and is timed like stand-up.',
+            'The humour carries real material: a mother who cannot accept him, immigration, the exhaustion of explaining oneself. The titles are long and jokey and the endings are frequently tender in a way the setup does not prepare you for. One of the most widely read younger American poets, and the accessibility is a choice rather than a limit.'
+        ],
+        readNext: [
+            { slug: 'ocean-vuong', name: 'Ocean Vuong', note: 'The same inheritance in a lusher register.' },
+            { slug: 'ross-gay', name: 'Ross Gay', note: 'Delight as a serious discipline.' },
+            { slug: 'hieu-minh-nguyen', name: 'Hieu Minh Nguyen', note: 'Queer Asian American poetry alongside him.' }
+        ]
+    },
+
+    'christopher-middleton': {
+        body: [
+            'A British poet and one of the major translators from German of his century — Robert Walser, Nietzsche, Trakl, Christa Wolf — who spent most of his working life teaching in Texas.',
+            'His own poems are experimental, learned and deliberately outside the English mainstream: surrealist procedures, prose poems, and a diction that borrows freely from other languages. He is a poet\'s poet in the exact sense — little read generally, and consistently important to other writers. Start with the prose poems.'
+        ],
+        readNext: [
+            { slug: 'michael-hofmann', name: 'Michael Hofmann', note: 'The next great translator from German.' },
+            { slug: 'tom-raworth', name: 'Tom Raworth', note: 'British experimental poetry of the same decades.' },
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The prose poem as its own genre.' }
+        ]
+    },
+
+    'ciaran-carson': {
+        body: [
+            'A Belfast poet who wrote in a very long line — much longer than the page comfortably holds — that he took from traditional Irish storytelling and from the rhythm of a session tune.',
+            'The subject is Belfast during the Troubles: streets, checkpoints, demolished pubs, and the way a city\'s map becomes a record of violence. He was a traditional musician and wrote about Irish music, and he translated Dante and the Táin. The digressive, unstoppable sentence is the form his material required.'
+        ],
+        readNext: [
+            { slug: 'paul-muldoon', name: 'Paul Muldoon', note: 'The same Northern generation, more oblique.' },
+            { slug: 'seamus-heaney', name: 'Seamus Heaney', note: 'The elder writing the same conflict.' },
+            { slug: 'derek-mahon', name: 'Derek Mahon', note: 'The formal Belfast alternative.' }
+        ]
+    },
+
+    'claudia-rankine': {
+        body: [
+            'Her best-known book is prose, lyric, essay and image at once — a sequence of short accounts of everyday racism, told in the second person, so that the reader occupies the position being described.',
+            'That formal decision is the whole argument: the accumulation of small incidents, each individually deniable, is the thing that cannot be shown any other way. She works with visual artists and in theatre, and her later book on whiteness continues the method. Whether it is poetry is a question the books deliberately leave open.'
+        ],
+        readNext: [
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'Documentary poetics of state language.' },
+            { slug: 'elizabeth-alexander', name: 'Elizabeth Alexander', note: 'The essayist-poet on the same ground.' },
+            { slug: 'susan-howe', name: 'Susan Howe', note: 'The archive broken open.' }
+        ]
+    },
+
+    'david-mason': {
+        body: [
+            'A formalist who works in narrative at length — including verse novels about Greek refugees and about the Colorado mining country — at a moment when almost nobody was attempting either.',
+            'The metre is handled unobtrusively and the interest is in the story and the people in it. He has written memoir and libretti and served as poet laureate of Colorado. The argument, made in his essays too, is that poetry gave up narrative to fiction unnecessarily and can take some of it back.'
+        ],
+        readNext: [
+            { slug: 'mark-jarman', name: 'Mark Jarman', note: 'The same argument for narrative and form.' },
+            { slug: 'dana-gioia', name: 'Dana Gioia', note: 'The formal revival\'s clearest advocate.' },
+            { slug: 'robinson-jeffers', name: 'Robinson Jeffers', note: 'The American long narrative poem.' }
+        ]
+    },
+
+    'david-wagoner': {
+        body: [
+            'A Pacific Northwest poet of forests, rivers, animals and getting lost in them — the best-known poem instructs a lost walker to stand still and let the forest find them, and that patience is the whole method.',
+            'He edited Theodore Roethke\'s notebooks and taught for decades in Seattle, and the influence of Roethke\'s greenhouse poems is audible. He wrote novels as well, and drew on Native American stories in ways that have since been reconsidered. Prolific, plainspoken and consistently attentive.'
+        ],
+        readNext: [
+            { slug: 'theodore-roethke', name: 'Theodore Roethke', note: 'His teacher, and the poems he edited.' },
+            { slug: 'william-e-stafford', name: 'William E. Stafford', note: 'The other great Northwest plain style.' },
+            { slug: 'john-haines', name: 'John Haines', note: 'Wilderness without consolation.' }
+        ]
+    },
+
+    'deborah-landau': {
+        body: [
+            'Anxious, sensual, mortality-haunted poems written in short sequences — a woman in a city, drinking wine, watching the news, aware of her own body ageing and of catastrophe arriving somewhere just offstage.',
+            'The tone is comic and dread-filled at once, and the poems accumulate rather than argue. One book circles a serious illness; another sets domestic pleasure against the ambient violence of the American present. She directs a major writing programme. Read a sequence whole.'
+        ],
+        readNext: [
+            { slug: 'natalie-shapero', name: 'Natalie Shapero', note: 'The comic-morbid contemporary poem.' },
+            { slug: 'brenda-shaughnessy', name: 'Brenda Shaughnessy', note: 'Appetite and dread together.' },
+            { slug: 'deborah-digges', name: 'Deborah Digges', note: 'The lyric of the anxious interior.' }
+        ]
+    },
+
+    'dick-allen': {
+        body: [
+            'An advocate of what he called expansive poetry — a return to narrative and metre against the dominance of the short free-verse lyric — and a poet whose own work is accessible, discursive and often set in suburban Connecticut.',
+            'The later books are increasingly Zen in their concerns, with short poems about attention and impermanence. He served as poet laureate of Connecticut. A poet who argued for a position and then quietly demonstrated it rather than continuing to argue.'
+        ],
+        readNext: [
+            { slug: 'dana-gioia', name: 'Dana Gioia', note: 'The parallel formal argument.' },
+            { slug: 'jane-hirshfield', name: 'Jane Hirshfield', note: 'Zen practice in American poetry.' },
+            { slug: 'carl-dennis', name: 'Carl Dennis', note: 'The reflective suburban poem.' }
+        ]
+    },
+
+    'donald-davie': {
+        body: [
+            'A critic first for most readers — his books on syntax in English poetry and on the tradition he called the line of wit shaped how a generation read — and a poet whose verse enacts the same preferences: lucid, classical, and suspicious of the image for its own sake.',
+            'He was associated with the Movement and then spent decades arguing with everyone including himself, particularly about Pound, whom he wrote about repeatedly and could neither accept nor dismiss. The poems are dry and intelligent and reward a reader who likes an argument.'
+        ],
+        readNext: [
+            { slug: 'philip-larkin', name: 'Philip Larkin', note: 'The Movement\'s best poet.' },
+            { slug: 'ezra-pound', name: 'Ezra Pound', note: 'The figure he could never settle with.' },
+            { slug: 'yvor-winters', name: 'Yvor Winters', note: 'The other great critic-poet of severe taste.' }
+        ]
+    },
+
+    'dorothy-parker': {
+        body: [
+            'Light verse with a blade in it: short, immaculately rhymed poems about love affairs, suicide, men and disappointment, in which the punchline usually withdraws whatever the poem appeared to be offering.',
+            'The famous quatrain listing the drawbacks of every available method of killing yourself and concluding that you might as well live is exactly the technique. She was a critic and short-story writer of real seriousness, and later a screenwriter and political activist blacklisted for it. The verse is period writing done at the highest level of the form.'
+        ],
+        readNext: [
+            { slug: 'edna-st-vincent-millay', name: 'Edna St. Vincent Millay', note: 'The contemporary she was measured against.' },
+            { slug: 'margaret-fishback', name: 'Margaret Fishback', note: 'The same wit, less acid.' },
+            { slug: 'franklin-pierce-adams', name: 'Franklin Pierce Adams', note: 'The column that made her name.' }
+        ]
+    },
+
+    'edmund-waller': {
+        body: [
+            'A seventeenth-century poet whose smooth, closed couplets did as much as anything to make the heroic couplet the dominant English form — Dryden said he had taught the age to write correctly.',
+            'The politics were flexible to the point of scandal: he plotted for the king, was caught, informed on his colleagues, was exiled, and later wrote a panegyric to Cromwell followed by one to the restored monarch. One short lyric telling a rose to go and confess its own mortality on his behalf is the poem that has outlasted all of it.'
+        ],
+        readNext: [
+            { slug: 'john-dryden', name: 'John Dryden', note: 'Who credited him with the modern couplet.' },
+            { slug: 'thomas-carew', name: 'Thomas Carew', note: 'The polished Caroline lyric.' },
+            { slug: 'robert-herrick', name: 'Robert Herrick', note: 'The other great carpe diem poet of the century.' }
+        ]
+    },
+
+    'emily-jungmin-yoon': {
+        body: [
+            'A Korean Canadian American poet whose central sequence gives voice to the women coerced into sexual slavery by the Japanese military, working from survivor testimony and refusing to aestheticise it.',
+            'The poems are spare and formally careful, and they keep asking what a poet who was not there is entitled to do with somebody else\'s account. Elsewhere she writes about language, immigration and being asked to translate herself. She is a translator from Korean as well.'
+        ],
+        readNext: [
+            { slug: 'don-mee-choi', name: 'Don Mee Choi', note: 'Korean history and the translated document.' },
+            { slug: 'carolyn-forch', name: 'Carolyn Forché', note: 'Witness and its ethical problem.' },
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'State violence in official language.' }
+        ]
+    },
+
+    'emma-lazarus': {
+        body: [
+            'She wrote the sonnet that ends up on the Statue of Liberty, and the poem is better and stranger than its use as national self-congratulation suggests — it explicitly rejects the conquering colossus of the ancient world in favour of a mother of exiles, and the immigrants it welcomes are described in terms nobody would put on a poster.',
+            'She was a Sephardic Jewish American writing in response to pogroms in Russia, and much of her later work is directly about Jewish history and about what became Zionism. The rest of the poetry is accomplished nineteenth-century verse; that sonnet is something else.'
+        ],
+        readNext: [
+            { slug: 'julia-ward-howe', name: 'Julia Ward Howe', note: 'The other great American public poem of the era.' },
+            { slug: 'frances-ellen-watkins-harper', name: 'Frances Ellen Watkins Harper', note: 'Political verse for a movement.' },
+            { slug: 'walt-whitman', name: 'Walt Whitman', note: 'The American promise, stated at length.' }
+        ]
+    },
+
+    'ernest-m-hemingway': {
+        body: [
+            'The poems are minor and he knew it. They are worth reading as evidence: early imagist exercises written in Paris, satirical squibs about other writers, and some bitter verse from the wars he covered.',
+            'The interest is in watching the prose style form — the flat declarative sentence, the refusal of adjectives — being tried out first in lines. There is also a good deal of adolescent cruelty in them. Read as a footnote to the fiction rather than as a body of work in its own right.'
+        ],
+        readNext: [
+            { slug: 'ezra-pound', name: 'Ezra Pound', note: 'Who taught him to cut.' },
+            { slug: 'gertrude-stein', name: 'Gertrude Stein', note: 'The other Paris influence on that prose.' },
+            { slug: 'stephen-crane', name: 'Stephen Crane', note: 'The American flat style before him.' }
+        ]
+    },
+
+    'frederick-goddard-tuckerman': {
+        body: [
+            'A nineteenth-century New England recluse who published one book, was admired by a few contemporaries, and then vanished from view until modernist readers rediscovered him.',
+            'The work is a set of sonnet sequences written after his wife\'s death, formally irregular and full of exact natural detail — plants named correctly, weather observed closely — set against a grief that never resolves. The long late poem about a cricket is his masterpiece and is one of the strangest American poems of the century.'
+        ],
+        readNext: [
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'The New England contemporary in comparable isolation.' },
+            { slug: 'edwin-arlington-robinson', name: 'Edwin Arlington Robinson', note: 'The formal New England poem after him.' },
+            { slug: 'thomas-hardy', name: 'Thomas Hardy', note: 'Grief for a wife, in a rougher music.' }
+        ]
+    },
+
+    'geoffrey-chaucer': {
+        body: [
+            'The first major poet in English, in the sense that he chose English when the prestige languages available to him were French and Latin — and made it capable of comedy, philosophy, filth and grief.',
+            'The pilgrims of his unfinished frame narrative are the achievement: a miller, a wife, a pardoner, a knight, each with a voice that is unmistakably their own and frequently at odds with what they think they are revealing. The Middle English looks harder than it is; read it aloud and roughly half the difficulty dissolves. The love poems and the dream visions are the other half of the work.'
+        ],
+        readNext: [
+            { slug: 'john-skelton', name: 'John Skelton', note: 'The next English poet with a comparable ear for the vernacular.' },
+            { slug: 'william-shakespeare', name: 'William Shakespeare', note: 'The next writer of that range.' },
+            { slug: 'anonymous', name: 'Anonymous', note: 'The ballads and tales alongside him.' }
+        ]
+    },
+
+    'george-bilgere': {
+        body: [
+            'Accessible, comic, conversational poems about middle-aged American life — a marriage, a bar, a father, a swimming pool — in the mode that Billy Collins made popular, and done with real timing.',
+            'The poems set up an ordinary scene, wander, and land on something about mortality or regret without ever changing tone. The risk in that mode is charm without weight and the best ones avoid it. Easy to read and harder to write than they look.'
+        ],
+        readNext: [
+            { slug: 'billy-collins', name: 'Billy Collins', note: 'The obvious comparison, and his advocate.' },
+            { slug: 'mark-halliday', name: 'Mark Halliday', note: 'The self-aware comic speaker.' },
+            { slug: 'stephen-dunn', name: 'Stephen Dunn', note: 'The reflective suburban poem.' }
+        ]
+    },
+
+    'george-santayana': {
+        body: [
+            'A philosopher who wrote verse throughout his life and was clear-eyed about its limits — he said his poems were the sincere expression of a mind that thought in prose, which is fair.',
+            'The sonnets are formally polished, late-Victorian in manner, and preoccupied with the loss of religious belief by somebody who continued to find Catholicism beautiful without believing a word of it. That position — aesthetic devotion without faith — is unusual and gives the best poems their particular cool sadness.'
+        ],
+        readNext: [
+            { slug: 'trumbull-stickney', name: 'Trumbull Stickney', note: 'His Harvard contemporary.' },
+            { slug: 'matthew-arnold', name: 'Matthew Arnold', note: 'The loss of belief argued in verse.' },
+            { slug: 'wallace-stevens', name: 'Wallace Stevens', note: 'His student, who took the problem further.' }
+        ]
+    },
+
+    'george-szirtes': {
+        body: [
+            'Born in Budapest and brought to England as a child refugee after 1956, he writes formally intricate poems in English about Hungary, the Holocaust his mother survived, and the condition of being a person who arrived.',
+            'He is also a major translator from Hungarian. The verse is metrically skilled and often uses inherited forms to hold material that would otherwise be shapeless — terza rima, canzone, sonnet sequences. The photographs and the family history recur. Formal control as a way of handling inherited catastrophe.'
+        ],
+        readNext: [
+            { slug: 'michael-hofmann', name: 'Michael Hofmann', note: 'The poet-translator working from German.' },
+            { slug: 'peter-balakian', name: 'Peter Balakian', note: 'Inherited genocide as subject.' },
+            { slug: 'adam-zagajewski', name: 'Adam Zagajewski', note: 'The European inheritance in the lyric.' }
+        ]
+    },
+
+    'grace-schulman': {
+        body: [
+            'Formally attentive poems about New York, Jewish practice, marriage and the natural world, written across many decades with a consistency of tone that rewards reading a selected rather than a single book.',
+            'She was poetry editor of a major literary magazine for thirty-five years, and translated from Hebrew and Spanish. The poems are unhurried and moral without being pious, and they are frequently addressed to somebody — a husband, a friend, a painter, a bird.'
+        ],
+        readNext: [
+            { slug: 'marie-ponsot', name: 'Marie Ponsot', note: 'Formal intricacy in a New York life.' },
+            { slug: 'chana-bloch', name: 'Chana Bloch', note: 'Jewish material handled conversationally.' },
+            { slug: 'marianne-moore', name: 'Marianne Moore', note: 'The poet she has written about.' }
+        ]
+    },
+
+    'hart-crane': {
+        body: [
+            'The most ambitious American poet of his short life and the most divisive — he set out to answer the pessimism of The Waste Land with an affirmative American epic built around Brooklyn Bridge, and the result is either sublime or unreadable depending on the page.',
+            'The style is what critics call the logic of metaphor: images justified by association and sound rather than by sense, at a very high pitch. The shorter poems, particularly the sea sequence written to a lover, are the easier and possibly the greater work. He died by suicide at thirty-two, jumping from a ship.'
+        ],
+        readNext: [
+            { slug: 'walt-whitman', name: 'Walt Whitman', note: 'The American affirmation he was continuing.' },
+            { slug: 't-s-eliot', name: 'T. S. Eliot', note: 'The poem he set out to answer.' },
+            { slug: 'melvin-b-tolson', name: 'Melvin B. Tolson', note: 'The same high style, differently used.' }
+        ]
+    },
+
+    'henry-david-thoreau': {
+        body: [
+            'The prose is the achievement and he thought of himself as a poet, which is worth taking seriously even though Emerson told him the verse was not good enough.',
+            'The poems are short, plain, formally conventional and occasionally very fine — the best of them handle the same material as the prose, a pond, smoke, mist, a season, with a compression the essays do not attempt. He burned some at Emerson\'s urging, which is a small literary tragedy. Read them as the compressed edge of the prose.'
+        ],
+        readNext: [
+            { slug: 'ralph-waldo-emerson', name: 'Ralph Waldo Emerson', note: 'His mentor, and his discouraging critic.' },
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'New England compression done supremely.' },
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The later American poetry of practice and place.' }
+        ]
+    },
+
+    'henry-dumas': {
+        body: [
+            'He was shot dead by a transit policeman in a New York subway station at thirty-three, in circumstances never satisfactorily explained, leaving most of his work unpublished.',
+            'What survives is remarkable: poems and stories drawing on the rural South, on Black music, and on an Afro-mystical imagination that has more in common with later Afrofuturism than with his contemporaries. Toni Morrison edited and championed him. The work is fragmentary because the life was cut off, not because it was unfinished in conception.'
+        ],
+        readNext: [
+            { slug: 'jean-toomer', name: 'Jean Toomer', note: 'The rural South rendered lyrically.' },
+            { slug: 'amiri-baraka', name: 'Amiri Baraka', note: 'The Black Arts moment he belonged to.' },
+            { slug: 'jay-wright', name: 'Jay Wright', note: 'Spiritual systems taken seriously.' }
+        ]
+    },
+
+    'henry-viii-king-of-england': {
+        body: [
+            'He wrote songs, and they are competent court lyrics of the early Tudor period — the best-known is a defence of pastime with good company, which is exactly what it sounds like.',
+            'The historical interest outweighs the literary: this is a monarch who was a trained musician participating in a courtly convention where writing verse was part of being cultivated. Read it as context for the court that produced Wyatt and Surrey, whose poems were written under the same king and are considerably more dangerous.'
+        ],
+        readNext: [
+            { slug: 'sir-thomas-wyatt', name: 'Sir Thomas Wyatt', note: 'The great poet of that court, and its prisoner.' },
+            { slug: 'henry-howard-earl-of-surrey', name: 'Henry Howard, Earl of Surrey', note: 'Executed by this king.' },
+            { slug: 'queen-elizabeth-i', name: 'Queen Elizabeth I', note: 'His daughter, and the better poet.' }
+        ]
+    },
+
+    'hieu-minh-nguyen': {
+        body: [
+            'Poems about being a queer Vietnamese American son in Minnesota — a mother, a body, desire, hunger and a family history that arrives through what is not said at dinner.',
+            'He came out of the performance scene and the poems keep that directness while being carefully made on the page. The tone is unguarded and frequently very funny about painful things. The second book is harder and better, refusing the redemptive shape the first sometimes reached for.'
+        ],
+        readNext: [
+            { slug: 'ocean-vuong', name: 'Ocean Vuong', note: 'The same inheritance, more lyrical.' },
+            { slug: 'chen-chen', name: 'Chen Chen', note: 'Queer Asian American humour and tenderness.' },
+            { slug: 'sam-sax', name: 'sam sax', note: 'The performance generation on the page.' }
+        ]
+    },
+
+    'jake-adam-york': {
+        body: [
+            'He set out to write an elegy for every person killed in the American civil rights movement, and had completed a substantial part of that project when he died suddenly in his forties.',
+            'The poems are formally careful, southern, and unusually self-aware about the position of a white Alabaman writing them — they keep examining their own right to the material. Food, smoke, music and Alabama landscape recur. The unfinished shape of the project is now part of what it means.'
+        ],
+        readNext: [
+            { slug: 'natasha-trethewey', name: 'Natasha Trethewey', note: 'The southern archive as a lifelong subject.' },
+            { slug: 'marilyn-nelson', name: 'Marilyn Nelson', note: 'Atrocity held inside strict form.' },
+            { slug: 'robert-hayden', name: 'Robert Hayden', note: 'The historical elegy at its source.' }
+        ]
+    },
+
+    'jaswinder-bolina': {
+        body: [
+            'Fast, discursive, essayistic poems that think aloud about race, class, American citizenship and the absurdity of being asked where you are really from — written in a voice that is genuinely funny and never resolves into a slogan.',
+            'He is also an essayist, and the essays on being a brown American poet are widely read. The verse moves by digression and self-interruption, and the political argument arrives as a side effect of the thinking rather than as its conclusion.'
+        ],
+        readNext: [
+            { slug: 'matthew-zapruder', name: 'Matthew Zapruder', note: 'The poem thinking aloud.' },
+            { slug: 'cathy-park-hong', name: 'Cathy Park Hong', note: 'The essayist-poet on race in America.' },
+            { slug: 'bob-hicok', name: 'Bob Hicok', note: 'Digression as a moral method.' }
+        ]
+    },
+
+    'jayne-cortez': {
+        body: [
+            'A performance poet whose work was written to be delivered with a band — she recorded for decades with a group of jazz and funk musicians, and the poems are scored for that.',
+            'The technique is repetition and incantation, and the subjects are police violence, colonialism, apartheid, and the exploitation of Black musicians. The language is blunt and the images are surreal in a way that comes from Surrealism proper as much as from the blues. On the page these are a script; find a recording.'
+        ],
+        readNext: [
+            { slug: 'amiri-baraka', name: 'Amiri Baraka', note: 'The same movement and the same music.' },
+            { slug: 'bob-kaufman', name: 'Bob Kaufman', note: 'Jazz surrealism in American poetry.' },
+            { slug: 'sonia-sanchez', name: 'Sonia Sanchez', note: 'Black Arts written for the voice.' }
+        ]
+    },
+
+    'jennifer-michael-hecht': {
+        body: [
+            'A historian of doubt and of suicide, and a poet whose verse is playful, dense with reference and philosophically restless — the poems argue with the history she writes about in prose.',
+            'The manner is comic and associative, closer to the New York School than to anything academic, which makes the erudition light on its feet. Her argument against suicide, made in prose and glanced at in the poems, is that we owe our continued existence to each other. Read the prose and the verse together.'
+        ],
+        readNext: [
+            { slug: 'philip-appleman', name: 'Philip Appleman', note: 'The argued humanist poem.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Scholarship and poem in one practice.' },
+            { slug: 'kenneth-koch', name: 'Kenneth Koch', note: 'Comic exuberance inside real technique.' }
+        ]
+    },
+
+    'jill-bialosky': {
+        body: [
+            'Quiet, narrative poems about family, motherhood, loss and the domestic interior, written in a plain register that stays close to the emotional facts.',
+            'Her sister\'s suicide is the material of a widely read prose memoir and it runs under the poems as well. She has worked as a senior editor at a major publisher for decades, which puts her on both sides of the poetry world. The verse is accessible and unshowy, and the best of it is very direct about grief.'
+        ],
+        readNext: [
+            { slug: 'edward-hirsch', name: 'Edward Hirsch', note: 'The book-length elegy for a child.' },
+            { slug: 'linda-pastan', name: 'Linda Pastan', note: 'The domestic lyric at similar scale.' },
+            { slug: 'jill-alexander-essbaum', name: 'Jill Alexander Essbaum', note: 'The same generation, at the opposite extreme.' }
+        ]
+    },
+
+    'john-kinsella': {
+        body: [
+            'An Australian poet of enormous output whose subject is the Western Australian wheatbelt — a landscape he writes about as a site of ecological destruction, colonial theft and personal history all at once.',
+            'He is an anarchist and a vegan and describes his work as activist, and the poems are formally restless: pastoral forms deliberately broken, long sequences, collaborations. The argument is that a pastoral written on stolen and poisoned land cannot be a comfortable form. Prolific to a degree that makes a selected essential.'
+        ],
+        readNext: [
+            { slug: 'les-murray', name: 'Les Murray', note: 'The Australian poet he argues with.' },
+            { slug: 'juliana-spahr', name: 'Juliana Spahr', note: 'Ecology and experimental politics.' },
+            { slug: 'alice-oswald', name: 'Alice Oswald', note: 'The broken pastoral in Britain.' }
+        ]
+    },
+
+    'joshua-beckman': {
+        body: [
+            'Quiet, spontaneous-seeming poems that are frequently untitled and read like overheard thought — short lines, ordinary words, no obvious occasion, and a strange cumulative tenderness.',
+            'He has worked as an editor and translator and has made books collaboratively, including improvised ones. The mode risks slightness and depends entirely on tone, which he sustains. Read twenty pages rather than one poem; the effect is atmospheric and does not survive sampling.'
+        ],
+        readNext: [
+            { slug: 'matthew-rohrer', name: 'Matthew Rohrer', note: 'His frequent collaborator.' },
+            { slug: 'james-schuyler', name: 'James Schuyler', note: 'Notation as a whole method.' },
+            { slug: 'ron-padgett', name: 'Ron Padgett', note: 'Deadpan plainness with a floor under it.' }
+        ]
+    },
+
+    'julia-ward-howe': {
+        body: [
+            'She wrote the words to a marching song that became the most enduring American public poem of the nineteenth century — apocalyptic, biblical, and set to a tune the soldiers were already singing.',
+            'The rest of her writing is largely forgotten and she was a considerable figure beyond it: an abolitionist, a suffragist, and the author of a proclamation calling on women to oppose war that later became one root of Mother\'s Day. The hymn is period rhetoric at its most effective, and it is worth reading rather than only singing.'
+        ],
+        readNext: [
+            { slug: 'emma-lazarus', name: 'Emma Lazarus', note: 'The other great American public poem.' },
+            { slug: 'john-greenleaf-whittier', name: 'John Greenleaf Whittier', note: 'The abolitionist verse of the same decades.' },
+            { slug: 'walt-whitman', name: 'Walt Whitman', note: 'The Civil War written without the trumpet.' }
+        ]
+    },
+
+    kabir: {
+        body: [
+            'A fifteenth-century North Indian poet-saint, born into a Muslim weaving family and claimed by Hindus, Muslims and Sikhs alike, whose short poems attack ritual, caste, priests and scholars in the plainest possible language.',
+            'The poems were sung rather than written and survive in many versions; there is no reliable single text and the tradition is oral. In English he is read through very free translations, most famously Tagore\'s and later Robert Bly\'s, which are closer to adaptations. The argument in them is constant: the divine is not in the temple or the book, and you are wasting your life looking there.'
+        ],
+        readNext: [
+            { slug: 'rabindranath-tagore', name: 'Rabindranath Tagore', note: 'His most famous English translator.' },
+            { slug: 'kahlil-gibran', name: 'Kahlil Gibran', note: 'Wisdom literature in English translation.' },
+            { slug: 'thomas-merton', name: 'Thomas Merton', note: 'Contemplative poetry across traditions.' }
+        ]
+    },
+
+    'katherine-philips': {
+        body: [
+            'A seventeenth-century poet who made female friendship a serious subject for verse — the poems addressed to the women in her circle use the vocabulary of passionate love, and readers have argued about the register ever since.',
+            'She translated Corneille, ran a coterie in which everyone took classical pen names, and had her poems published without permission, which she claimed to find mortifying. The verse is formally polished and emotionally direct, and it was widely admired in a century that gave women writers very little room.'
+        ],
+        readNext: [
+            { slug: 'aphra-behn', name: 'Aphra Behn', note: 'The next Englishwoman to live by writing.' },
+            { slug: 'anne-finch-countess-of-winchilsea', name: 'Anne Finch, Countess of Winchilsea', note: 'The generation after.' },
+            { slug: 'andrew-marvell', name: 'Andrew Marvell', note: 'The formal poise of the same decades.' }
+        ]
+    },
+
+    'katie-ford': {
+        body: [
+            'Spare, austere poems of faith and its withdrawal — she trained in divinity, and the poems address a God who is either absent or unwilling, in a register closer to psalm than to lyric.',
+            'One book comes out of Hurricane Katrina and the drowning of New Orleans; another out of the end of a marriage and severe illness. The lines are short and the vocabulary is plain, and the restraint is what makes the desolation land. Nothing here is consoling and nothing is theatrical.'
+        ],
+        readNext: [
+            { slug: 'fanny-howe', name: 'Fanny Howe', note: 'Belief pursued without resolution.' },
+            { slug: 'jean-valentine', name: 'Jean Valentine', note: 'The short poem full of silence.' },
+            { slug: 'louise-glck', name: 'Louise Glück', note: 'Austerity as a whole method.' }
+        ]
+    },
+
+    'khaled-mattawa': {
+        body: [
+            'A Libyan American poet and one of the essential translators of contemporary Arabic poetry into English — Adonis, Saadi Youssef, Fadhil Al-Azzawi and others reach English readers largely through him.',
+            'His own poems move between Benghazi and the American Midwest, and they are preoccupied with exile, revolution and the impossibility of reporting a country to people who have already decided what it is. The line is long and discursive. The translations and the poems are one project.'
+        ],
+        readNext: [
+            { slug: 'adonis', name: 'Adonis', note: 'The poet he has translated most.' },
+            { slug: 'fady-joudah', name: 'Fady Joudah', note: 'The other great Arabic-English poet-translator.' },
+            { slug: 'mahmoud-darwish', name: 'Mahmoud Darwish', note: 'The Arabic tradition behind both.' }
+        ]
+    },
+
+    'kobayashi-issa': {
+        body: [
+            'One of the four great masters of Japanese haiku, and the most human of them — the poems are full of flies, fleas, frogs, sparrows and small creatures addressed as equals, in a voice that is comic and grieving at once.',
+            'His life was a catalogue of losses, including several children, and the most famous poems are about exactly that: a world of dew, and yet. The plainness is deceptive and the humour is not decoration. In English he is read through many competing translations, and comparing two or three is the fastest way to see what the original is doing.'
+        ],
+        readNext: [
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The Japanese tradition in American English.' },
+            { slug: 'jane-hirshfield', name: 'Jane Hirshfield', note: 'A translator from the Japanese tradition.' },
+            { slug: 'kenneth-rexroth', name: 'Kenneth Rexroth', note: 'Who brought this poetry into American English.' }
+        ]
+    },
+
+    'kofi-awoonor': {
+        body: [
+            'A Ghanaian poet who built his English verse on the Ewe dirge — a traditional funeral song form — so the poems carry the cadence and the communal grief of that tradition into a European language.',
+            'He was also a diplomat, a novelist and a political prisoner in Ghana in the 1970s. The poems are elegiac, formally rooted in oral practice, and preoccupied with the damage colonialism did to a culture\'s ability to mourn its own. He was killed in the 2013 terrorist attack on a Nairobi shopping mall while attending a literary festival.'
+        ],
+        readNext: [
+            { slug: 'chris-abani', name: 'Chris Abani', note: 'West African poetry in English, later.' },
+            { slug: 'derek-walcott', name: 'Derek Walcott', note: 'The colonial inheritance and the English line.' },
+            { slug: 'kamau-brathwaite', name: 'Kamau Brathwaite', note: 'Oral form remaking the page.' }
+        ]
+    },
+
+    'lady-mary-wroth': {
+        body: [
+            'The first Englishwoman known to have written a full sonnet sequence, and it inverts the convention it inherits: the speaker is a woman, constant and clear-eyed, addressing a man who is not.',
+            'She was Philip Sidney\'s niece and Mary Sidney\'s, and the family tradition is visible in the technical command — the sequence ends with a crown of sonnets, fourteen poems locked together by repeated lines, which is about as difficult as English verse gets. Her prose romance caused a scandal at court and was withdrawn. A major writer suppressed in her own time and recovered late.'
+        ],
+        readNext: [
+            { slug: 'sir-philip-sidney', name: 'Sir Philip Sidney', note: 'Her uncle, and the sequence she answers.' },
+            { slug: 'mary-sidney-herbert-countess-of-pembroke', name: 'Mary Sidney Herbert', note: 'Her aunt, and the family\'s other major poet.' },
+            { slug: 'katherine-philips', name: 'Katherine Philips', note: 'The next Englishwoman of that stature.' }
+        ]
+    },
+
+    'lawson-fusao-inada': {
+        body: [
+            'A Japanese American poet who was interned as a child during the Second World War, and who writes about the camps in a voice shaped by jazz — he is a musician, and the poems are built on riff, repeat and swing.',
+            'That combination is unusual and effective: the improvisatory form keeps the historical material from settling into monument. He was central to establishing Asian American literature as a field, co-editing a landmark anthology. He served as poet laureate of Oregon.'
+        ],
+        readNext: [
+            { slug: 'garrett-hongo', name: 'Garrett Hongo', note: 'Japanese American memory in narrative verse.' },
+            { slug: 'michael-s-harper', name: 'Michael S. Harper', note: 'Jazz as poetic structure.' },
+            { slug: 'cathy-song', name: 'Cathy Song', note: 'Japanese American family history, quieter.' }
+        ]
+    },
+
+    'marilyn-hacker': {
+        body: [
+            'A formal virtuoso — sonnets, sestinas, villanelles, crowns of sonnets — used for material the forms were never designed to hold: lesbian desire, breast cancer, Paris, exile and political argument.',
+            'One book is a novel in verse about a love affair, entirely in received forms. Another is a sequence written through cancer treatment that refuses both bravery and self-pity. She is also a major translator from French. The argument implicit in the whole career is that form belongs to whoever can use it.'
+        ],
+        readNext: [
+            { slug: 'a-e-stallings', name: 'A. E. Stallings', note: 'The next generation of formal command.' },
+            { slug: 'agha-shahid-ali', name: 'Agha Shahid Ali', note: 'Strict inherited form in American English.' },
+            { slug: 'adrienne-rich', name: 'Adrienne Rich', note: 'The politics she shares and the form she kept.' }
+        ]
+    },
+
+    'mark-doty': {
+        body: [
+            'A lyric poet of great descriptive richness whose central body of work came out of the AIDS epidemic and the death of his partner — poems that describe a fish market, a beach, a dog, an illness, at length and in colour.',
+            'The abundance is the argument: the world is described lavishly because it is being lost. He writes superbly about animals and about looking at art, and his prose memoirs are as good as the verse. The risk is prettiness and the best poems earn their beauty by what they are holding up against.'
+        ],
+        readNext: [
+            { slug: 'thom-gunn', name: 'Thom Gunn', note: 'The same epidemic, in metre.' },
+            { slug: 'd-a-powell', name: 'D. A. Powell', note: 'The same losses, at the other extreme of style.' },
+            { slug: 'carl-phillips', name: 'Carl Phillips', note: 'Desire under syntactic control.' }
+        ]
+    },
+
+    'mary-mapes-dodge': {
+        body: [
+            'Best known for a children\'s novel about a Dutch boy and a pair of silver skates, and more important as the founding editor of a children\'s magazine that published Twain, Alcott, Kipling and Stevenson.',
+            'Her own verse is light, competent and written for children — rhymes about weather, animals and small domestic events. The editorial achievement is the larger one: she insisted that writing for children should be as well made as writing for adults, and commissioned accordingly.'
+        ],
+        readNext: [
+            { slug: 'robert-louis-stevenson', name: 'Robert Louis Stevenson', note: 'Whose children\'s verse she published.' },
+            { slug: 'joyce-sidman', name: 'Joyce Sidman', note: 'The modern children\'s nature poem.' },
+            { slug: 'mother-goose', name: 'Mother Goose', note: 'The anonymous ground of all of it.' }
+        ]
+    },
+
+    'mei-mei-berssenbrugge': {
+        body: [
+            'Very long lines — sometimes running the width of the page — in a cool, abstract, almost scientific register, describing perception, weather, light, animals and the space between people.',
+            'There is no narrative and almost no personality in the usual sense; the poems are phenomenological, examining how a thing is apprehended rather than what it means. She has collaborated with visual artists throughout her career. Difficult in a completely unaggressive way: nothing is hidden, and nothing is explained either.'
+        ],
+        readNext: [
+            { slug: 'barbara-guest', name: 'Barbara Guest', note: 'The painterly spacious line.' },
+            { slug: 'arthur-sze', name: 'Arthur Sze', note: 'Constellated perception.' },
+            { slug: 'cole-swensen', name: 'Cole Swensen', note: 'The book-length lyric investigation.' }
+        ]
+    },
+
+    'michael-collier': {
+        body: [
+            'Quiet, formally attentive poems about family, childhood, illness and the ordinary Maryland and Arizona landscapes of his life, in a plain style that owes something to Bishop and something to Frost.',
+            'He directed a major writers\' conference for years and served as poet laureate of Maryland, and translated a Greek tragedy. The poems are unshowy and psychologically exact, particularly about the strain inside families that appear to be functioning. A poet of the middle register done carefully.'
+        ],
+        readNext: [
+            { slug: 'elizabeth-bishop', name: 'Elizabeth Bishop', note: 'Observation carrying the feeling.' },
+            { slug: 'stanley-plumly', name: 'Stanley Plumly', note: 'The same elegiac care.' },
+            { slug: 'michael-ryan', name: 'Michael Ryan', note: 'Family examined without mercy.' }
+        ]
+    },
+
+    'michael-field': {
+        body: [
+            'Not one person. Michael Field was the pen name of Katharine Bradley and her niece Edith Cooper, who lived together as a couple, wrote together for decades, and asked to be read as a single poet.',
+            'The verse is aesthetic, sensuous and heavily influenced by Sappho and by Renaissance painting, and the poems about their own love are among the frankest of the period. When the identity became known their reputation collapsed — the Victorian public would accept a male poet and not two women. Recovered late and read seriously now.'
+        ],
+        readNext: [
+            { slug: 'algernon-charles-swinburne', name: 'Algernon Charles Swinburne', note: 'The aesthetic movement at its loudest.' },
+            { slug: 'christina-rossetti', name: 'Christina Rossetti', note: 'The Victorian woman poet at her best.' },
+            { slug: 'sappho', name: 'Sappho', note: 'The Greek model they wrote from.' }
+        ]
+    },
+
+    'miller-williams': {
+        body: [
+            'A plainspoken Southern poet who read at a presidential inauguration and spent his career writing narrative, formally controlled poems about ordinary people in Arkansas and elsewhere.',
+            'The mode is compassionate and unsentimental: the poems present a life in twenty lines and decline to judge it. He was also a translator and a publisher, and taught for decades. His verse is technically tighter than the conversational surface suggests, and rereading usually reveals the metre that was holding it.'
+        ],
+        readNext: [
+            { slug: 'edwin-arlington-robinson', name: 'Edwin Arlington Robinson', note: 'The formal portrait of a failed life.' },
+            { slug: 'rodney-jones', name: 'Rodney Jones', note: 'Southern narrative verse.' },
+            { slug: 'wesley-mcnair', name: 'Wesley McNair', note: 'The same compassion, in New England.' }
+        ]
+    },
+
+    'molly-peacock': {
+        body: [
+            'A formal poet who writes about the body, marriage, a difficult childhood and desire in rhymed and metred poems that read as though they were spoken — the rhyme frequently falls mid-line where you do not expect it.',
+            'She was a central figure in reviving public poetry reading series and in the poetry-in-transit movement, and has written memoir and biography. The poems are frank about sex and about family damage, and the form is what keeps that frankness from becoming a confession.'
+        ],
+        readNext: [
+            { slug: 'marilyn-hacker', name: 'Marilyn Hacker', note: 'Form carrying contemporary material.' },
+            { slug: 'marie-ponsot', name: 'Marie Ponsot', note: 'Formal intricacy and a woman\'s life.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Rhyme hidden inside the line.' }
+        ]
+    },
+
+    'peter-everwine': {
+        body: [
+            'Spare, quiet poems of loss and the Californian valley, and a translator of Aztec poetry and of the Hebrew poet Natan Zach — the translations and the originals share a bare, unhurried line.',
+            'He belonged to the Fresno circle around Philip Levine, and his work is the quietest of that group: short poems, plain images, a great deal of silence. Absence is the constant subject — a father, a language, a landscape that has been farmed out. Read slowly; there is very little to hold onto and that is intentional.'
+        ],
+        readNext: [
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'His Fresno colleague and friend.' },
+            { slug: 'larry-levis', name: 'Larry Levis', note: 'The same valley, more elliptical.' },
+            { slug: 'w-s-merwin', name: 'W. S. Merwin', note: 'Translation and the bare line.' }
+        ]
+    },
+
+    'phillis-wheatley': {
+        body: [
+            'Kidnapped from West Africa as a child, enslaved in Boston, and the first African American to publish a book of poems — which she could only do after being examined by a panel of prominent men to certify that she had written it.',
+            'That examination is part of how the poems have to be read. They are neoclassical, formally accomplished, and careful, and the arguments about slavery in them are made obliquely because they could not be made otherwise. The elegies are the largest part of the work. She was freed after the book appeared and died in poverty in her early thirties.'
+        ],
+        readNext: [
+            { slug: 'george-moses-horton', name: 'George Moses Horton', note: 'The next poet to publish while enslaved.' },
+            { slug: 'frances-ellen-watkins-harper', name: 'Frances Ellen Watkins Harper', note: 'The abolitionist generation.' },
+            { slug: 'alexander-pope', name: 'Alexander Pope', note: 'The couplet tradition she wrote in.' }
+        ]
+    },
+
+    'rickey-laurentiis': {
+        body: [
+            'Formally rich, sensuous poems about the American South, lynching photographs, queer desire and the Black body as it has been looked at — the first book is largely a set of confrontations with images.',
+            'The diction is deliberately ornate, which sets up a tension with the violence being described that the poems never resolve and do not want to. The influence of the Southern gothic and of Renaissance devotional verse are both audible. Uncomfortable by design, and very carefully made.'
+        ],
+        readNext: [
+            { slug: 'jericho-brown', name: 'Jericho Brown', note: 'Desire, violence and invented form.' },
+            { slug: 'natasha-trethewey', name: 'Natasha Trethewey', note: 'The southern image as historical record.' },
+            { slug: 'carl-phillips', name: 'Carl Phillips', note: 'Syntax as a moral instrument.' }
+        ]
+    },
+
+    'rigoberto-gonzlez': {
+        body: [
+            'A Chicano poet, memoirist and critic whose work is about queer Latino life, migrant farm labour, family violence and the border, written plainly and without any bid for sympathy.',
+            'The poems are narrative and image-led, and the family material is handled with an unusual refusal to redeem anybody. He has done a great deal as a reviewer and anthologist to widen the visibility of Latino writing. The memoirs and the poems cover the same ground and are worth reading together.'
+        ],
+        readNext: [
+            { slug: 'eduardo-c-corral', name: 'Eduardo C. Corral', note: 'The same ground, more lyrical.' },
+            { slug: 'gary-soto', name: 'Gary Soto', note: 'Field labour and childhood.' },
+            { slug: 'richard-blanco', name: 'Richard Blanco', note: 'Queer Latino poetry, warmer.' }
+        ]
+    },
+
+    'robert-hayden': {
+        body: [
+            'A poet of extraordinary formal control who insisted on being read as a poet rather than as a spokesman, which cost him support during the Black Arts years and looks like integrity now.',
+            'The great poems are historical: a slave ship rendered through the voices of its crew and its cargo, a portrait of Frederick Douglass in a single sentence, an escape north told as a chorus. The most quoted is fourteen lines about a father getting up in the cold to light the fires, and the son who never thanked him. He was the first African American to hold the Library of Congress poetry post.'
+        ],
+        readNext: [
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'The contemporary who chose differently.' },
+            { slug: 'rita-dove', name: 'Rita Dove', note: 'The historical sequence after him.' },
+            { slug: 'michael-s-harper', name: 'Michael S. Harper', note: 'His champion and inheritor.' }
+        ]
+    },
+
+    'robert-southey': {
+        body: [
+            'Poet Laureate for thirty years, enormously prolific, and now read mainly for two things: a short poem on the pointlessness of a famous battle that nobody in it can explain, and a ballad about a bishop eaten by rats.',
+            'He began as a political radical planning a utopian commune with Coleridge and ended as an establishment conservative, which Byron never let him forget and satirised savagely. The long epics were admired in their day and are unread now. The short poems and the prose are where anything survives.'
+        ],
+        readNext: [
+            { slug: 'samuel-taylor-coleridge', name: 'Samuel Taylor Coleridge', note: 'His brother-in-law and co-conspirator.' },
+            { slug: 'william-wordsworth', name: 'William Wordsworth', note: 'The third of that Lake circle.' },
+            { slug: 'thomas-love-peacock', name: 'Thomas Love Peacock', note: 'Who mocked all of them in prose.' }
+        ]
+    },
+
+    'rosanna-warren': {
+        body: [
+            'A poet, translator and scholar whose verse is formally exact and steeped in classical and French material — she has written a major life of a French poet and translates from several languages.',
+            'The poems are dense and elegiac, dealing with family, painting, war and the dead, and the erudition is worn as working knowledge rather than display. She is also a painter, and there is a painter\'s attention to light and edge throughout. Slow, careful, and unfashionably learned.'
+        ],
+        readNext: [
+            { slug: 'david-ferry', name: 'David Ferry', note: 'Translation and original work inseparable.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'Classical scholarship as poetic method.' },
+            { slug: 'geoffrey-brock', name: 'Geoffrey Brock', note: 'The poet-translator of the same generation.' }
+        ]
+    },
+
+    'sherod-santos': {
+        body: [
+            'Lyrical, meditative poems in long sentences, drawn to landscape, painting and the moment where perception turns into memory — the manner is elegiac even when nothing has been lost.',
+            'He has translated Greek lyric and written a book of prose poems built from the accounts of psychiatric patients, which is the most striking thing he has done. The style is deliberately unhurried and can seem old-fashioned; the attention in it is real.'
+        ],
+        readNext: [
+            { slug: 'charles-wright', name: 'Charles Wright', note: 'The long meditative American line.' },
+            { slug: 'david-st-john', name: 'David St. John', note: 'The unembarrassed lyric.' },
+            { slug: 'stanley-plumly', name: 'Stanley Plumly', note: 'The elegiac register held for a career.' }
+        ]
+    },
+
+    'solmaz-sharif': {
+        body: [
+            'Her first book takes terms from the United States Department of Defense dictionary of military terms and sets them, in small capitals, inside poems about her Iranian family, exile and surveillance.',
+            'The device is exact rather than clever: the official vocabulary is shown doing what it was built to do, which is to make violence procedural. The second book is quieter and angrier, about return, borders and the position of a poet writing in the language of the state that bombed her relatives. Among the most disciplined political poetry being written.'
+        ],
+        readNext: [
+            { slug: 'claudia-rankine', name: 'Claudia Rankine', note: 'Documentary poetics of the present.' },
+            { slug: 'srikanth-reddy', name: 'Srikanth Reddy', note: 'Official language carved into confession.' },
+            { slug: 'monica-youn', name: 'Monica Youn', note: 'Legal vocabulary as poetic material.' }
+        ]
+    },
+
+    'stanley-plumly': {
+        body: [
+            'An elegiac poet in the most literal sense — the poems return again and again to his father\'s death and to the Ohio of his childhood, in long sinuous sentences that unwind across the line breaks.',
+            'He also wrote superb prose about the Romantics, including a book on Keats\'s death and another on the posthumous life of his reputation. The verse is unhurried, image-rich and formally quiet, and it depends on the reader\'s willingness to follow a sentence for a long way. The late poems on his own dying are the most direct.'
+        ],
+        readNext: [
+            { slug: 'james-wright', name: 'James Wright', note: 'The same Ohio and the same sympathy.' },
+            { slug: 'charles-wright', name: 'Charles Wright', note: 'The long meditative sentence.' },
+            { slug: 'john-keats', name: 'John Keats', note: 'The poet he wrote two books about.' }
+        ]
+    },
+
+    'suzanne-buffam': {
+        body: [
+            'Short, dry, aphoristic poems assembled into books that behave like commonplace books — one is built as a series of observations on sleeplessness, another as a catalogue of small comparisons.',
+            'The wit is understated and the accumulation is the form: individually the pieces look like fragments, and read in sequence they build a temperament. The influence of the aphorism and of the classical Japanese pillow book are both visible. Precise, funny, and easy to underestimate.'
+        ],
+        readNext: [
+            { slug: 'mary-ruefle', name: 'Mary Ruefle', note: 'The aphoristic turn handled comically.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Compression as a whole method.' },
+            { slug: 'sarah-manguso', name: 'Sarah Manguso', note: 'The aphorism as a book-length form.' }
+        ]
+    },
+
+    'tato-laviera': {
+        body: [
+            'A Nuyorican poet who wrote in English, Spanish and the mixture of the two that is actually spoken, and whose books are built for performance — the page is a score for a voice that moves between languages mid-sentence.',
+            'The subjects are the Lower East Side, Puerto Rican identity in New York, Afro-Caribbean music and the refusal to choose one country. He answered a famous poem about assimilation with one declaring he had not assimilated but had assimilated America instead. Central to Nuyorican literature and best encountered aloud.'
+        ],
+        readNext: [
+            { slug: 'victor-hernndez-cruz', name: 'Victor Hernández Cruz', note: 'The same movement and the same music.' },
+            { slug: 'pedro-pietri', name: 'Pedro Pietri', note: 'The Nuyorican poem at its most confrontational.' },
+            { slug: 'juan-felipe-herrera', name: 'Juan Felipe Herrera', note: 'Bilingual performance poetry.' }
+        ]
+    },
+
+    'tom-raworth': {
+        body: [
+            'The fastest poet in modern British English — very short lines, no punctuation, no settling, read aloud at a speed that makes the syntax impossible to hold and is the entire experience.',
+            'He was a central figure in the British Poetry Revival, a printer and a connector between the American and British avant-gardes. The poems refuse to be about anything in the ordinary sense; they are about velocity and the failure of the mind to keep up. Find a recording, then read the page.'
+        ],
+        readNext: [
+            { slug: 'veronica-forrest-thomson', name: 'Veronica Forrest-Thomson', note: 'The British avant-garde theorised.' },
+            { slug: 'christopher-middleton', name: 'Christopher Middleton', note: 'British experiment of the same decades.' },
+            { slug: 'clark-coolidge', name: 'Clark Coolidge', note: 'The American equivalent in speed.' }
+        ]
+    },
+
+    'veronica-forrest-thomson': {
+        body: [
+            'A poet and theorist who died at twenty-seven, leaving a book of criticism that has become foundational for British experimental poetics and a small body of dense, allusive verse.',
+            'The theory argues that poetry works by artifice — by the formal features that resist being paraphrased into a statement about the world — and that criticism which rushes to meaning destroys what a poem does. The poems demonstrate it: pastiche, quotation, technical vocabulary and lyric all colliding. Read the criticism and the poems together; neither is complete alone.'
+        ],
+        readNext: [
+            { slug: 'tom-raworth', name: 'Tom Raworth', note: 'The British avant-garde she wrote among.' },
+            { slug: 'clark-coolidge', name: 'Clark Coolidge', note: 'The American abstraction alongside it.' },
+            { slug: 'lyn-hejinian', name: 'Lyn Hejinian', note: 'The parallel American theory.' }
+        ]
+    },
+
+    'wanda-coleman': {
+        body: [
+            'The unofficial poet laureate of Los Angeles — not the city of the film industry but of South Central, low-wage work, medical bills, racism and rage, written across decades and largely outside the institutions.',
+            'She invented her own version of the sonnet, loose and driving, and used it for hundreds of poems. The voice is loud, funny, obscene and completely unsentimental about poverty. She was famously combative in print. Among the most important American poets of her generation and still under-read.'
+        ],
+        readNext: [
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Whose sonnets acknowledge hers.' },
+            { slug: 'charles-bukowski', name: 'Charles Bukowski', note: 'The other Los Angeles outsider, and her opposite.' },
+            { slug: 'lucille-clifton', name: 'Lucille Clifton', note: 'Compression and authority.' }
+        ]
+    },
+
+    'zachary-schomburg': {
+        body: [
+            'Short surreal prose poems in a flat, calm, fairy-tale voice — a person turns into an object, a town is swallowed, someone is buried alive and comments on the temperature.',
+            'The mode is directly descended from Edson and from Eastern European surrealism, and the tone is the whole instrument: nothing is ever surprised by what happens. Death and love are the two subjects. He also draws and runs a small press. Read fifteen at a time; individually they read as jokes.'
+        ],
+        readNext: [
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The direct ancestor.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'The late prose poems in the same key.' },
+            { slug: 'matthew-rohrer', name: 'Matthew Rohrer', note: 'The contemporary deadpan.' }
+        ]
+    },
+
+    'ada-limn': {
+        body: [
+            'Warm, direct, physically alert poems about horses, gardens, grief, the body and the difficulty of staying hopeful without lying about anything — she is one of the very few contemporary poets who can write about joy without it reading as a evasion.',
+            'The line is conversational and the images are exact. Illness, childlessness and a stepfamily recur in the later books. She served as United States Poet Laureate and used the role for a project on poetry and public land. Widely loved, and the craft underneath the accessibility is easy to miss.'
+        ],
+        readNext: [
+            { slug: 'ross-gay', name: 'Ross Gay', note: 'The other contemporary poet of insisted-on delight.' },
+            { slug: 'aimee-nezhukumatathil', name: 'Aimee Nezhukumatathil', note: 'Wonder handled as a discipline.' },
+            { slug: 'natalie-diaz', name: 'Natalie Diaz', note: 'The body and the land, at higher voltage.' }
+        ]
+    },
+
+    'adam-kirsch': {
+        body: [
+            'A critic first — widely published on literature, Jewish thought and the modern canon — and a formal poet whose verse is metrically strict, restrained and intellectually serious.',
+            'The poems are frequently about historical or biblical figures, or about the moral position of somebody living comfortably while thinking about catastrophe. The manner is deliberately unfashionable: no confession, no free verse, no display. Read the criticism alongside; the same temperament runs through both.'
+        ],
+        readNext: [
+            { slug: 'j-v-cunningham', name: 'J. V. Cunningham', note: 'The hard modern epigram.' },
+            { slug: 'david-yezzi', name: 'David Yezzi', note: 'The contemporary formalist alongside him.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'History and moral scruple in verse.' }
+        ]
+    },
+
+    adonis: {
+        body: [
+            'The most influential living Arabic poet, read here in translation, and the central figure in the modernist transformation of Arabic verse — he broke with the classical metrical system and argued for it in criticism as forcefully as he demonstrated it in poems.',
+            'The work is visionary, mythic and politically unsparing towards Arab regimes and towards religious authority, which has kept him controversial across the region for sixty years. He writes long sequences rather than lyrics. His prose on the static and the dynamic in Arab culture is as important as the poetry.'
+        ],
+        readNext: [
+            { slug: 'mahmoud-darwish', name: 'Mahmoud Darwish', note: 'The other great modern Arabic poet.' },
+            { slug: 'khaled-mattawa', name: 'Khaled Mattawa', note: 'His principal English translator.' },
+            { slug: 'arthur-rimbaud', name: 'Arthur Rimbaud', note: 'The French visionary line he drew on.' }
+        ]
+    },
+
+    'allen-tate': {
+        body: [
+            'A Southern poet and critic, central to the Fugitive group and to the New Criticism that dominated American literary study for decades — the insistence on reading the poem as an object rather than through the author\'s biography is largely his generation\'s doing.',
+            'His best-known poem is a long ode at a Confederate cemetery, and its subject is the impossibility of the very commemoration it performs. The Southern Agrarian politics he espoused were reactionary and defended segregation, which is part of the record. The poems are dense, formal and deliberately difficult.'
+        ],
+        readNext: [
+            { slug: 'john-crowe-ransom', name: 'John Crowe Ransom', note: 'The Fugitive group\'s other central figure.' },
+            { slug: 'robert-lowell', name: 'Robert Lowell', note: 'His student, who broke with the method.' },
+            { slug: 'hart-crane', name: 'Hart Crane', note: 'His friend, and his opposite in every way.' }
+        ]
+    },
+
+    'ama-ata-aidoo': {
+        body: [
+            'A Ghanaian writer better known for plays and fiction, whose poems carry the same argument: about African women, about the disappointments of independence, and about what an educated diaspora owes the place it left.',
+            'The verse is direct, conversational and frequently addressed to somebody in particular, drawing on Akan oral forms. The tone moves between anger and comedy without warning. She served briefly as a government minister for education and resigned. Read the poems alongside the plays; the voice is continuous.'
+        ],
+        readNext: [
+            { slug: 'kofi-awoonor', name: 'Kofi Awoonor', note: 'The Ghanaian contemporary, more elegiac.' },
+            { slug: 'chris-abani', name: 'Chris Abani', note: 'West African writing in English, later.' },
+            { slug: 'audre-lorde', name: 'Audre Lorde', note: 'The politics of Black women\'s writing.' }
+        ]
+    },
+
+    'ambrose-bierce': {
+        body: [
+            'A journalist and short-story writer of exceptional bleakness whose verse is mostly satirical — epigrams, mock-definitions and attacks on politicians, clergy and rival writers, delivered with a cruelty he made no attempt to soften.',
+            'He is best known for a sardonic dictionary that redefines ordinary words as instruments of hypocrisy, and much of that book is in verse. He served in the Civil War and wrote the best American short fiction about it. He disappeared in Mexico in his seventies and was never found.'
+        ],
+        readNext: [
+            { slug: 'stephen-crane', name: 'Stephen Crane', note: 'The same American bleakness.' },
+            { slug: 'dorothy-parker', name: 'Dorothy Parker', note: 'The epigram with a blade.' },
+            { slug: 'jonathan-swift', name: 'Jonathan Swift', note: 'Satire as a moral instrument.' }
+        ]
+    },
+
+    'andrew-motion': {
+        body: [
+            'A British Poet Laureate for a decade, and a poet whose work is narrative, elegiac and formally quiet — the recurring material is his mother\'s long illness after a riding accident, and the poems return to it across many books.',
+            'He has written biographies of Larkin and Keats, and founded a national poetry archive of recorded readings. The laureate poems attracted the usual difficulty of writing to order about public occasions. The best work is the personal narrative verse, and the war poems assembled from veterans\' testimony.'
+        ],
+        readNext: [
+            { slug: 'philip-larkin', name: 'Philip Larkin', note: 'His subject as a biographer.' },
+            { slug: 'david-harsent', name: 'David Harsent', note: 'The contemporary British darkness.' },
+            { slug: 'george-szirtes', name: 'George Szirtes', note: 'The formal British generation.' }
+        ]
+    },
+
+    'anna-ltitia-barbauld': {
+        body: [
+            'A radical Dissenting writer of the late eighteenth century whose long poem imagining Britain in ruins and America ascendant was so badly received that she stopped publishing verse entirely.',
+            'The rest of the work is various and often domestic in the best sense — a poem to a mouse in a trap answering a scientist, hymns, and children\'s books that Coleridge and Lamb argued about. She was an important editor and critic. The reputation vanished for a century and a half and has been substantially restored.'
+        ],
+        readNext: [
+            { slug: 'charlotte-smith', name: 'Charlotte Smith', note: 'The contemporary who revived the sonnet.' },
+            { slug: 'william-cowper', name: 'William Cowper', note: 'The Dissenting sensibility in verse.' },
+            { slug: 'william-blake', name: 'William Blake', note: 'The radical decade from the other side.' }
+        ]
+    },
+
+    'anne-sexton': {
+        body: [
+            'She began writing in a hospital after a breakdown, on a therapist\'s suggestion, and published poems about mental illness, abortion, masturbation and her own body at a moment when none of that had appeared in American verse.',
+            'The best work is more formally controlled than the confessional label suggests — she rhymed heavily and used strict stanzas, and the discipline is what makes the material bearable. The book of retold fairy tales is savagely funny. She performed with a rock band and died by suicide at forty-five. Read the early formal books before the late ones.'
+        ],
+        readNext: [
+            { slug: 'sylvia-plath', name: 'Sylvia Plath', note: 'Her friend, and the same seminar.' },
+            { slug: 'maxine-kumin', name: 'Maxine Kumin', note: 'Her closest friend, and the elegies for her.' },
+            { slug: 'w-d-snodgrass', name: 'W. D. Snodgrass', note: 'Where the confessional mode begins.' }
+        ]
+    },
+
+    'baron-brooke-fulke-greville': {
+        body: [
+            'An Elizabethan statesman and Philip Sidney\'s lifelong friend and biographer, whose own verse is astringent, philosophical and considerably darker than anything in the sonnet fashion he began inside.',
+            'The sequence of love poems turns steadily into a study of human corruption and the failure of the will, and the late religious poems are Calvinist and unsparing. The style is knotted and difficult, and the difficulty is doctrinal rather than decorative. A poet for readers who like their Elizabethans bleak.'
+        ],
+        readNext: [
+            { slug: 'sir-philip-sidney', name: 'Sir Philip Sidney', note: 'His friend, and the life he wrote.' },
+            { slug: 'george-herbert', name: 'George Herbert', note: 'The devotional argument, gentler.' },
+            { slug: 'john-donne', name: 'John Donne', note: 'The knotted argumentative line.' }
+        ]
+    },
+
+    'carter-revard': {
+        body: [
+            'An Osage poet and medieval scholar who spent a career editing English manuscripts while writing poems that braid Osage history, birds, science and academic life together with considerable humour.',
+            'The mixture is the point: a poem can move from a Middle English lyric to a coyote to a uranium mine without a change of tone. He wrote about being enrolled Osage and of mixed descent, and about the specific comedy of an Indigenous scholar working on the colonisers\' literature. Warm, learned and unusually funny.'
+        ],
+        readNext: [
+            { slug: 'duane-niatum', name: 'Duane Niatum', note: 'The Native American poetry of the same era.' },
+            { slug: 'linda-hogan', name: 'Linda Hogan', note: 'Ecology and Native inheritance.' },
+            { slug: 'joy-harjo', name: 'Joy Harjo', note: 'The best-known voice of that generation.' }
+        ]
+    },
+
+    'christopher-smart': {
+        body: [
+            'He wrote his most extraordinary poem while confined in an asylum: a vast unfinished antiphonal work in which every line begins with the same word, and which contains the passage about his cat Jeoffry that is one of the best-loved things in English.',
+            'That poem was unpublished for nearly two centuries. The public work is more conventional and includes a superb religious ode. The madness he was confined for consisted largely of praying aloud in the street, which his friend Johnson thought no worse a habit than most. Read the cat, then the rest.'
+        ],
+        readNext: [
+            { slug: 'william-blake', name: 'William Blake', note: 'The private mythology and the visionary line.' },
+            { slug: 'samuel-johnson', name: 'Samuel Johnson', note: 'His friend and defender.' },
+            { slug: 'john-clare', name: 'John Clare', note: 'The asylum poems a generation later.' }
+        ]
+    },
+
+    'clarence-major': {
+        body: [
+            'A poet, novelist and painter whose work moves between experimental abstraction and plain narrative, and who has been publishing across every genre since the 1960s without settling in any of them.',
+            'The poems draw on jazz, on the visual arts and on Black American speech, and he edited an early dictionary of African American slang. He was associated with the Black Arts moment while resisting its demand that Black writing be programmatic. The result is a body of work that is hard to summarise and consistently interesting.'
+        ],
+        readNext: [
+            { slug: 'ishmael-reed', name: 'Ishmael Reed', note: 'The satirist of the same era.' },
+            { slug: 'nathaniel-mackey', name: 'Nathaniel Mackey', note: 'Black experimental writing at length.' },
+            { slug: 'jayne-cortez', name: 'Jayne Cortez', note: 'Jazz and the Black avant-garde.' }
+        ]
+    },
+
+    'clark-coolidge': {
+        body: [
+            'One of the most radically abstract poets in American English — the early work strips language down to isolated words and syllables on the page, and the later work runs at enormous speed through a diction drawn from jazz, geology and pulp fiction.',
+            'He is a drummer, and the poems are best understood rhythmically: what governs them is pulse rather than syntax. Enormously prolific. There is no way to read a Coolidge poem for its content, and readers who accept that find one of the great sonic bodies of work of the period.'
+        ],
+        readNext: [
+            { slug: 'tom-raworth', name: 'Tom Raworth', note: 'The British equivalent in velocity.' },
+            { slug: 'gertrude-stein', name: 'Gertrude Stein', note: 'The ancestor of the abstract sentence.' },
+            { slug: 'michael-palmer', name: 'Michael Palmer', note: 'Disjunction with a lyric surface.' }
+        ]
+    },
+
+    'dannie-abse': {
+        body: [
+            'A Welsh Jewish doctor who practised chest medicine for decades and wrote poems the whole time, about patients, South Wales, Jewish inheritance and the awkwardness of being a physician who is also the man writing this down.',
+            'The tone is humane and self-deprecating, the forms are traditional but unobtrusive, and the poems about the consulting room are the best of them — a doctor watching himself perform competence. The late elegies for his wife, killed in a car crash, are direct and unbearable.'
+        ],
+        readNext: [
+            { slug: 'rafael-campo', name: 'Rafael Campo', note: 'The physician writing in metre.' },
+            { slug: 'r-s-thomas', name: 'R. S. Thomas', note: 'The Welsh poem, colder.' },
+            { slug: 'c-dale-young', name: 'C. Dale Young', note: 'Medicine handled precisely.' }
+        ]
+    },
+
+    'darren-sardelli': {
+        body: [
+            'A children\'s poet writing short, rhymed comic pieces built for classroom performance — poems about school, homework, teachers and inventive excuses, with the punchline always in the last line.',
+            'The craft is entirely in the metre and the timing, which have to survive being read aloud by a nine-year-old. He works in schools, and the poems are written with that room in mind. A working children\'s poet rather than a literary figure, and good at the job.'
+        ],
+        readNext: [
+            { slug: 'kenn-nesbitt', name: 'Kenn Nesbitt', note: 'The same comic territory.' },
+            { slug: 'jack-prelutsky', name: 'Jack Prelutsky', note: 'The master of this form.' },
+            { slug: 'bruce-lansky', name: 'Bruce Lansky', note: 'The anthologist of that shelf.' }
+        ]
+    },
+
+    'david-lehman': {
+        body: [
+            'A poet, critic and anthologist who founded and edited a long-running annual selection of American poetry, which has probably shaped more reading habits than any individual book of his.',
+            'His own verse is fast, witty and New York School in descent — one book contains a poem written every day for a year, and the daily discipline shows in the looseness and the charm. He has written well on Auden, on the New York School and on the American songbook. Light on its feet, and knowing about it.'
+        ],
+        readNext: [
+            { slug: 'kenneth-koch', name: 'Kenneth Koch', note: 'His teacher, and comic exuberance.' },
+            { slug: 'ron-padgett', name: 'Ron Padgett', note: 'The deadpan New York line.' },
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'The poem as a daily practice.' }
+        ]
+    },
+
+    'david-orr': {
+        body: [
+            'Primarily a critic — poetry columnist for a major newspaper for years, and the author of a genuinely useful book about why people find poetry intimidating and a second about the most misread poem in America.',
+            'The criticism is funny, sceptical and unusually good at explaining what the poetry world is actually like as an institution. His own verse is sparse and formally careful. Read the prose on Frost first; it is the best short account of how a poem gets misunderstood into fame.'
+        ],
+        readNext: [
+            { slug: 'robert-frost', name: 'Robert Frost', note: 'The subject of his book on misreading.' },
+            { slug: 'stephanie-burt', name: 'Stephanie Burt', note: 'The other contemporary critic-poet here.' },
+            { slug: 'randall-jarrell', name: 'Randall Jarrell', note: 'The critic-poet tradition.' }
+        ]
+    },
+
+    'diane-di-prima': {
+        body: [
+            'The most significant woman of the Beat generation, and the one who kept working long after the movement dispersed — a publisher, a co-editor of an underground literary newsletter, and a poet for six decades.',
+            'The long serial poem she worked on for years mixes revolutionary politics, alchemy, magic and feminist argument in a loose incantatory line. The earlier work is more directly autobiographical about bohemian New York, single motherhood and poverty. She was also a serious student of Buddhism and of the occult, and neither is decorative in the poems.'
+        ],
+        readNext: [
+            { slug: 'anne-waldman', name: 'Anne Waldman', note: 'The next generation of the long incantatory poem.' },
+            { slug: 'gregory-corso', name: 'Gregory Corso', note: 'The Beat with the strangest ear.' },
+            { slug: 'joanne-kyger', name: 'Joanne Kyger', note: 'The other essential woman of that scene.' }
+        ]
+    },
+
+    'duane-niatum': {
+        body: [
+            'A Klallam poet from the Pacific Northwest whose poems are grounded in the coastal landscape — cedar, rain, herons, the strait — and in a family history of removal and boarding schools.',
+            'He edited two important anthologies of Native American poetry that established the field for a general readership, which is a large part of his significance. The verse is lyrical and formally quiet, and it resists the mythic register that publishers often wanted from Native writers of his generation.'
+        ],
+        readNext: [
+            { slug: 'carter-revard', name: 'Carter Revard', note: 'The same generation, with more comedy.' },
+            { slug: 'linda-hogan', name: 'Linda Hogan', note: 'Land and inheritance together.' },
+            { slug: 'sherwin-bitsui', name: 'Sherwin Bitsui', note: 'The later Native American avant-garde.' }
+        ]
+    },
+
+    'edward-taylor': {
+        body: [
+            'A Puritan minister in frontier Massachusetts who wrote elaborate devotional poems for two centuries\' worth of nobody — he left instructions that they not be published, and they were discovered in a library in the 1930s.',
+            'The style is metaphysical, closer to Herbert and Crashaw than to anything in colonial America, and the conceits are homely and extravagant at once: God as a spinning wheel, the soul as a bowling ball, Christ as a distillery. The poems were written as private preparation before administering communion. Nothing else in early American literature is remotely like them.'
+        ],
+        readNext: [
+            { slug: 'george-herbert', name: 'George Herbert', note: 'His obvious model.' },
+            { slug: 'anne-bradstreet', name: 'Anne Bradstreet', note: 'The other colonial poet of substance.' },
+            { slug: 'richard-crashaw', name: 'Richard Crashaw', note: 'The extravagant conceit at its limit.' }
+        ]
+    },
+
+    'etel-adnan': {
+        body: [
+            'A Lebanese American writer and painter whose poems, essays and paintings form one practice — she came to visual art partly because writing in French felt politically compromised during the Algerian war.',
+            'The poems are spare, philosophical and preoccupied with mountains, war, exile and colour. Her prose account of the Lebanese civil war is a landmark. The late work, made in her nineties, is among the most admired; she was rediscovered by the art world very late and the writing followed. Read the poems and look at the paintings together.'
+        ],
+        readNext: [
+            { slug: 'adonis', name: 'Adonis', note: 'The Arabic modernist tradition.' },
+            { slug: 'meena-alexander', name: 'Meena Alexander', note: 'Displacement across several languages.' },
+            { slug: 'inger-christensen', name: 'Inger Christensen', note: 'Philosophical poetry of the same scale.' }
+        ]
+    },
+
+    'gjertrud-schnackenberg': {
+        body: [
+            'A formalist of extraordinary technical ambition whose books are long, meditative sequences in strict metre and rhyme — on her father\'s death, on a chess-playing automaton, on Byzantium, on the death of her husband.',
+            'The scale is unusual: these are book-length poems that sustain formal pressure over hundreds of lines, densely allusive and unhurried. The elegy for her husband is the most direct and the most devastating. She publishes rarely and each book is a single conceived structure rather than a collection.'
+        ],
+        readNext: [
+            { slug: 'anthony-hecht', name: 'Anthony Hecht', note: 'Elaborate form carrying historical horror.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'Difficulty defended.' },
+            { slug: 'lucie-brock-broido', name: 'Lucie Brock-Broido', note: 'Ornate diction and grief.' }
+        ]
+    },
+
+    'gregory-corso': {
+        body: [
+            'The youngest of the core Beats, largely self-educated in prison, and the one with the strangest ear — the poems lurch between the sublime and the ridiculous within a line and are frequently very funny.',
+            'The best-known is a long comic monologue about marriage as a horrifying prospect, and another meditates on the atomic bomb by addressing it directly and affectionately. The technique is genuine: the diction is archaic and slangy at once, deliberately. Uneven, and the good poems are unlike anyone else\'s.'
+        ],
+        readNext: [
+            { slug: 'allen-ginsberg', name: 'Allen Ginsberg', note: 'His friend and promoter.' },
+            { slug: 'lawrence-ferlinghetti', name: 'Lawrence Ferlinghetti', note: 'The publisher of that scene.' },
+            { slug: 'diane-di-prima', name: 'Diane di Prima', note: 'The Beat who kept going.' }
+        ]
+    },
+
+    'gregory-pardlo': {
+        body: [
+            'His poems move between Brooklyn, fatherhood, a father who was a striking air traffic controller, and a long meditation on Black masculinity and inheritance — all handled with an essayist\'s willingness to complicate.',
+            'The style is discursive and syntactically elaborate, and the poems frequently pause to interrogate their own terms. He has written a memoir and translated from Danish. The best pieces set a small domestic scene against a large historical argument without forcing the connection.'
+        ],
+        readNext: [
+            { slug: 'major-jackson', name: 'Major Jackson', note: 'The same generation and register.' },
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Formal invention on shared ground.' },
+            { slug: 'elizabeth-alexander', name: 'Elizabeth Alexander', note: 'The essayist-poet on family and history.' }
+        ]
+    },
+
+    'irving-feldman': {
+        body: [
+            'A poet of Jewish American life and of the Holocaust\'s aftermath, writing in long, syntactically dense poems that argue with themselves and with the reader.',
+            'The early work includes some of the strongest American poetry on the murder of European Jews written by somebody who was not there and knows it. The later books are comic, satirical and preoccupied with friendship, art and the absurdity of literary ambition. He is a poet other poets read; the general audience never quite arrived.'
+        ],
+        readNext: [
+            { slug: 'gerald-stern', name: 'Gerald Stern', note: 'The Jewish American ecstatic line.' },
+            { slug: 'delmore-schwartz', name: 'Delmore Schwartz', note: 'The generation before.' },
+            { slug: 'karl-shapiro', name: 'Karl Shapiro', note: 'Jewish identity in mid-century American verse.' }
+        ]
+    },
+
+    'isabella-whitney': {
+        body: [
+            'The first Englishwoman known to have published original secular poetry, in the 1560s and 70s, and the poems are startlingly practical: she writes as a servant out of work, giving advice to her sisters in service and to her brothers.',
+            'Her best-known piece is a mock will bequeathing the city of London itself — its shops, streets and prisons — since she has nothing else to leave. It is a poem about poverty disguised as a joke, and it is one of the liveliest documents of Elizabethan city life. Recovered by scholars only recently.'
+        ],
+        readNext: [
+            { slug: 'lady-mary-wroth', name: 'Lady Mary Wroth', note: 'The next Englishwoman to publish at length.' },
+            { slug: 'katherine-philips', name: 'Katherine Philips', note: 'The next Englishwoman to publish widely.' },
+            { slug: 'john-skelton', name: 'John Skelton', note: 'The rough vernacular verse of the period.' }
+        ]
+    },
+
+    'ishion-hutchinson': {
+        body: [
+            'A Jamaican poet whose language is dense, baroque and heavily consonantal — the influence of Walcott and of Hopkins is audible, and the vocabulary reaches for the rare word on purpose.',
+            'The subjects are a Jamaican childhood, an absent father, colonial history, and in a recent book the West Indian soldiers and labourers conscripted into the First World War. The difficulty is textural rather than structural: read for the sound and the sense arrives. One of the strongest voices of his generation.'
+        ],
+        readNext: [
+            { slug: 'derek-walcott', name: 'Derek Walcott', note: 'The Caribbean inheritance he works from.' },
+            { slug: 'gerard-manley-hopkins', name: 'Gerard Manley Hopkins', note: 'The consonantal density behind it.' },
+            { slug: 'kamau-brathwaite', name: 'Kamau Brathwaite', note: 'The other Caribbean method.' }
+        ]
+    },
+
+    'jamaal-may': {
+        body: [
+            'A Detroit poet whose poems are built around machines, repair, sound and fear — he worked with electronics and the vocabulary of circuits and engines runs through the work as native language.',
+            'The best-known sequence catalogues phobias, one per poem, and uses them to write about a city, a body and a childhood without ever announcing that it is doing so. He came out of the performance scene and the poems retain that momentum. The line is muscular and the images are exact.'
+        ],
+        readNext: [
+            { slug: 'nate-marshall', name: 'Nate Marshall', note: 'The same generation and city poetics.' },
+            { slug: 'philip-levine', name: 'Philip Levine', note: 'Detroit named plainly.' },
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Invented sequences with a purpose.' }
+        ]
+    },
+
+    'jennifer-moxley': {
+        body: [
+            'A poet of deliberately old-fashioned diction and syntax used for entirely contemporary ends — the poems sound like nineteenth-century verse and are about precarious academic labour, friendship, feminism and the poetry world.',
+            'That estrangement is the method: an elevated register applied to a shabby present makes both visible. She has translated from French and written memoir. The work is austere and demanding and has a devoted readership among poets who value the refusal to sound current.'
+        ],
+        readNext: [
+            { slug: 'lisa-robertson', name: 'Lisa Robertson', note: 'Archaic register turned to theory.' },
+            { slug: 'rosmarie-waldrop', name: 'Rosmarie Waldrop', note: 'The sentence as the site of thought.' },
+            { slug: 'susan-howe', name: 'Susan Howe', note: 'The historical page reactivated.' }
+        ]
+    },
+
+    'joanne-kyger': {
+        body: [
+            'A poet of daily life in Bolinas, California — the garden, the neighbours, the weather, Buddhist practice, a walk — written in short casual lines that look like notes and are considerably more constructed than they appear.',
+            'She travelled in Japan and India with Snyder and Ginsberg and wrote a superb journal of it. The work is anti-monumental on principle: no big poems, no summing up, just attention paid daily for fifty years. Hugely influential on younger poets who wanted an alternative to the ambitious lyric.'
+        ],
+        readNext: [
+            { slug: 'gary-snyder', name: 'Gary Snyder', note: 'The Buddhist and Pacific line.' },
+            { slug: 'cedar-sigo', name: 'Cedar Sigo', note: 'The poet she mentored.' },
+            { slug: 'diane-di-prima', name: 'Diane di Prima', note: 'The other essential woman of that scene.' }
+        ]
+    },
+
+    'john-bunyan': {
+        body: [
+            'The allegory is the achievement, and the verse inside and around it is plainer than anything else in seventeenth-century English — deliberately, since he was writing for readers who had little schooling and less patience for ornament.',
+            'The best-known poem is a marching hymn about being valiant against all discouragement, still sung. He wrote from prison, jailed for preaching without a licence, and the plainness is a Nonconformist position as much as an aesthetic one. Read the verses inside the allegory rather than separately.'
+        ],
+        readNext: [
+            { slug: 'george-herbert', name: 'George Herbert', note: 'The devotional poem, from the other end of the church.' },
+            { slug: 'john-milton', name: 'John Milton', note: 'The Puritan imagination at its grandest.' },
+            { slug: 'christopher-smart', name: 'Christopher Smart', note: 'Praise written from confinement.' }
+        ]
+    },
+
+    'john-lee-clark': {
+        body: [
+            'A DeafBlind poet who writes about tactile life — touch, protactile communication, the body as the medium of contact — from inside an experience most literature has only described from outside.',
+            'The poems are plain, funny and frequently angry about the assumptions hearing and sighted people make. He has argued for a distinctively DeafBlind poetics rather than an accommodation of an existing one, and the essays make the case. Genuinely new material handled without any bid for inspiration.'
+        ],
+        readNext: [
+            { slug: 'ilya-kaminsky', name: 'Ilya Kaminsky', note: 'Deafness as a poetic and political subject.' },
+            { slug: 'lucia-perillo', name: 'Lucia Perillo', note: 'The body written without appeal.' },
+            { slug: 'lucia-perillo', name: 'Lucia Perillo', note: 'Disability written without appeal.' }
+        ]
+    },
+
+    'john-skelton': {
+        body: [
+            'A Tudor poet and royal tutor who wrote in short, rough, headlong lines rhyming on the same sound for as long as he could keep it up — a metre that has been named after him and that nobody else has used well.',
+            'The effect is comic and slightly deranged, and he used it for savage satires on Cardinal Wolsey, for a mock-elegy for a sparrow, and for an alehouse portrait that is one of the earliest great low-life poems in English. Coarse, energetic and completely unlike the courtly verse that followed him.'
+        ],
+        readNext: [
+            { slug: 'geoffrey-chaucer', name: 'Geoffrey Chaucer', note: 'The vernacular master before him.' },
+            { slug: 'isabella-whitney', name: 'Isabella Whitney', note: 'The city and the poor in Tudor verse.' },
+            { slug: 'sir-thomas-wyatt', name: 'Sir Thomas Wyatt', note: 'The courtly manner that displaced him.' }
+        ]
+    },
+
+    'jonathan-williams': {
+        body: [
+            'A poet, publisher, photographer and walker who founded a press that printed Olson, Creeley, Zukofsky, Niedecker and many others — the publishing is at least as important as the poems.',
+            'The verse is short, comic and often built from found language: overheard Appalachian speech, hillbilly sayings, gravestones, gardening catalogues. He championed outsider art and self-taught artists of the American South before anyone else did. A collector, a connector, and a genuine eccentric.'
+        ],
+        readNext: [
+            { slug: 'lorine-niedecker', name: 'Lorine Niedecker', note: 'One of the poets his press kept in print.' },
+            { slug: 'charles-olson', name: 'Charles Olson', note: 'The Black Mountain circle he published.' },
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'Northern speech condensed.' }
+        ]
+    },
+
+    'joyce-sidman': {
+        body: [
+            'A children\'s poet whose books pair verse with natural science — poems about nocturnal animals, about things that survive, about the chemistry of colour — designed so a child gets a poem and a fact from the same page.',
+            'The forms vary widely and are chosen to suit the creature, which is a quiet lesson in what form is for. The books are illustrated and conceived as whole objects. Among the best writing for children about the natural world being made now.'
+        ],
+        readNext: [
+            { slug: 'j-patrick-lewis', name: 'J. Patrick Lewis', note: 'Children\'s verse with a wide range.' },
+            { slug: 'aimee-nezhukumatathil', name: 'Aimee Nezhukumatathil', note: 'Natural wonder for adults.' },
+            { slug: 'marianne-moore', name: 'Marianne Moore', note: 'The precise animal poem.' }
+        ]
+    },
+
+    'juliana-spahr': {
+        body: [
+            'A poet of connection and complicity — one book repeats and extends a sentence about everyone breathing the same air until the reader is implicated in a war being conducted in their name.',
+            'The method is repetition with slow accretion, and the politics are explicit: ecology, empire, capital and the position of a poet inside institutions she criticises. She has co-written and co-edited extensively, and her work on the economics of the poetry world is unusually candid. Formally repetitive by design; read a whole sequence.'
+        ],
+        readNext: [
+            { slug: 'joshua-clover', name: 'Joshua Clover', note: 'His frequent collaborator, and the same politics.' },
+            { slug: 'lyn-hejinian', name: 'Lyn Hejinian', note: 'The Language inheritance.' },
+            { slug: 'craig-santos-perez', name: 'Craig Santos Perez', note: 'Ecology, empire and experimental form.' }
+        ]
+    },
+
+    'kiki-petrosino': {
+        body: [
+            'Her work moves between formal experiment and historical research — a recent book uses her own DNA test results and the archives of a Virginia university founded by a slaveholding president to write about ancestry and erasure.',
+            'The earlier poems are funnier and stranger, built around invented personae and a dry absurdist streak. The constant is a refusal to let a poem settle into either lyric confession or documentary. Formally curious throughout, and the archive work is exact.'
+        ],
+        readNext: [
+            { slug: 'natasha-trethewey', name: 'Natasha Trethewey', note: 'The archive and mixed inheritance.' },
+            { slug: 'evie-shockley', name: 'Evie Shockley', note: 'Formal experiment and Black poetics.' },
+            { slug: 'tyehimba-jess', name: 'Tyehimba Jess', note: 'History in engineered forms.' }
+        ]
+    },
+
+    'kyle-dargan': {
+        body: [
+            'Formally restless poems about Black masculinity, music, technology and Washington, D.C., written with a strong rhythmic pulse drawn from go-go and hip-hop.',
+            'He invents forms and uses received ones, and the books are usually organised around a governing conceit — a video game, a body of water, a set of transmissions. The politics are direct without being slogans. He has edited a literary magazine and taught for years in the city he writes about.'
+        ],
+        readNext: [
+            { slug: 'thomas-sayers-ellis', name: 'Thomas Sayers Ellis', note: 'The other great D.C. poet of that music.' },
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Invented forms with a purpose.' },
+            { slug: 'major-jackson', name: 'Major Jackson', note: 'The same generation and register.' }
+        ]
+    },
+
+    'leigh-hunt': {
+        body: [
+            'A journalist, editor and poet who went to prison for libelling the Prince Regent and whose real importance is as a connector — he published and promoted Keats and Shelley when nobody else would.',
+            'His own verse is uneven and was mocked for its cosy diction; two short poems have survived, one about a man whose love of his fellow beings gets him ahead of the pious in heaven, and one about a stolen kiss. Read him for the literary history and for those two, which are genuinely charming.'
+        ],
+        readNext: [
+            { slug: 'john-keats', name: 'John Keats', note: 'The poet he introduced to the world.' },
+            { slug: 'percy-bysshe-shelley', name: 'Percy Bysshe Shelley', note: 'His friend and defender.' },
+            { slug: 'charles-lamb', name: 'Charles Lamb', note: 'The same London literary circle.' }
+        ]
+    },
+
+    'lisa-robertson': {
+        body: [
+            'A Canadian poet whose books are conceptual and essayistic — one is a set of reports on the weather written in the diction of eighteenth-century meteorology, another rewrites Virgil\'s farming poem as a work about the city.',
+            'The prose is dense, theoretical and voluptuous at once, borrowing period vocabulary to think about architecture, gender, clothing and the constructed nature of nature. Difficult and pleasurable in equal measure. Read a whole book: each one is a single sustained argument.'
+        ],
+        readNext: [
+            { slug: 'jennifer-moxley', name: 'Jennifer Moxley', note: 'The archaic register put to current use.' },
+            { slug: 'cole-swensen', name: 'Cole Swensen', note: 'The book-length lyric investigation.' },
+            { slug: 'sina-queyras', name: 'Sina Queyras', note: 'Canadian experimental poetics.' }
+        ]
+    },
+
+    'marcus-wicker': {
+        body: [
+            'Poems about Black American life that use pop culture — television, sneakers, internet video, gospel — as their vocabulary, with a formal control that the casual surface disguises.',
+            'One book is structured around prayers addressed to unlikely recipients; another confronts police violence directly and refuses the consolations available. The tone moves between comedy and grief quickly and deliberately. A strong ear for the line, and an unusual willingness to let a joke carry the weight.'
+        ],
+        readNext: [
+            { slug: 'terrance-hayes', name: 'Terrance Hayes', note: 'Pop culture inside real technique.' },
+            { slug: 'kyle-dargan', name: 'Kyle Dargan', note: 'The same generation and music.' },
+            { slug: 'jericho-brown', name: 'Jericho Brown', note: 'Faith, violence and invented form.' }
+        ]
+    },
+
+    'margaret-burroughs': {
+        body: [
+            'An artist, teacher and founder of a Black history museum in Chicago, whose poems belong to the same civic project: written to be read at gatherings, direct in address, and unembarrassed about instruction.',
+            'The best-known asks what she should tell her children who are Black, and answers by listing what a world has told them about themselves. She was a printmaker and organiser as much as a writer, and the poems are one instrument among several. Read as part of a life\'s work rather than as a separate career.'
+        ],
+        readNext: [
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'Her Chicago contemporary and friend.' },
+            { slug: 'margaret-walker', name: 'Margaret Walker', note: 'The same generation of public verse.' },
+            { slug: 'langston-hughes', name: 'Langston Hughes', note: 'Poetry written to be useful.' }
+        ]
+    },
+
+    'margaret-walker': {
+        body: [
+            'Her first book opens with a long incantatory poem for her people that has been recited for eighty years — a catalogue of Black American labour, worship and endurance ending in a demand for a new generation.',
+            'She also wrote folk ballads about legendary Black figures, in traditional stanzas, and a major historical novel about her great-grandmother\'s life in slavery and Reconstruction. She taught in Mississippi for decades and founded an institute there. The formal range, from ballad to free-verse oration, is wider than the anthologies show.'
+        ],
+        readNext: [
+            { slug: 'gwendolyn-brooks', name: 'Gwendolyn Brooks', note: 'Her contemporary and the formal counterweight.' },
+            { slug: 'james-weldon-johnson', name: 'James Weldon Johnson', note: 'The folk sermon in Black American verse.' },
+            { slug: 'robert-hayden', name: 'Robert Hayden', note: 'History rendered formally.' }
+        ]
+    },
+
+    'mary-jo-salter': {
+        body: [
+            'A formal poet of considerable technical ease writing about family, travel, art and mortality — the rhymes are frequently so unobtrusive that a reader notices them only on the second pass.',
+            'She was an editor of a major poetry anthology and taught for decades, and the poems have that reader\'s breadth of reference without any showing-off. The best of them take an ordinary domestic occasion and let a formal shape reveal what it contains. Quiet, skilled and unfashionably composed.'
+        ],
+        readNext: [
+            { slug: 'molly-peacock', name: 'Molly Peacock', note: 'Form and a woman\'s life.' },
+            { slug: 'richard-wilbur', name: 'Richard Wilbur', note: 'The formal generation she learned from.' },
+            { slug: 'elizabeth-spires', name: 'Elizabeth Spires', note: 'The same careful middle register.' }
+        ]
+    },
+
+    'michael-schmidt': {
+        body: [
+            'A poet, critic and, above all, a publisher — he founded and ran a press and a magazine that between them kept a very large part of modern poetry in print in Britain for fifty years.',
+            'His histories of poetry, told through the lives of poets, are readable and opinionated. The own verse is formally careful and cosmopolitan, reflecting a Mexican childhood and an English literary life. As with several figures here, the editorial work has shaped what is available to read more than the poems have.'
+        ],
+        readNext: [
+            { slug: 'donald-davie', name: 'Donald Davie', note: 'The critic-poet of British taste.' },
+            { slug: 'james-laughlin', name: 'James Laughlin', note: 'The publisher-poet in America.' },
+            { slug: 'jonathan-galassi', name: 'Jonathan Galassi', note: 'The same double life.' }
+        ]
+    },
+
+    'mina-loy': {
+        body: [
+            'A modernist of extraordinary nerve — her early poems about sex, pregnancy and the female body were considered obscene, and her feminist manifesto demanded the abolition of virginity as a category.',
+            'The style is fragmented, latinate and syntactically strange, using enormous words with total precision. She was a painter, a lampshade designer and a fixture of several avant-gardes without belonging to any. Her long elegy for the poet-boxer she married is among the great modernist poems. Neglected for decades and now central.'
+        ],
+        readNext: [
+            { slug: 'gertrude-stein', name: 'Gertrude Stein', note: 'The other modernist remaking the sentence.' },
+            { slug: 'h-d', name: 'H. D.', note: 'The modernist woman against type.' },
+            { slug: 'e-e-cummings', name: 'E. E. Cummings', note: 'Typographic modernism.' }
+        ]
+    },
+
+    'natalie-diaz': {
+        body: [
+            'A Mojave poet whose language is physical, erotic and charged — the poems handle the Colorado River as a body, the body as a territory, and desire between women with a sensuality that is inseparable from the politics of land and water.',
+            'The first book deals with a brother\'s addiction and is more narrative; the second is denser and more formally ambitious. She is a language activist working on Mojave preservation, and the poems argue that a language and a river are the same kind of thing to lose. Among the most striking voices now writing.'
+        ],
+        readNext: [
+            { slug: 'joy-harjo', name: 'Joy Harjo', note: 'The elder of contemporary Native poetry.' },
+            { slug: 'ada-limn', name: 'Ada Limón', note: 'Her collaborator, and the body in the landscape.' },
+            { slug: 'sherwin-bitsui', name: 'Sherwin Bitsui', note: 'The Native American avant-garde.' }
+        ]
+    },
+
+    'ocean-vuong': {
+        body: [
+            'Lush, elegiac poems about a Vietnamese American family, a mother who could not read, a grandmother\'s war, and queer desire — the language is deliberately beautiful and the material is not.',
+            'The influence of Whitman, of Dickinson and of Vietnamese oral forms are all present. He has since become better known for fiction, and the poems remain the more concentrated work. The risk in the style is over-sweetness and the best poems earn their beauty by what they are holding.'
+        ],
+        readNext: [
+            { slug: 'li-young-lee', name: 'Li-Young Lee', note: 'The clearest ancestor for this sensuousness.' },
+            { slug: 'chen-chen', name: 'Chen Chen', note: 'The same generation, funnier.' },
+            { slug: 'hieu-minh-nguyen', name: 'Hieu Minh Nguyen', note: 'Queer Vietnamese American poetry alongside him.' }
+        ]
+    },
+
+    'patricia-lockwood': {
+        body: [
+            'Her poems came out of the internet and read like it — jokes escalating into surrealism, escalating into grief, in a voice that is unmistakably one person talking.',
+            'The most notorious is a furious prose-poem about rape culture that circulated enormously; another imagines the natural world engaged in relentless sexual activity and is very funny. She has since written memoir and fiction and is a formidable critic. The poems are the least respectable and possibly the most alive part of the work.'
+        ],
+        readNext: [
+            { slug: 'mary-ruefle', name: 'Mary Ruefle', note: 'The comic turn into the abyss.' },
+            { slug: 'dorothea-lasky', name: 'Dorothea Lasky', note: 'Flat statement carrying extremity.' },
+            { slug: 'russell-edson', name: 'Russell Edson', note: 'The prose poem as fable.' }
+        ]
+    },
+
+    'paul-hoover': {
+        body: [
+            'A poet, editor and translator whose anthology of postmodern American poetry defined that field for a generation of students, and whose own work moves through most of the styles it collects.',
+            'The poems are experimental, procedural and often comic — one book is a set of variations on a single Renaissance sonnet, another works through philosophical vocabulary. He translates from Spanish and Vietnamese. Read the anthology to see what he values, then the poems.'
+        ],
+        readNext: [
+            { slug: 'charles-bernstein', name: 'Charles Bernstein', note: 'The movement his anthology mapped.' },
+            { slug: 'clark-coolidge', name: 'Clark Coolidge', note: 'Abstraction at its most committed.' },
+            { slug: 'michael-palmer', name: 'Michael Palmer', note: 'Lyric disjunction.' }
+        ]
+    },
+
+    'peter-cole': {
+        body: [
+            'A translator of medieval Hebrew and Arabic poetry whose versions of the Jewish poets of Muslim Spain are among the finest translations of the last fifty years, and a poet whose own work is formally intricate and steeped in that material.',
+            'The poems are dense with sound and argument, and they engage directly with the politics of Jerusalem, where he lives. Mysticism, translation and political conflict are treated as one subject. He co-founded a press for Hebrew and Arabic literature in translation.'
+        ],
+        readNext: [
+            { slug: 'yehuda-amichai', name: 'Yehuda Amichai', note: 'The modern Hebrew poem.' },
+            { slug: 'khaled-mattawa', name: 'Khaled Mattawa', note: 'The Arabic tradition in English.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'Density and moral argument.' }
+        ]
+    },
+
+    'pierre-martory': {
+        body: [
+            'A French poet who published almost nothing in his lifetime and is read in English largely because John Ashbery, his partner for many years, translated him.',
+            'The poems are dreamlike, melancholy and precise, moving between wartime memory, Parisian life and a persistent sense of exclusion. Ashbery said Martory was the poet he had learned the most from, which reframes both bodies of work. Read them together; the influence runs in both directions.'
+        ],
+        readNext: [
+            { slug: 'john-ashbery', name: 'John Ashbery', note: 'His partner and translator.' },
+            { slug: 'paul-verlaine', name: 'Paul Verlaine', note: 'The French melancholy lyric.' },
+            { slug: 'james-schuyler', name: 'James Schuyler', note: 'The quiet observational poem.' }
+        ]
+    },
+
+    'reginald-dwayne-betts': {
+        body: [
+            'He served over eight years in prison from the age of sixteen, taught himself to read seriously inside, and later became a lawyer — the poems come out of all of that and refuse to be a redemption narrative.',
+            'The technique is formal: sonnets, a canzone, an abecedarian, used because the constraint mirrors the sentence. One book confronts solitary confinement with pages that are partly redacted. He works on prison reform and on getting books into prisons, and the poems and that work are one project.'
+        ],
+        readNext: [
+            { slug: 'etheridge-knight', name: 'Etheridge Knight', note: 'The American prison poem at its source.' },
+            { slug: 'jimmy-santiago-baca', name: 'Jimmy Santiago Baca', note: 'Literacy acquired inside.' },
+            { slug: 'jill-mcdonough', name: 'Jill McDonough', note: 'The carceral system in formal verse.' }
+        ]
+    },
+
+    'richard-jones': {
+        body: [
+            'Plain, quiet, accessible poems about family, faith, fatherhood and ordinary domestic moments, written in short lines and a deliberately simple vocabulary.',
+            'He has edited a long-running literary magazine and the poems have an editor\'s dislike of excess. The mode risks blandness and is saved by the exactness of the observation and by an undertow of grief in the later books. A poet writing for readers rather than for the seminar.'
+        ],
+        readNext: [
+            { slug: 'ted-kooser', name: 'Ted Kooser', note: 'The plain American lyric.' },
+            { slug: 'linda-pastan', name: 'Linda Pastan', note: 'The domestic poem at similar scale.' },
+            { slug: 'jane-kenyon', name: 'Jane Kenyon', note: 'Quiet with a darker floor.' }
+        ]
+    },
+
+    'richard-lovelace': {
+        body: [
+            'A Cavalier poet, imprisoned twice for the royalist cause, who wrote the two lines everyone knows about stone walls not making a prison — and meant them, having tested the proposition.',
+            'The other famous poem tells a lover he could not love her so much if he did not love honour more, which is either gallant or self-serving depending on the reader. The verse is smooth, courtly and technically deft. He died in poverty after the royalist defeat, which gives the earlier gallantry a retrospective edge.'
+        ],
+        readNext: [
+            { slug: 'sir-john-suckling', name: 'Sir John Suckling', note: 'The Cavalier at his most cynical.' },
+            { slug: 'thomas-carew', name: 'Thomas Carew', note: 'The polished end of that circle.' },
+            { slug: 'robert-herrick', name: 'Robert Herrick', note: 'The other great royalist lyricist.' }
+        ]
+    },
+
+    'robert-fitzgerald': {
+        body: [
+            'His verse translations of Homer and Virgil are the reason he matters — supple, readable English hexameter-adjacent lines that became the standard classroom texts for decades and are still the versions many readers hear in their heads.',
+            'His own poems are formally careful, classical in temper and few in number. He was a close friend and editor of Flannery O\'Connor and of James Agee, and much of his working life went into other people\'s books. Read the Odyssey first; the original poems are a footnote to a translator of the first rank.'
+        ],
+        readNext: [
+            { slug: 'david-ferry', name: 'David Ferry', note: 'The later poet-translator of the classics.' },
+            { slug: 'rosanna-warren', name: 'Rosanna Warren', note: 'Classical learning in contemporary verse.' },
+            { slug: 'anne-carson', name: 'Anne Carson', note: 'The classics remade for a later ear.' }
+        ]
+    },
+
+    'robin-becker': {
+        body: [
+            'Accessible, formally attentive poems about lesbian life, family, horses, art and loss, written in a conversational register that never strains for effect.',
+            'The elegies for her sister run through several books and are the strongest material. She writes well about the physical world and about the ethics of ordinary attachment. A poet of the middle register who has been quietly good at it for a long time.'
+        ],
+        readNext: [
+            { slug: 'minnie-bruce-pratt', name: 'Minnie Bruce Pratt', note: 'The same generation and politics.' },
+            { slug: 'marilyn-hacker', name: 'Marilyn Hacker', note: 'Lesbian life in strict form.' },
+            { slug: 'jane-kenyon', name: 'Jane Kenyon', note: 'The quiet elegiac lyric.' }
+        ]
+    },
+
+    'sandra-beasley': {
+        body: [
+            'Witty, formally varied poems about the body, illness, Southern inheritance and the awkwardness of a life lived around a set of severe allergies — the constraint is treated as material rather than as complaint.',
+            'One sequence is spoken by a persona who is part damsel and part something considerably less docile. The tone is dry and the poems are frequently very funny about serious things. She has also written a memoir about food allergy and about disability as a social fact.'
+        ],
+        readNext: [
+            { slug: 'natalie-shapero', name: 'Natalie Shapero', note: 'The comic-morbid contemporary poem.' },
+            { slug: 'lucia-perillo', name: 'Lucia Perillo', note: 'The body written without appeal.' },
+            { slug: 'kay-ryan', name: 'Kay Ryan', note: 'Wit at compressed scale.' }
+        ]
+    },
+
+    'sandra-m-gilbert': {
+        body: [
+            'A critic whose study of nineteenth-century women writers changed how English literature is taught, and a poet whose verse deals with grief, Italian American family and the body.',
+            'Her husband died after routine surgery and the poems and prose that came out of that are the most direct writing she has done. The criticism and the poetry share a preoccupation with what women were permitted to say and what happened to the rest. She also edited a major anthology of women\'s literature.'
+        ],
+        readNext: [
+            { slug: 'alicia-ostriker', name: 'Alicia Ostriker', note: 'The critic-poet on the same questions.' },
+            { slug: 'adrienne-rich', name: 'Adrienne Rich', note: 'The generation of that argument.' },
+            { slug: 'maxine-kumin', name: 'Maxine Kumin', note: 'Grief handled practically.' }
+        ]
+    },
+
+    'shane-mccrae': {
+        body: [
+            'His line is broken by slashes and gaps, interrupting words mid-syllable, and the fracture is the argument: this is a poetics of a history that cannot be spoken smoothly.',
+            'The books take on the American slave trade, a mixed-race childhood in which he was raised by white supremacist grandparents who abducted him, and a heaven populated by figures from that history. The formal control is total and the effect is of somebody speaking under enormous pressure. Among the most distinctive voices now writing.'
+        ],
+        readNext: [
+            { slug: 'robert-hayden', name: 'Robert Hayden', note: 'The historical poem at its source.' },
+            { slug: 'tyehimba-jess', name: 'Tyehimba Jess', note: 'History in engineered forms.' },
+            { slug: 'rickey-laurentiis', name: 'Rickey Laurentiis', note: 'The southern image confronted.' }
+        ]
+    },
+
+    'sherwin-bitsui': {
+        body: [
+            'A Diné poet whose long poems move by rapid surreal image — a city, a desert, oil, water, a horse — with almost no connective tissue and no explanatory frame.',
+            'The Navajo language and ceremonial structure underlie the work without being translated for the reader, which is a deliberate refusal. The subjects are extraction, urban Native life and ecological damage. Difficult in the way a landscape is difficult: read for accumulation rather than argument.'
+        ],
+        readNext: [
+            { slug: 'natalie-diaz', name: 'Natalie Diaz', note: 'The same generation, more erotic and political.' },
+            { slug: 'dg-nanouk-okpik', name: 'dg nanouk okpik', note: 'The Native avant-garde alongside him.' },
+            { slug: 'arthur-sze', name: 'Arthur Sze', note: 'Constellated images of the Southwest.' }
+        ]
+    },
+
+    'sir-arthur-conan-doyle': {
+        body: [
+            'The detective stories are the achievement and he wrote verse throughout his life — ballads of the sea, of soldiers, of sport and of medicine, in brisk traditional metres built for reading aloud.',
+            'The poems are competent, energetic and entirely conventional, and they show a professional storyteller working in a form he enjoyed rather than one he needed. His late spiritualism appears in some of them. Read as a sidelight on a writer whose real instrument was prose narrative.'
+        ],
+        readNext: [
+            { slug: 'rudyard-kipling', name: 'Rudyard Kipling', note: 'The recitable ballad done supremely.' },
+            { slug: 'robert-louis-stevenson', name: 'Robert Louis Stevenson', note: 'The other Scottish storyteller in verse.' },
+            { slug: 'alfred-noyes', name: 'Alfred Noyes', note: 'Narrative verse built for performance.' }
+        ]
+    },
+
+    'stanley-kunitz': {
+        body: [
+            'A career of seventy years in which the poems got simpler and better — the early work is dense and formal, the late work is plain, short and among the finest American poetry about old age.',
+            'The father who died by suicide before he was born runs through the whole body of work, returned to at intervals for decades. He was a gardener of some seriousness and the late poems use it exactly. He served twice as the nation\'s poetry consultant, the second time in his nineties, and mentored several generations.'
+        ],
+        readNext: [
+            { slug: 'theodore-roethke', name: 'Theodore Roethke', note: 'His friend, and the other great American gardener-poet.' },
+            { slug: 'gregory-orr', name: 'Gregory Orr', note: 'His student, working the same wound.' },
+            { slug: 'david-ferry', name: 'David Ferry', note: 'The other great late career here.' }
+        ]
+    },
+
+    'stephen-c-foster': {
+        body: [
+            'The first American to make a living as a professional songwriter, and the words to his songs are the closest thing the nineteenth-century United States had to a national popular verse.',
+            'The melodies have outlasted everything, and the lyrics are a genuine problem: many were written for blackface minstrel performance and carry its caricature, even where he later revised toward sympathy. Ignoring that is dishonest and so is pretending the songs are not extraordinarily well made. He died at thirty-seven in poverty.'
+        ],
+        readNext: [
+            { slug: 'james-whitcomb-riley', name: 'James Whitcomb Riley', note: 'The dialect problem in a later generation.' },
+            { slug: 'paul-laurence-dunbar', name: 'Paul Laurence Dunbar', note: 'The Black poet writing against that caricature.' },
+            { slug: 'anonymous', name: 'Anonymous', note: 'The folk tradition his songs entered.' }
+        ]
+    },
+
+    'susan-griffin': {
+        body: [
+            'An ecofeminist writer whose best-known book alternates the voice of scientific rationality with a lyric counter-voice, arguing that the domination of women and of the natural world are the same operation.',
+            'The form is a hybrid of poem, essay and documentary collage, and it was formally radical when it appeared. Her later work on war, private life and the roots of violence continues the method. The poems proper are direct and political. Read the hybrid books; that is where the real invention is.'
+        ],
+        readNext: [
+            { slug: 'adrienne-rich', name: 'Adrienne Rich', note: 'The same feminist argument in verse.' },
+            { slug: 'juliana-spahr', name: 'Juliana Spahr', note: 'Ecology and politics in experimental form.' },
+            { slug: 'brenda-hillman', name: 'Brenda Hillman', note: 'Environmental activism inside the poem.' }
+        ]
+    },
+
+    'susan-howe': {
+        body: [
+            'She works in archives — colonial New England documents, Dickinson\'s manuscripts, Melville\'s marginalia — and cuts the language she finds into pages where text is scattered, overlapped and set at angles.',
+            'The argument is that history reaches us as damaged material and that a poem should show the damage rather than transcribe it into sense. She began as a visual artist and the pages are meant to be seen. Difficult, exacting, and among the most original bodies of work in American poetry.'
+        ],
+        readNext: [
+            { slug: 'emily-dickinson', name: 'Emily Dickinson', note: 'The manuscripts she has written about at length.' },
+            { slug: 'ronald-johnson', name: 'Ronald Johnson', note: 'Erasure as composition.' },
+            { slug: 'charles-olson', name: 'Charles Olson', note: 'The archive as an open field.' }
+        ]
+    },
+
+    'tarfia-faizullah': {
+        body: [
+            'Her first book is a sequence built from interviews with Bangladeshi women raped by Pakistani soldiers during the 1971 war — the poems alternate the survivors\' testimony with the interviewer\'s discomfort at extracting it.',
+            'That self-implication is what raises the book above documentary. The second collection is more personal, dealing with a sister\'s death and a Bangladeshi American girlhood in Texas. The line is lyrical and the material is not, and she never resolves the tension in favour of beauty.'
+        ],
+        readNext: [
+            { slug: 'emily-jungmin-yoon', name: 'Emily Jungmin Yoon', note: 'Testimony and the poet\'s position.' },
+            { slug: 'carolyn-forch', name: 'Carolyn Forché', note: 'Witness and its ethical problem.' },
+            { slug: 'solmaz-sharif', name: 'Solmaz Sharif', note: 'War in official and personal language.' }
+        ]
+    },
+
+    'tess-taylor': {
+        body: [
+            'Formally attentive poems about American landscape, agriculture, family history and the archive — one book traces her descent from Thomas Jefferson and the plantation that implies, without letting herself off.',
+            'She has worked as a critic and reviewer, and writes well about the labour of growing food. The verse is exact and unhurried, and the historical material is handled with the discomfort it deserves rather than as a curiosity.'
+        ],
+        readNext: [
+            { slug: 'natasha-trethewey', name: 'Natasha Trethewey', note: 'The southern archive as a subject.' },
+            { slug: 'camille-t-dungy', name: 'Camille T. Dungy', note: 'Landscape read against history.' },
+            { slug: 'tess-gallagher', name: 'Tess Gallagher', note: 'The plainspoken American lyric.' }
+        ]
+    },
+
+    'thomas-james': {
+        body: [
+            'He published one book and died by suicide shortly afterwards at twenty-seven, and the book became a cult object — passed between poets in photocopies for decades before being reprinted.',
+            'The poems are cold, precise and full of Egyptian mummies, drowned figures and bodies preserved or dissolving. The influence on later American poets, particularly on Louise Glück, has been considerable and openly acknowledged. A very small body of work with an outsized afterlife.'
+        ],
+        readNext: [
+            { slug: 'louise-glck', name: 'Louise Glück', note: 'Who wrote about the book\'s influence on her.' },
+            { slug: 'sylvia-plath', name: 'Sylvia Plath', note: 'The cold late style he learned from.' },
+            { slug: 'frank-stanford', name: 'Frank Stanford', note: 'Another cult figure who died young.' }
+        ]
+    },
+
+    'thylias-moss': {
+        body: [
+            'Formally unpredictable poems that move fast between registers — theology, science, Black girlhood in Cleveland, jokes, rage — with long sinuous sentences and images that refuse to sit still.',
+            'She later worked on what she called limited fork poetics, extending the poem into video and multimedia. The written work is where most readers start, and the best of it is genuinely startling: a poem can begin with a doll and end somewhere metaphysical without a visible seam.'
+        ],
+        readNext: [
+            { slug: 'harryette-mullen', name: 'Harryette Mullen', note: 'Language pushed structurally.' },
+            { slug: 'lucille-clifton', name: 'Lucille Clifton', note: 'Black girlhood in fewer words.' },
+            { slug: 'will-alexander', name: 'Will Alexander', note: 'Language at maximum pressure.' }
+        ]
+    },
+
+    'tyehimba-jess': {
+        body: [
+            'His major book is an engineering feat: poems about nineteenth-century Black performers built as sonnet crowns that can be read across, down and backwards, plus fold-out pages that work in several directions at once.',
+            'The form is the argument. Conjoined twins who performed together get poems that must be read two ways; a musician erased from the record gets a shape that refuses a single reading. The material is minstrelsy, ragtime, and the artists whose work was stolen. Read the physical book if you can.'
+        ],
+        readNext: [
+            { slug: 'adrian-matejka', name: 'Adrian Matejka', note: 'History assembled from many voices.' },
+            { slug: 'marilyn-nelson', name: 'Marilyn Nelson', note: 'Strict form holding atrocity.' },
+            { slug: 'douglas-kearney', name: 'Douglas Kearney', note: 'The page as a performance score.' }
+        ]
+    },
+
+    'victoria-chang': {
+        body: [
+            'Her best-known book is a sequence of obituaries — for her mother, her father\'s mind, and dozens of abstractions and objects — written in identical justified blocks, so the form itself becomes the relentlessness of loss.',
+            'Later books work through the language of business memoranda and through correspondence with the dead. The formal constraint is always doing conceptual work. She writes about Asian American identity, motherhood and grief with a dryness that keeps the material from becoming sentimental.'
+        ],
+        readNext: [
+            { slug: 'mary-jo-bang', name: 'Mary Jo Bang', note: 'Grief handled through form.' },
+            { slug: 'marilyn-chin', name: 'Marilyn Chin', note: 'The Chinese American inheritance.' },
+            { slug: 'monica-youn', name: 'Monica Youn', note: 'Conceptual precision.' }
+        ]
+    },
+
+    'vijay-seshadri': {
+        body: [
+            'Conversational, essayistic poems that think their way through a subject with a dry wit and an unusual willingness to be uncertain in public.',
+            'Born in India and raised in the American Midwest, he writes about that displacement without making it the whole subject; the poems are as likely to be about a fish, a memory of manual work, or the mechanics of consciousness. The register is calm and the endings frequently open outward rather than closing. A small, careful body of work.'
+        ],
+        readNext: [
+            { slug: 'john-koethe', name: 'John Koethe', note: 'The meditative American poem.' },
+            { slug: 'jaswinder-bolina', name: 'Jaswinder Bolina', note: 'The essayistic poem on displacement.' },
+            { slug: 'carl-dennis', name: 'Carl Dennis', note: 'The reflective register held for a career.' }
+        ]
+    },
+
+    'wisawa-szymborska': {
+        body: [
+            'A Polish poet, read here in translation, whose poems are conversational, ironic and deceptively modest — they begin with an ordinary observation and arrive at something enormous without ever raising the voice.',
+            'The technique is the question: many poems are structured as a series of quiet enquiries into things everybody assumes are settled — a photograph, a cat in an empty flat, the statistics of a population, the end of the world happening elsewhere. She received the Nobel Prize in Literature. Her acceptance speech, in praise of not knowing, is the best short statement of her method.'
+        ],
+        readNext: [
+            { slug: 'czeslaw-milosz', name: 'Czeslaw Milosz', note: 'Her Polish contemporary and fellow laureate.' },
+            { slug: 'zbigniew-herbert', name: 'Zbigniew Herbert', note: 'The same generation, more classical.' },
+            { slug: 'miroslav-holub', name: 'Miroslav Holub', note: 'The dry Central European deadpan.' }
+        ]
+    },
+
+    'w-s-graham': {
+        body: [
+            'A Scottish poet who lived in poverty in Cornwall for most of his life and wrote poems whose central subject is language itself — the difficulty of reaching another person through words, addressed directly to the reader.',
+            'The early work is dense and Dylan Thomas-adjacent; the mature poems are spare, strange and unmistakable, frequently addressing somebody by name across a gap. He wrote superb elegies for painter friends. Neglected in his lifetime and steadily more admired since, particularly by other poets.'
+        ],
+        readNext: [
+            { slug: 'basil-bunting', name: 'Basil Bunting', note: 'The other great neglected British modernist.' },
+            { slug: 'paul-celan', name: 'Paul Celan', note: 'Language as the subject and the obstacle.' },
+            { slug: 'tom-pickard', name: 'Tom Pickard', note: 'The British poem outside the metropolitan centre.' }
+        ]
+    },
+
+    'william-logan': {
+        body: [
+            'Notorious as a reviewer — probably the most severe working critic of American poetry, and genuinely funny about it, which is why the pieces are read even by people who think he is wrong.',
+            'His own poems are formally exact, dense with historical and natural detail, and considerably colder than most contemporary verse. The criticism has overshadowed them almost completely. Read a book of reviews and a collection together and decide whether the standards he applies to others hold up applied to him.'
+        ],
+        readNext: [
+            { slug: 'yvor-winters', name: 'Yvor Winters', note: 'The critic-poet of comparable severity.' },
+            { slug: 'geoffrey-hill', name: 'Geoffrey Hill', note: 'Difficulty and historical density.' },
+            { slug: 'donald-davie', name: 'Donald Davie', note: 'The critical temperament in verse.' }
+        ]
+    },
+
+    'thomas-traherne': {
+        body: [
+            'A seventeenth-century clergyman whose poems and prose meditations were unknown until manuscripts were found on a London bookstall in the 1890s and, remarkably, more were discovered a century later.',
+            'The subject is almost entirely one thing: the world as seen by a child before habit and ownership spoiled it — wheat as orient and immortal, streets as gold. That radiant vision is unusual in a century of devotional gloom. The prose meditations are the greater achievement and the poems are their compressed form.'
+        ],
+        readNext: [
+            { slug: 'henry-vaughan', name: 'Henry Vaughan', note: 'The other mystic of childhood and light.' },
+            { slug: 'george-herbert', name: 'George Herbert', note: 'The devotional tradition behind both.' },
+            { slug: 'william-blake', name: 'William Blake', note: 'Innocence as a serious philosophical position.' }
+        ]
+    },
+
+    'toma-alamun': {
+        body: [
+            'A Slovenian poet, widely translated, whose poems are fast, playful, aggressive and non-sequential — lines that do not follow each other and are not supposed to.',
+            'He published his first book in the 1960s after being briefly jailed for a satirical piece, and became the central figure in Central European poetic modernism, enormously influential on American poets who read him in translation. The tone is exuberant and slightly manic. Read for velocity; asking what a poem is about is the wrong question here.'
+        ],
+        readNext: [
+            { slug: 'frank-ohara', name: 'Frank O\'Hara', note: 'The velocity he admired and adapted.' },
+            { slug: 'marin-sorescu', name: 'Marin Sorescu', note: 'Central European play under a regime.' },
+            { slug: 'james-tate', name: 'James Tate', note: 'The American deadpan absurd.' }
+        ]
+    },
+
+    'john-logan': {
+        body: [
+            'A Catholic poet who taught for decades and whose work moves from formal early verse to a looser, confessional line about desire, drink, faith and friendship.',
+            'He was an important teacher and editor for younger poets, and a generous presence in the American poetry of his period. The poems about the body and about being a Catholic no longer able to be one are the most affecting. Never widely read, and consistently valued by the poets who knew him.'
+        ],
+        readNext: [
+            { slug: 'john-berryman', name: 'John Berryman', note: 'The same generation and the same wreckage.' },
+            { slug: 'james-wright', name: 'James Wright', note: 'The turn from formal to plain.' },
+            { slug: 'thomas-merton', name: 'Thomas Merton', note: 'The Catholic poem of the period.' }
+        ]
+    },
+
+    'dave-smith': {
+        body: [
+            'A Virginia poet of the tidewater and the Chesapeake — watermen, boats, fathers, small towns — writing dense, syntactically knotted narrative poems in a distinctly Southern register.',
+            'The line is long and the diction is thick, which divides readers: the argument for it is that a landscape of mud, tide and labour should not be rendered in a clean lyric line. He edited a major literary review and an influential anthology of his generation. Read the boat and river poems first.'
+        ],
+        readNext: [
+            { slug: 'james-l-dickey', name: 'James L. Dickey', note: 'The Southern physical poem before him.' },
+            { slug: 'rodney-jones', name: 'Rodney Jones', note: 'Southern narrative verse alongside him.' },
+            { slug: 'david-bottoms', name: 'David Bottoms', note: 'The same generation and region.' }
+        ]
+    },
+
+    'e-ethelbert-miller': {
+        body: [
+            'A poet and, more consequentially, a literary organiser — for decades he ran an African American resource centre in Washington, edited anthologies, hosted radio, and connected a very large number of Black writers to each other.',
+            'The poems are short, accessible and frequently about baseball, love, fatherhood and the ordinary business of a Black American life. The plainness is deliberate: he has argued for poetry that reaches people outside the university. The organising work is inseparable from the writing.'
+        ],
+        readNext: [
+            { slug: 'lucille-clifton', name: 'Lucille Clifton', note: 'Plainness with total authority.' },
+            { slug: 'cornelius-eady', name: 'Cornelius Eady', note: 'The institution-builder as poet.' },
+            { slug: 'thomas-sayers-ellis', name: 'Thomas Sayers Ellis', note: 'The other great D.C. poetic presence.' }
         ]
     }
 }
