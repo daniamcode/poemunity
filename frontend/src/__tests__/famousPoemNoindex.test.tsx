@@ -69,6 +69,7 @@ const renderPoem = (origin?: Poem['origin']) => {
         <DetailPage
             initialPoem={poem(origin)}
             initialNextPoem={null}
+            initialRelated={null}
             initialUser={null}
             baseUrl='https://poemunity.com'
             poemId='aubade'

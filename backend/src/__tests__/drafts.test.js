@@ -167,6 +167,10 @@ describe('Drafts — public read paths', () => {
     ['GET /poem/:id (published poem)', (f) => `/api/v1/poem/${f.zenoPublished._id}`],
     ['GET /poem/:id/next (walk from a published poem)', (f) => `/api/v1/poem/${f.zenoPublished._id}/next`],
     ['GET /poem/:slug/next (walk from the oldest poem)', () => '/api/v1/poem/finished-elegy/next'],
+    // Zeno's draft sits between his two published poems by date, so an
+    // unfiltered "more by this author" returns it in the MIDDLE of the list.
+    ['GET /poem/:id/related (more by this author / genre)', (f) => `/api/v1/poem/${f.zenoPublished._id}/related`],
+    ['GET /poem/:slug/related', () => '/api/v1/poem/finished-elegy/related'],
     ['GET /authors (top authors)', () => '/api/v1/authors'],
     ['GET /authors?letter=A', () => '/api/v1/authors?letter=A'],
     ['GET /authors?letter=Z', () => '/api/v1/authors?letter=Z']

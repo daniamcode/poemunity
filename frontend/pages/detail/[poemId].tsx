@@ -12,6 +12,7 @@ import {
     markBackendUnavailable
 } from '../../src/lib/serverApi'
 import { NextPoemResponse } from '../../src/components/Detail/hooks/useNextPoem'
+import { RelatedPoemsResponse } from '../../src/components/Detail/hooks/useRelatedPoems'
 import { JsonLd } from '../../src/components/JsonLd'
 import { Breadcrumbs } from '../../src/components/Breadcrumbs'
 import { categoryToSlug } from '../../src/data/constants'
@@ -23,12 +24,13 @@ import { Poem } from '../../src/typescript/interfaces'
 interface PageProps {
     initialPoem: Poem | null
     initialNextPoem: NextPoemResponse | null
+    initialRelated: RelatedPoemsResponse | null
     initialUser: ServerUser | null
     baseUrl: string
     poemId: string
 }
 
-export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poemId }: PageProps) {
+export default function DetailPage({ initialPoem, initialNextPoem, initialRelated, baseUrl, poemId }: PageProps) {
     const title = poemTitle(initialPoem?.title ?? '', initialPoem?.author)
     const description = poemDescription(initialPoem?.poem ?? '')
     // A poem is reachable by BOTH its id and its slug, so the two URLs are
@@ -109,7 +111,11 @@ export default function DetailPage({ initialPoem, initialNextPoem, baseUrl, poem
                             { name: initialPoem?.title || 'Poem' }
                         ]}
                     />
-                    <Detail initialPoem={initialPoem ?? undefined} initialNextPoem={initialNextPoem} />
+                    <Detail
+                        initialPoem={initialPoem ?? undefined}
+                        initialNextPoem={initialNextPoem}
+                        initialRelated={initialRelated}
+                    />
                 </div>
             </div>
         </>
@@ -125,9 +131,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
     // does not depend on the first call and must not add a hop to TTFB.
     // serverFetch swallows failures into null, so an absent next simply renders
     // nothing — it can never break the page.
-    const [poemResult, nextPoem, initialUser] = await Promise.all([
+    //
+    // /related is in this wave for exactly the same reason. It resolves the poem
+    // itself, so it does not have to wait for the first call — which is the
+    // whole reason it is one endpoint on the backend rather than two ?userId=
+    // and ?genre= calls the page could only build AFTER learning the author and
+    // genre. Two extra lists, no extra hop.
+    const [poemResult, nextPoem, related, initialUser] = await Promise.all([
         serverFetchResult<Poem>(`/api/v1/poem/${poemId}`, undefined, token),
         serverFetch<NextPoemResponse>(`/api/v1/poem/${poemId}/next`, undefined, token),
+        serverFetch<RelatedPoemsResponse>(`/api/v1/poem/${poemId}/related`, undefined, token),
         fetchServerUser(token)
     ])
 
@@ -159,6 +172,13 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
     }
 
     return {
-        props: { initialPoem: poemResult.data, initialNextPoem: nextPoem, initialUser, baseUrl, poemId }
+        props: {
+            initialPoem: poemResult.data,
+            initialNextPoem: nextPoem,
+            initialRelated: related,
+            initialUser,
+            baseUrl,
+            poemId
+        }
     }
 }

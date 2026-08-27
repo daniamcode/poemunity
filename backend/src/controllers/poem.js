@@ -15,9 +15,15 @@ const {
   authorIdOf
 } = require('../utils/poemVisibility')
 const { notify, notifyMany, retract, NOTIFICATION_TYPE } = require('../utils/notifications')
+const { escapeRegex, MAX_REGEX_INPUT } = require('../utils/escapeRegex')
 const Follow = require('../models/Follow')
 
-const AUTHOR_FIELDS = 'name slug picture username'
+// `type` is here for the AI badge. It was missing, so a poem opened directly at
+// /detail/<slug> — the SSR path, and the one a search result lands on — carried
+// no `authorType` and rendered no disclosure, while the same poem reached from a
+// list (which populates `type`) showed one. A disclosure that depends on how the
+// reader arrived is not a disclosure.
+const AUTHOR_FIELDS = 'name slug picture username type'
 
 // A poem is addressable by ObjectId or by slug. Both GET /:poemId and
 // GET /:poemId/next resolve the same way, so the lookup lives here once.
@@ -191,6 +197,91 @@ poemRouter.get('/:poemId/next', userExtractor.optional, async (req, res) => {
     return res.json({ poem: null })
   } catch (error) {
     return res.status(500).json({ error: 'Failed to resolve next poem' })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Related poems (GET /:poemId/related)
+//
+// A poem page used to carry exactly ONE outbound link to another poem — the
+// next-poem card — so 16,087 poems formed a single linked list and reaching the
+// nth cost n clicks. A crawl from the homepage following only server-rendered
+// links reached 11% of the poems within five clicks, which is a large part of
+// why 17,349 URLs sit in Search Console as "Discovered — currently not
+// indexed". This route is the fix: two short lists, so every poem sits on a
+// dozen paths instead of one.
+//
+// It is its own endpoint rather than two calls to GET /poems from the page,
+// for the same reason /next is: the page cannot build those queries until it
+// knows the poem's author and genre, so doing it from the frontend means a
+// SECOND round-trip that starts only after the first finishes. Resolving the
+// poem here lets getServerSideProps fetch this in PARALLEL with the poem
+// itself, adding nothing to TTFB.
+//
+// Ordered like every other list — date DESC, _id DESC — so a poet's newest work
+// leads, and the _id tie-break is load-bearing for the same reason it is
+// everywhere else here: poems seeded in one batch share a `date` to the
+// millisecond, and without it the six returned are arbitrary among the ties.
+//
+// Three exclusions, each of which is a visible bug without it:
+//   * the current poem, which must not offer itself as a way off the page;
+//   * drafts, via publishedOnly — this is a public read path;
+//   * anything already in `byAuthor` is dropped from `byGenre`, or a prolific
+//     poet in a thin category fills both lists with the same six poems and the
+//     module doubles the page's links without adding a single destination.
+//
+// Only the fields a card needs are selected. Twelve full poem bodies is tens of
+// kilobytes on every poem page to render twelve titles.
+// ---------------------------------------------------------------------------
+
+const RELATED_LIMIT = 6
+const RELATED_FIELDS = 'title slug genre date authorId'
+
+function findRelated (filter, excludeIds) {
+  return Poem.find(publishedOnly({ ...filter, _id: { $nin: excludeIds } }))
+    .select(RELATED_FIELDS)
+    .sort(TOTAL_ORDER)
+    .limit(RELATED_LIMIT)
+    .populate('authorId', AUTHOR_FIELDS)
+}
+
+poemRouter.get('/:poemId/related', userExtractor.optional, async (req, res) => {
+  let current
+  try {
+    current = await findPoemByIdOrSlug(req.params.poemId, { populate: false })
+  } catch (error) {
+    current = null
+  }
+
+  // Same 404-not-403 answer as GET /:poemId and /next. A different status for a
+  // draft that exists would make this route an oracle for guessed slugs.
+  if (!current || !canReadPoem(current, req.userId)) {
+    return res.status(404).json({ error: 'poem not found' })
+  }
+
+  try {
+    // A poem with no author has no "more by" list — the same poems the walk
+    // refuses to place. Not an error; the module simply does not render.
+    const byAuthor = current.authorId
+      ? await findRelated({ authorId: current.authorId }, [current._id])
+      : []
+
+    // Anchored and case-insensitive, matching how ?genre= reads the list
+    // endpoint: the collection holds mixed-case genres, so an exact string
+    // match on this poem's own value would miss its neighbours. Escaped
+    // because the pattern is built by interpolation, and a helper that only
+    // some of its call sites reach is how the raw ones happen.
+    const genre = String(current.genre || '').slice(0, MAX_REGEX_INPUT)
+    const byGenre = genre
+      ? await findRelated(
+          { genre: { $regex: `^${escapeRegex(genre)}$`, $options: 'i' } },
+          [current._id, ...byAuthor.map((poem) => poem._id)]
+        )
+      : []
+
+    return res.json({ byAuthor, byGenre })
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to resolve related poems' })
   }
 })
 

@@ -14,7 +14,9 @@ export interface NextPoemTarget {
     author: string
 }
 
-export function poemHref(poem: Poem): string {
+// Structural, not `Poem`: the related-poems endpoint returns a trimmed record
+// with no body or likes, and a link needs only these two fields.
+export function poemHref(poem: { id: string; slug?: string }): string {
     return `/detail/${poem.slug || poem.id}`
 }
 

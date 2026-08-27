@@ -243,6 +243,98 @@
     color: $color-text-medium;
 }
 
+// Related poems — "More by this author" / "More in this genre".
+//
+// Matches .poem__block and .next-poem exactly (including the $bp-xl override
+// above) so all the stacked blocks on a poem page share one width and one left
+// edge. Change one, change all three.
+.related-poems {
+    width: 90vw;
+    max-width: 800px;
+    margin: 0 $space-5 $space-5;
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+}
+
+.related-poems__heading {
+    font-family: $font-heading;
+    font-size: $fs-lg;
+    color: $color-text-dark;
+    margin: 0 0 $space-sm;
+}
+
+.related-poems__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.related-poems__item {
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
+    // A hairline between rows rather than bullets: the titles are the content,
+    // and a bulleted list of poem titles reads as an index rather than as
+    // something to click.
+    border-top: 1px solid $color-border-subtle;
+
+    &:first-child {
+        border-top: none;
+    }
+}
+
+.related-poems__link {
+    // The row is the target, not just the words: a link the width of a short
+    // title is a small tap area on a phone.
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: $space-sm;
+    // 12px rather than 8px: the row is the tap target, and at 8px it measured
+    // 34px tall in the browser. Past WCAG 2.2 AA either way, but 34px is a
+    // cramped thing to hit on a phone when there are seven of them stacked.
+    padding: $space-3 0;
+    text-decoration: none;
+
+    &:hover .related-poems__title,
+    &:focus-visible .related-poems__title {
+        text-decoration: underline;
+    }
+}
+
+.related-poems__title {
+    // A flex item defaults to min-width: auto and would refuse to shrink below
+    // its intrinsic width, so a long unbroken title overflows the row instead
+    // of clamping — the same trap .next-poem__body documents above.
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    // A LINK HAS TO LOOK LIKE ONE. These first rendered as plain black body
+    // text: the rows were links, they navigated, and nothing on screen said so
+    // — which for a module whose entire purpose is to be clicked is the whole
+    // feature missing. Colour plus size, with the underline held back for
+    // hover so six stacked titles do not read as a wall of rules.
+    font-family: $font-heading;
+    font-size: $fs-base;
+    color: $color-primary-dark;
+}
+
+.related-poems__author {
+    font-size: $fs-sm-plus;
+    color: $color-text-medium;
+}
+
+.related-poems__see-all {
+    display: inline-block;
+    margin-top: $space-sm;
+    font-size: $fs-sm-plus;
+    color: $color-primary-dark;
+}
+
 .poem__comments-sentinel {
     width: 1px;
     height: 1px;
@@ -386,7 +478,8 @@
     // all three stacked blocks share one width. It cannot be added here: that
     // file is a CSS module and its class name is hashed. Change one, change both.
     .poem__block,
-    .next-poem {
+    .next-poem,
+    .related-poems {
         width: 40vw;
     }
 }

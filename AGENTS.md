@@ -529,6 +529,49 @@ spinner is gated on `!q`, or the input unmounts mid-search and the user loses
 focus and caret on every keystroke.
 
 
+## Related poems (the other way off a poem page)
+
+Under every poem, two lists of up to six: **More by this author** and **More in
+this genre**. Before them a poem page carried exactly ONE outbound link to
+another poem — the next-poem card — so 16,087 poems formed a single linked list
+and reaching the nth cost n clicks. A crawl from the homepage following only
+server-rendered links reached 11% of the poems within five clicks.
+
+**One endpoint, `GET /api/v1/poem/:poemId/related`, not two calls from the
+page.** The page cannot build a `?userId=` or `?genre=` query until it knows the
+poem's author and genre, so doing it client-side means a SECOND round-trip that
+starts only after the first finishes. Resolving the poem server-side lets
+`getServerSideProps` fetch this in parallel with the poem itself — the same
+reason `/next` is shaped that way.
+
+It answers **404 for a draft nobody owns**, like `/:poemId` and `/next`: a
+different status confirms the slug exists.
+
+Three exclusions, each a visible bug without it: the **current poem** (which must
+not offer itself as a way off the page); **drafts**, via `publishedOnly()`; and
+everything already in `byAuthor` is dropped from `byGenre`, or a prolific poet in
+a thin category fills both lists with the same six poems and the module doubles
+the page's links without adding one destination. A fourth exclusion is
+client-side — the **next-poem card's own destination**, which is normally the
+newest of "More by this author", so the same title appeared twice four lines
+apart. That one was found by looking at the page; no test would have called it
+wrong.
+
+**The links must be in the server-rendered HTML**, which is the whole point:
+crawlers do not run effects. `RelatedPoems.ssr.test.tsx` is a `renderToString`
+guard for exactly the bug that has shipped here three times — seed the props
+into state via a `useEffect` and RTL still passes while the server emits
+nothing. Keep the hook returning straight from its props.
+
+Only the fields a card needs are selected (`title slug genre date authorId`).
+Twelve full poem bodies on every poem page, to render twelve titles.
+
+The **AI badge rides on every row that names an author**, which is what forced a
+related fix: `controllers/poem.js` populated `AUTHOR_FIELDS` without `type`, so
+a poem opened directly at `/detail/<slug>` — the SSR path a search result lands
+on — rendered no badge, while the same poem reached from a list did. A
+disclosure that depends on how the reader arrived is not a disclosure.
+
 ## Next poem (one rule)
 
 The poem detail page carries one **"Next poem"** control. It is never hidden and

@@ -35,6 +35,7 @@ _All other P0 launch blockers are complete._ 🎉 (email on, prod migration, dep
 - **Nine commits are unverified in production.** Six from 2026-08-10 — frontend: `978fa24` author pagination, `dc341f7` SEO smalls, `be58670` sitemap cache header; backend: `5aeb0dd` legacy `/users` routes deleted, `59b3cf9` `?genre=` escaped, `c42e4ca` 400s + the empty-poem guard. **The three backend ones are the first backend deploys in a while and the backend has no test gate at all**, so nothing but CI-on-push stood between them and production. Plus three older: `8d113ba` (author listing aggregation, a **public read path** — confirm the real 3,300-author collection returns the same letters and counts as before), `8283b88` (notification fan-out + index) and `d3adb85` (notifications UI).
 - **This week's SEO work, six commits, all frontend** — `6218d7a` (503 on backend outage), `4698dd0` + `37c0135` (genre introductions, now 132), `9f756cd` (famous poems noindex + sitemap), `24885e5` (introduction collapsed behind "Read more"). Spot-checked on the deployed URL as each went out; what is NOT verified is how the introductions read to a person on a phone, and whether the "Read more" control is obviously tappable at 375px.
 
+- **Related poems on the live site.** Verified locally against the production database at desktop and at a 351px column: links render server-side, the long-title clamp holds, the tap target is 42px. What only the deployed URL can answer is whether the extra backend call shows up in TTFB on a cold serverless function — it is parallel, so it should cost nothing, but that is reasoning, not a measurement.
 - **The header on a real phone, portrait.** Fixed 2026-08-11 and measured from 320px up, but confirm on the device: all five controls visible (menu, wordmark, bell, avatar, logout), nothing clipped, and the Categories menu still opens.
 - **The notifications panel on a real phone.** Fixed 2026-08-11 and measured across 13 widths in a harness built from the real compiled SCSS, but a harness is not a phone: confirm the panel opens fully on screen, that nothing below it scrolls sideways, and that it still sits under the bell on a tablet.
 - **Publishing a poem still works.** `c42e4ca` added validation to the create route and now stores `title`/`poem` trimmed — the most user-facing write on the site. Publish one real poem and confirm it saves, appears in the list, and its slug resolves.
@@ -153,8 +154,6 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 - 🤝 **The scraped corpus includes living, in-copyright poets** (raised 2026-08-17). `seed-poems.js` records the source as `seed@poetryfoundation.org`, and a sample of what it pulled includes Joseph O. Legaspi, Dani Couture, Susan Elizabeth Howe and Andrew Shields — full texts of contemporary poets. **This is legal exposure, not an SEO question**, and `noindex` does not resolve it: the pages are still publicly served. The narrow fix, if you want one, is to remove the in-copyright poems and keep the public-domain canon (Dickinson, Donne, Whitman, Housman, Keats), which would preserve the collections that make the genre pages worth browsing. Scoping how many are affected is a script, not a decision.
 
-- 🤖 **Poem pages are near dead-ends — add "More by this author" and "More in this genre"** (`docs/SEO_AUDIT.md` P3). Measured on the live site: a poem page carries exactly **one** outbound poem link (the Next-poem card), so 16,087 poems form a single linked list and reaching the *n*th costs *n* hops. The author's other poems are already loaded on the page; the genre module is one extra query. It is a reader improvement first and worth doing regardless of the noindex decisions above.
-
 - 🤖 **Pagination strands the middle of large genres** (`docs/SEO_AUDIT.md` P4). The nav on `/love?page=63` links first, last and ±2 — so page 63 of 125 is ~30 hops from either end. Widen the window, or add paginated list URLs to `pages.xml`. Secondary: those poems are reachable through author pages and the sitemap, so this is signal flow rather than discovery.
 
 - 🤖 **Sitemap and heading smalls, one commit** (`docs/SEO_AUDIT.md` P5, ~an hour):
@@ -266,6 +265,8 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 ---
 
 ## ✅ Recently shipped (context — do not re-add)
+
+- **"More by this author" / "More in this genre" on poem pages** (2026-08-27) — a poem page carried exactly ONE outbound poem link, so 16,087 poems formed a single linked list. Two lists of up to six, from one new endpoint `GET /poem/:id/related` fetched in PARALLEL with the poem (it resolves the poem itself, so it adds no hop to TTFB — the reason it is not two `?userId=`/`?genre=` calls from the page). Also fixed a latent disclosure bug found on the way: `poem.js` never populated the author's `type`, so a poem opened directly at `/detail/<slug>` — the SSR path a search result lands on — showed no AI badge while the same poem reached from a list did.
 
 **One line each, by design.** The reasoning that outlives the change lives in `AGENTS.md`; this list exists only so nobody proposes the work again.
 

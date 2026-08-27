@@ -346,6 +346,7 @@ describe('poem page metadata', () => {
             <DetailPage
                 initialPoem={poem as never}
                 initialNextPoem={null}
+            initialRelated={null}
                 initialUser={null}
                 baseUrl='https://poemunity.com'
                 poemId={poemId}
