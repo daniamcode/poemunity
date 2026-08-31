@@ -31,10 +31,39 @@
     display: block;
 }
 
+// THE NAME AND THE POINTS DO NOT FIT ON ONE LINE, so they are stacked.
+//
+// Measured, not guessed. In the 265px right rail the row is 225px wide, and the
+// single-line version spent 169px of that on chrome — rank 28, avatar 44, three
+// 12px gaps, and a 61px points pill — leaving the NAME, which is the only thing
+// anybody reads a ranking for, 56px. Every one of the eight poets was
+// truncated: "Ray Higgins" needed 79px, "Catherine Cawley" 113px. The rail
+// showed "R.", "S...", "C...".
+//
+// Shaving the chrome does not fix it. At the tightest one line can go — rank 22,
+// avatar 34, 8px gaps, 6px pill padding — the name still only reaches 92px and
+// two of eight ordinary two-word names still clip. One line simply cannot hold
+// a name and an "N pts" pill in this rail.
+//
+// Stacking gives the name 122px and fits all eight with room to spare, and it
+// costs almost nothing in height: the row is already sized by the avatar, so
+// two short lines beside it took the card from 619px to 655px — 36px over eight
+// rows. The avatar and the "pts" label both survive, which the one-line
+// alternatives (drop the avatar, drop the unit) do not allow.
+//
+// The rank and avatar span both rows, so they stay vertically centred against
+// the pair rather than pinning to the first line.
 .ranking__item {
     display: grid;
-    grid-template-columns: 28px 44px 1fr auto;
-    column-gap: 12px;
+    // minmax(0, 1fr) rather than 1fr: a bare `1fr` is `minmax(auto, 1fr)`, whose
+    // auto MINIMUM is the full width of the nowrap name — so a long name widens
+    // the grid and overflows the rail instead of ellipsising inside it.
+    grid-template-columns: 24px 40px minmax(0, 1fr);
+    grid-template-areas:
+        'rank avatar name'
+        'rank avatar points';
+    column-gap: 10px;
+    row-gap: 2px;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid $color-bg-subtle;
@@ -51,6 +80,7 @@
 }
 
 .ranking__rank-number {
+    grid-area: rank;
     font-size: $fs-md;
     font-weight: $fw-bold;
     color: $color-text-placeholder;
@@ -62,8 +92,9 @@
 }
 
 .ranking__avatar {
-    width: 44px;
-    height: 44px;
+    grid-area: avatar;
+    width: 40px;
+    height: 40px;
     border-radius: $radius-full;
     overflow: hidden;
 
@@ -86,15 +117,44 @@
 }
 
 .ranking__author-name {
+    grid-area: name;
+    // Sits on the baseline nearest the points below it, rather than floating in
+    // the middle of its own row.
+    align-self: end;
     font-size: $fs-base;
     color: #34495e;
     font-weight: $fw-medium;
-    white-space: nowrap;
+    // WRAPS, rather than clipping to one line.
+    //
+    // Stacking alone only fixed the widest windows. The rail is 15% of the page,
+    // so it is 265px at 1920 but 165px at $bp-xl — and 1280-1440 is where most
+    // people actually are. Measured across widths with the name still on one
+    // line: 1920 clipped one of eight names, 1600 clipped four, 1280 clipped
+    // six, 1200 clipped all eight at a 25px column.
+    //
+    // Widening the rail until today's longest name fits (270px) is chasing a
+    // moving target — the next poet with a longer name breaks it again. Wrapping
+    // has no such threshold: measured at 200/220/230/240/265px, nothing clips at
+    // any of them, and only genuinely long names take a second line. It costs
+    // height only where it is earned.
+    //
+    // `anywhere` so a single unbroken 30-character username breaks rather than
+    // widening the grid, and the clamp keeps even that to two lines with an
+    // ellipsis instead of a tower.
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .ranking__points {
+    grid-area: points;
+    // The pill hugs its number instead of stretching the width of the column.
+    justify-self: start;
+    align-self: start;
     background: $color-bg-subtle;
     padding: 4px 10px;
     border-radius: $radius-pill;

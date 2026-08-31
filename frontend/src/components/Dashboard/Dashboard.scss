@@ -44,6 +44,11 @@
         top: 100px;
         align-self: flex-start;
         width: 15%;
+        // Matches the ranking rail's floor. The two rails MUST total the same
+        // (see the note on .dashboard__ranking below), so a minimum on one is a
+        // minimum on both — otherwise the centre column stops being
+        // page-centred at exactly the widths where the floor applies.
+        min-width: 230px;
         margin-left: 3%;
         margin-right: 3%;
         max-height: calc(100vh - 120px);
@@ -56,6 +61,14 @@
 
     .dashboard__list {
         width: 65%;
+        // REQUIRED by the rails' min-width, not cosmetic. The three declared
+        // widths total 107% (15 + 65 + 15 plus 12% of margins), so this layout
+        // has always depended on flex SHRINKING the columns. A flex item's
+        // default `min-width: auto` is content-based, so once the rails stopped
+        // shrinking past 230px the whole overage had to come from here — and it
+        // could not. Measured: 148px of horizontal page overflow at 1200px and
+        // 105px at 1280px, and this line takes both to zero.
+        min-width: 0;
         border-left: 2px solid $color-border-subtle;
     }
 
@@ -78,6 +91,19 @@
         top: 100px;
         align-self: flex-start;
         width: 15%;
+        // A FLOOR, because 15% stops being a usable column well before $bp-xl
+        // does. At 1920 this rail is 265px; at $bp-xl itself it is 165px, of
+        // which the rank, the avatar, the gaps and the card's own padding take
+        // 124 — leaving the poet's NAME, the only thing anyone reads a ranking
+        // for, 25px. That is why the rail rendered "R.", "S...", "C...".
+        //
+        // Measured, not chosen: 230px is where the name column reaches ~81px,
+        // enough for an ordinary word on one line, with longer names wrapping
+        // rather than clipping (see Ranking.scss). Nothing clips at any width
+        // from 1200 to 1920 with this floor in place.
+        //
+        // Applied to the accordion rail too, or the balance below breaks.
+        min-width: 230px;
         margin-left: 3%;
         margin-right: 3%;
         // Both are REQUIRED, not polish — the accordion rail already has them.

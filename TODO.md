@@ -243,6 +243,17 @@ Seeded by a competitor review plus conventions from Allpoetry / HelloPoetry. **S
 
 **Accepted limits** (decided, documented so they are not rediscovered as bugs):
 
+- **The ranking rail has a 230px floor, and so does the accordion rail.** The
+  rails are `width: 15%`, which is 265px at 1920 but 165px at `$bp-xl` — and the
+  poet names were rendering as "R.", "S...", "C...". Fixed 2026-08-31 by
+  stacking the points under the name, wrapping instead of clipping, and flooring
+  both rails; `.dashboard__list` needed `min-width: 0` to pay for it, because the
+  declared widths total 107% and a flex item's default `min-width: auto` left
+  148px of horizontal overflow at 1200px. **Both rails must keep the same
+  floor** — Dashboard.scss's own invariant is that they total the same, or the
+  centre column stops being page-centred. `rankingNames.test.ts` pins all of it
+  against the compiled SCSS, since jsdom computes no widths.
+
 - **The dashboard right rail keeps its own scrollbar.** The nested-scrollbar fix on 2026-08-24 took the dashboard from five scrollable regions to two: the page, and `.dashboard__ranking`. That last one stays on purpose — it is a sticky rail whose content (ranking plus Poem of the week) is taller than the viewport, and a sticky element taller than the viewport pins its top, so without a scroller everything below the fold inside it is permanently unreachable. Removing it means shortening the rail — fewer ranking rows, or dropping the sticky — which is a product call, not a bug fix. Measured in headless Chrome at 1728x950: content 1,086px in an 687px rail.
 
 - **A read notification is never retracted.** Unliking removes the row only while unread: a notification you have already seen is part of what happened to you. The visible consequence is a row saying "X liked your poem" beside a poem whose like count no longer includes them. If it ever reads as a bug rather than as history, the alternative is marking the row withdrawn — never a silent delete.
