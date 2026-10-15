@@ -5,3 +5,4 @@ docs/EMAIL_AUTH_PLAN.md
 # these archives, so they must never reach the repository — the directory is
 # tracked-by-name only, never by content.
 /poemunity-backups
+.claude/
