@@ -57,6 +57,27 @@ function interceptComments() {
     cy.intercept('DELETE', '**/api/v1/comments/**').as('deleteComment')
 }
 
+/**
+ * Open a poem page with the comments section guaranteed to mount.
+ *
+ * Comments mount LAZILY: Detail renders a sentinel BELOW RelatedPoems and only
+ * mounts the section once that sentinel comes within 400px of the viewport
+ * (rootMargin). This spec creates poems as it runs, so by mid-suite the two
+ * related lists have grown enough to push the sentinel past the margin — it
+ * never intersects, no section mounts, no GET fires, and every remaining
+ * cy.wait('@getComments') dies with "No request ever occurred" (13 of 21
+ * tests, purely from page height). A plain visit therefore depends on how much
+ * content happens to sit above the fold; scrolling after the poem has rendered
+ * does not.
+ */
+function visitPoem(poemId: string) {
+    cy.visit(`/detail/${poemId}`)
+    // Wait for the poem itself: scrolling before the sentinel exists in the
+    // DOM is a scroll to nothing, and the observer is never attached in time.
+    cy.get('[data-testid="detail-component"]', { timeout: 15000 }).should('exist')
+    cy.scrollTo('bottom')
+}
+
 // ─── Auth gate ────────────────────────────────────────────────────────────────
 
 describe('Comments — auth gate', () => {
@@ -73,7 +94,7 @@ describe('Comments — auth gate', () => {
     it('logged-out user sees login link instead of comment form', () => {
         interceptComments()
         cy.clearLocalStorage()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.contains('Log in').should('be.visible')
         cy.get('textarea').should('not.exist')
@@ -81,14 +102,14 @@ describe('Comments — auth gate', () => {
 
     it('login link points to /login', () => {
         cy.clearLocalStorage()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.get('a[href="/login"]').should('exist')
     })
 
     it('logged-in user sees comment textarea', () => {
         interceptComments()
         cy.login()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.get('textarea').should('be.visible')
     })
@@ -113,7 +134,7 @@ describe('Comments — posting', () => {
 
     it('types and submits a comment, which appears in the list', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
 
         cy.get('textarea').type('This is my comment')
@@ -128,7 +149,7 @@ describe('Comments — posting', () => {
 
     it('comment count increments after posting', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
 
         cy.wait('@getComments').then(interception => {
             const initialCount = (interception.response?.body as unknown[]).length
@@ -150,7 +171,7 @@ describe('Comments — posting', () => {
 
     it('textarea is cleared after posting', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
 
         cy.get('textarea').type('Will be cleared')
@@ -162,14 +183,14 @@ describe('Comments — posting', () => {
 
     it('submit button is disabled when textarea is empty', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.get('button').contains('Post').should('be.disabled')
     })
 
     it('submit button is disabled for whitespace-only input', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.get('textarea').type('   ')
         cy.get('button').contains('Post').should('be.disabled')
@@ -194,7 +215,7 @@ describe('Comments — delete own comment', () => {
             postComment(t, poemId, 'My deletable comment').then(() => {
                 interceptComments()
                 cy.login()
-                cy.visit(`/detail/${poemId}`)
+                visitPoem(poemId)
                 cy.wait('@getComments')
                 cy.get('textarea').should('be.visible')
                 cy.contains('My deletable comment', { timeout: 8000 })
@@ -210,7 +231,7 @@ describe('Comments — delete own comment', () => {
             postComment(t, poemId, 'Modal check comment').then(() => {
                 interceptComments()
                 cy.login()
-                cy.visit(`/detail/${poemId}`)
+                visitPoem(poemId)
                 cy.wait('@getComments')
                 cy.contains('Modal check comment', { timeout: 8000 }).should('be.visible')
 
@@ -233,7 +254,7 @@ describe('Comments — delete own comment', () => {
             postComment(t, poemId, 'Comment to delete').then(created => {
                 interceptComments()
                 cy.login()
-                cy.visit(`/detail/${poemId}`)
+                visitPoem(poemId)
                 cy.wait('@getComments')
                 cy.contains('Comment to delete', { timeout: 8000 }).should('be.visible')
 
@@ -260,7 +281,7 @@ describe('Comments — delete own comment', () => {
             postComment(t, poemId, 'Kept comment').then(() => {
                 interceptComments()
                 cy.login()
-                cy.visit(`/detail/${poemId}`)
+                visitPoem(poemId)
                 cy.wait('@getComments')
                 cy.contains('Kept comment', { timeout: 8000 }).should('be.visible')
 
@@ -303,7 +324,7 @@ describe('Comments — reply flow', () => {
 
     it('clicking Reply shows a reply textarea', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.contains('Parent comment here', { timeout: 8000 }).should('be.visible')
         cy.get('button').contains('Reply').first().click()
@@ -312,7 +333,7 @@ describe('Comments — reply flow', () => {
 
     it('Cancel hides the reply form without posting', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.contains('Parent comment here', { timeout: 8000 }).should('be.visible')
         cy.get('button').contains('Reply').first().click()
@@ -324,7 +345,7 @@ describe('Comments — reply flow', () => {
 
     it('submits a reply with the correct parentId in the POST body', () => {
         interceptComments()
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.contains('Parent comment here', { timeout: 8000 }).should('be.visible')
 
@@ -365,7 +386,7 @@ describe('Comments — cross-user interactions', () => {
         postComment(tokenA, poemId, 'Alice was here').then(() => {
             interceptComments()
             cy.login('test2')
-            cy.visit(`/detail/${poemId}`)
+            visitPoem(poemId)
             cy.wait('@getComments')
             cy.contains('Alice was here', { timeout: 8000 }).should('be.visible')
         })
@@ -375,7 +396,7 @@ describe('Comments — cross-user interactions', () => {
         postComment(tokenA, poemId, 'Only Alice can delete this').then(() => {
             interceptComments()
             cy.login('test2')
-            cy.visit(`/detail/${poemId}`)
+            visitPoem(poemId)
             cy.wait('@getComments')
             cy.get('textarea').should('be.visible')
             cy.contains('Only Alice can delete this', { timeout: 8000 })
@@ -388,7 +409,7 @@ describe('Comments — cross-user interactions', () => {
     it('User B can post their own comment on User A poem', () => {
         interceptComments()
         cy.login('test2')
-        cy.visit(`/detail/${poemId}`)
+        visitPoem(poemId)
         cy.wait('@getComments')
         cy.get('textarea').type('Bob was also here')
         cy.get('button').contains('Post').click()
@@ -404,7 +425,7 @@ describe('Comments — cross-user interactions', () => {
             postComment(tokenB, poemId, 'Bob replies to Alice', parent.id).then(() => {
                 interceptComments()
                 cy.login('test')
-                cy.visit(`/detail/${poemId}`)
+                visitPoem(poemId)
                 cy.wait('@getComments')
                 cy.contains('Alice top-level', { timeout: 8000 }).should('be.visible')
                 cy.contains('Bob replies to Alice', { timeout: 8000 }).should('be.visible')
@@ -422,7 +443,7 @@ describe('Comments — cross-user interactions', () => {
             postComment(tokenB, poemId, 'Bob also commented B')
             interceptComments()
             cy.login('test')
-            cy.visit(`/detail/${poemId}`)
+            visitPoem(poemId)
             cy.wait('@getComments')
             cy.get('textarea').should('be.visible')
             cy.contains('Delete this reply A', { timeout: 8000 }).should('be.visible')
@@ -449,7 +470,7 @@ describe('Comments — cross-user interactions', () => {
         postComment(tokenA, poemId, 'Protected comment C').then(() => {
             interceptComments()
             cy.login('test2')
-            cy.visit(`/detail/${poemId}`)
+            visitPoem(poemId)
             cy.wait('@getComments')
             cy.get('textarea').should('be.visible')
             cy.contains('Protected comment C', { timeout: 8000 }).should('be.visible')
