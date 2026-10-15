@@ -103,6 +103,21 @@ const availabilityLimiter = rateLimit({
   skip: () => process.env.NODE_ENV === 'test'
 })
 
+const commentLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: 'Too many comments, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: req =>
+    process.env.NODE_ENV === 'test' ||
+    req.method !== 'POST' ||
+    (
+      process.env.SIMULATION_INTERNAL_SECRET &&
+      req.get('x-simulation-secret') === process.env.SIMULATION_INTERNAL_SECRET
+    )
+})
+
 app.use('/api/v1/login', loginLimiter, loginRouter)
 app.use('/api/v1/register/availability', availabilityLimiter)
 app.use('/api/v1/register', registerLimiter, registerRouter)
@@ -117,11 +132,11 @@ app.use('/api/v1/poem', poemRouter)
 // paths are matched here before the authors router gets a chance at them.
 app.use('/api/v1/authors', followsRouter)
 app.use('/api/v1/authors', authorsRouter)
-app.use('/api/v1/comments', commentsRouter)
+app.use('/api/v1/comments', commentLimiter, commentsRouter)
 app.use('/api/v1/notifications', notificationsRouter)
 
 app.get('/', (req, res) => {
   res.send('Server is ok')
 })
 
-module.exports = { app }
+module.exports = { app, commentLimiter }
