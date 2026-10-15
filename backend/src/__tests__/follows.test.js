@@ -5,6 +5,17 @@ const { app } = require('../../app')
 const Author = require('../models/Author')
 const Follow = require('../models/Follow')
 
+// Build the unique { follower, following } index BEFORE any test relies on the
+// database rejecting a duplicate edge. The follow route has no read-then-write
+// check by design (both requests in a double-click read "no" before either
+// writes) — it depends entirely on E11000 — so if these tests run while the
+// index is still building in the background, the idempotency test's second POST
+// silently INSERTS a second edge and reports followerCount 4 instead of 3.
+// (observed as a full-suite-only flake; same pattern as auth-integrity.test.js)
+beforeAll(async () => {
+  await Follow.init()
+})
+
 // ---------------------------------------------------------------------------
 // The social graph.
 //
