@@ -26,8 +26,9 @@ module.exports = async (req, res, next) => {
     // accounts not present in the Author collection can't be evaluated here, so
     // they pass (they predate verification).
     if (author && !author.emailVerified) {
+      const action = req.baseUrl && req.baseUrl.includes('comments') ? 'commenting' : 'publishing'
       return res.status(403).json({
-        error: 'Please verify your email address before publishing.',
+        error: `Please verify your email address before ${action}.`,
         code: 'EMAIL_UNVERIFIED'
       })
     }

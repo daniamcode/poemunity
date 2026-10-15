@@ -69,6 +69,52 @@
     }
 }
 
+.commentsUnverified {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-2;
+    padding: $space-4;
+    background: #fff4e5;
+    color: #7a4f01;
+    border: 1px solid #f0d9b5;
+    border-radius: $radius-md;
+    font-size: $fs-sm-plus;
+    margin-top: $space-4;
+}
+
+.commentsUnverifiedText {
+    margin: 0;
+    font-weight: $fw-medium;
+}
+
+.commentsUnverifiedButton {
+    border: 1px solid #7a4f01;
+    background: transparent;
+    color: #7a4f01;
+    padding: 0.3rem 0.8rem;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    transition: background 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background: rgba(122, 79, 1, 0.08);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.commentsUnverifiedSent {
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    color: #7a4f01;
+}
+
 .comment {
     padding: $space-md 0;
     border-bottom: 1px solid $color-border-subtle;

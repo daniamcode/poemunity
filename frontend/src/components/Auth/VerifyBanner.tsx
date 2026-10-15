@@ -32,7 +32,7 @@ const VerifyBanner = (): React.JSX.Element | null => {
     return (
         <div className='verify-banner' role='status'>
             <span className='verify-banner__text'>
-                Please verify your email address to secure your account.
+                Please verify your email address to publish poems and leave comments.
             </span>
             {state === 'sent'
                 ? (

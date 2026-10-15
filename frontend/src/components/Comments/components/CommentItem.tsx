@@ -53,6 +53,11 @@ export default function CommentItem({ comment, replies, context, onDelete, onRep
     const isOwner = !!context.user && context.userId === comment.authorId
     const isAdmin = !!context.user && context.isAdmin
     const canDelete = isOwner || isAdmin
+    // Same rule CommentsSection uses for the composer: signed in, admin-exempt,
+    // and the profile says the address is not verified yet. `undefined` (an
+    // older context, or SSR props not yet hydrated) is NOT unverified — only an
+    // explicit false is, so nobody is locked out by a missing field.
+    const isUnverified = Boolean(context.user && context.emailVerified === false && !context.isAdmin)
 
     const handleDelete = () => {
         setShowConfirm(true)
@@ -110,20 +115,35 @@ export default function CommentItem({ comment, replies, context, onDelete, onRep
 
             <div className={styles.commentFooter}>
                 {context.user && (
-                    <button className={styles.commentReplyBtn} onClick={() => setShowReplyForm(v => !v)}>
+                    // Hover/focus hint: an unverified reader learns WHY before
+                    // clicking, instead of only after opening the form.
+                    <button
+                        type='button'
+                        className={styles.commentReplyBtn}
+                        onClick={() => setShowReplyForm(v => !v)}
+                        title={isUnverified ? 'Verify your email address to reply' : undefined}
+                    >
                         Reply
                     </button>
                 )}
             </div>
 
             {showReplyForm && (
-                <CommentForm
-                    onSubmit={handleReply}
-                    placeholder='Write a reply…'
-                    buttonLabel='Reply'
-                    onCancel={() => setShowReplyForm(false)}
-                    styles={styles}
-                />
+                isUnverified ? (
+                    <div className={styles.commentsUnverified} role='status'>
+                        <p className={styles.commentsUnverifiedText}>
+                            Please verify your email address to reply.
+                        </p>
+                    </div>
+                ) : (
+                    <CommentForm
+                        onSubmit={handleReply}
+                        placeholder='Write a reply…'
+                        buttonLabel='Reply'
+                        onCancel={() => setShowReplyForm(false)}
+                        styles={styles}
+                    />
+                )
             )}
 
             {replies.length > 0 && (

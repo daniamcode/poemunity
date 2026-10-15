@@ -211,6 +211,41 @@ describe('requireVerified gate on publishing (flag-controlled)', () => {
       delete process.env.REACT_APP_ADMIN
     }
   })
+
+  test('flag OFF (default): an unverified user can still comment', async () => {
+    const author = await registerUser()
+    const targetId = new (require('mongoose').Types.ObjectId)()
+    await request(app)
+      .post('/api/v1/comments')
+      .set('Authorization', `Bearer ${tokenFor(author)}`)
+      .send({ targetType: 'profile', targetId, body: 'Hello' })
+      .expect(201)
+  })
+
+  test('flag ON: an unverified user is blocked from commenting with 403 EMAIL_UNVERIFIED', async () => {
+    process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+    const author = await registerUser()
+    const targetId = new (require('mongoose').Types.ObjectId)()
+    const res = await request(app)
+      .post('/api/v1/comments')
+      .set('Authorization', `Bearer ${tokenFor(author)}`)
+      .send({ targetType: 'profile', targetId, body: 'Hello' })
+      .expect(403)
+    expect(res.body.code).toBe('EMAIL_UNVERIFIED')
+    expect(res.body.error).toBe('Please verify your email address before commenting.')
+  })
+
+  test('flag ON: a verified user can comment', async () => {
+    process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+    const author = await registerUser()
+    await Author.updateOne({ _id: author._id }, { $set: { emailVerified: true } })
+    const targetId = new (require('mongoose').Types.ObjectId)()
+    await request(app)
+      .post('/api/v1/comments')
+      .set('Authorization', `Bearer ${tokenFor(author)}`)
+      .send({ targetType: 'profile', targetId, body: 'Hello' })
+      .expect(201)
+  })
 })
 
 describe('POST /api/v1/admin/test-users (admin test-account exemption)', () => {

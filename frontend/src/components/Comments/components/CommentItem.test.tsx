@@ -199,6 +199,48 @@ describe('CommentItem', () => {
         })
     })
 
+    describe('email verification gate', () => {
+        const unverifiedCtx: Context = { ...loggedInCtx, emailVerified: false }
+        const verifiedCtx: Context = { ...loggedInCtx, emailVerified: true }
+
+        test('reply button carries a hover hint for an unverified reader', () => {
+            renderItem(baseComment, unverifiedCtx)
+            expect(screen.getByRole('button', { name: /reply/i })).toHaveAttribute(
+                'title',
+                'Verify your email address to reply'
+            )
+        })
+
+        test('reply button has no hint once the address is verified', () => {
+            renderItem(baseComment, verifiedCtx)
+            expect(screen.getByRole('button', { name: /reply/i })).not.toHaveAttribute('title')
+        })
+
+        test('no hint when the account state is unknown (field absent)', () => {
+            renderItem(baseComment, loggedInCtx)
+            expect(screen.getByRole('button', { name: /reply/i })).not.toHaveAttribute('title')
+        })
+
+        test('clicking Reply while unverified shows the notice, not the reply form', () => {
+            renderItem(baseComment, unverifiedCtx)
+            fireEvent.click(screen.getByRole('button', { name: /reply/i }))
+            expect(screen.getByText('Please verify your email address to reply.')).toBeInTheDocument()
+            expect(screen.queryByPlaceholderText('Write a reply…')).not.toBeInTheDocument()
+        })
+
+        test('an admin can reply even when flagged unverified', () => {
+            renderItem(baseComment, { ...adminCtx, emailVerified: false })
+            fireEvent.click(screen.getByRole('button', { name: /reply/i }))
+            expect(screen.getByPlaceholderText('Write a reply…')).toBeInTheDocument()
+        })
+
+        test('a verified reader gets the reply form', () => {
+            renderItem(baseComment, verifiedCtx)
+            fireEvent.click(screen.getByRole('button', { name: /reply/i }))
+            expect(screen.getByPlaceholderText('Write a reply…')).toBeInTheDocument()
+        })
+    })
+
     describe('nested replies', () => {
         const reply: Comment = {
             ...baseComment,
