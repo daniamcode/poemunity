@@ -152,6 +152,45 @@ describe('Poems API - Pagination', () => {
       )
     })
 
+    test('should echo the requested page/limit when the author slug matches nobody', async () => {
+      // The author-not-found branch used to hardcode `page: 1, limit: 10`
+      // whatever was asked for, so a client paginating an author page past the
+      // end got a response claiming it had requested page 1 of 10 — and any
+      // logic reading `page` back (nav highlighting, URL sync) disagreed with
+      // the URL it was built from.
+      const response = await request(app)
+        .get('/api/v1/poems')
+        .query({ author: 'no-such-author-slug', page: 3, limit: 25 })
+        .expect(200)
+
+      expect(response.body.poems).toHaveLength(0)
+      expect(response.body.total).toBe(0)
+      expect(response.body.page).toBe(3)
+      expect(response.body.limit).toBe(25)
+      expect(response.body.totalPages).toBe(0)
+      expect(response.body.hasMore).toBe(false)
+    })
+
+    test('should cap the echoed limit at 100 for an author slug that matches nobody', async () => {
+      const response = await request(app)
+        .get('/api/v1/poems')
+        .query({ author: 'no-such-author-slug', page: 1, limit: 250 })
+        .expect(200)
+
+      expect(response.body.limit).toBe(100)
+    })
+
+    test('should still default to page 1 / limit 10 when pagination was not requested', async () => {
+      const response = await request(app)
+        .get('/api/v1/poems')
+        .query({ author: 'no-such-author-slug' })
+        .expect(200)
+
+      expect(response.body.poems).toHaveLength(0)
+      expect(response.body.page).toBe(1)
+      expect(response.body.limit).toBe(10)
+    })
+
     test('should validate page parameter', async () => {
       const response = await request(app)
         .get('/api/v1/poems')

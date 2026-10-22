@@ -256,11 +256,37 @@ poemsRouter.get('/', userExtractor.optional, async (req, res) => {
       filter.likes = req.query.likedBy
     }
 
+    // Pagination is parsed BEFORE the author filter, not after, because the
+    // author-not-found response below has to ECHO the caller's requested
+    // page/limit — it used to hardcode `page: 1, limit: 10` whatever was asked
+    // for, so `/api/v1/poems?author=missing&page=3&limit=25` claimed the
+    // request had asked for page 1 of 10.
+    const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
+    let page = 1
+    let limit = 10
+
+    if (isPaginationRequested) {
+      const pageParam = req.query.page !== undefined ? parseInt(req.query.page) : null
+      const limitParam = req.query.limit !== undefined ? parseInt(req.query.limit) : null
+
+      if (pageParam !== null && (isNaN(pageParam) || pageParam < 1)) {
+        return res.status(400).json({ error: 'Page must be greater than 0' })
+      }
+      if (limitParam !== null && (isNaN(limitParam) || limitParam < 1)) {
+        return res.status(400).json({ error: 'Limit must be greater than 0' })
+      }
+
+      page = pageParam || 1
+      limit = limitParam || 10
+    }
+
     // Author filter by slug — O(1) indexed lookup, no regex or reconstruction
     if (req.query.author) {
       const author = await Author.findOne({ slug: req.query.author })
       if (!author) {
-        return res.json({ poems: [], total: 0, page: 1, limit: 10, totalPages: 0, hasMore: false })
+        const echoedLimit = isPaginationRequested ? Math.min(limit, 100) : 10
+        const echoedPage = isPaginationRequested ? page : 1
+        return res.json({ poems: [], total: 0, page: echoedPage, limit: echoedLimit, totalPages: 0, hasMore: false })
       }
       filter.authorId = author._id
     }
@@ -302,21 +328,7 @@ poemsRouter.get('/', userExtractor.optional, async (req, res) => {
       Object.assign(filter, PUBLISHED_MATCH)
     }
 
-    const isPaginationRequested = req.query.page !== undefined || req.query.limit !== undefined
-
     if (isPaginationRequested) {
-      const pageParam = req.query.page !== undefined ? parseInt(req.query.page) : null
-      const limitParam = req.query.limit !== undefined ? parseInt(req.query.limit) : null
-
-      if (pageParam !== null && (isNaN(pageParam) || pageParam < 1)) {
-        return res.status(400).json({ error: 'Page must be greater than 0' })
-      }
-      if (limitParam !== null && (isNaN(limitParam) || limitParam < 1)) {
-        return res.status(400).json({ error: 'Limit must be greater than 0' })
-      }
-
-      const page = pageParam || 1
-      const limit = limitParam || 10
       const effectiveLimit = Math.min(limit, 100)
       const skip = (page - 1) * effectiveLimit
 
