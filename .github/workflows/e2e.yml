@@ -117,10 +117,18 @@ jobs:
       # Poll rather than sleep. A cold runner compiles the first route on
       # demand, so the wait is wildly variable; a fixed sleep is either a race or
       # a tax on every run.
+      #
+      # Poll /robots.txt, NOT /. Since 6218d7a the homepage answers 503 when the
+      # backend is down — and the test backend only starts LATER, inside
+      # cypress.config.ts — so `curl -f /` could never succeed and every run
+      # died here after 90s without a single spec executing (the scheduled runs
+      # sat red for three weeks over exactly this). robots.txt is a static file:
+      # it proves the dev server accepts requests without involving SSR or the
+      # backend.
       - name: Wait for frontend
         run: |
           for i in $(seq 1 90); do
-            if curl -fsS -o /dev/null http://localhost:3000/; then
+            if curl -fsS -o /dev/null http://localhost:3000/robots.txt; then
               echo "frontend up after ${i}s"
               exit 0
             fi
