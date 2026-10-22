@@ -39,9 +39,8 @@ const sections: LegalSection[] = [
                 'make account features work. The service does not currently use third-party advertising cookies.'
             ]),
             text([
-                'The authentication implementation is being migrated toward httpOnly cookies.',
-                'During that migration, some client-side flows may still read account session data from',
-                'local storage.'
+                'The authentication session is stored in an httpOnly cookie, which JavaScript cannot',
+                'read. Poemunity does not store account session data in local storage.'
             ])
         ]
     },
