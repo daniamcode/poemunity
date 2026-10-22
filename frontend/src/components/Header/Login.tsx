@@ -39,7 +39,7 @@ const Login = (): React.JSX.Element => {
     return (
         <div className='login-container'>
             <div className='login-card'>
-                <h2>Login</h2>
+                <h1>Login</h1>
                 <form className='login' onSubmit={handleLogin} data-testid='login'>
                     <label>
                         Introduce your login credentials or click &quot;Register&quot; if you don&apos;t have them

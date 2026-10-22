@@ -116,7 +116,7 @@ const Register: React.FC = () => {
     return (
         <div className='register-container'>
             <div className='register-card'>
-                <h2>Register</h2>
+                <h1>Register</h1>
                 <form className='register' onSubmit={handleRegister}>
                     <label>Introduce your new credentials or click &quot;Login&quot; if you already have them</label>
                     <div className='register__username'>
