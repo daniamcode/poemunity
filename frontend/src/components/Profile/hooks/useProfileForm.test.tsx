@@ -6,14 +6,15 @@ import store from '../../../redux/store'
 import * as poemActions from '../../../redux/actions/poemActions'
 import * as poemsActions from '../../../redux/actions/poemsActions'
 import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
-import { manageSuccess, manageError } from '../../../utils/notifications'
+import { manageSuccess, manageError, manageServerError } from '../../../utils/notifications'
 import React from 'react'
 import mockRouter from 'next-router-mock'
 
 // Mock the notification utils
 jest.mock('../../../utils/notifications', () => ({
     manageSuccess: jest.fn(),
-    manageError: jest.fn()
+    manageError: jest.fn(),
+    manageServerError: jest.fn()
 }))
 
 // Mock the Redux actions
@@ -663,11 +664,13 @@ describe('useProfileForm', () => {
         })
     })
 
-    test('should call manageError when create poem fails', () => {
+    test('should surface the server message when create poem fails', () => {
         ;(poemsActions.createPoemAction as jest.Mock).mockImplementation(({ callbacks }) => {
             return () => {
                 if (callbacks && callbacks.error) {
-                    callbacks.error()
+                    // The thunk hands its error callback the RESPONSE BODY, so
+                    // this is the 403 EMAIL_UNVERIFIED the gate answers with.
+                    callbacks.error({ code: 'EMAIL_UNVERIFIED', error: 'Please verify your email address before publishing.' })
                 }
                 return Promise.resolve()
             }
@@ -691,7 +694,15 @@ describe('useProfileForm', () => {
             result.current.handleSend(mockEvent)
         })
 
-        expect(manageError).toHaveBeenCalledWith('Sorry. There was an error creating the poem')
+        // The server's body is forwarded WITH the generic fallback: which one
+        // becomes the toast is the helper's own unit test to pin.
+        expect(manageServerError).toHaveBeenCalledWith(
+            { code: 'EMAIL_UNVERIFIED', error: 'Please verify your email address before publishing.' },
+            'Sorry. There was an error creating the poem'
+        )
+        // The generic message must NOT be shown directly any more — swallowing
+        // the EMAIL_UNVERIFIED text is the bug this replaced.
+        expect(manageError).not.toHaveBeenCalled()
     })
 
     test('should call preventDefault on handleSend', () => {
@@ -834,7 +845,7 @@ describe('useProfileForm', () => {
         expect(manageSuccess).toHaveBeenCalledWith('Poem saved')
     })
 
-    test('should call manageError when save poem fails', () => {
+    test('should call manageServerError with the fallback when save poem fails', () => {
         const mockPoemQueryWithItem = {
             item: {
                 id: 'poem-123',
@@ -870,6 +881,6 @@ describe('useProfileForm', () => {
             result.current.handleSend(mockEvent)
         })
 
-        expect(manageError).toHaveBeenCalledWith('Sorry. There was an error saving the poem')
+        expect(manageServerError).toHaveBeenCalledWith(undefined, 'Sorry. There was an error saving the poem')
     })
 })

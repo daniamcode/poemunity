@@ -12,7 +12,7 @@ import {
 } from '../redux/actions/poemsActions'
 import { poemUpdated, poemRemoved } from '../redux/reducers/poemEntitiesReducers'
 import { Context, Poem, PoemStatus } from '../typescript/interfaces'
-import { manageError, manageSuccess } from '../utils/notifications'
+import { manageError, manageServerError, manageSuccess } from '../utils/notifications'
 
 export interface UsePoemActionsParams {
     poem: Poem
@@ -61,6 +61,14 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         else {
                             dispatch(addPoemToFavouritesCache({ poemId: poem.id }))
                         }
+                    },
+                    // There used to be no error callback at all, so a rejected
+                    // like — verification gate, rate limit, anything — did
+                    // nothing visibly: the icon just failed to toggle. The
+                    // server's own words (403 EMAIL_UNVERIFIED, 429) replace
+                    // the fallback when it has any.
+                    error: (err: any) => {
+                        manageServerError(err, 'Sorry. There was an error saving your like')
                     }
                 }
             })
@@ -142,8 +150,8 @@ export function usePoemActions({ poem, context, onDeleteSuccess }: UsePoemAction
                         dispatch(getUserStatsAction())
                         manageSuccess(status === 'published' ? 'Poem published' : 'Poem moved to drafts')
                     },
-                    error: () => {
-                        manageError('Sorry. There was an error updating the poem')
+                    error: (err: any) => {
+                        manageServerError(err, 'Sorry. There was an error updating the poem')
                     }
                 }
             })

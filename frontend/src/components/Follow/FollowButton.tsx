@@ -7,6 +7,7 @@ import type { RootState } from '../../redux/store'
 import { selectAuthorEntityById } from '../../redux/reducers/authorEntitiesReducers'
 import { followAuthorAction, unfollowAuthorAction } from '../../redux/actions/followsActions'
 import { FOLLOW, FOLLOWING_STATE, UNFOLLOW, FOLLOW_LOGGED_OUT_TITLE } from '../../data/constants'
+import { manageServerError } from '../../utils/notifications'
 
 interface FollowButtonProps {
     /** The author's id — the key of the normalized record this button reflects. */
@@ -70,7 +71,13 @@ export default function FollowButton({ authorId, authorSlug, initialIsFollowing 
             context: { config: context.config },
             callbacks: {
                 success: () => setPending(false),
-                error: () => setPending(false)
+                // A rejected follow (verification gate, rate limit) used to
+                // clear the spinner and say nothing, so the button simply
+                // failed to change state. The server's words when it has any.
+                error: (err: any) => {
+                    setPending(false)
+                    manageServerError(err, 'Sorry. There was an error updating your follow')
+                }
             }
         }))
     }

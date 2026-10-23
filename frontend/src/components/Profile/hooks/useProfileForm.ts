@@ -10,7 +10,7 @@ import {
 } from '../../../redux/actions/poemsActions'
 import { poemUpdated } from '../../../redux/reducers/poemEntitiesReducers'
 import { getUserStatsAction } from '../../../redux/actions/statsActions'
-import { manageError, manageSuccess } from '../../../utils/notifications'
+import { manageServerError, manageSuccess } from '../../../utils/notifications'
 import { buildPoemData } from '../../../utils/poemUtils'
 import { PoemStatus } from '../../../typescript/interfaces'
 
@@ -197,8 +197,11 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         dispatch(getUserStatsAction())
                         manageSuccess('Poem created successfully')
                     },
-                    error: () => {
-                        manageError('Sorry. There was an error creating the poem')
+                    error: (err: any) => {
+                        // The server's words when it has any — chiefly the
+                        // 403 EMAIL_UNVERIFIED, which used to be swallowed by
+                        // this generic message and left the poet guessing.
+                        manageServerError(err, 'Sorry. There was an error creating the poem')
                     }
                 }
             })
@@ -240,8 +243,8 @@ export function useProfileForm(context: any, poemQuery: any, poemsListQuery: any
                         router.push('/profile')
                         setPoem(initialPoemState)
                     },
-                    error: () => {
-                        manageError('Sorry. There was an error saving the poem')
+                    error: (err: any) => {
+                        manageServerError(err, 'Sorry. There was an error saving the poem')
                     }
                 }
             })

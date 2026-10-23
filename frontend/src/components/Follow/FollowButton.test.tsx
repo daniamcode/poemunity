@@ -6,6 +6,7 @@ import configureStore from 'redux-mock-store'
 import FollowButton from './FollowButton'
 import { AppContext } from '../../App'
 import * as followsActions from '../../redux/actions/followsActions'
+import * as notifications from '../../utils/notifications'
 import { FOLLOW, FOLLOWING_STATE, UNFOLLOW } from '../../data/constants'
 
 jest.mock('../../redux/actions/followsActions', () => ({
@@ -13,6 +14,8 @@ jest.mock('../../redux/actions/followsActions', () => ({
     followAuthorAction: jest.fn(() => ({ type: 'FOLLOW_AUTHOR' })),
     unfollowAuthorAction: jest.fn(() => ({ type: 'UNFOLLOW_AUTHOR' }))
 }))
+
+jest.mock('../../utils/notifications')
 
 const mockFollow = followsActions.followAuthorAction as jest.Mock
 const mockUnfollow = followsActions.unfollowAuthorAction as jest.Mock
@@ -191,6 +194,52 @@ describe('FollowButton', () => {
             await user.click(button)
 
             expect(mockFollow).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    describe('when the server rejects the follow', () => {
+        test('the server message is shown and the button is usable again', async () => {
+            // A rejected follow (verification gate, rate limit) used to clear
+            // the spinner and say NOTHING — the button just failed to change
+            // state. The thunk hands the error callback the response body.
+            mockFollow.mockImplementationOnce(({ callbacks }: any) => {
+                callbacks.error({
+                    code: 'EMAIL_UNVERIFIED',
+                    error: 'Please verify your email address before following.'
+                })
+                return { type: 'FOLLOW_AUTHOR' }
+            })
+            const user = userEvent.setup()
+            renderButton()
+
+            await user.click(screen.getByRole('button', { name: FOLLOW }))
+
+            expect(notifications.manageServerError).toHaveBeenCalledWith(
+                {
+                    code: 'EMAIL_UNVERIFIED',
+                    error: 'Please verify your email address before following.'
+                },
+                'Sorry. There was an error updating your follow'
+            )
+            // A stuck pending state would hide the retry behind a disabled
+            // button, so the error path has to clear it.
+            expect(screen.getByRole('button', { name: FOLLOW })).not.toBeDisabled()
+        })
+
+        test('a failure with no readable server message falls back to the generic one', async () => {
+            mockFollow.mockImplementationOnce(({ callbacks }: any) => {
+                callbacks.error(undefined)
+                return { type: 'FOLLOW_AUTHOR' }
+            })
+            const user = userEvent.setup()
+            renderButton()
+
+            await user.click(screen.getByRole('button', { name: FOLLOW }))
+
+            expect(notifications.manageServerError).toHaveBeenCalledWith(
+                undefined,
+                'Sorry. There was an error updating your follow'
+            )
         })
     })
 })

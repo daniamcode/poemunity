@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast'
-import { manageError, manageSuccess, manageWarning } from './notifications'
+import { manageError, manageServerError, manageSuccess, manageWarning } from './notifications'
 
 // react-hot-toast's default export is a callable with .error/.success methods.
 jest.mock('react-hot-toast', () => {
@@ -66,6 +66,52 @@ describe('notifications', () => {
     test('manageSuccess forwards to toast.success', () => {
         manageSuccess('Poem deleted')
         expect(toast.success).toHaveBeenCalledWith('Poem deleted')
+    })
+
+    describe('manageServerError prefers the SERVER message over the fallback', () => {
+        // The thunks hand their error callbacks the RESPONSE BODY, so the
+        // server's words live at `.error` — which is not where manageError's
+        // axios-error branch looks. Without this helper the 403
+        // EMAIL_UNVERIFIED and the rate-limit texts all collapsed into the
+        // generic fallback at every call site.
+        test('a thunk-style body uses its message', () => {
+            manageServerError(
+                { error: 'Please verify your email address before liking.' },
+                'generic fallback'
+            )
+            expect(toast.error).toHaveBeenCalledWith('Please verify your email address before liking.')
+        })
+
+        test('a rate-limit body surfaces its own text, not the fallback', () => {
+            manageServerError(
+                { error: 'Too many likes, please try again later' },
+                'generic fallback'
+            )
+            expect(toast.error).toHaveBeenCalledWith('Too many likes, please try again later')
+        })
+
+        test('a raw axios-style error is read through response.data.error', () => {
+            manageServerError(
+                { response: { data: { error: 'This username already exists' } } },
+                'generic fallback'
+            )
+            expect(toast.error).toHaveBeenCalledWith('This username already exists')
+        })
+
+        test('a body with a non-string error uses the fallback — never "[object Object]"', () => {
+            manageServerError({ error: { nested: true } }, 'generic fallback')
+            expect(toast.error).toHaveBeenCalledWith('generic fallback')
+        })
+
+        test('network failures and empty bodies use the fallback', () => {
+            manageServerError(new Error('Network Error'), 'generic fallback')
+            manageServerError(undefined, 'generic fallback')
+            manageServerError(null, 'generic fallback')
+            expect(toast.error).toHaveBeenCalledTimes(3)
+            expect(toast.error).toHaveBeenNthCalledWith(1, 'generic fallback')
+            expect(toast.error).toHaveBeenNthCalledWith(2, 'generic fallback')
+            expect(toast.error).toHaveBeenNthCalledWith(3, 'generic fallback')
+        })
     })
 
     test('manageWarning shows a warning toast', () => {

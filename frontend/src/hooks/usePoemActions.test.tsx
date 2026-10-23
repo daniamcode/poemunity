@@ -152,6 +152,40 @@ describe('usePoemActions', () => {
         })
     })
 
+    test('onLike error callback surfaces the server message (the like used to fail SILENTLY)', () => {
+        const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+
+        const mockEvent = { preventDefault: jest.fn() } as any
+        result.current.onLike(mockEvent)
+
+        // There was no error callback at all before this, so a 403
+        // (verification gate) or 429 (rate limit) did nothing visibly. The
+        // thunk hands the callback the RESPONSE BODY; which of its fields
+        // becomes the toast is pinned in notifications.test.js.
+        const likePoemCall = (poemActions.likePoemAction as jest.Mock).mock.calls[0][0]
+        likePoemCall.callbacks.error({ error: 'Too many likes, please try again later' })
+
+        expect(notifications.manageServerError).toHaveBeenCalledWith(
+            { error: 'Too many likes, please try again later' },
+            'Sorry. There was an error saving your like'
+        )
+    })
+
+    test('onPublish error callback surfaces the server message too', () => {
+        const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
+
+        const mockEvent = { preventDefault: jest.fn() } as any
+        result.current.onPublish(mockEvent)
+
+        const savePoemCall = (poemActions.savePoemAction as jest.Mock).mock.calls[0][0]
+        savePoemCall.callbacks.error({ code: 'EMAIL_UNVERIFIED', error: 'Please verify your email address before publishing.' })
+
+        expect(notifications.manageServerError).toHaveBeenCalledWith(
+            { code: 'EMAIL_UNVERIFIED', error: 'Please verify your email address before publishing.' },
+            'Sorry. There was an error updating the poem'
+        )
+    })
+
     test('onLike success callback updates the single entity and syncs favourites', () => {
         const { result } = renderHook(() => usePoemActions({ poem: mockPoem, context: mockContext }))
 
