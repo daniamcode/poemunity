@@ -8,11 +8,16 @@ Single source of truth for the backlog (frontend + backend). Deeper detail lives
 
 ---
 
-## ▶️ Start here — the three that matter
+## ▶️ Start here — the four that matter
 
-1. **👤 Rotate the MongoDB password and `RESEND_API_KEY`** (P0). Open since 2026-07-30 and the only item with a clock on it. Everything else on this list can wait a week without getting worse; leaked credentials get worse by sitting.
-2. **👤 Count the legacy `users` collection** (P2 security). One query — `db.users.countDocuments()` — decides whether the two routes deleted on 2026-08-10 were serving real people's email addresses to anyone who asked, or nothing at all. It also decides whether there is a migration gap stranding real accounts.
-3. **👤 Look at the live site.** Nine commits are in production unlooked-at, six of them from 2026-08-10, and three of those are backend deploys — the backend has no test gate at all. CI cannot prove a deploy; only the URL can. The list is in *Live-site verification* below, and it takes about ten minutes.
+1. **🤖➡️👤 Push the six LOCAL commits — nothing from 2026-10-23 is on GitHub yet** (blocked when the session ended by a broken machine network: `scutil --dns` said *"No DNS configuration available"* — `nslookup` against `10.116.60.100` resolved, `curl`/git could not, IP connectivity (ping) was fine. Reconnect/renew DHCP first; then push). **All six commits exist only on this laptop** — `cfe721d` (audit smalls, backend) · `888c6da` (docs) · `cac0cc1` (social-write limiters + four-action email gate, backend) · `1cd0103` (client error surfacing, frontend) · `5e81f6e` + this entry (docs). Everything is committed, lint-clean and test-green locally (637 backend / 6,866 frontend, all red-checked). **Push in THREE steps, backend first** — `ignoreCommand` compares only `HEAD^..HEAD`, so one push of all six ends on a docs commit and deploys **neither** app (Standing rule):
+   1. `git push origin cac0cc1:master` → head is backend-only → the backend deploys carrying **both** backend commits (`cfe721d` + `cac0cc1`) in one build;
+   2. `git push origin 1cd0103:master` → head is frontend-only → the frontend deploys;
+   3. `git push origin master` → pushes the remaining docs commits (head is docs-only), no deploy.
+   **Then verify live** (details in *Live-site verification*): `ratelimit-limit: 30/10/10` headers on `PUT /poem/:id`, follow and `POST /poems`; the actual `REQUIRE_EMAIL_VERIFICATION` state in prod (the gate is a pass-through until it is `true`, and flipping it is a live decision needing `verify-existing-users.js` run first); and the earlier `cfe721d` audit-smalls endpoints. Never infer any of this from a green tick.
+2. **👤 Rotate the MongoDB password and `RESEND_API_KEY`** (P0). Open since 2026-07-30 and the only item with a clock on it. Everything else on this list can wait a week without getting worse; leaked credentials get worse by sitting.
+3. **👤 Count the legacy `users` collection** (P2 security). One query — `db.users.countDocuments()` — decides whether the two routes deleted on 2026-08-10 were serving real people's email addresses to anyone who asked, or nothing at all. It also decides whether there is a migration gap stranding real accounts.
+4. **👤 Look at the live site.** Nine commits are in production unlooked-at, six of them from 2026-08-10, and three of those are backend deploys — the backend has no test gate at all. CI cannot prove a deploy; only the URL can. The list is in *Live-site verification* below, and it takes about ten minutes.
 
 **The coverage data landed early, on 2026-08-14: 708 indexed, 19,100 not.** The dominant reason is *Discovered — currently not indexed* (17,349): Google knows those URLs and is choosing not to crawl them. That reframes the top of this list — see the two SEO items in P3, one of which (1,025 soft 404s) is a real bug and the other of which is the famous-poem decision, now informed rather than speculative.
 
