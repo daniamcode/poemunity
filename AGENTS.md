@@ -139,7 +139,7 @@ italic) means adding it in `fonts.ts`, or the browser synthesises one.
 - `index.js` → `app.js` for local/long-running hosts (`app.listen`).
 - **Vercel** uses `api/index.js`, which exports a handler wrapping the Express `app` and caches the Mongo connection across warm invocations. `backend/vercel.json` routes all traffic to it.
 
-**Routes** (`app.js`), all under `/api/v1/`: `login`, `register`, `password`, `verify`, `admin`, `users`, `poems`, `poem`, `authors`, `comments`. `helmet`, `morgan` (non-test), and `express-rate-limit` on login/register/password/verify/comments (10/min on POST; all limiters skip when `NODE_ENV=test`). CORS allowlist from `FRONTEND_URLS` (comma-separated, preferred) else `FRONTEND_URL`.
+**Routes** (`app.js`), all under `/api/v1/`: `login`, `register`, `password`, `verify`, `admin`, `users`, `poems`, `poem`, `authors`, `comments`. `helmet`, `morgan` (non-test), and `express-rate-limit` — login 5/15min, register 3/h, password 5/h, verify 10/h, availability 30/min, and on the social writes: comments 10/min POST, likes 30/min PUT, follows 10/min POST+DELETE (one quota for the pair), poem creation 10/min POST. All limiters skip when `NODE_ENV=test`; the ones the seed scripts legitimately trip also skip on the `x-simulation-secret` credential (`hasSimulationSecret` in `app.js`). The limiters are exported alongside the app so the wiring tests exercise the mounted instances, not re-declared copies. CORS allowlist from `FRONTEND_URLS` (comma-separated, preferred) else `FRONTEND_URL`.
 
 **Models** (`src/models/`): **`Author`** is the primary identity (registered users, fake seeded users, and famous poets — distinguished by `origin`/`fake`). `Poem` stores `authorId` and derives display fields from the populated Author (`name || username`); `Poem.likes` is `[String]`, holding author ids as strings. `Comment`. `User` is **legacy/unused** (kept only for reference).
 
@@ -157,7 +157,10 @@ accounts so several of them can share one inbox.
 (`controllers/password.js`) and email verification (`controllers/verify.js`) store only
 `sha256(token)`, never the raw token, and strip those fields in `toJSON`.
 `passwordChangedAt` revokes existing sessions on reset. `REQUIRE_EMAIL_VERIFICATION`
-gates publishing/commenting (`requireVerified`), and the admin (`REACT_APP_ADMIN`) is
+gates the four social writes — publishing (POST /poems and the PATCH **publish
+transition** only; withdraw and edit stay allowed), commenting, liking and
+following (`requireVerified`, a factory naming the action so the 403 says what
+was actually blocked) — and the admin (`REACT_APP_ADMIN`) is
 exempt. There is **no logged-in "change password" route** yet — the only path is the
 emailed reset link, which resolves by `findOne({ email })` and so is ambiguous for
 shared-inbox test accounts (use `set-account-password.js`). Full design in
@@ -242,7 +245,7 @@ inferred from CI.
 
 **Frontend Vercel project**: `NEXT_PUBLIC_API_URL` (full backend URL). Locally optional — axios defaults to `http://localhost:4200`.
 
-**Backend Vercel project**: `MONGODB` (prod) / `MONGODB_PRE` (dev — but see Gotchas: same database), `SECRET` (JWT), `REACT_APP_ADMIN` (prod) / `REACT_APP_ADMIN_PRE` (dev) admin ObjectId, `FRONTEND_URL` (required in prod) and/or `FRONTEND_URLS`, `RESEND_API_KEY` + `EMAIL_FROM` (email; unset ⇒ sending is a logged no-op), `REQUIRE_EMAIL_VERIFICATION`, `SIMULATION_INTERNAL_SECRET` (lets the simulation scripts bypass the login rate limiter), `NODE_ENV`, `DEBUG`.
+**Backend Vercel project**: `MONGODB` (prod) / `MONGODB_PRE` (dev — but see Gotchas: same database), `SECRET` (JWT), `REACT_APP_ADMIN` (prod) / `REACT_APP_ADMIN_PRE` (dev) admin ObjectId, `FRONTEND_URL` (required in prod) and/or `FRONTEND_URLS`, `RESEND_API_KEY` + `EMAIL_FROM` (email; unset ⇒ sending is a logged no-op), `REQUIRE_EMAIL_VERIFICATION` (the social-write gate; **off by default — flipping it on is a live decision** and legacy users need `verify-existing-users.js` run first), `SIMULATION_INTERNAL_SECRET` (`x-simulation-secret` header — exempts the seed scripts from the rate limiters they legitimately trip), `NODE_ENV`, `DEBUG`.
 
 ## Done: single source of truth (normalized Redux store)
 
