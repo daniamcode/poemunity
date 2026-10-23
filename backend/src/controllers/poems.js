@@ -353,7 +353,7 @@ poemsRouter.get('/', userExtractor.optional, async (req, res) => {
   }
 })
 
-poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
+poemsRouter.post('/', userExtractor, requireVerified('publishing'), async (req, res) => {
   const poemData = req.body
   const { userId } = req
 

@@ -4,6 +4,19 @@ const { getAdminId } = require('../utils/authToken')
 // Write-action email-verification gate. Runs AFTER userExtractor (needs
 // req.userId).
 //
+// A FACTORY, parameterised by the ACTION it blocks, so a blocked request is
+// told the truth about what it was trying to do:
+//
+//   requireVerified('commenting')    POST /comments
+//   requireVerified('publishing')    POST /poems, and the PATCH publish transition
+//   requireVerified('liking')        PUT  /poem/:id
+//   requireVerified('following')     POST/DELETE /authors/:id/follow
+//
+// The action used to be inferred from the mount path (comments ⇒ 'commenting',
+// else 'publishing'), which is why every blocked like would have told the user
+// to "verify before publishing". One parameter is also one place: a new gated
+// route names its own action instead of extending an if/else.
+//
 // OFF BY DEFAULT: enforcement only kicks in when REQUIRE_EMAIL_VERIFICATION is
 // the string 'true'. This is deliberate — until transactional email is actually
 // configured in production (RESEND_API_KEY set + domain verified), no user can
@@ -11,32 +24,33 @@ const { getAdminId } = require('../utils/authToken')
 // out. Shipping the mechanism flag-off lets it be flipped on the moment email
 // is live, with no code change. Until then this is a pass-through and the client
 // shows a soft "verify your email" banner instead.
-module.exports = async (req, res, next) => {
-  if (process.env.REQUIRE_EMAIL_VERIFICATION !== 'true') {
-    return next()
-  }
-  // Admin bypass: the admin can always publish, regardless of the verification
-  // state of their own account (admin should be able to do anything).
-  if (req.userId && String(req.userId) === getAdminId()) {
-    return next()
-  }
-  try {
-    const author = await Author.findById(req.userId).select('emailVerified')
-    // Only block accounts we can positively identify as unverified. Legacy
-    // accounts not present in the Author collection can't be evaluated here, so
-    // they pass (they predate verification).
-    if (author && !author.emailVerified) {
-      const action = req.baseUrl && req.baseUrl.includes('comments') ? 'commenting' : 'publishing'
-      return res.status(403).json({
-        error: `Please verify your email address before ${action}.`,
-        code: 'EMAIL_UNVERIFIED'
-      })
+module.exports = function requireVerified (action) {
+  return async (req, res, next) => {
+    if (process.env.REQUIRE_EMAIL_VERIFICATION !== 'true') {
+      return next()
     }
-    return next()
-  } catch (err) {
-    // Fail open: a transient lookup error must not block publishing for everyone
-    // while this soft, opt-in gate is enabled.
-    console.error(err)
-    return next()
+    // Admin bypass: the admin can always publish, regardless of the verification
+    // state of their own account (admin should be able to do anything).
+    if (req.userId && String(req.userId) === getAdminId()) {
+      return next()
+    }
+    try {
+      const author = await Author.findById(req.userId).select('emailVerified')
+      // Only block accounts we can positively identify as unverified. Legacy
+      // accounts not present in the Author collection can't be evaluated here, so
+      // they pass (they predate verification).
+      if (author && !author.emailVerified) {
+        return res.status(403).json({
+          error: `Please verify your email address before ${action}.`,
+          code: 'EMAIL_UNVERIFIED'
+        })
+      }
+      return next()
+    } catch (err) {
+      // Fail open: a transient lookup error must not block publishing for everyone
+      // while this soft, opt-in gate is enabled.
+      console.error(err)
+      return next()
+    }
   }
 }

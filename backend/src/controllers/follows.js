@@ -1,6 +1,7 @@
 const followsRouter = require('express').Router()
 const Follow = require('../models/Follow')
 const userExtractor = require('../middleware/userExtractor')
+const requireVerified = require('../middleware/requireVerified')
 const { notify, NOTIFICATION_TYPE } = require('../utils/notifications')
 const {
   FOLLOW_AUTHOR_FIELDS,
@@ -87,7 +88,7 @@ function listFollows ({ field, populated }) {
 followsRouter.get('/:idOrSlug/followers', listFollows({ field: 'following', populated: 'follower' }))
 followsRouter.get('/:idOrSlug/following', listFollows({ field: 'follower', populated: 'following' }))
 
-followsRouter.post('/:idOrSlug/follow', userExtractor, async (req, res) => {
+followsRouter.post('/:idOrSlug/follow', userExtractor, requireVerified('following'), async (req, res) => {
   try {
     const author = await resolveAuthorRef(req.params.idOrSlug)
     if (!author) return res.status(404).json({ error: 'Author not found' })
@@ -134,7 +135,7 @@ followsRouter.post('/:idOrSlug/follow', userExtractor, async (req, res) => {
   }
 })
 
-followsRouter.delete('/:idOrSlug/follow', userExtractor, async (req, res) => {
+followsRouter.delete('/:idOrSlug/follow', userExtractor, requireVerified('following'), async (req, res) => {
   try {
     const author = await resolveAuthorRef(req.params.idOrSlug)
     if (!author) return res.status(404).json({ error: 'Author not found' })

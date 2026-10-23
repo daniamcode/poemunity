@@ -4,6 +4,7 @@ const Poem = require('../models/Poem')
 const Author = require('../models/Author')
 const findPoemById = require('../middleware/findPoemById')
 const userExtractor = require('../middleware/userExtractor')
+const requireVerified = require('../middleware/requireVerified')
 const { computeRanking } = require('../utils/ranking')
 const { normalizeGenre } = require('../utils/genre')
 const {
@@ -306,7 +307,7 @@ poemRouter.get('/:poemId', userExtractor.optional, async (req, res) => {
 })
 
 // like poem
-poemRouter.put('/:poemId', userExtractor, findPoemById, async (req, res) => {
+poemRouter.put('/:poemId', userExtractor, requireVerified('liking'), findPoemById, async (req, res) => {
   const { poem } = req
 
   // Nobody can see a draft, so nobody can like one — including its author, whose
@@ -420,7 +421,23 @@ const ADMIN_ONLY_PATCH_FIELDS = ['date', 'likes', 'origin', 'userId']
 
 // modify poem — also the publish/unpublish route (`{ status }`), which is why it
 // is owner-gated and why it can return a ranking.
-poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async (req, res) => {
+// Publishing through PATCH is the same act as publishing through POST /poems,
+// so it takes the same gate — but ONLY the publish TRANSITION. An author must
+// always be able to withdraw a poem or edit its text; requiring verification to
+// take something DOWN would make the gate a trap rather than a standard.
+//
+// The decision is made on the REQUEST, before the allowlist runs, and through
+// `normalizeStatus` rather than raw equality: that is how the handler itself
+// reads the value, so 'Published' or a display name cannot slip a publish past
+// the gate. A body with no `status` at all is not a publish — note that
+// `normalizeStatus(undefined)` folds to 'published', which is exactly why the
+// `!== undefined` check comes first.
+const requireVerifiedToPublish = (req, res, next) =>
+  (req.body && req.body.status !== undefined && normalizeStatus(req.body.status) === POEM_STATUS.PUBLISHED)
+    ? requireVerified('publishing')(req, res, next)
+    : next()
+
+poemRouter.patch('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, requireVerifiedToPublish, async (req, res) => {
   const doc = req.poem
 
   const adminId = process.env.NODE_ENV === 'development'

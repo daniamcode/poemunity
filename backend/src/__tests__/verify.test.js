@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken')
 const { app } = require('../../app')
 const Author = require('../models/Author')
 const Poem = require('../models/Poem')
+const Follow = require('../models/Follow')
 const { sendEmail } = require('../utils/email')
 
 const USER = { username: 'verifyuser', email: 'verify@example.com', password: 'password123' }
@@ -245,6 +246,226 @@ describe('requireVerified gate on publishing (flag-controlled)', () => {
       .set('Authorization', `Bearer ${tokenFor(author)}`)
       .send({ targetType: 'profile', targetId, body: 'Hello' })
       .expect(201)
+  })
+})
+
+describe('requireVerified gate on likes, follows and publish-via-PATCH (flag-controlled)', () => {
+  async function createPoemFor (author, overrides = {}) {
+    return Poem.create({
+      title: 'Gate Poem',
+      poem: 'Some words about a gate',
+      genre: 'love',
+      authorId: author._id,
+      origin: 'user',
+      likes: [],
+      date: new Date(),
+      slug: 'gate-poem',
+      ...overrides
+    })
+  }
+
+  async function createTarget () {
+    return Author.create({
+      username: 'followtarget',
+      name: 'Follow Target',
+      slug: 'follow-target',
+      type: 'user'
+    })
+  }
+
+  // A second registered user: `registerUser` posts the same email otherwise,
+  // and the uniqueness index answers the second attempt with the neutral
+  // conflict, which would leave `Author.findOne` handing back the FIRST user.
+  async function registerSecondUser () {
+    return registerUser({ username: 'seconduser', email: 'second@example.com' })
+  }
+
+  describe('liking', () => {
+    test('flag ON: an unverified user is blocked, and the poem is untouched', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const poet = await registerUser()
+      const liker = await registerSecondUser()
+      const poem = await createPoemFor(poet)
+
+      const res = await request(app)
+        .put(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(liker)}`)
+        .expect(403)
+      expect(res.body.code).toBe('EMAIL_UNVERIFIED')
+      expect(res.body.error).toBe('Please verify your email address before liking.')
+
+      // The like route TOGGLES and saves, so a broken gate would leave a like
+      // behind even while answering 403 — hence the database, not the status.
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.likes).toEqual([])
+    })
+
+    test('flag ON: a verified user can like', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const poet = await registerUser()
+      const liker = await registerSecondUser()
+      await Author.updateOne({ _id: liker._id }, { $set: { emailVerified: true } })
+      const poem = await createPoemFor(poet)
+
+      await request(app)
+        .put(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(liker)}`)
+        .expect(200)
+
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.likes.map(String)).toContain(String(liker._id))
+    })
+
+    test('flag OFF (default): an unverified user can still like', async () => {
+      const poet = await registerUser()
+      const liker = await registerSecondUser()
+      const poem = await createPoemFor(poet)
+
+      await request(app)
+        .put(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(liker)}`)
+        .expect(200)
+    })
+  })
+
+  describe('following', () => {
+    test('flag ON: an unverified user is blocked from following AND unfollowing', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const follower = await registerUser()
+      const target = await createTarget()
+
+      const follow = await request(app)
+        .post(`/api/v1/authors/${target._id}/follow`)
+        .set('Authorization', `Bearer ${tokenFor(follower)}`)
+        .expect(403)
+      expect(follow.body.code).toBe('EMAIL_UNVERIFIED')
+      expect(follow.body.error).toBe('Please verify your email address before following.')
+      expect(await Follow.countDocuments({ follower: follower._id })).toBe(0)
+
+      // Unfollow goes through the same gate: the edge never existed, and a
+      // 200 here would report success for work nobody did.
+      const unfollow = await request(app)
+        .delete(`/api/v1/authors/${target._id}/follow`)
+        .set('Authorization', `Bearer ${tokenFor(follower)}`)
+        .expect(403)
+      expect(unfollow.body.code).toBe('EMAIL_UNVERIFIED')
+    })
+
+    test('flag ON: a verified user can follow', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const follower = await registerUser()
+      await Author.updateOne({ _id: follower._id }, { $set: { emailVerified: true } })
+      const target = await createTarget()
+
+      const res = await request(app)
+        .post(`/api/v1/authors/${target._id}/follow`)
+        .set('Authorization', `Bearer ${tokenFor(follower)}`)
+        .expect(200)
+      expect(res.body.following).toBe(true)
+
+      expect(await Follow.countDocuments({
+        follower: follower._id,
+        following: target._id
+      })).toBe(1)
+    })
+
+    test('flag OFF (default): an unverified user can still follow', async () => {
+      const follower = await registerUser()
+      const target = await createTarget()
+
+      await request(app)
+        .post(`/api/v1/authors/${target._id}/follow`)
+        .set('Authorization', `Bearer ${tokenFor(follower)}`)
+        .expect(200)
+    })
+  })
+
+  describe('publish-via-PATCH', () => {
+    test('flag ON: an unverified author can still EDIT and WITHDRAW', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const author = await registerUser()
+      const poem = await createPoemFor(author) // published by default
+
+      // The distractor for a blanket PATCH gate: requiring verification to take
+      // something down or fix its text would make the gate a trap rather than a
+      // standard, so both must pass for an unverified owner.
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ poem: 'Edited words, still unverified' })
+        .expect(200)
+
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ status: 'draft' })
+        .expect(200)
+
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.poem).toBe('Edited words, still unverified')
+      expect(inDb.status).toBe('draft')
+    })
+
+    test('flag ON: an unverified author cannot publish a draft this way', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const author = await registerUser()
+      const poem = await createPoemFor(author, { status: 'draft' })
+
+      const res = await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ status: 'published' })
+        .expect(403)
+      expect(res.body.error).toBe('Please verify your email address before publishing.')
+
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.status).toBe('draft')
+    })
+
+    test('flag ON: a capitalised "Published" is still a publish, and still gated', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const author = await registerUser()
+      const poem = await createPoemFor(author, { status: 'draft' })
+
+      // The gate decides through `normalizeStatus`, the same reading the
+      // handler does — raw string equality would let this one through and
+      // publish the poem.
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ status: 'Published' })
+        .expect(403)
+
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.status).toBe('draft')
+    })
+
+    test('flag ON: a verified author can publish a draft this way', async () => {
+      process.env.REQUIRE_EMAIL_VERIFICATION = 'true'
+      const author = await registerUser()
+      await Author.updateOne({ _id: author._id }, { $set: { emailVerified: true } })
+      const poem = await createPoemFor(author, { status: 'draft' })
+
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ status: 'published' })
+        .expect(200)
+
+      const inDb = await Poem.findById(poem._id)
+      expect(inDb.status).toBe('published')
+    })
+
+    test('flag OFF (default): an unverified author can still publish', async () => {
+      const author = await registerUser()
+      const poem = await createPoemFor(author, { status: 'draft' })
+
+      await request(app)
+        .patch(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${tokenFor(author)}`)
+        .send({ status: 'published' })
+        .expect(200)
+    })
   })
 })
 
