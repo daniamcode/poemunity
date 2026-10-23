@@ -447,102 +447,161 @@ describe('Poems API - Create and Update', () => {
   })
 
   describe('PATCH /api/v1/poems (bulk update)', () => {
-    test('should add new property to all poems', async () => {
-      // Create test poems
-      await Poem.create([
-        {
-          title: 'Poem 1',
-          author: 'testuser',
-          poem: 'Content 1',
-          genre: 'love',
-          likes: [],
-          userId: testUser._id,
-          picture: 'pic1.jpg',
-          date: new Date()
-        },
-        {
-          title: 'Poem 2',
-          author: 'testuser',
-          poem: 'Content 2',
-          genre: 'sad',
-          likes: [],
-          userId: testUser._id,
-          picture: 'pic2.jpg',
-          date: new Date()
-        }
-      ])
+    // This is the one endpoint that can change every poem at once, so it is
+    // admin-gated, allowlisted and DRY RUN BY DEFAULT (`?apply=true` to act) —
+    // see the handler for the reasoning. Every test asserts on the COLLECTION
+    // as well as the status, because both wrong answers here pass a status-only
+    // check: a route that applies the update and still calls itself a dry run,
+    // and a route that writes nothing and answers 204. The old
+    // `updateMany({}, { $set: req.body })` survived a green suite exactly that
+    // way.
 
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ newField: 'newValue' })
-        .expect(204)
+    const seed = (status) => Poem.create([
+      {
+        title: 'Poem 1',
+        author: 'testuser',
+        poem: 'Content 1',
+        genre: 'love',
+        likes: [],
+        userId: testUser._id,
+        picture: 'pic1.jpg',
+        date: new Date(),
+        status
+      },
+      {
+        title: 'Poem 2',
+        author: 'testuser',
+        poem: 'Content 2',
+        genre: 'sad',
+        likes: [],
+        userId: testUser._id,
+        picture: 'pic2.jpg',
+        date: new Date(),
+        status
+      }
+    ])
 
-      const poems = await Poem.find({})
-      expect(poems).toHaveLength(2)
-      expect(poems[0].newField).toBe('newValue')
-      expect(poems[1].newField).toBe('newValue')
+    const patch = (query = '') => request(app)
+      .patch(`/api/v1/poems${query}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    const statuses = async () =>
+      (await Poem.find({}).sort({ title: 1 })).map(poem => poem.status)
+
+    test('one request cannot unpublish the site: without ?apply=true it writes nothing', async () => {
+      await seed('published')
+
+      const res = await patch().send({ status: 'draft' }).expect(200)
+
+      expect(res.body.applied).toBe(false)
+      expect(res.body.matched).toBe(2)
+      // The write is the assertion. A version that applies the update and then
+      // describes itself as a dry run answers 200 with this same body.
+      expect(await statuses()).toEqual(['published', 'published'])
     })
 
-    test('should update existing property on all poems', async () => {
-      // Create test poems with initial property
-      await Poem.create([
-        {
-          title: 'Poem 1',
-          author: 'testuser',
-          poem: 'Content 1',
-          genre: 'love',
-          likes: [],
-          userId: testUser._id,
-          picture: 'pic1.jpg',
-          date: new Date(),
-          status: 'draft'
-        },
-        {
-          title: 'Poem 2',
-          author: 'testuser',
-          poem: 'Content 2',
-          genre: 'sad',
-          likes: [],
-          userId: testUser._id,
-          picture: 'pic2.jpg',
-          date: new Date(),
-          status: 'draft'
-        }
-      ])
+    test('?apply=true performs the update and reports what it changed', async () => {
+      await seed('draft')
 
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ status: 'published' })
-        .expect(204)
+      const res = await patch('?apply=true').send({ status: 'published' }).expect(200)
 
-      const poems = await Poem.find({})
-      expect(poems[0].status).toBe('published')
-      expect(poems[1].status).toBe('published')
+      expect(res.body).toEqual({ applied: true, matched: 2, modified: 2 })
+      expect(await statuses()).toEqual(['published', 'published'])
     })
 
-    test('should handle empty database', async () => {
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ newField: 'value' })
-        .expect(204)
+    test('drops fields outside the allowlist, even with ?apply=true', async () => {
+      await seed('draft')
 
-      const poems = await Poem.find({})
-      expect(poems).toHaveLength(0)
+      await patch('?apply=true')
+        .send({ status: 'published', newField: 'newValue', verified: true })
+        .expect(200)
+
+      const poems = await Poem.find({}).sort({ title: 1 })
+      expect(poems.map(poem => poem.status)).toEqual(['published', 'published'])
+      // `Poem` is `strict: false`, so an unknown key is persisted verbatim.
+      // This checks the DOCUMENT, not the response — the allowlist is the point,
+      // and a test that only read the status would pass without it.
+      expect(poems[0].toObject().newField).toBeUndefined()
+      expect(poems[0].toObject().verified).toBeUndefined()
     })
 
-    test('should update all poems regardless of author', async () => {
-      // Create second user
-      const user2 = await User.create({
+    test('cannot overwrite every poem’s words in one request', async () => {
+      await seed('published')
+
+      await patch('?apply=true')
+        .send({ title: 'One Title', poem: 'One Body', status: 'published' })
+        .expect(200)
+
+      const poems = await Poem.find({}).sort({ title: 1 })
+      expect(poems.map(poem => poem.title)).toEqual(['Poem 1', 'Poem 2'])
+      expect(poems.map(poem => poem.poem)).toEqual(['Content 1', 'Content 2'])
+    })
+
+    test('rejects a status that is not a real one, without writing', async () => {
+      await seed('published')
+
+      const res = await patch('?apply=true').send({ status: 'archeved' }).expect(400)
+      expect(res.body.error).toMatch(/status/i)
+
+      // Not folded into `published` (which is what normalizeStatus does for one
+      // poem) and not stored: a typo must not rewrite 16k documents, in either
+      // direction.
+      expect(await statuses()).toEqual(['published', 'published'])
+    })
+
+    test('validates the genre and stores a display name as its slug', async () => {
+      await seed('published')
+
+      await patch('?apply=true').send({ genre: 'not-a-category' }).expect(400)
+
+      // SORTED, and by title rather than trusting the natural order: `seed`
+      // inserts the two documents in parallel, so an unsorted `find` returns
+      // them in either order and `toEqual(['love','sad'])` flaked for exactly
+      // that reason.
+      const untouched = await Poem.find({}).sort({ title: 1 })
+      expect(untouched.map(poem => poem.genre)).toEqual(['love', 'sad'])
+
+      // Same normalisation as creation: silently storing 'Hope' next to 'hope'
+      // would split one category in two, which is why the list endpoint has to
+      // match genres case-insensitively in the first place.
+      await patch('?apply=true').send({ genre: 'Hope' }).expect(200)
+      const refiled = await Poem.find({}).sort({ title: 1 })
+      expect(refiled.map(poem => poem.genre)).toEqual(['hope', 'hope'])
+    })
+
+    test('rejects a body with nothing in it that may be set', async () => {
+      await seed('published')
+
+      const res = await patch('?apply=true').send({ newField: 'value' }).expect(400)
+
+      // Names the allowlist rather than failing obscurely at the driver with an
+      // empty `$set`.
+      expect(res.body.error).toContain('status')
+      expect(await statuses()).toEqual(['published', 'published'])
+    })
+
+    test('rejects a value it cannot apply', async () => {
+      await seed('published')
+
+      // `likes` is [String] and `origin` is a string: a wrong shape is a 400
+      // here, where the driver would otherwise answer 500 after the request had
+      // already been allowed through.
+      await patch('?apply=true').send({ likes: 'aaaaaaaaaaaaaaaaaaaaaaaa' }).expect(400)
+      await patch('?apply=true').send({ origin: 42 }).expect(400)
+
+      const poems = await Poem.find({})
+      expect(poems.every(poem => poem.likes.length === 0)).toBe(true)
+      expect(poems.every(poem => poem.origin === undefined)).toBe(true)
+    })
+
+    test('applies across every author, not just one', async () => {
+      const secondUser = await User.create({
         username: 'user2',
         email: 'user2@example.com',
-        passwordHash: await bcrypt.hash('pass', 10),
+        passwordHash: await bcrypt.hash('password123', 10),
         picture: 'pic.jpg'
       })
 
-      // Create poems from different users
       await Poem.create([
         {
           title: 'User 1 Poem',
@@ -560,118 +619,53 @@ describe('Poems API - Create and Update', () => {
           poem: 'Content',
           genre: 'sad',
           likes: [],
-          userId: user2._id,
+          userId: secondUser._id,
           picture: 'pic2.jpg',
           date: new Date()
         }
       ])
 
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ verified: true })
-        .expect(204)
+      // `origin` is on the allowlist — an allowlist that admitted nothing would
+      // be as broken as one that admitted everything, and no other test here
+      // writes a field besides status/genre.
+      const res = await patch('?apply=true').send({ origin: 'famous' }).expect(200)
 
+      expect(res.body).toEqual({ applied: true, matched: 2, modified: 2 })
       const poems = await Poem.find({})
       expect(poems).toHaveLength(2)
-      expect(poems[0].verified).toBe(true)
-      expect(poems[1].verified).toBe(true)
+      expect(poems.every(poem => poem.origin === 'famous')).toBe(true)
     })
 
-    test('should update multiple properties at once', async () => {
-      await Poem.create({
-        title: 'Test Poem',
-        author: 'testuser',
-        poem: 'Content',
-        genre: 'love',
-        likes: [],
-        userId: testUser._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
+    test('an admin may still bulk-clear likes', async () => {
+      // The legitimate bulk repair this endpoint exists for: a like wave that
+      // has to be undone across the collection after a spam incident.
+      const LIKES = ['aaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbbbbbbbbbb']
+      await Poem.create([
+        {
+          title: 'Poem 1',
+          author: 'testuser',
+          poem: 'Content 1',
+          genre: 'love',
+          likes: LIKES,
+          userId: testUser._id,
+          date: new Date()
+        },
+        {
+          title: 'Poem 2',
+          author: 'testuser',
+          poem: 'Content 2',
+          genre: 'sad',
+          likes: LIKES,
+          userId: testUser._id,
+          date: new Date()
+        }
+      ])
 
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          featured: true,
-          verified: true,
-          status: 'published'
-        })
-        .expect(204)
+      const res = await patch('?apply=true').send({ likes: [] }).expect(200)
+      expect(res.body.modified).toBe(2)
 
-      const poem = await Poem.findOne({})
-      expect(poem.featured).toBe(true)
-      expect(poem.verified).toBe(true)
-      expect(poem.status).toBe('published')
-    })
-
-    test('should handle numeric values', async () => {
-      await Poem.create({
-        title: 'Test Poem',
-        author: 'testuser',
-        poem: 'Content',
-        genre: 'love',
-        likes: [],
-        userId: testUser._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
-
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ viewCount: 0 })
-        .expect(204)
-
-      const poem = await Poem.findOne({})
-      expect(poem.viewCount).toBe(0)
-    })
-
-    test('should handle boolean values', async () => {
-      await Poem.create({
-        title: 'Test Poem',
-        author: 'testuser',
-        poem: 'Content',
-        genre: 'love',
-        likes: [],
-        userId: testUser._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
-
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ isPinned: false })
-        .expect(204)
-
-      const poem = await Poem.findOne({})
-      expect(poem.isPinned).toBe(false)
-    })
-
-    test('should handle array values', async () => {
-      await Poem.create({
-        title: 'Test Poem',
-        author: 'testuser',
-        poem: 'Content',
-        genre: 'love',
-        likes: [],
-        userId: testUser._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      })
-
-      await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ tags: ['poetry', 'modern', 'featured'] })
-        .expect(204)
-
-      const poem = await Poem.findOne({})
-      expect(Array.isArray(poem.tags)).toBe(true)
-      expect(poem.tags).toHaveLength(3)
-      expect(poem.tags).toContain('poetry')
+      const poems = await Poem.find({})
+      expect(poems.every(poem => poem.likes.length === 0)).toBe(true)
     })
 
     test('should require admin authentication', async () => {
@@ -689,32 +683,45 @@ describe('Poems API - Create and Update', () => {
       // No Authorization header
       await request(app)
         .patch('/api/v1/poems')
-        .send({ newField: 'value' })
+        .send({ status: 'draft' })
         .expect(401)
     })
 
-    test('should update poems with large batch', async () => {
-      // Create 50 poems
-      const poems = Array.from({ length: 50 }, (_, i) => ({
-        title: `Poem ${i}`,
-        author: 'testuser',
-        poem: `Content ${i}`,
-        genre: 'love',
-        likes: [],
-        userId: testUser._id,
-        picture: 'pic.jpg',
-        date: new Date()
-      }))
-      await Poem.insertMany(poems)
+    test('a signed-in user who is not the admin gets 403 and writes nothing', async () => {
+      await seed('published')
+
+      const other = await User.create({
+        username: 'notadmin',
+        name: 'Not Admin',
+        email: 'notadmin@example.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        picture: 'pic.jpg'
+      })
+      const otherToken = jwt.sign(
+        { id: other._id, username: other.username },
+        process.env.SECRET,
+        { expiresIn: 60 * 60 * 24 * 7 }
+      )
 
       await request(app)
-        .patch('/api/v1/poems')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ bulkUpdate: true })
-        .expect(204)
+        .patch('/api/v1/poems?apply=true')
+        .set('Authorization', `Bearer ${otherToken}`)
+        .send({ status: 'draft' })
+        .expect(403)
 
-      const updatedPoems = await Poem.find({ bulkUpdate: true })
-      expect(updatedPoems).toHaveLength(50)
+      expect(await statuses()).toEqual(['published', 'published'])
+    })
+
+    test('reports zero matches on an empty collection', async () => {
+      const res = await patch().send({ status: 'draft' }).expect(200)
+
+      // The echoed `update` is what a dry run is for: read what would be
+      // written, and how much of the collection it touches, before deciding.
+      expect(res.body).toEqual({
+        applied: false,
+        matched: 0,
+        update: { status: 'draft' }
+      })
     })
   })
 })

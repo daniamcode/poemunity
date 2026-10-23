@@ -174,9 +174,21 @@ authorsRouter.get('/:slug', userExtractor.optional, async (req, res) => {
   try {
     const author = await Author.findOne(
       { slug: req.params.slug },
-      'name slug picture type bio preferredGenres surname city country birthYear gender website privateFields'
+      'name slug picture type bio preferredGenres surname city country birthYear gender website privateFields testAccount'
     )
     if (!author) return res.status(404).json({ error: 'Author not found' })
+
+    // Hidden from the directory, and therefore not addressable inside it
+    // either. `buildFilter` keeps testAccount authors out of every listing, and
+    // a page that appears in no list but still answers on its own URL is a page
+    // a crawler — and anyone who guesses the slug — reaches anyway; the filter
+    // is supposed to mean these admin-created fixtures are not published.
+    //
+    // The SAME answer as "no such author", not a 403: a different status would
+    // confirm that a slug resolves to somebody. No owner-or-admin exception
+    // either — the signed-in owner has /profile, and an exception would put the
+    // rule in two places (here and in the listings) instead of one.
+    if (author.testAccount) return res.status(404).json({ error: 'Author not found' })
 
     const priv = new Set(author.privateFields || [])
     const result = {

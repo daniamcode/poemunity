@@ -493,7 +493,51 @@ poemsRouter.post('/', userExtractor, requireVerified, async (req, res) => {
   }
 })
 
-// add new property to all existing poems — admin only
+// ---------------------------------------------------------------------------
+// Bulk edit — admin only, and the one endpoint that can change every poem at
+// once.
+//
+// It used to be `updateMany({}, { $set: req.body })`, which is two hazards in
+// one line: `{"status":"draft"}` unpublished the entire site in a single
+// request with nothing to confirm first, and — `Poem` being `strict: false` —
+// every other key the caller cared to send was persisted, declared in the
+// schema or not. Nothing in this repository calls the route; its own tests were
+// the only clients, and they pinned the permissiveness.
+//
+// Three rules now, in the order they run:
+//
+//   1. ALLOWLIST — only fields that mean the same thing on every poem.
+//   2. VALIDATION — an unknown status or genre is a 400, not a silent rewrite
+//      of 16k documents into a state nobody asked for precisely.
+//   3. DRY RUN BY DEFAULT — nothing is written until the caller adds
+//      `?apply=true`, matching every script in backend/scripts, which are
+//      dry-run first because each one is a production write.
+//
+// The dry run answers with `matched`, so "this touches 16,087 poems" is read
+// BEFORE the write instead of discovered after it. Both modes return counts,
+// which is why this answers 200 with JSON rather than the old bare 204:
+// knowing what changed is the entire point of the route.
+//
+// No ranking rides along. `computeRanking()` is recomputed on every read of the
+// sidebar, there is no frontend caller waiting on this response, and paying a
+// $group over 16k poems on top of a bulk write would be the most expensive
+// thing on a route nobody takes lightly.
+// ---------------------------------------------------------------------------
+
+// What may be set in bulk: the fields that CLASSIFY a poem across the whole
+// collection.
+//
+// Deliberately absent: `title` and `poem` (a bulk set would overwrite every
+// poem's words with one string — the same catastrophe as unpublishing them),
+// `date` (the sort key for every list and for the next-poem walk), and `userId`
+// (a legacy key nothing reads: authorship lives on `authorId`, and
+// `serializePoem` derives `userId` from the populated author).
+//
+// An allowlist rather than a delete-list, for the same reason as the ones in
+// poem.js: a field added to the model later is inert until somebody decides it
+// is safe to write 16,000 times in one request.
+const BULK_ALLOWED_FIELDS = ['status', 'genre', 'origin', 'likes']
+
 poemsRouter.patch('/', userExtractor, async (req, res) => {
   const adminId = process.env.NODE_ENV === 'development'
     ? process.env.REACT_APP_ADMIN_PRE
@@ -503,12 +547,74 @@ poemsRouter.patch('/', userExtractor, async (req, res) => {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
-  const newProperty = req.body
-  const response = await Poem.updateMany({}, { $set: newProperty })
-  if (response === null) {
-    return res.status(404).json({ error: 'error' })
+  try {
+    const body = req.body && typeof req.body === 'object' ? req.body : {}
+    const update = Object.fromEntries(
+      Object.entries(body).filter(([key]) => BULK_ALLOWED_FIELDS.includes(key))
+    )
+
+    // Fields outside the allowlist are dropped, not rejected, for the reason
+    // the single-poem route drops them: a payload is allowed to carry more than
+    // this endpoint will act on. But an update with NOTHING left in it is a
+    // different situation — the caller asked for a change and not one of them
+    // was permitted — and `$set: {}` would only fail at the driver anyway. Say
+    // what this endpoint accepts instead of failing obscurely.
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({
+        error: `No bulk-editable field in that update — this endpoint accepts: ${BULK_ALLOWED_FIELDS.join(', ')}`
+      })
+    }
+
+    // Validated rather than normalized. `normalizeStatus` folds anything
+    // unrecognised into `published`, which is the forgiving default for one
+    // poem the form has just sent and the wrong silent answer for 16k of them —
+    // a typo would publish or unpublish the site depending on its spelling.
+    if (update.status !== undefined && !Object.values(POEM_STATUS).includes(update.status)) {
+      return res.status(400).json({ error: `Unknown status: ${update.status}` })
+    }
+
+    // Same validation as creation and as the single-poem PATCH: a bulk edit is
+    // not a way to file poems under a category that has no page and no sitemap
+    // entry. Display names are accepted and stored as slugs.
+    if (update.genre !== undefined) {
+      const genre = normalizeGenre(update.genre)
+      if (!genre.ok) {
+        return res.status(400).json({ error: genre.error })
+      }
+      update.genre = genre.genre
+    }
+
+    if (update.origin !== undefined && typeof update.origin !== 'string') {
+      return res.status(400).json({ error: 'origin must be a string' })
+    }
+
+    if (update.likes !== undefined) {
+      if (!Array.isArray(update.likes)) {
+        return res.status(400).json({ error: 'likes must be an array' })
+      }
+      // The same sanitizer as POST /poems: `Poem.likes` is `[String]` and every
+      // like comparison is strict, so a non-string entry would be a like nobody
+      // could ever remove — replicated 16k times at once here.
+      update.likes = sanitizeLikes(update.likes)
+    }
+
+    const apply = req.query.apply === 'true'
+
+    if (!apply) {
+      const matched = await Poem.countDocuments({})
+      return res.json({ applied: false, matched, update })
+    }
+
+    const result = await Poem.updateMany({}, { $set: update })
+    return res.json({
+      applied: true,
+      matched: result.matchedCount,
+      modified: result.modifiedCount
+    })
+  } catch (error) {
+    console.error('Bulk poem update failed:', error)
+    return res.status(500).json({ error: 'Bulk update failed' })
   }
-  res.status(204).end()
 })
 
 module.exports = poemsRouter

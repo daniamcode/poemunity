@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken')
 const { app } = require('../../app')
 const User = require('../models/User')
 const Poem = require('../models/Poem')
+const Comment = require('../models/Comment')
+const Notification = require('../models/Notification')
 
 describe('Poem API', () => {
   let testUser
@@ -635,6 +637,146 @@ describe('Poem API', () => {
 
       const deletedPoem = await Poem.findById(poem._id)
       expect(deletedPoem).toBeNull()
+    })
+
+    test('removes the comments that pointed at the deleted poem', async () => {
+      const poem = await Poem.create({
+        title: 'Test Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+      const otherPoem = await Poem.create({
+        title: 'Other Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      const onPoem = await Comment.create({
+        targetType: 'poem',
+        targetId: poem._id,
+        authorId: testUser._id,
+        body: 'First'
+      })
+      // A reply carries the same targetType/targetId as its thread, so it goes
+      // with the thread — no walk of parent ids needed.
+      await Comment.create({
+        targetType: 'poem',
+        targetId: poem._id,
+        authorId: testUser._id,
+        body: 'Reply',
+        parentId: onPoem._id
+      })
+      // Distractors: a comment on a DIFFERENT poem, and a profile comment,
+      // whose target is an author rather than a poem.
+      await Comment.create({
+        targetType: 'poem',
+        targetId: otherPoem._id,
+        authorId: testUser._id,
+        body: 'Elsewhere'
+      })
+      await Comment.create({
+        targetType: 'profile',
+        targetId: testUser._id,
+        authorId: testUser._id,
+        body: 'On the page'
+      })
+
+      await request(app)
+        .delete(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      expect(await Comment.countDocuments({ targetId: poem._id })).toBe(0)
+
+      // Asserted through the endpoint the orphan actually leaked from: the
+      // by-target branch served these rows forever, long after the poem stopped
+      // resolving.
+      const listed = await request(app)
+        .get(`/api/v1/comments?targetType=poem&targetId=${poem._id}`)
+        .expect(200)
+      expect(listed.body).toEqual([])
+
+      const survivors = await Comment.find({}).sort({ body: 1 })
+      expect(survivors.map(comment => comment.body)).toEqual(['Elsewhere', 'On the page'])
+    })
+
+    test('removes the notifications the poem raised', async () => {
+      const poem = await Poem.create({
+        title: 'Test Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+      const otherPoem = await Poem.create({
+        title: 'Other Poem',
+        author: 'testuser',
+        poem: 'Content',
+        genre: 'love',
+        likes: [],
+        authorId: testUser._id,
+        picture: 'pic.jpg',
+        date: new Date()
+      })
+
+      await Notification.create({
+        recipient: testUser._id,
+        type: 'like',
+        actors: [testUser._id],
+        poem: poem._id
+      })
+      await Notification.create({
+        recipient: testUser._id,
+        type: 'comment',
+        actors: [testUser._id],
+        poem: poem._id
+      })
+      // Distractors: a row about ANOTHER poem, and one that carries no poem at
+      // all — a follow must not be swept up by a poem-scoped delete.
+      await Notification.create({
+        recipient: testUser._id,
+        type: 'like',
+        actors: [testUser._id],
+        poem: otherPoem._id
+      })
+      await Notification.create({
+        recipient: testUser._id,
+        type: 'follow',
+        actors: [testUser._id]
+      })
+
+      await request(app)
+        .delete(`/api/v1/poem/${poem._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      expect(await Notification.countDocuments({ poem: poem._id })).toBe(0)
+
+      // The bell keeps offering links to a 404 page otherwise, and the badge
+      // counts rows nobody can open. Length, not "no row mentions the poem":
+      // the `poem` field is POPULATED, so a row whose poem is gone comes back
+      // as null — which a `not.toContain` check sails straight past.
+      const listed = await request(app)
+        .get('/api/v1/notifications')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+      expect(listed.body.notifications).toHaveLength(2)
+
+      expect(await Notification.countDocuments({ poem: otherPoem._id })).toBe(1)
+      expect(await Notification.countDocuments({ type: 'follow' })).toBe(1)
     })
 
     test('should return 404 for non-existent poem', async () => {

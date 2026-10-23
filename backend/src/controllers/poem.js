@@ -17,6 +17,8 @@ const {
 const { notify, notifyMany, retract, NOTIFICATION_TYPE } = require('../utils/notifications')
 const { escapeRegex, MAX_REGEX_INPUT } = require('../utils/escapeRegex')
 const Follow = require('../models/Follow')
+const Comment = require('../models/Comment')
+const Notification = require('../models/Notification')
 
 // `type` is here for the AI badge. It was missing, so a poem opened directly at
 // /detail/<slug> — the SSR path, and the one a search result lands on — carried
@@ -491,6 +493,37 @@ poemRouter.delete('/:poemId', userExtractor, findPoemById, isOwnerOrAdmin, async
       return res.status(404).json({
         error: 'poem not found or not deleted'
       })
+    }
+
+    // The poem's comments and notifications die with it, because both are rows
+    // that POINT at it rather than belonging to anything else:
+    //
+    //   comments — `targetId` is this poem, so every one of them would live on
+    //               serving a poem that no longer resolves. Replies come too:
+    //               a reply carries the same `targetType`/`targetId` as the
+    //               thread it hangs off, so they are covered by the same
+    //               filter rather than needing a walk of parent ids. Profile
+    //               comments are a different `targetType` and are untouched.
+    //   notifications — `poem` is the row's destination, so the bell would keep
+    //               offering links to a page that answers 404. Only rows about
+    //               THIS poem: a `follow` row carries no poem at all.
+    //
+    // Awaited, not fire-and-forget: this runs on a serverless function that may
+    // be frozen the moment the response is sent, so an un-awaited write is a
+    // write that sometimes does not happen.
+    //
+    // It runs inside its own try. The poem is already gone by this point, so a
+    // cascade failure reported through the route's catch would answer 404 —
+    // "not deleted" — about a deletion that did happen. The pre-cascade
+    // behaviour (orphan rows the UI already copes with) is the fallback, and it
+    // earns a log line rather than a wrong status code.
+    try {
+      await Promise.all([
+        Comment.deleteMany({ targetType: 'poem', targetId: poem._id }),
+        Notification.deleteMany({ poem: poem._id })
+      ])
+    } catch (cascadeError) {
+      console.error('Poem deleted, but its comments/notifications were not:', cascadeError)
     }
 
     // Return the recomputed ranking (the author lost this poem's points) so the
