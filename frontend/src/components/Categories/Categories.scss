@@ -1,0 +1,85 @@
+@use '../../styles/variables' as *;
+
+.categories-page {
+    max-width: $max-width-narrow;
+    margin: 0 auto $space-9;
+    padding: $space-7 $space-5 $space-9;
+    color: $color-text-dark;
+}
+
+.categories-page__header {
+    margin-bottom: $space-7;
+}
+
+.categories-page__eyebrow {
+    color: $color-primary-dark;
+    font-family: $font-heading;
+    font-size: $fs-base-minus;
+    font-weight: $fw-semibold;
+    margin-bottom: $space-2;
+}
+
+.categories-page h1 {
+    font-family: $font-heading;
+    font-size: $fs-3xl;
+    line-height: $lh-tight;
+    margin-bottom: $space-4;
+}
+
+.categories-page__intro {
+    color: $color-text-medium;
+    font-size: $fs-md;
+    line-height: $lh-relaxed;
+}
+
+.categories-page__intro + .categories-page__intro {
+    margin-top: $space-4;
+}
+
+.categories-page__intro a {
+    color: $color-primary;
+}
+
+// Two columns rather than one long column: 140+ entries in a single stack put
+// the last category two screens below the fold, and a reader scanning for one
+// theme would never reach it. Single column below `$bp-sm`.
+.categories-page__list {
+    columns: 2;
+    column-gap: $space-7;
+    list-style: none;
+    margin-top: $space-6;
+}
+
+.categories-page__list li {
+    break-inside: avoid;
+    margin-bottom: $space-2;
+}
+
+.categories-page__list a {
+    color: $color-primary;
+    font-size: $fs-base;
+    text-decoration: none;
+}
+
+.categories-page__list a:hover,
+.categories-page__list a:focus-visible {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: $bp-sm) {
+    .categories-page {
+        padding: $space-6 $space-4 $space-8;
+    }
+
+    .categories-page h1 {
+        font-size: $fs-2xl;
+    }
+
+    .categories-page__intro {
+        font-size: $fs-base;
+    }
+
+    .categories-page__list {
+        columns: 1;
+    }
+}

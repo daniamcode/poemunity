@@ -23,7 +23,9 @@ export default function SimpleAccordion({ genre, closeOnSelect = false }: Simple
     const [expanded, setExpanded] = useState(false)
     const [showAll, setShowAll] = useState(false)
 
-    // Only navigation collapses the panel — "Browse all" expands the list in place.
+    // Only navigation collapses the panel — including "Browse all categories",
+    // which used to expand the list in place and now navigates to /categories
+    // so a crawler can follow it.
     const handleSelect = () => {
         if (closeOnSelect) setExpanded(false)
     }
@@ -82,12 +84,19 @@ export default function SimpleAccordion({ genre, closeOnSelect = false }: Simple
             </AccordionDetails>
             {!showAll && (
                 <AccordionDetails>
-                    <button
+                    {/* A LINK, not a button. The old `<button onClick>` created
+                        the target's only inbound path in the browser, which a
+                        crawler never runs — so the 117 categories outside
+                        MUST_HAVE had no server-rendered link anywhere on the
+                        site. Mirrors AuthorsAccordion, which has always linked
+                        its "browse all" to /authors. */}
+                    <Link
                         className='header__dropdown-subcategories authors-accordion__browse-all'
-                        onClick={() => setShowAll(true)}
+                        href='/categories'
+                        onClick={handleSelect}
                     >
                         {CATEGORIES_BROWSE_ALL}
-                    </button>
+                    </Link>
                 </AccordionDetails>
             )}
         </Accordion>

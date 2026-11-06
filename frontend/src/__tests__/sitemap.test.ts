@@ -89,7 +89,7 @@ describe('<lastmod> is emitted only where it is true', () => {
         expect(entries(xml).get('/authors/ada-brine')).toBeNull()
     })
 
-    test('privacy and terms get none; the homepage gets the newest poem date', () => {
+    test('privacy, terms and the category hub get none; the homepage gets the newest poem date', () => {
         const xml = renderUrlset(BASE, buildPageEntries(new Map(), '2026-07-07T00:00:00.000Z'))
         const found = entries(xml)
 
@@ -97,6 +97,12 @@ describe('<lastmod> is emitted only where it is true', () => {
         expect(found.get('/authors')).toBe('2026-07-07')
         expect(found.get('/privacy')).toBeNull()
         expect(found.get('/terms')).toBeNull()
+        // `toBeNull()`, not `toBeUndefined()`: a missing entry reads as
+        // `undefined` and an unstamped one as `null`, so this single
+        // assertion checks BOTH that the hub is listed and that it carries no
+        // date. Its content is the compile-time CATEGORIES list, which no poem
+        // ever changes — stamping it would claim a change that never happened.
+        expect(found.get('/categories')).toBeNull()
     })
 
     test('NOT everything is stamped — that is the whole point', () => {

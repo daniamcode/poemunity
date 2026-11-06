@@ -351,6 +351,11 @@ export function buildPageEntries(
     const staticPages: SitemapEntry[] = [
         { path: '/', priority: '1.0', changefreq: 'daily', lastmod: newestOverall },
         { path: '/authors', priority: '0.8', changefreq: 'daily', lastmod: newestOverall },
+        // The category hub. `lastmod: undefined` for the same reason privacy
+        // and terms get none: its content is the compile-time CATEGORIES list,
+        // which no poem ever changes. Stamping it with the newest poem date
+        // would claim a page changed because something it does not contain did.
+        { path: '/categories', priority: '0.8', changefreq: 'weekly', lastmod: undefined },
         { path: '/privacy', priority: '0.3', changefreq: 'yearly', lastmod: undefined },
         { path: '/terms', priority: '0.3', changefreq: 'yearly', lastmod: undefined }
     ]

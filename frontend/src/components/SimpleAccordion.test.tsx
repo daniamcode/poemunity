@@ -52,20 +52,22 @@ describe('SimpleAccordion', () => {
         })
     })
 
-    test('should render "Browse all categories" button when not showing all', () => {
+    test('should render "Browse all categories" as a link to the hub when not showing all', () => {
         renderWithRouter(<SimpleAccordion />)
-        expect(screen.getByText(CATEGORIES_BROWSE_ALL)).toBeInTheDocument()
+
+        const hub = screen.getByText(CATEGORIES_BROWSE_ALL).closest('a')
+        expect(hub).toHaveAttribute('href', '/categories')
     })
 
-    test('should show all categories after clicking "Browse all categories"', () => {
+    test('reaches the rest through /categories, not by expanding in place', () => {
         renderWithRouter(<SimpleAccordion />)
 
-        fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
-
-        CATEGORIES.forEach(category => {
-            expect(screen.getByText(category)).toBeInTheDocument()
-        })
-        expect(screen.queryByText(CATEGORIES_BROWSE_ALL)).not.toBeInTheDocument()
+        // The dropdown still shows only the must-have set. Expanding it
+        // client-side was the behaviour this replaced — and rendering all 141
+        // here would be the OTHER fix, one deliberately not taken because it
+        // adds ~13KB to the HTML of every page on the site.
+        expect(screen.queryByText('Fantasy')).not.toBeInTheDocument()
+        expect(screen.getByText('Love')).toBeInTheDocument()
     })
 
     test('should auto-show all categories when active genre is not a must-have category', () => {
@@ -119,9 +121,11 @@ describe('SimpleAccordion', () => {
         })
     })
 
-    test('should render links with correct paths for all categories when expanded', () => {
-        renderWithRouter(<SimpleAccordion />)
-        fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
+    test('should render links with correct paths for every category when the genre sits outside the must-have set', () => {
+        // `showAll` is now reached only through the `genre` effect — clicking
+        // "Browse all" navigates to /categories instead of expanding here.
+        // Same rendering path, different trigger.
+        renderWithRouter(<SimpleAccordion genre='fantasy' />)
 
         CATEGORIES.forEach(category => {
             const link = screen.getByText(category).closest('a')
@@ -195,13 +199,17 @@ describe('SimpleAccordion', () => {
             expect(container.querySelector('.accordion')).not.toHaveClass('Mui-expanded')
         })
 
-        test('stays open for "Browse all categories", which is not navigation', () => {
+        test('"Browse all categories" navigates now, so it collapses like every other link', () => {
             const { container } = renderWithRouter(<SimpleAccordion closeOnSelect />)
             expand(container)
 
+            // The old assertion here pinned the OPPOSITE — that this control
+            // stays open — because it was a button that expanded the list
+            // without going anywhere. It links to /categories now, so
+            // `handleSelect` treats it like every other category link.
             fireEvent.click(screen.getByText(CATEGORIES_BROWSE_ALL))
 
-            expect(container.querySelector('.accordion')).toHaveClass('Mui-expanded')
+            expect(container.querySelector('.accordion')).not.toHaveClass('Mui-expanded')
         })
 
         test('stays open after picking a category when disabled (dashboard sidebar)', () => {
@@ -217,10 +225,16 @@ describe('SimpleAccordion', () => {
     test('should sort must-have categories alphabetically by default', () => {
         const { container } = renderWithRouter(<SimpleAccordion />)
 
-        const categoryLinks = container.querySelectorAll('a.header__dropdown-subcategories')
-        const categoryTexts = Array.from(categoryLinks)
-            .slice(0, -1) // exclude the "All" link
-            .map(link => link.textContent || '')
+        // Filtered by href rather than `slice(0, -1)`. That worked while the
+        // last link was "All", but "Browse all categories" is an <a> now too,
+        // so the trailing slice left "All" in the list and the test failed on
+        // an extra entry instead of on ordering.
+        const categoryLinks = Array.from(container.querySelectorAll('a.header__dropdown-subcategories'))
+            .filter(link => {
+                const href = link.getAttribute('href')
+                return href !== '/' && href !== '/categories'
+            })
+        const categoryTexts = categoryLinks.map(link => link.textContent || '')
 
         const sortedMustHave = [...MUST_HAVE_CATEGORIES].sort()
         expect(categoryTexts).toEqual(sortedMustHave)

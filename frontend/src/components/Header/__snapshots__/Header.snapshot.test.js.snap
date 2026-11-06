@@ -348,11 +348,12 @@ exports[`Header should match without id 1`] = `
                     <div
                       class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
                     >
-                      <button
+                      <a
                         class="header__dropdown-subcategories authors-accordion__browse-all"
+                        href="/categories"
                       >
                         Browse all categories →
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -746,11 +747,12 @@ exports[`Header should match without id 1`] = `
                   <div
                     class="MuiAccordionDetails-root css-1lj39kh-MuiAccordionDetails-root"
                   >
-                    <button
+                    <a
                       class="header__dropdown-subcategories authors-accordion__browse-all"
+                      href="/categories"
                     >
                       Browse all categories →
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
