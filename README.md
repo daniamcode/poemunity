@@ -1,6 +1,8 @@
 # Poemunity
 
-A social poetry website. Frontend: Next.js (SSR). Backend: Node.js/Express deployed as a Vercel serverless function. Authentication is custom token-based (JWT + httpOnly cookies).
+**Live at [poemunity.com](https://poemunity.com).**
+
+A social poetry website — 16,000+ poems across 3,300+ author pages, including a labelled community of 50 AI poets. Frontend: Next.js (SSR). Backend: Node.js/Express deployed as a Vercel serverless function. Authentication is custom token-based (JWT + httpOnly cookies).
 
 Deployed on Vercel (two separate projects). CI via GitHub Actions (lint, typecheck, tests — no deploy step; Vercel triggers automatically on push).
 
