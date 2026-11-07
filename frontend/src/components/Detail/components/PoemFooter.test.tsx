@@ -175,4 +175,66 @@ describe('PoemFooter', () => {
         const deleteIcon = container.querySelector('.poem__delete-icon')
         expect(deleteIcon).toHaveStyle({ fill: 'red' })
     })
+
+    describe('embed control', () => {
+        // THE point of the feature: a backlink is produced by somebody who is
+        // NOT you, so the control that produces one has to be reachable without
+        // signing in. Every other action in this footer is gated on
+        // `context.user` or `isOwner`, which is exactly why "it must not be"
+        // needs its own test — a copy-paste of a neighbouring gate would pass
+        // every existing assertion in this file.
+        test('is shown to a LOGGED-OUT visitor', () => {
+            const contextNoUser = { ...mockContext, user: '' }
+            renderWithRouter(<PoemFooter poem={mockPoem} context={contextNoUser} {...mockHandlers} />)
+
+            expect(screen.getByTestId('embed-icon')).toBeInTheDocument()
+            // ...while the owner-only actions stay hidden, which is what makes
+            // this a real distinction rather than "everything renders".
+            expect(screen.queryByTestId('edit-icon')).not.toBeInTheDocument()
+            expect(screen.queryByTestId('delete-icon')).not.toBeInTheDocument()
+        })
+
+        test('is shown to a signed-in non-owner', () => {
+            renderWithRouter(<PoemFooter poem={mockPoem} context={mockContext} {...mockHandlers} />)
+
+            expect(screen.getByTestId('embed-icon')).toBeInTheDocument()
+        })
+
+        test('is shown to the owner as well', () => {
+            const contextOwner = { ...mockContext, userId: mockPoem.userId }
+            renderWithRouter(<PoemFooter poem={mockPoem} context={contextOwner} {...mockHandlers} />)
+
+            expect(screen.getByTestId('embed-icon')).toBeInTheDocument()
+        })
+
+        test('stays out of the way until asked for', () => {
+            renderWithRouter(<PoemFooter poem={mockPoem} context={mockContext} {...mockHandlers} />)
+
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+            // Guards the older assertion that the footer contains exactly one
+            // link: a dialog rendered open would put its own controls in the
+            // tree on every poem page.
+            expect(screen.getAllByRole('link')).toHaveLength(1)
+        })
+
+        test('clicking it opens the snippet for THIS poem', () => {
+            renderWithRouter(<PoemFooter poem={mockPoem} context={mockContext} {...mockHandlers} />)
+
+            fireEvent.click(screen.getByTestId('embed-icon'))
+
+            const dialog = screen.getByRole('dialog')
+            expect(dialog).toBeInTheDocument()
+            expect((screen.getByTestId('embed-snippet') as HTMLTextAreaElement).value)
+                .toContain('/embed/poem-123')
+        })
+
+        test('the dialog opens, and Escape puts it away again', () => {
+            renderWithRouter(<PoemFooter poem={mockPoem} context={mockContext} {...mockHandlers} />)
+
+            fireEvent.click(screen.getByTestId('embed-icon'))
+            fireEvent.keyDown(window, { key: 'Escape' })
+
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
+    })
 })

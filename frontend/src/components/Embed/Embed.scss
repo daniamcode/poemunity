@@ -1,0 +1,154 @@
+@use '../../styles/variables' as *;
+
+// =============================================================================
+// THE EMBED CARD — everything on this page is sized for a 420px iframe sitting
+// on somebody else's website, which is why none of it matches the main layout.
+// =============================================================================
+
+// The shell `_app.tsx` swaps in when `pageProps.chromeless` is set: no header,
+// no skip link, no footer, and none of the 90px of header clearance that
+// `.margin-body` reserves — dead space at this size.
+.embed-shell {
+    min-height: 100vh;
+    background: $color-bg-surface;
+}
+
+// The outage state. Stands on its own — it is rendered by the route directly,
+// which _app already wraps in `.embed-shell`, so it centres itself rather than
+// relying on `.embed` (which has no poem to lay out).
+.embed__unavailable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: $space-4;
+    text-align: center;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+}
+
+.embed {
+    // The three-band layout is the whole design. See EmbedPoem.tsx rule 2:
+    // a poem has no natural end, so the header and the attribution pin while
+    // only the body scrolls — otherwise the one link the embed exists to emit
+    // sits below however many stanzas the reader never reaches.
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: $color-bg-surface;
+    color: $color-text-dark;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+}
+
+.embed__head {
+    flex: 0 0 auto;
+    padding: $space-4 $space-4 $space-3;
+    border-bottom: 1px solid $color-border-subtle;
+}
+
+.embed__title {
+    font-family: $font-heading;
+    font-size: 20px;
+    font-weight: $fw-semibold;
+    line-height: 1.25;
+    color: $color-text-dark;
+    // A long title must not push the byline out of the fixed header.
+    overflow-wrap: anywhere;
+}
+
+.embed__byline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-1 0;
+    margin-top: $space-2;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+}
+
+.embed__author {
+    color: $color-text-medium;
+    text-decoration: underline;
+
+    &:hover {
+        color: $color-primary;
+    }
+}
+
+.embed__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: $space-4;
+    // A reader must be able to select and copy from an embed — the frame
+    // itself is deliberately NOT sandboxed without `allow-same-origin`.
+    -webkit-overflow-scrolling: touch;
+}
+
+.embed__poem {
+    font-size: 18px;
+    line-height: $lh-relaxed;
+    white-space: pre-line;
+    color: $color-text-dark;
+    overflow-wrap: anywhere;
+}
+
+.embed__foot {
+    flex: 0 0 auto;
+    border-top: 1px solid $color-border;
+    background: $color-bg-subtle;
+}
+
+.embed__cta {
+    display: block;
+    padding: $space-3 $space-4;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    text-align: center;
+    text-decoration: none;
+    color: $color-primary;
+    // The whole feature is this one anchor. Make it look like the destination
+    // it is rather than like grey chrome, and keep it pinned where it cannot
+    // be scrolled past.
+    transition: background-color 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: $color-primary-bg;
+        color: $color-primary-dark;
+    }
+}
+
+.embed__cta-brand {
+    text-decoration: underline;
+}
+
+.embed__cta-arrow {
+    display: inline-block;
+    // Decorative, so it does not move for anyone who has asked the OS for
+    // reduced motion — same rule the next-poem arrow follows.
+    transition: transform 0.15s ease;
+}
+
+.embed__cta:hover .embed__cta-arrow {
+    transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .embed__cta-arrow {
+        transition: none;
+    }
+}
+
+// A viewport narrower than any phone still gets a readable card rather than a
+// title clipped by the frame the host chose.
+@media (max-width: 360px) {
+    .embed__title {
+        font-size: 18px;
+    }
+
+    .embed__poem {
+        font-size: 16px;
+    }
+}

@@ -465,6 +465,24 @@ exports[`MUI Components Visual Regression Tests PoemFooter should render poem fo
       />
     </svg>
   </a>
+  <button
+    aria-label="Embed or link this poem"
+    class="poem__embed-icon"
+    data-testid="embed-icon"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root"
+      data-testid="CodeIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z"
+      />
+    </svg>
+  </button>
 </section>
 `;
 

@@ -31,6 +31,7 @@ import '../src/components/PoemOfTheWeek/PoemOfTheWeek.scss'
 import '../src/components/Register/Register.scss'
 import '../src/components/Auth/VerifyBanner.scss'
 import '../src/components/Join/Join.scss'
+import '../src/components/Embed/Embed.scss'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -73,15 +74,34 @@ export default function MyApp({ Component, pageProps, emotionCache = clientSideE
             )}
             <Provider store={store}>
                 <AppProvider initialUser={pageProps.initialUser}>
-                    <div className='container'>
-                        <a className='skip-link' href='#main-content'>Skip to main content</a>
-                        <Header />
-                        <VerifyBanner />
-                        <div className='margin-body' id='main-content' tabIndex={-1}>
+                    {/* THE EMBED ROUTE RENDERS INSIDE AN IFRAME on somebody
+                        else's website, so it gets none of this shell: the nav
+                        and footer are dead space at 420px, `.margin-body`
+                        reserves 90px of header clearance the card cannot
+                        spare, and the skip link points at `#main-content`,
+                        which does not exist there.
+
+                        Driven by a pageProps flag set in `getServerSideProps`
+                        rather than by `router.pathname`, so the SERVER omits
+                        the shell and the browser hydrates markup that never
+                        had a header in it. A client-side check would paint a
+                        full page and then strip it a frame later — a flash of
+                        navigation inside every embedded poem. */}
+                    {pageProps.chromeless ? (
+                        <div className='container embed-shell'>
                             <Component {...pageProps} />
                         </div>
-                        <Footer />
-                    </div>
+                    ) : (
+                        <div className='container'>
+                            <a className='skip-link' href='#main-content'>Skip to main content</a>
+                            <Header />
+                            <VerifyBanner />
+                            <div className='margin-body' id='main-content' tabIndex={-1}>
+                                <Component {...pageProps} />
+                            </div>
+                            <Footer />
+                        </div>
+                    )}
                     <Toaster position='bottom-right' />
                 </AppProvider>
             </Provider>

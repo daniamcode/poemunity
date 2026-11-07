@@ -134,8 +134,34 @@
     padding: 0;
 }
 
+// The embed control — same 24px transparent hit target as its neighbours, so
+// the footer row does not shift when it appears.
+.poem__embed-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 5%;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: $color-text-dark;
+
+    // Unlike edit and delete this one is available to EVERY reader, logged in
+    // or not — it is a share affordance, not an owner action, and hiding it
+    // from logged-out visitors would hide it from exactly the people most
+    // likely to put it on their own site.
+    &:hover,
+    &:focus-visible {
+        color: $color-primary;
+    }
+}
+
 .poem__edit-icon svg,
-.poem__delete-icon svg {
+.poem__delete-icon svg,
+.poem__embed-icon svg {
     width: 24px;
     height: 24px;
     transition: fill 0.15s ease;
@@ -399,6 +425,110 @@
     color: #fff;
 
     &:hover { background: $color-error-hover; }
+}
+
+// ---------------------------------------------------------------------------
+// Embed / share dialog. Reuses .poem__confirm-overlay for the dimmer, the
+// centring and the z-index — same modal, second caller — and only adds what is
+// specific to it: the format toggle and the snippet box.
+// ---------------------------------------------------------------------------
+.embed-dialog {
+    width: min(480px, 100%);
+    background: $color-bg-surface;
+    border-radius: $radius-md;
+    padding: $space-md;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    // Clicking the dimmer closes; clicks inside must not fall through to it.
+    text-align: center;
+}
+
+.embed-dialog__tabs {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    margin-bottom: $space-3;
+    background: $color-bg-subtle;
+    border-radius: $radius-md;
+}
+
+.embed-dialog__tab {
+    padding: 6px 18px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: $color-text-medium;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    cursor: pointer;
+
+    // aria-pressed carries the state, so the visual must follow the ATTRIBUTE
+    // rather than :hover — otherwise a resting-but-selected format reads as
+    // unselected.
+    &[aria-pressed='true'] {
+        background: $color-bg-surface;
+        color: $color-text-dark;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    &:hover { color: $color-text-dark; }
+}
+
+.embed-dialog__label {
+    display: block;
+    margin-bottom: $space-2;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+}
+
+.embed-dialog__snippet {
+    width: 100%;
+    padding: $space-2;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-bg-subtle;
+    color: $color-text-dark;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+    // Monospace snippets are one unbroken run of punctuation — without this
+    // they overflow the dialog and the selected text cannot be read.
+    resize: none;
+    word-break: break-all;
+
+    &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px $color-primary-focus-shadow;
+    }
+}
+
+.embed-dialog__hint {
+    margin: $space-3 0;
+    font-size: 13px;
+    color: $color-text-secondary;
+}
+
+.embed-dialog__copy {
+    background: $color-primary;
+    color: #fff;
+
+    &:hover { background: $color-primary-hover; }
+}
+
+.embed-dialog__manual {
+    margin-top: $space-3;
+    font-size: 13px;
+    color: $color-warning;
+
+    kbd {
+        padding: 1px 5px;
+        border: 1px solid $color-border;
+        border-radius: 4px;
+        background: $color-bg-subtle;
+        font-family: inherit;
+        font-size: 12px;
+    }
 }
 
 .poem__footer {

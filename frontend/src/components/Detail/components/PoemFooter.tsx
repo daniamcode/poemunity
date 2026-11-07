@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import Link from 'next/link'
 import HighlightOffSharpIcon from '@mui/icons-material/HighlightOffSharp'
 import EditIcon from '@mui/icons-material/Edit'
 import SubjectSharpIcon from '@mui/icons-material/SubjectSharp'
+import CodeIcon from '@mui/icons-material/Code'
 import { LIKE, LIKES } from '../../../data/constants'
 import { COMMENTS_ANCHOR } from '../../Comments/CommentsSection'
 import { Poem, Context } from '../../../typescript/interfaces'
 import { ConfirmDialog } from '../../common/ConfirmDialog'
+import { EmbedDialog } from './EmbedDialog'
 
 interface PoemFooterProps {
     poem: Poem
@@ -18,6 +20,11 @@ interface PoemFooterProps {
 
 export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFooterProps) {
     const [showConfirm, setShowConfirm] = useState(false)
+    const [showEmbed, setShowEmbed] = useState(false)
+    // Stable identity: the dialog's Escape handler is wired in an effect keyed
+    // on this callback, so an inline arrow would tear the listener down and
+    // re-add it on every render of the footer.
+    const closeEmbed = useCallback(() => setShowEmbed(false), [])
     const isUserLiked = poem.likes.some(id => id === context.userId)
     const isOwner = poem.userId === context.userId || context.isAdmin
     const canLike = context.user && poem.userId !== context.userId
@@ -103,6 +110,24 @@ export function PoemFooter({ poem, context, onLike, onDelete, onEdit }: PoemFoot
                     }}
                 />
             </Link>
+
+            {/* Deliberately OUTSIDE every `context.user` / `isOwner` gate above.
+                The embed is a share affordance, not an owner action — the whole
+                point is that a reader pastes it onto THEIR site, so requiring a
+                signed-in visitor would hide it from exactly the people who would
+                use it. Drafts are already unreachable through the dialog: the
+                embed route is called without credentials and answers 404. */}
+            <button
+                type='button'
+                className='poem__embed-icon'
+                onClick={() => setShowEmbed(true)}
+                data-testid='embed-icon'
+                aria-label='Embed or link this poem'
+            >
+                <CodeIcon />
+            </button>
+
+            <EmbedDialog open={showEmbed} poem={poem} onClose={closeEmbed} />
         </section>
     )
 }
