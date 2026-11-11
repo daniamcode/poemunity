@@ -20,7 +20,7 @@ export interface ServerUser {
 }
 
 // JWT decode using Node.js Buffer — works in getServerSideProps (no browser atob needed)
-export function decodeServerToken(token: string): Record<string, any> | null {
+export function decodeUnverifiedJwtPayload(token: string): Record<string, any> | null {
     try {
         const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
         return JSON.parse(Buffer.from(base64, 'base64').toString('utf8'))
@@ -29,8 +29,8 @@ export function decodeServerToken(token: string): Record<string, any> | null {
     }
 }
 
-export function buildServerUser(token: string): ServerUser | null {
-    const jwt = decodeServerToken(token)
+export function buildUnverifiedUserFromToken(token: string): ServerUser | null {
+    const jwt = decodeUnverifiedJwtPayload(token)
     if (!jwt) return null
     return {
         user: 'authenticated',
@@ -79,7 +79,7 @@ export function buildServerUser(token: string): ServerUser | null {
  * in". The fallback survives only for the case it was written for — the backend
  * being unreachable or broken (status 0 or 5xx) — where a signed-in reader
  * keeps their identity on screen through a blip. Even then the identity is
- * unverified, which is why `buildServerUser` grants no privilege.
+ * unverified, which is why `buildUnverifiedUserFromToken` grants no privilege.
  */
 export async function fetchServerUser(token?: string): Promise<ServerUser | null> {
     if (!token) return null
@@ -99,7 +99,7 @@ export async function fetchServerUser(token?: string): Promise<ServerUser | null
         // not an outage. Same reasoning as PUBLISHED_MATCH and the poem field
         // allowlist: a status nobody thought about should be inert, not trusted.
         const backendUnavailable = status === 0 || status >= 500
-        return backendUnavailable ? buildServerUser(token) : null
+        return backendUnavailable ? buildUnverifiedUserFromToken(token) : null
     }
     return {
         user: 'authenticated',

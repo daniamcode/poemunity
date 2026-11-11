@@ -1,11 +1,11 @@
-import { fetchServerUser, buildServerUser, decodeServerToken } from './serverApi'
+import { fetchServerUser, buildUnverifiedUserFromToken, decodeUnverifiedJwtPayload } from './serverApi'
 
 /**
  * `fetchServerUser` and the token fallback behind it.
  *
  * The vulnerability these tests exist for: `fetchServerUser` used `serverFetch`,
  * which collapses EVERY failure into `null`, and then fell back to
- * `buildServerUser(token)` — a decode of the JWT WITHOUT signature
+ * `buildUnverifiedUserFromToken(token)` — a decode of the JWT WITHOUT signature
  * verification (it cannot verify; the secret lives on the backend). So a
  * structurally valid token signed with the wrong secret went: backend 401 →
  * fallback → page hydrated as signed in, under whatever `username` and
@@ -78,7 +78,7 @@ describe('fetchServerUser: a refused token is not rescued by the fallback', () =
 
             // The premise: this token is not junk. A regression that falls back
             // to decoding it produces a signed-in admin, not an empty object.
-            const decoded = decodeServerToken(forgedAdminToken)
+            const decoded = decodeUnverifiedJwtPayload(forgedAdminToken)
             expect(decoded).toMatchObject({ username: 'attacker', isAdmin: true })
 
             await expect(fetchServerUser(forgedAdminToken)).resolves.toBeNull()
@@ -124,8 +124,8 @@ describe('fetchServerUser: an unreachable or broken backend still falls back', (
         }
     )
 
-    it('buildServerUser hardcodes isAdmin false directly', () => {
-        const user = buildServerUser(forgedAdminToken)
+    it('buildUnverifiedUserFromToken hardcodes isAdmin false directly', () => {
+        const user = buildUnverifiedUserFromToken(forgedAdminToken)
         expect(user!.username).toBe('attacker')
         expect(user!.isAdmin).toBe(false)
     })
@@ -196,7 +196,7 @@ describe('fetchServerUser: degenerate tokens', () => {
 
         await expect(fetchServerUser('not-a-jwt')).resolves.toBeNull()
         await expect(fetchServerUser('a.b')).resolves.toBeNull()
-        expect(decodeServerToken('not-a-jwt')).toBeNull()
+        expect(decodeUnverifiedJwtPayload('not-a-jwt')).toBeNull()
     })
 
     describe('the fallback is an allowlist, not a denylist', () => {
