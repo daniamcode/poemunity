@@ -62,10 +62,11 @@ describe('SimpleAccordion', () => {
     test('reaches the rest through /categories, not by expanding in place', () => {
         renderWithRouter(<SimpleAccordion />)
 
-        // The dropdown still shows only the must-have set. Expanding it
-        // client-side was the behaviour this replaced — and rendering all 141
-        // here would be the OTHER fix, one deliberately not taken because it
-        // adds ~13KB to the HTML of every page on the site.
+        // The DASHBOARD still shows only the must-have set, and deliberately
+        // so: rendering all 143 on every page would add ~13KB to the HTML of
+        // all 16,087 of them. Genre pages are the one exception — see
+        // SimpleAccordion.ssr.test.tsx — where the full list is what was
+        // already being sent to the browser, just not to the crawler first.
         expect(screen.queryByText('Fantasy')).not.toBeInTheDocument()
         expect(screen.getByText('Love')).toBeInTheDocument()
     })

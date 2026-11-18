@@ -113,6 +113,16 @@ everything looks fine. The guards are `renderToString` tests —
 `List.ssr.test.tsx` and `Authors.ssr.test.tsx` — and a new SSR-seeded list needs
 one too.
 
+**The same shape has since bitten a component that derives from a PROP rather
+than from a fetch.** `SimpleAccordion` started both of its flags at `false` and
+corrected them in a `useEffect`, so the server always emitted a collapsed panel
+holding the 26 `MUST_HAVE_CATEGORIES` and the other 117 links were created by
+the browser after hydration — on all 109 genre pages outside that list, absent
+from the HTML a crawler reads first. `SimpleAccordion.ssr.test.tsx` is the
+guard, and it red-checks the instructive way: reverting the two initial values
+fails its three genre-page tests while all 26 tests in
+`SimpleAccordion.test.tsx` stay green.
+
 **API integration**
 - axios instance in `src/redux/actions/axiosInstance.js`. Client-side, `baseURL` is the Next proxy **`/api/backend`**; server-side it's `NEXT_PUBLIC_API_URL`.
 - The proxy `pages/api/backend/[...path].ts` forwards to the backend, attaches the httpOnly cookie as a Bearer token, and refreshes the cookie when a response body carries a `token`.

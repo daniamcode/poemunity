@@ -20,8 +20,29 @@ interface SimpleAccordionProps {
 }
 
 export default function SimpleAccordion({ genre, closeOnSelect = false }: SimpleAccordionProps) {
-    const [expanded, setExpanded] = useState(false)
-    const [showAll, setShowAll] = useState(false)
+    // DERIVED FROM THE PROP — NOT FROM AN EFFECT. This is the whole point of
+    // the change, and the reason it is worth ~10KB on genre pages.
+    //
+    // Both flags used to start `false` and get corrected in a `useEffect`.
+    // Effects do not run during server rendering, so the server always emitted
+    // a collapsed panel holding only MUST_HAVE_CATEGORIES — and on the 109
+    // genre pages outside that list the other 117 category links were added by
+    // the browser AFTER hydration, i.e. absent from the HTML a crawler reads
+    // before deciding when to render. They were already being sent to the
+    // browser on those pages, so this moves them into the first response
+    // instead of a second pass.
+    //
+    // Hydration-safe for the same reason the SSR-seeded lists are: the client's
+    // FIRST render computes the identical values from the same prop, so markup
+    // matches byte-for-byte and nothing flips. The effect below stays for
+    // client-side navigations between genres — the header does not remount when
+    // the route changes, so initial state alone would carry the old genre's
+    // flags across.
+    const showAllFor = (g?: string) =>
+        Boolean(g) && !MUST_HAVE_CATEGORIES.some(c => categoryToSlug(c) === g)
+
+    const [expanded, setExpanded] = useState(Boolean(genre))
+    const [showAll, setShowAll] = useState(showAllFor(genre))
 
     // Only navigation collapses the panel — including "Browse all categories",
     // which used to expand the list in place and now navigates to /categories
@@ -33,9 +54,7 @@ export default function SimpleAccordion({ genre, closeOnSelect = false }: Simple
     useEffect(() => {
         if (genre) {
             setExpanded(true)
-            if (!MUST_HAVE_CATEGORIES.some(c => categoryToSlug(c) === genre)) {
-                setShowAll(true)
-            }
+            setShowAll(showAllFor(genre))
         }
     }, [genre])
 
