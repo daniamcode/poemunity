@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
-const rateLimit = require('express-rate-limit')
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit')
 
 const loginRouter = require('./src/controllers/login')
 const registerRouter = require('./src/controllers/register')
@@ -55,12 +55,45 @@ const hasSimulationSecret = req =>
   Boolean(process.env.SIMULATION_INTERNAL_SECRET) &&
   req.get('x-simulation-secret') === process.env.SIMULATION_INTERNAL_SECRET
 
+/**
+ * The login bucket, keyed per ACCOUNT as well as per address.
+ *
+ * `req.ip` alone was ONE bucket for the whole site, and two things made it so:
+ * Express defaults to `trust proxy: false` (so `req.ip` is the socket address
+ * and X-Forwarded-For is ignored), and `pages/api/backend/[...path].ts` is a
+ * server-side `fetch` that forwards neither the client IP nor X-Forwarded-For —
+ * so every real reader arrives from Vercel's egress IP. Five attempts anywhere
+ * exhausted the quota for everyone, for fifteen minutes. That is the
+ * "login is broken in production" report, verified live before this change.
+ *
+ * The identifier being attempted joins the key, which is what gives each reader
+ * their own five attempts instead of sharing one. It is also the better key for
+ * what this limiter exists to stop — guessing ONE account's password — since a
+ * per-IP limit is exactly what a botnet spreads across anyway.
+ *
+ * Normalised the same way the route matches (CI_COLLATION in
+ * controllers/login.js): lowercased, because login accepts username OR email
+ * case-insensitively, and a gate that did not would hand five fresh attempts to
+ * every spelling of one account.
+ *
+ * `ipKeyGenerator`, not a bare `req.ip`: it collapses IPv6 to its /56 subnet so
+ * one address cannot hand itself a new bucket per interface, and it is the
+ * helper express-rate-limit documents for custom keyGenerators — calling it is
+ * what keeps the library's own keyGenerator validation satisfied.
+ *
+ * An absent or non-string username keys to `ip|` — one bucket, which is the
+ * right answer for a request that names no account.
+ */
+const loginIdentifier = body =>
+  body && typeof body.username === 'string' ? body.username.trim().toLowerCase() : ''
+
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   message: { error: 'Too many login attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: req => `${ipKeyGenerator(req.ip)}|${loginIdentifier(req.body)}`,
   skip: req =>
     process.env.NODE_ENV === 'test' ||
     hasSimulationSecret(req)
@@ -198,4 +231,4 @@ app.get('/', (req, res) => {
 // test — a re-declared limiter passes happily while app.js is edited (max
 // raised, limiter unmounted), which is the hollow-test shape AGENTS.md warns
 // about. See commentLimiter.test.js and socialRateLimiters.test.js.
-module.exports = { app, commentLimiter, likeLimiter, followLimiter, createPoemLimiter }
+module.exports = { app, commentLimiter, likeLimiter, followLimiter, createPoemLimiter, loginLimiter }
