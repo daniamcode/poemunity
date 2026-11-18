@@ -100,12 +100,59 @@ const loginLimiter = rateLimit({
     hasSimulationSecret(req)
 })
 
+/**
+ * Key for the four gates that have no session to key on: register,
+ * availability, password and verify.
+ *
+ * Same shape as loginLimiter — `<address>|<subject>` — because they suffer the
+ * identical bug for the identical reason: `req.ip` is one shared address behind
+ * the frontend proxy, so each was ONE bucket for the whole site. 3 registrations
+ * an HOUR, 30 availability checks a MINUTE, 5 password resets an HOUR, 10
+ * verifications an HOUR — shared by every reader at once. A couple of people on
+ * the register page exhausted it for everyone.
+ *
+ * The subject is whatever the request is ABOUT: the account being registered or
+ * reset, the name being checked, the token being confirmed. Lowercased to match
+ * the routes' case-insensitive collation (CI_COLLATION), so five spellings of
+ * one address cannot buy five quotas. verify/resend carries a session instead
+ * and takes it through peekUserId, for the same reason the write limiters do —
+ * this key is built before userExtractor runs.
+ *
+ * THE TRADE-OFF, STATED PLAINLY. These four were per-ACTOR limits by intent,
+ * and the old shared bucket capped the whole SITE, which accidentally also
+ * capped a determined attacker. Per-subject keying trades that cap away: a
+ * legitimate reader is never blocked by strangers again and a direct hit is
+ * still bounded per address, but an attacker who varies the subject gets a fresh
+ * quota. That is the same trade loginLimiter already made, and for the same
+ * reason — a limit that blocks every legitimate reader is not a limit, it is an
+ * outage. If a hard site-wide ceiling is wanted back, the way to have both is a
+ * second, generous global bucket alongside this one; it is deliberately not
+ * bundled here.
+ *
+ * An absent subject keys to `<address>|` — one bucket, which is the right
+ * answer for a request that names nothing.
+ */
+const gateSubject = req => {
+  const session = userExtractor.peekUserId(req)
+  if (session) return session
+
+  const body = req.body || {}
+  const query = req.query || {}
+  const raw = [body.email, query.email, body.username, query.username, body.token]
+    .find(value => typeof value === 'string' && value.trim())
+
+  return raw ? raw.trim().toLowerCase() : ''
+}
+
+const gateLimitKey = req => `${ipKeyGenerator(req.ip)}|${gateSubject(req)}`
+
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 3,
   message: { error: 'Too many registration attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: gateLimitKey,
   // Only gate account creation (POST). The public availability check (GET) has
   // its own, looser limiter below so debounced typing does not burn the quota.
   skip: req => process.env.NODE_ENV === 'test' || req.method !== 'POST'
@@ -119,6 +166,7 @@ const passwordLimiter = rateLimit({
   message: { error: 'Too many password reset attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: gateLimitKey,
   skip: req => process.env.NODE_ENV === 'test'
 })
 
@@ -130,6 +178,7 @@ const verifyLimiter = rateLimit({
   message: { error: 'Too many verification attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: gateLimitKey,
   skip: req => process.env.NODE_ENV === 'test'
 })
 
@@ -139,6 +188,7 @@ const availabilityLimiter = rateLimit({
   message: { error: 'Too many availability checks, please slow down' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: gateLimitKey,
   skip: () => process.env.NODE_ENV === 'test'
 })
 
@@ -261,5 +311,17 @@ app.get('/', (req, res) => {
 // THE instances that are mounted, not a copy of their options re-declared in the
 // test — a re-declared limiter passes happily while app.js is edited (max
 // raised, limiter unmounted), which is the hollow-test shape AGENTS.md warns
-// about. See commentLimiter.test.js and socialRateLimiters.test.js.
-module.exports = { app, commentLimiter, likeLimiter, followLimiter, createPoemLimiter, loginLimiter }
+// about. See commentLimiter.test.js, socialRateLimiters.test.js,
+// perAccountWriteLimiters.test.js and gateRateLimiters.test.js.
+module.exports = {
+  app,
+  commentLimiter,
+  likeLimiter,
+  followLimiter,
+  createPoemLimiter,
+  loginLimiter,
+  registerLimiter,
+  availabilityLimiter,
+  passwordLimiter,
+  verifyLimiter
+}
