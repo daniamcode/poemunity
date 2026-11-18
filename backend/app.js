@@ -17,6 +17,7 @@ const authorsRouter = require('./src/controllers/authors')
 const followsRouter = require('./src/controllers/follows')
 const commentsRouter = require('./src/controllers/comments')
 const notificationsRouter = require('./src/controllers/notifications')
+const userExtractor = require('./src/middleware/userExtractor')
 
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
   throw new Error('FRONTEND_URL env var must be set in production')
@@ -141,12 +142,39 @@ const availabilityLimiter = rateLimit({
   skip: () => process.env.NODE_ENV === 'test'
 })
 
+/**
+ * Key for the four authenticated-write limiters: ONE BUCKET PER ACCOUNT.
+ *
+ * `req.userId` cannot be read here — userExtractor runs inside the routers,
+ * which these limiters are mounted AHEAD of — so the key peeks at the session
+ * token itself (signature check only, synchronous; see peekUserId).
+ *
+ * WHY THIS IS NEEDED. All four keyed on `req.ip` alone, and behind the
+ * frontend's /api/backend proxy every request arrives from Vercel's egress IP.
+ * So each was ONE bucket for the whole site: 10 comments a minute, 30 likes,
+ * 10 follows and 10 poems shared by every reader at once — a handful of
+ * comments anywhere stopped everybody commenting. That is the same failure
+ * that broke login (see loginLimiter above), on four more routes.
+ *
+ * Per-account is also the truer model for what these limiters exist to stop —
+ * one account working the social graph at machine speed — since a per-IP limit
+ * is exactly what a botnet spreads across anyway.
+ *
+ * Falls back to the client address when there is no usable session, which is
+ * the bucket these limiters used before: a request that names no account can
+ * only be judged by where it came from. It also keeps the unauthenticated path
+ * behaving exactly as it did, so socialRateLimiters.test.js still pins it.
+ */
+const writeLimitKey = req =>
+  userExtractor.peekUserId(req) ?? ipKeyGenerator(req.ip)
+
 const commentLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
   message: { error: 'Too many comments, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: writeLimitKey,
   skip: req =>
     process.env.NODE_ENV === 'test' ||
     req.method !== 'POST' ||
@@ -163,6 +191,7 @@ const likeLimiter = rateLimit({
   message: { error: 'Too many likes, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: writeLimitKey,
   skip: req =>
     process.env.NODE_ENV === 'test' ||
     req.method !== 'PUT' ||
@@ -180,6 +209,7 @@ const followLimiter = rateLimit({
   message: { error: 'Too many follow requests, please slow down' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: writeLimitKey,
   skip: req =>
     process.env.NODE_ENV === 'test' ||
     (req.method !== 'POST' && req.method !== 'DELETE') ||
@@ -195,6 +225,7 @@ const createPoemLimiter = rateLimit({
   message: { error: 'Too many poems, please slow down' },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: writeLimitKey,
   skip: req =>
     process.env.NODE_ENV === 'test' ||
     req.method !== 'POST' ||
