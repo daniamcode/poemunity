@@ -43,14 +43,15 @@ async function buildSection(section: SitemapSection): Promise<SitemapEntry[]> {
             return buildAuthorEntries(await fetchAllAuthors())
 
         case 'poems-community': {
-            // The poems that exist ONLY here — 435 of them against 15,652
-            // famous ones, and since the famous section was dropped this is the
-            // ONLY poem sitemap. That makes the partition check below more
-            // load-bearing than it was, not less: `origin` is enumerated by
-            // hand in COMMUNITY_ORIGINS because the list endpoint has no "not
-            // this one", so a fourth origin added tomorrow would now be in no
-            // sitemap at all AND noindexed by nothing. The assertion is what
-            // turns that into a loud 500 instead of poems quietly vanishing.
+            // The poems that exist ONLY here — 435 of them against the 15,652
+            // famous ones, which have their own section again. `origin` is
+            // enumerated by hand in COMMUNITY_ORIGINS because the list endpoint
+            // filters by equality and has no "not this one", so a fourth origin
+            // added tomorrow would belong to no section at all. The assertion is
+            // what turns that into a loud 500 instead of poems quietly
+            // vanishing — and it runs HERE rather than on the famous case
+            // because `famous` is defined positively and cannot be wrong, while
+            // this list is defined by omission and can.
             const perOrigin = await Promise.all(
                 COMMUNITY_ORIGINS.map(origin => fetchAllPoems(`&origin=${origin}`))
             )
@@ -64,6 +65,13 @@ async function buildSection(section: SitemapSection): Promise<SitemapEntry[]> {
 
             return buildPoemEntries(community)
         }
+
+        case 'poems-famous':
+            // Asked positively (`&origin=famous`), so unlike COMMUNITY_ORIGINS
+            // there is nothing here that can omit a class of poem by being
+            // forgotten. The partition check above already proved this set and
+            // the community set cover everything, so it does not repeat it.
+            return buildPoemEntries(await fetchAllPoems('&origin=famous'))
     }
 }
 

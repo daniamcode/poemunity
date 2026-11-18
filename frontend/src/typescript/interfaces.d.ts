@@ -35,10 +35,10 @@ export interface Poem {
      * the admin can post a famous poem on behalf of an account, and it is the
      * poem that is or is not a verbatim copy of something published elsewhere.
      *
-     * `origin === 'famous'` is what drives `noindex` on the detail page and
-     * what partitions the sitemap, so read this rather than `authorType` for
-     * any question about duplication. Optional because a poem created through
-     * the ordinary form carries no origin at all.
+     * `origin === 'famous'` is what partitions the sitemap (and drove the
+     * `noindex` these poems carried until 2026-11-18), so read this rather
+     * than `authorType` for any question about duplication. Optional because a
+     * poem created through the ordinary form carries no origin at all.
      */
     origin?: 'famous' | 'user' | 'ai'
     /**

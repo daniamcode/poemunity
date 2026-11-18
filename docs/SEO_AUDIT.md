@@ -280,6 +280,15 @@ in Search Console, not just the index, and read coverage per file:
   measure of whether the site is working.
 - `authors.xml` and `pages.xml` — where P2's traffic should appear.
 
+> **Addendum, 2026-11-18.** P0 (the famous-poem `noindex` + dropping
+> `poems-famous` from the sitemap) shipped 2026-08-18 and was **reversed in
+> full on 2026-11-18** — the tag is off and the section is back in the sitemap.
+> So the first bullet above now reads backwards: index counts on
+> `poems-famous.xml` are expected to **rise**, and `poems-community` is no
+> longer the only poem file. This audit's own recommendation — "do not expect
+> the famous poems to rank if kept" — still holds; the reversal asks for them
+> to be crawled and counted, not to win.
+
 Leading indicator that P0 + P2 worked: **impressions on genre queries**, before
 any click growth. If genre-page impressions are still flat 8 weeks after the
 editorial work lands, the site-level classification has not lifted yet, and the

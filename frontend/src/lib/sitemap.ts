@@ -23,25 +23,20 @@ export const FETCH_CONCURRENCY = 16
  * Google index faster — it makes Google tell you WHY it isn't.
  */
 /**
- * `poems-famous` WAS a fourth section here and was removed on 2026-08-18.
+ * `poems-famous` left this list on 2026-08-18 and returned on 2026-11-18,
+ * tracking the `noindex` on those poems themselves (see
+ * pages/detail/[poemId].tsx). The coupling is the whole point: a sitemap is a
+ * REQUEST TO INDEX, so listing URLs whose own response says `noindex` asks
+ * Google to index pages it is simultaneously told not to — a contradiction that
+ * costs a crawl of every one of them to discover. The two must move together,
+ * and `famousPoemIndexing.test.tsx` pins the pair.
  *
- * A sitemap is a request to index. The 15,652 famous poems are now
- * `noindex,follow` (see pages/detail/[poemId].tsx), so listing them here would
- * ask Google to index pages the same response tells it not to — a contradiction
- * that costs a crawl of every one of them to discover.
- *
- * The route for it is gone too, so `/sitemaps/poems-famous.xml` 404s. That is
- * deliberate rather than left serving-but-unlisted: an unlisted file Google
- * already has submitted keeps being fetched and keeps making the same request.
- * It has to be REMOVED IN SEARCH CONSOLE by hand — deleting the route does not
- * withdraw a submission, and until it is withdrawn GSC will report an error
- * against it.
- *
- * The famous poems are NOT deleted and nothing about the site changes for a
- * reader: they stay published, linked from every genre list and author page,
- * and crawlable through those. Only the request to rank them is withdrawn.
+ * Restoring the section also restores the split that earns the index its
+ * existence: `poems-famous` reports the 15,652 verbatim copies separately from
+ * the 435 that exist only here, instead of averaging two classes with entirely
+ * different prospects into one number.
  */
-export const SITEMAP_SECTIONS = ['pages', 'authors', 'poems-community'] as const
+export const SITEMAP_SECTIONS = ['pages', 'authors', 'poems-community', 'poems-famous'] as const
 
 /**
  * The cache header every sitemap route sends, in one place so the index and the

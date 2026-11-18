@@ -720,27 +720,37 @@ a link on screen nor an `item` in the markup.
 titles and author names into a raw `<script>`, where the HTML parser ends the
 element at the first literal `</script>` regardless of JSON quoting.
 
-## Famous poems are noindex (one condition, two places)
+## Famous poems (noindex on 2026-08-18, off 2026-11-18)
 
 15,652 of 16,087 poems are `origin: 'famous'` — verbatim copies of poems on
 poetryfoundation.org and poets.org, the originals, on far older domains. They
 cannot outrank their own source however they are marked up, and Search Console
-already agreed: 17,349 URLs at *Discovered — currently not indexed*. So since
-2026-08-18 they are `noindex,follow` and out of the sitemap.
+agreed when it was decided: 17,349 URLs at *Discovered — currently not
+indexed*. So from 2026-08-18 they were `noindex,follow` and out of the sitemap.
 
-**This is NOT a deletion and must not become one.** Every famous poem stays
-published, readable, linked from every genre list and author page, and
-crawlable through them. Including the canon is normal for a poetry site — the
-anomaly here is the ratio (**15,652 famous / 416 AI / 19 human**), not the
-inclusion. What is withdrawn is only the request to *rank* them.
+**Both halves were removed together on 2026-11-18.** `pages/detail/[poemId].tsx`
+passes no `noIndex` for any origin — so no robots tag at all, `index,follow` by
+omission rather than by statement — and `poems-famous` is back in
+`SITEMAP_SECTIONS`. The arguments above have not stopped being true; what the
+removal changes is that these pages are *asked* to be indexed again, and their
+coverage numbers stop being partly a self-fulfilling prophecy (while `noindex`
+stood, "not indexed" was something we had requested).
 
-**The condition is per-POEM, never per-route.** `/detail/[poemId]` serves all
-three origins, so a `noIndex` on the route deindexes the 19 human poems and 416
-AI ones — precisely the pages the change exists to rescue — while rendering
-identically and passing every other test. `famousPoemNoindex.test.tsx` pins this
-with fixtures that differ *only* by `origin`.
+**Never a deletion, in either direction.** Every famous poem stayed published,
+readable, linked from every genre list and author page throughout the period,
+and including the canon is normal for a poetry site. The anomaly is the ratio
+(**15,652 famous / 416 AI / 19 human**), not the inclusion.
 
-Three details that each look like a free choice and are not:
+**If it is ever reinstated, the tag and `SITEMAP_SECTIONS` move together.** A
+sitemap is a request to index, so listing URLs whose own response says
+`noindex` is a contradiction that costs a crawl each to discover — which is
+exactly why `poems-famous` left when the tag arrived and returned when it went.
+
+**And it stays per-POEM, never per-route.** `/detail/[poemId]` serves all three
+origins, so a `noIndex` on the route deindexes the 19 human poems and 416 AI
+ones — precisely the pages any such exercise exists to rescue — while rendering
+identically and passing every other test. Three details that each look like a
+free choice and are not:
 
 - **`origin`, not `authorType`.** They usually agree and need not: `authorType`
   is the author's kind, `origin` is the poem's provenance, and it is the poem
@@ -754,22 +764,26 @@ Three details that each look like a free choice and are not:
   poems form a single linked list). Deindexing them must not sever the paths
   through them.
 
-**The sitemap side is the same decision.** A sitemap is a request to index, so
-listing URLs whose own response says `noindex` is a contradiction that costs a
-crawl each to discover. `poems-famous` is gone from `SITEMAP_SECTIONS` and its
-route 404s. `assertOriginsPartitionPoems` becomes *more* load-bearing, not less:
-`poems-community` is now the only poem sitemap, so a fourth origin would be in
-no sitemap at all — the assertion turns that into a 500 instead of silence.
+`followLinks` only has an effect *inside* a `noindex` tag (`SeoHead` renders
+both conditionally), so both props were dropped from the route together.
 
-👤 **Deleting the route does not withdraw a submission** — `poems-famous.xml`
-must be removed in Search Console by hand, or GSC reports an error against it.
+`famousPoemIndexing.test.tsx` pins the current state — no poem of any origin
+emits a robots tag, and the sitemap advertises all four sections — with
+fixtures that differ *only* by `origin`. Its predecessor,
+`famousPoemNoindex.test.tsx`, asserted the opposite; it was rewritten and
+renamed rather than deleted, because the per-poem/per-route distinction it
+teaches is the same in both directions.
 
-**What this does and does not buy.** It recovers crawl focus and makes coverage
-numbers legible. It is *not* a growth lever and the site-level quality benefit
-is plausible rather than documented — Google has said noindexed pages generally
-do not feed site-wide signals, which is about as firm as the public evidence
-gets. The binding constraint on traffic is that 19 people have written a poem
-here. Do not expect a traffic change from this alone.
+👤 **Search Console must be updated by hand in both directions.** The section's
+route 404'd while it was out (deleting the route does not withdraw a
+submission, so GSC was reporting an error against it), and `poems-famous.xml`
+now has to be **re-submitted** — neither happens automatically.
+
+**What this does and does not buy.** Reinstating the request does not make
+these pages rank, and the binding constraint on traffic is still that 19 people
+have written a poem here. The trade is the ordinary one: 15,652 near-duplicate
+pages are back in the crawl request, competing for attention with the 435 that
+exist only here.
 
 ## Paginated list URLs
 
