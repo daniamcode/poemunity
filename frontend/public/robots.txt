@@ -1,6 +1,63 @@
+# Poemunity robots.txt
+#
+# Policy, decided 2026-11-20: block AI *training* crawlers, keep AI *search*
+# crawlers. Every vendor runs those as two separate user agents, and a training
+# opt-out has no effect on whether you appear in that vendor's answers — while
+# blocking the search agent removes you from them. See AGENTS.md, "AI crawler
+# policy", for the reasoning and for which one costs which.
+#
+# Anything not named below falls into the `User-agent: *` group, so Googlebot,
+# bingbot, DuckDuckBot, Applebot, OAI-SearchBot, ChatGPT-User, Claude-SearchBot,
+# Claude-User, PerplexityBot and meta-webindexer all stay allowed to crawl.
+
 User-agent: *
 Allow: /
 Disallow: /profile
 Disallow: /api/
+
+# --- AI TRAINING CRAWLERS: excluded from model training ----------------------
+# Each is its own group, and under RFC 9309 a crawler with its own group
+# ignores the `*` group entirely — harmless here, because every group below
+# disallows the whole site and so needs no other rule of its own.
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: MistralAI-Training
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+# --- TRAINING CONTROL TOKENS -------------------------------------------------
+# These are not crawlers. Google and Apple read the token and apply it to
+# requests their real crawler already makes, so neither produces a request of
+# its own: blocking them is a statement about training use, not quota relief.
+# `Google-Extended` explicitly does not affect Google Search or AI Overviews,
+# and `Applebot-Extended` explicitly does not affect Applebot/Siri.
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
 
 Sitemap: https://poemunity.com/sitemap.xml

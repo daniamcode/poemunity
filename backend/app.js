@@ -307,6 +307,40 @@ app.get('/', (req, res) => {
   res.send('Server is ok')
 })
 
+/**
+ * robots.txt for THIS origin.
+ *
+ * `poemunity-backend.vercel.app` is a different host from `poemunity.com`, and
+ * robots.txt is per-host — the file in `frontend/public/` can never reach here.
+ * Nor could a static copy: `backend/vercel.json` routes `/(.*)` into this
+ * function, so anything not matched by a route below 404s instead of being
+ * served from disk. A route is the only shape that works.
+ *
+ * Disallow everything. The API returns JSON whose HTML already exists on the
+ * frontend, so a crawler gains nothing from indexing it and the frontend loses
+ * nothing by it going. This host is the majority of the site's edge traffic
+ * (804,966 of 1,310,510 requests in the 30 days to 2026-11-20) and had NO
+ * robots.txt before this line — a missing file means "assume everything is
+ * allowed" under RFC 9309, which is the open door a scraper walks through to
+ * page through all 16,087 poems as JSON with no limiter standing in the way.
+ *
+ * It cannot throttle our own traffic: robots.txt is read only by crawlers.
+ * The frontend's server-side fetches and the `/api/backend` proxy ignore it
+ * entirely, so this cannot self-DoS the way an IP-keyed rate limit would.
+ */
+const API_ROBOTS_TXT = [
+  '# Poemunity API — JSON, not pages.',
+  '# Every poem is served as HTML at https://poemunity.com, which is what',
+  '# should be crawled. There is nothing here worth indexing.',
+  'User-agent: *',
+  'Disallow: /',
+  ''
+].join('\n')
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(API_ROBOTS_TXT)
+})
+
 // The limiters are exported alongside the app so the wiring tests can exercise
 // THE instances that are mounted, not a copy of their options re-declared in the
 // test — a re-declared limiter passes happily while app.js is edited (max

@@ -994,6 +994,58 @@ identical for every visitor, while the SSR pages embed `initialUser` and would
 serve one reader's signed-in header to everyone. See `TODO.md` for that
 decision, which is parked behind the Search Console numbers.
 
+## AI crawler policy (robots.txt)
+
+`frontend/public/robots.txt` **blocks AI training crawlers and allows AI search
+crawlers.** Every vendor ships those as two separate user agents and documents
+the settings as independent, which is what makes this the safe direction to
+fail in: `GPTBot` costs nothing in ChatGPT answers (`OAI-SearchBot` is what puts
+you there), `ClaudeBot` costs nothing in Claude's (`Claude-SearchBot` and
+`Claude-User` are what do), `Google-Extended` explicitly does not touch Google
+Search, and `Applebot-Extended` does not touch Applebot/Siri.
+
+**A crawler obeys the group that NAMES its token, and falls back to
+`User-agent: *` only when nothing names it (RFC 9309).** That is the entire
+mechanism, and it fails in two directions:
+
+- **Training tokens need their own group.** robots.txt has no negation — you
+  cannot say "everyone except X" — so a training bot nobody names stays allowed.
+- **Search tokens must have NO group at all.** Adding `User-agent: Googlebot`
+  above a `Disallow: /` makes that group govern Googlebot and stops `*`
+  applying to it: an edit that looks like an addition and deindexes the site.
+  That is the realistic way this file gets broken — by tidying.
+
+So: training tokens get a `Disallow: /` of their own, search tokens get nothing.
+
+**`Google-Extended` and `Applebot-Extended` are control tokens, not crawlers.**
+Google and Apple read the token and apply it to requests their real crawler
+already makes, so neither emits a request of its own — blocking them is a
+statement about training use and buys **no** quota.
+
+`frontend/src/__tests__/robotsTxt.test.ts` is the guard. It parses the file
+into groups the way a crawler does and asserts on the resulting *permissions*,
+because a substring test cannot answer the question being asked: `Googlebot`
+occurs inside `Google-Extended`, `Applebot` inside `Applebot-Extended`, and
+`Disallow: /` inside `Disallow: /profile`. It also pins the wildcard `Allow: /`
+— losing that takes the site out of every engine while every other test in the
+repo keeps passing, since nothing else here reads robots.txt.
+
+**The API origin needed its own file and had none.** `poemunity-backend.vercel.app`
+is a different origin, so the frontend file never reaches it — and
+`backend/vercel.json` routes `/(.*)` into the function, so a static copy there
+would never be served either. `GET /robots.txt` in `app.js` disallows
+everything: the API is JSON whose HTML already exists on the frontend, and that
+host carried **804,966 of 1,310,510** edge requests in the 30 days to
+2026-11-20 with no robots.txt at all (a missing file means "allow everything")
+**and no rate limiter on any GET route**. Server-to-server calls ignore
+robots.txt, so this cannot throttle our own SSR traffic the way an IP-keyed
+limit would.
+
+What it does not do: stop a scraper that ignores robots.txt — that needs a
+limiter, which has to exempt server-to-server calls or it 429s the site's own
+SSR (every such call shares Vercel's egress IP). The quota picture is in
+`TODO.md`.
+
 ## Poem of the week
 
 `GET /api/v1/poems/poem-of-the-week` returns one famous poem plus the Monday its
